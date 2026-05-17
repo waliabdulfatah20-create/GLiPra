@@ -95,6 +95,19 @@ jest.mock('react-native-mmkv', () => ({
   })),
 }));
 
+// Mock AsyncStorage
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  default: {
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    multiGet: jest.fn(),
+    multiSet: jest.fn(),
+    getAllKeys: jest.fn(),
+    clear: jest.fn(),
+  },
+}));
+
 // Global window object setup for React Native testing
 // @ts-expect-error
 global.window = {};

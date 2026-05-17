@@ -1,32 +1,36 @@
-import * as React from 'react';
-import { useMMKVString } from 'react-native-mmkv';
+import { useCallback, useEffect, useState } from 'react';
 
-import { storage } from '../storage';
+import { getItem, setItem } from '@/lib/storage';
 
 const SELECTED_THEME = 'SELECTED_THEME';
 export type ColorSchemeType = 'light' | 'dark' | 'system';
 /**
  * this hooks should only be used while selecting the theme
- * This hooks will return the selected theme which is stored in MMKV
+ * This hooks will return the selected theme which is stored in AsyncStorage
  * selectedTheme should be one of the following values 'light', 'dark' or 'system'
  */
 export function useSelectedTheme() {
-  const [theme, _setTheme] = useMMKVString(SELECTED_THEME, storage);
+  const [theme, setThemeState] = useState<ColorSchemeType | undefined>(undefined);
 
-  const setSelectedTheme = React.useCallback(
-    (t: ColorSchemeType) => {
-      _setTheme(t);
-    },
-    [_setTheme],
-  );
+  useEffect(() => {
+    getItem<ColorSchemeType>(SELECTED_THEME).then((value) => {
+      setThemeState(value ?? 'system');
+    });
+  }, []);
 
-  const selectedTheme = (theme ?? 'system') as ColorSchemeType;
+  const setSelectedTheme = useCallback((t: ColorSchemeType) => {
+    setThemeState(t);
+    setItem(SELECTED_THEME, t);
+  }, []);
+
+  const selectedTheme = theme ?? 'system';
   return { selectedTheme, setSelectedTheme } as const;
 }
-// to be used in the root file to load the selected theme from MMKV
-export function loadSelectedTheme() {
-  const theme = storage.getString(SELECTED_THEME);
-  if (theme !== undefined) {
+
+// to be used in the root file to load the selected theme from AsyncStorage
+export async function loadSelectedTheme() {
+  const theme = await getItem<ColorSchemeType>(SELECTED_THEME);
+  if (theme !== null) {
     console.log('theme', theme);
   }
 }

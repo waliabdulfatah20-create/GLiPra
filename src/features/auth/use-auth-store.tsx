@@ -1,49 +1,46 @@
-import type { TokenType } from '@/lib/auth/utils';
+import type { Session } from '@supabase/supabase-js';
 
 import { create } from 'zustand';
-import { getToken, removeToken, setToken } from '@/lib/auth/utils';
+
+import { supabase } from '@/lib/supabase';
 import { createSelectors } from '@/lib/utils';
 
 type AuthState = {
-  token: TokenType | null;
-  status: 'idle' | 'signOut' | 'signIn';
-  signIn: (data: TokenType) => void;
-  signOut: () => void;
-  hydrate: () => void;
+  session: Session | null;
+  status: 'idle' | 'signIn' | 'signOut';
+  setSession: (session: Session | null) => void;
+  hydrate: () => Promise<void>;
+  signOut: () => Promise<void>;
 };
 
 const _useAuthStore = create<AuthState>((set, get) => ({
   status: 'idle',
-  token: null,
-  signIn: (token) => {
-    setToken(token);
-    set({ status: 'signIn', token });
+  session: null,
+
+  setSession: (session) => {
+    set({
+      session,
+      status: session !== null ? 'signIn' : 'signOut',
+    });
   },
-  signOut: () => {
-    removeToken();
-    set({ status: 'signOut', token: null });
+
+  hydrate: async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    get().setSession(session);
   },
-  hydrate: () => {
-    try {
-      const userToken = getToken();
-      if (userToken !== null) {
-        get().signIn(userToken);
-      }
-      else {
-        get().signOut();
-      }
-    }
-    catch (e) {
-      // only to remove eslint error, handle the error properly
-      console.error(e);
-      // catch error here
-      // Maybe sign_out user!
-    }
+
+  signOut: async () => {
+    await supabase.auth.signOut();
+    // Supabase fires onAuthStateChange(SIGNED_OUT) → root layout calls setSession(null)
+    // Store updates automatically — no manual setState here.
   },
 }));
 
 export const useAuthStore = createSelectors(_useAuthStore);
 
-export const signOut = () => _useAuthStore.getState().signOut();
-export const signIn = (token: TokenType) => _useAuthStore.getState().signIn(token);
+// Module-level action exports for use outside components
 export const hydrateAuth = () => _useAuthStore.getState().hydrate();
+export const setSession = (session: Session | null) =>
+  _useAuthStore.getState().setSession(session);

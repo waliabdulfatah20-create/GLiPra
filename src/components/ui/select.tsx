@@ -1,4 +1,3 @@
-/* eslint-disable better-tailwindcss/no-unknown-classes */
 import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 import type { PressableProps } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
@@ -12,7 +11,6 @@ import { Platform, Pressable, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { tv } from 'tailwind-variants';
 
-import { useUniwind } from 'uniwind';
 import colors from '@/components/ui/colors';
 
 import { CaretDown } from '@/components/ui/icons';
@@ -71,8 +69,7 @@ function keyExtractor(item: OptionType) {
 export function Options({ ref, options, onSelect, value, testID }: OptionsProps & { ref?: React.RefObject<BottomSheetModal | null> }) {
   const height = options.length * 70 + 100;
   const snapPoints = React.useMemo(() => [height], [height]);
-  const { theme } = useUniwind();
-  const isDark = theme === 'dark';
+  const isDark = false;
 
   const renderSelectItem = React.useCallback(
     ({ item }: { item: OptionType }) => (
@@ -118,10 +115,9 @@ const Option = React.memo(
   }) => {
     return (
       <Pressable
-        className="flex-row items-center border-b border-neutral-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
         {...props}
       >
-        <Text className="flex-1 dark:text-neutral-100">{label}</Text>
+        <Text>{label}</Text>
         {selected && <Check />}
       </Pressable>
     );
@@ -179,30 +175,27 @@ export function Select(props: SelectProps) {
 
   return (
     <>
-      <View className={styles.container()}>
+      <View>
         {label && (
           <Text
             testID={testID ? `${testID}-label` : undefined}
-            className={styles.label()}
           >
             {label}
           </Text>
         )}
         <Pressable
-          className={styles.input()}
           disabled={disabled}
           onPress={modal.present}
           testID={testID ? `${testID}-trigger` : undefined}
         >
-          <View className="flex-1">
-            <Text className={styles.inputValue()}>{textValue}</Text>
+          <View>
+            <Text>{textValue}</Text>
           </View>
           <CaretDown />
         </Pressable>
         {error && (
           <Text
             testID={`${testID}-error`}
-            className="text-sm text-danger-300 dark:text-danger-600"
           >
             {error}
           </Text>
@@ -226,7 +219,6 @@ function Check({ ...props }: SvgProps) {
       fill="none"
       viewBox="0 0 25 24"
       {...props}
-      className="stroke-black dark:stroke-white"
     >
       <Path
         d="m20.256 6.75-10.5 10.5L4.506 12"

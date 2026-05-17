@@ -13,8 +13,6 @@ import { hydrateAuth } from '@/features/auth/use-auth-store';
 
 import { APIProvider } from '@/lib/api';
 import { loadSelectedTheme } from '@/lib/hooks/use-selected-theme';
-// Import  global CSS file
-import '../global.css';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -50,8 +48,6 @@ function Providers({ children }: { children: React.ReactNode }) {
   return (
     <GestureHandlerRootView
       style={styles.container}
-      // eslint-disable-next-line better-tailwindcss/no-unknown-classes
-      className={theme.dark ? `dark` : undefined}
     >
       <KeyboardProvider>
         <ThemeProvider value={theme}>

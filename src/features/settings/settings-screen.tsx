@@ -1,5 +1,4 @@
 import Env from 'env';
-import { useUniwind } from 'uniwind';
 
 import {
   colors,
@@ -18,9 +17,7 @@ import { ThemeItem } from './components/theme-item';
 
 export function SettingsScreen() {
   const signOut = useAuth.use.signOut();
-  const { theme } = useUniwind();
-  const iconColor
-    = theme === 'dark' ? colors.neutral[400] : colors.neutral[500];
+  const iconColor = colors.neutral[500];
   return (
     <>
       <FocusAwareStatusBar />

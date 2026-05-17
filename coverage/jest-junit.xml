@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="37" failures="0" errors="0" time="7.365">
+  <testsuite name="src\components\ui\input.test.tsx" errors="0" failures="0" skipped="0" timestamp="2026-05-17T08:31:21" time="3.337" tests="11">
+    <testcase classname="input component " name="renders correctly " time="0.04">
+    </testcase>
+    <testcase classname="input component " name="should use the right direction for rtl layout" time="0.004">
+    </testcase>
+    <testcase classname="input component " name="should use the right direction for ltr layout" time="0.003">
+    </testcase>
+    <testcase classname="input component " name="should render the placeholder correctly " time="0.004">
+    </testcase>
+    <testcase classname="input component " name="should render the label correctly " time="0.004">
+    </testcase>
+    <testcase classname="input component " name="should render the error message correctly " time="0.003">
+    </testcase>
+    <testcase classname="input component " name="should render the label, error message &amp; placeholder correctly " time="0.006">
+    </testcase>
+    <testcase classname="input component " name="should trigger onFocus event correctly " time="0.115">
+    </testcase>
+    <testcase classname="input component " name="should trigger onBlur event correctly " time="0.124">
+    </testcase>
+    <testcase classname="input component " name="should trigger onChangeText event correctly" time="0.155">
+    </testcase>
+    <testcase classname="input component " name="should be disabled when disabled prop is true" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="src\components\ui\button.test.tsx" errors="0" failures="0" skipped="0" timestamp="2026-05-17T08:31:21" time="4.045" tests="8">
+    <testcase classname="button component " name="should render correctly " time="0.055">
+    </testcase>
+    <testcase classname="button component " name="should render correctly if we add explicit child " time="0.004">
+    </testcase>
+    <testcase classname="button component " name="should render the label correctly" time="0.003">
+    </testcase>
+    <testcase classname="button component " name="should render the loading indicator correctly" time="0.016">
+    </testcase>
+    <testcase classname="button component " name="should call onClick handler when clicked" time="0.152">
+    </testcase>
+    <testcase classname="button component " name="should be disabled when loading" time="0.008">
+    </testcase>
+    <testcase classname="button component " name="should be disabled when disabled prop is true" time="0.002">
+    </testcase>
+    <testcase classname="button component " name="shouldn&apos;t call onClick when disabled" time="0.006">
+    </testcase>
+  </testsuite>
+  <testsuite name="src\components\ui\select.test.tsx" errors="0" failures="0" skipped="0" timestamp="2026-05-17T08:31:21" time="4.137" tests="5">
+    <testcase classname="select component " name="should render correctly " time="0.045">
+    </testcase>
+    <testcase classname="select component " name="should render the label correctly " time="0.009">
+    </testcase>
+    <testcase classname="select component " name="should render the error correctly " time="0.009">
+    </testcase>
+    <testcase classname="select component " name="should open options modal on press" time="0.172">
+    </testcase>
+    <testcase classname="select component " name="should call onSelect on selecting an option" time="0.321">
+    </testcase>
+  </testsuite>
+  <testsuite name="src\components\ui\checkbox.test.tsx" errors="0" failures="0" skipped="0" timestamp="2026-05-17T08:31:21" time="4.239" tests="9">
+    <testcase classname="checkbox, Radio &amp; Switch components " name="&lt;Checkbox /&gt; renders correctly and call on change on Press" time="0.205">
+    </testcase>
+    <testcase classname="checkbox, Radio &amp; Switch components " name="&lt;CheckBox/&gt; shouldn&apos;t change value while disabled" time="0.022">
+    </testcase>
+    <testcase classname="checkbox, Radio &amp; Switch components " name="&lt;CheckBox/&gt; Should render the correct label" time="0.016">
+    </testcase>
+    <testcase classname="checkbox, Radio &amp; Switch components " name="&lt;Radio /&gt; renders correctly and call on change on Press" time="0.148">
+    </testcase>
+    <testcase classname="checkbox, Radio &amp; Switch components " name="&lt;Radio /&gt; should render the correct label" time="0.168">
+    </testcase>
+    <testcase classname="checkbox, Radio &amp; Switch components " name="&lt;Radio/&gt; shouldn&apos;t change value while disabled" time="0.016">
+    </testcase>
+    <testcase classname="checkbox, Radio &amp; Switch components " name="&lt;Switch /&gt; renders correctly and call on change on Press" time="0.148">
+    </testcase>
+    <testcase classname="checkbox, Radio &amp; Switch components " name="&lt;Switch /&gt; should render the correct label" time="0.149">
+    </testcase>
+    <testcase classname="checkbox, Radio &amp; Switch components " name="&lt;Switch/&gt; shouldn&apos;t change value while disabled" time="0.017">
+    </testcase>
+  </testsuite>
+  <testsuite name="src\features\auth\components\login-form.test.tsx" errors="0" failures="0" skipped="0" timestamp="2026-05-17T08:31:21" time="5.629" tests="4">
+    <testcase classname="loginForm Form " name="renders correctly" time="0.032">
+    </testcase>
+    <testcase classname="loginForm Form " name="should display required error when values are empty" time="0.221">
+    </testcase>
+    <testcase classname="loginForm Form " name="should display matching error when email is invalid" time="0.399">
+    </testcase>
+    <testcase classname="loginForm Form " name="should call LoginForm with correct values when values are valid" time="0.556">
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,70 +1,67 @@
-> This project was generated from the [Obytes React Native Template](https://github.com/obytes/react-native-template-obytes), a production-ready React Native starter with modern tooling and best practices.
+# DosePath — Project-Local Claude Context
 
-## What: Technology Stack
+**This file documents the scaffold inside `dosepath/` and overrides the Obytes template defaults.**
 
-- **Expo SDK 54** with React Native 0.81.5 - Managed React Native development
-- **TypeScript** - Strict type safety throughout
-- **Expo Router 6** - File-based routing (like Next.js)
-- **TailwindCSS** via Uniwind/Nativewind - Utility-first styling for React Native
-- **Zustand** - Lightweight global state management
-- **React Query** - Server state and data fetching
-- **TanStack Form + Zod** - Type-safe form handling and validation
-- **MMKV** - Encrypted local storage
-- **Jest + React Testing Library** - Unit testing
+For the full product spec, architecture, and the 10 non-negotiable rules, see the project-root file:
+`../CLAUDE.md`
 
-## What: Project Structure
+---
 
-```
-src/
-├── app/              # Expo Router file-based routes (add new routes here)
-├── features/         # Feature modules - auth, feed, settings are EXAMPLES
-├── components/ui/    # Pre-built UI components (button, input, modal, etc.)
-├── lib/              # Pre-configured utilities (api, auth, i18n, storage)
-├── translations/     # i18n files (en.json, ar.json - add more languages)
-└── global.css        # TailwindCSS configuration
+## Stack (Actual — Scaffolded 2026-05-17)
 
-Root Files:
-├── env.ts           # Environment config (CUSTOMIZE bundle IDs, API URLs)
-├── app.config.ts    # Expo configuration
-└── README.md        # Project-specific documentation
-```
+| What | Choice |
+|---|---|
+| Framework | **Expo SDK 54** (newer than the spec's SDK 52 — accepted upgrade) |
+| Navigation | **Expo Router 6** (newer than spec's v3) |
+| Language | TypeScript strict |
+| Styling | **StyleSheet API + `src/theme/colors.ts`** — NativeWind/Tailwind STRIPPED |
+| Backend | Supabase (`@supabase/supabase-js` v2.105.4) |
+| State | Zustand (global) + React Query (server) |
+| Forms | TanStack Form + Zod (from Obytes) |
+| Persistence | **AsyncStorage** for Supabase sessions (NOT MMKV) — overrides Obytes default |
+| Date math | `date-fns` v4.1.0 only |
+| Testing | **Vitest** for pure-TS utils; **jest-expo** for components |
+| Package manager | **pnpm** v11.1.2 |
 
-## How: Development Workflow
+## Overrides vs Obytes Template Defaults
 
-**Essential Commands:**
+The Obytes template ships with several patterns that DosePath explicitly rejects:
+
+| Obytes Default | DosePath Override | Reason |
+|---|---|---|
+| NativeWind/Tailwind className styling | StyleSheet + `colors.ts` design tokens | CLAUDE.md Rule — no NativeWind |
+| MMKV for all persistence | AsyncStorage for Supabase sessions | Standard Supabase-RN pattern; MMKV reserved for non-auth sensitive data later |
+| `tailwind-variants` / `tailwind-merge` | Removed | Tailwind-specific; produce useless output without NativeWind |
+| Jest only | Vitest (utils) + jest-expo (components) | Rule 4 — safety code needs 90% coverage; Vitest is faster for pure-TS |
+| Inner `global.css` | Deleted | Tailwind artifact |
+
+## Supply Chain Posture
+
+- `pnpm install --ignore-scripts` for new dep installs
+- Audit baseline documented at `../docs/security/AUDIT-BASELINE.md`
+- 42 high vulns are dev-only transitive (Expo SDK 54 ecosystem state) — none reach production
+- Pinned scaffold tag: Obytes v9.0.0
+
+## Cost Posture
+
+- `EXPO_PUBLIC_USE_MOCK_AI=true` is the default (zero OpenAI spend)
+- All native-only packages deferred (RevenueCat, HealthKit, PostHog, Sentry) — added at first EAS dev build
+- Local Supabase via Docker (free)
+
+## Commands (pnpm, not npm)
+
 ```bash
-pnpm start              # Start dev server
-pnpm ios/android        # Run on platform
-pnpm lint               # ESLint check
-pnpm type-check         # TypeScript validation
-pnpm test               # Run Jest tests
-pnpm check-all          # All quality checks
+pnpm start                 # Start dev server
+pnpm test                  # Run jest-expo (component + integration tests)
+pnpm test:utils            # Run Vitest (pure TS safety code)
+pnpm test:utils:coverage   # Vitest with 90% coverage gate
+pnpm tsc --noEmit          # TypeScript check
+pnpm expo install <pkg>    # Add an Expo-compatible package
 ```
 
-**Environment-Specific:**
-```bash
-pnpm start:preview              # Preview environment
-pnpm ios:production             # Production iOS
-pnpm build:production:ios       # EAS production build
-```
+## Reading Priority
 
-## How: Key Patterns
-
-- **Create features**: New folder in `src/features/[your-feature]/` with screens, components, API hooks
-- **Add routes**: Create files in `src/app/` (file-based routing)
-- **Forms**: Use TanStack Form + Zod (see `src/features/auth/components/login-form.tsx`)
-- **Data fetching**: Use React Query (see `src/features/feed/api.ts`)
-- **Global state**: Use Zustand (see `src/features/auth/use-auth-store.tsx`)
-- **Styling**: NativeWind/Tailwind classes (see `src/components/ui/button.tsx`)
-- **Storage**: Use MMKV via `src/lib/storage.tsx` for sensitive data
-- **Imports**: Always use `@/` prefix, never relative imports
-
-## How: Essential Rules
-
-- ✅ **DO** use absolute imports: `@/components/ui/button`
-- ✅ **DO** follow feature-based structure: `src/features/[name]/`
-- ✅ **DO** use TanStack Form for forms (not react-hook-form)
-- ✅ **DO** use MMKV storage for sensitive data (not AsyncStorage)
-- ✅ **DO** use EAS Build for production: `pnpm build:production:ios`
-- ✅ **DO** prefix env vars with `EXPO_PUBLIC_*` for app access
-- ❌ **DO NOT** modify `android/` or `ios/` directly (use Expo config plugins)
+When a question arises:
+1. **Project-root `../CLAUDE.md`** — authoritative for product/clinical/legal rules
+2. **This file** — authoritative for scaffold state and Obytes overrides
+3. **Obytes template README** — descriptive only; treat as default that may be overridden

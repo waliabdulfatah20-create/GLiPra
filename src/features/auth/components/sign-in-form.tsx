@@ -232,13 +232,19 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: 12,
+    // @ts-expect-error borderCurve
+    borderCurve: 'continuous',
     paddingHorizontal: 14,
     paddingVertical: 13,
     fontSize: 15,
     color: colors.textPrimary,
+    // @ts-expect-error boxShadow string form
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
   },
   inputFocused: {
     borderColor: colors.borderFocus,
+    // @ts-expect-error boxShadow string form
+    boxShadow: '0 0 0 3px rgba(45,107,228,0.12)',
   },
   inputError: {
     borderColor: colors.error,

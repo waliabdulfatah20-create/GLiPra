@@ -26,6 +26,11 @@ yarn-debug.*
 yarn-error.*
 error.txt
 output.txt
+*.log
+
+# test artifacts
+coverage/
+.nyc_output/
 
 # macOS
 .DS_Store

@@ -7,9 +7,8 @@ import {
 } from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
 import * as React from 'react';
-import { Platform, Pressable, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { tv } from 'tailwind-variants';
 
 import colors from '@/components/ui/colors';
 
@@ -17,37 +16,42 @@ import { CaretDown } from '@/components/ui/icons';
 import { Modal, useModal } from './modal';
 import { Text } from './text';
 
-const selectTv = tv({
-  slots: {
-    container: 'mb-4',
-    label: 'text-grey-100 mb-1 text-lg dark:text-neutral-100',
-    input:
-      'border-grey-50 mt-0 flex-row items-center justify-center rounded-xl border-[0.5px] p-3 dark:border-neutral-500 dark:bg-neutral-800',
-    inputValue: 'dark:text-neutral-100',
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 16,
   },
-
-  variants: {
-    focused: {
-      true: {
-        input: 'border-neutral-600',
-      },
-    },
-    error: {
-      true: {
-        input: 'border-danger-600',
-        label: 'text-danger-600 dark:text-danger-600',
-        inputValue: 'text-danger-600',
-      },
-    },
-    disabled: {
-      true: {
-        input: 'bg-neutral-200',
-      },
-    },
+  label: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 4,
   },
-  defaultVariants: {
-    error: false,
-    disabled: false,
+  input: {
+    marginTop: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 12,
+    borderWidth: 0.5,
+    borderColor: colors.neutral[300],
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    backgroundColor: colors.neutral[100],
+  },
+  inputFocused: {
+    borderColor: colors.neutral[600],
+  },
+  inputError: {
+    borderColor: colors.danger[600],
+  },
+  inputDisabled: {
+    backgroundColor: colors.neutral[200],
+  },
+  inputValue: {
+    flex: 1,
+  },
+  errorText: {
+    fontSize: 14,
+    color: colors.danger[600],
   },
 });
 
@@ -156,15 +160,6 @@ export function Select(props: SelectProps) {
     [modal, onSelect],
   );
 
-  const styles = React.useMemo(
-    () =>
-      selectTv({
-        error: Boolean(error),
-        disabled,
-      }),
-    [error, disabled],
-  );
-
   const textValue = React.useMemo(
     () =>
       value !== undefined
@@ -173,12 +168,19 @@ export function Select(props: SelectProps) {
     [value, options, placeholder],
   );
 
+  const inputStyle = [
+    styles.input,
+    error && styles.inputError,
+    disabled && styles.inputDisabled,
+  ];
+
   return (
     <>
-      <View>
+      <View style={styles.container}>
         {label && (
           <Text
             testID={testID ? `${testID}-label` : undefined}
+            style={styles.label}
           >
             {label}
           </Text>
@@ -187,8 +189,9 @@ export function Select(props: SelectProps) {
           disabled={disabled}
           onPress={modal.present}
           testID={testID ? `${testID}-trigger` : undefined}
+          style={inputStyle}
         >
-          <View>
+          <View style={styles.inputValue}>
             <Text>{textValue}</Text>
           </View>
           <CaretDown />
@@ -196,6 +199,7 @@ export function Select(props: SelectProps) {
         {error && (
           <Text
             testID={`${testID}-error`}
+            style={styles.errorText}
           >
             {error}
           </Text>

@@ -1,24 +1,35 @@
 import * as React from 'react';
 import { useImperativeHandle } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { twMerge } from 'tailwind-merge';
 
 type Props = {
   initialProgress?: number;
-  className?: string;
+  style?: object;
 };
 
 export type ProgressBarRef = {
   setProgress: (value: number) => void;
 };
 
-export function ProgressBar({ ref, initialProgress = 0, className = '' }: Props & { ref?: React.RefObject<ProgressBarRef | null> }) {
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#EAEAEA',
+    height: 2,
+    overflow: 'hidden',
+  },
+  bar: {
+    height: 2,
+    backgroundColor: '#000',
+  },
+});
+
+export function ProgressBar({ ref, initialProgress = 0, style: customStyle }: Props & { ref?: React.RefObject<ProgressBarRef | null> }) {
   const progress = useSharedValue<number>(initialProgress ?? 0);
   useImperativeHandle(ref, () => {
     return {
@@ -31,16 +42,15 @@ export function ProgressBar({ ref, initialProgress = 0, className = '' }: Props 
     };
   }, [progress]);
 
-  const style = useAnimatedStyle(() => {
+  const animatedStyle = useAnimatedStyle(() => {
     return {
       width: `${progress.value}%`,
-      backgroundColor: '#000',
-      height: 2,
     };
   });
+
   return (
-    <View className={twMerge(`bg-[#EAEAEA]`, className)}>
-      <Animated.View style={style} />
+    <View style={[styles.container, customStyle]}>
+      <Animated.View style={[styles.bar, animatedStyle]} />
     </View>
   );
 }

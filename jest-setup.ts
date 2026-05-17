@@ -39,8 +39,14 @@ jest.mock('react-native-reanimated', () => {
     },
     FadeIn: { duration: jest.fn(() => ({})) },
     FadeOut: { duration: jest.fn(() => ({})) },
-    FadeInDown: { duration: jest.fn(() => ({})) },
-    FadeInUp: { duration: jest.fn(() => ({})) },
+    FadeInDown: {
+      duration: jest.fn(() => ({ delay: jest.fn(() => ({})) })),
+      delay: jest.fn(() => ({ duration: jest.fn(() => ({})) })),
+    },
+    FadeInUp: {
+      duration: jest.fn(() => ({ delay: jest.fn(() => ({})) })),
+      delay: jest.fn(() => ({ duration: jest.fn(() => ({})) })),
+    },
     FadeInLeft: { duration: jest.fn(() => ({})) },
     FadeInRight: { duration: jest.fn(() => ({})) },
     SlideInDown: { duration: jest.fn(() => ({})) },
@@ -48,6 +54,7 @@ jest.mock('react-native-reanimated', () => {
     SlideInLeft: { duration: jest.fn(() => ({})) },
     SlideInRight: { duration: jest.fn(() => ({})) },
     Layout: {},
+    LinearTransition: {},
     Keyframe: jest.fn(),
   };
 });
@@ -96,16 +103,28 @@ jest.mock('react-native-mmkv', () => ({
 }));
 
 // Mock AsyncStorage
-jest.mock('@react-native-async-storage/async-storage', () => ({
-  default: {
-    getItem: jest.fn(),
-    setItem: jest.fn(),
-    removeItem: jest.fn(),
-    multiGet: jest.fn(),
-    multiSet: jest.fn(),
-    getAllKeys: jest.fn(),
-    clear: jest.fn(),
-  },
+jest.mock('@react-native-async-storage/async-storage', () => {
+  const mock = {
+    getItem: jest.fn(() => Promise.resolve(null)),
+    setItem: jest.fn(() => Promise.resolve()),
+    removeItem: jest.fn(() => Promise.resolve()),
+    multiGet: jest.fn(() => Promise.resolve([])),
+    multiSet: jest.fn(() => Promise.resolve()),
+    getAllKeys: jest.fn(() => Promise.resolve([])),
+    clear: jest.fn(() => Promise.resolve()),
+  };
+  return {
+    __esModule: true,
+    default: mock,
+  };
+});
+
+// Mock src/lib/storage so getItem returns null (not a Promise) during module init.
+// This prevents i18n from receiving a Promise object as the `lng` parameter.
+jest.mock('./src/lib/storage', () => ({
+  getItem: jest.fn(() => null),
+  setItem: jest.fn(() => Promise.resolve()),
+  removeItem: jest.fn(() => Promise.resolve()),
 }));
 
 // Global window object setup for React Native testing

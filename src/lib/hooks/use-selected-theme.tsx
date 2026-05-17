@@ -28,9 +28,6 @@ export function useSelectedTheme() {
 }
 
 // to be used in the root file to load the selected theme from AsyncStorage
-export async function loadSelectedTheme() {
-  const theme = await getItem<ColorSchemeType>(SELECTED_THEME);
-  if (theme !== null) {
-    console.log('theme', theme);
-  }
+export async function loadSelectedTheme(): Promise<ColorSchemeType | null> {
+  return getItem<ColorSchemeType>(SELECTED_THEME);
 }

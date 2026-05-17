@@ -47,7 +47,7 @@ export function useSelectedLanguage() {
 
   useEffect(() => {
     getItem<Language>(LOCAL).then((value) => {
-      if (value !== null) setLang(value);
+      setLang(value ?? 'en');
     });
   }, []);
 
@@ -55,11 +55,10 @@ export function useSelectedLanguage() {
     (lang: Language) => {
       setLang(lang);
       setItem(LOCAL, lang);
-      if (lang !== undefined)
-        changeLanguage(lang as Language);
+      changeLanguage(lang);
     },
     [],
   );
 
-  return { language: language as Language, setLanguage };
+  return { language: language ?? 'en', setLanguage };
 }

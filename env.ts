@@ -17,6 +17,11 @@ const envSchema = z.object({
 
   // only available for app.config.ts usage
   APP_BUILD_ONLY_VAR: z.string().optional(),
+
+  // === DosePath-specific vars ===
+  EXPO_PUBLIC_SUPABASE_URL: z.string().url().or(z.literal('')).optional(),
+  EXPO_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
+  EXPO_PUBLIC_USE_MOCK_AI: z.enum(['true', 'false']).default('true'),
 });
 
 // Config records per environment
@@ -59,6 +64,11 @@ const _env: z.infer<typeof envSchema> = {
   EXPO_PUBLIC_VAR_NUMBER: Number(process.env.EXPO_PUBLIC_VAR_NUMBER ?? 0),
   EXPO_PUBLIC_VAR_BOOL: process.env.EXPO_PUBLIC_VAR_BOOL === 'true',
   APP_BUILD_ONLY_VAR: process.env.APP_BUILD_ONLY_VAR,
+
+  // === DosePath vars ===
+  EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL ?? '',
+  EXPO_PUBLIC_SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
+  EXPO_PUBLIC_USE_MOCK_AI: (process.env.EXPO_PUBLIC_USE_MOCK_AI ?? 'true') as 'true' | 'false',
 };
 
 function getValidatedEnv(env: z.infer<typeof envSchema>) {

@@ -1,13 +1,24 @@
-import { useMMKVBoolean } from 'react-native-mmkv';
+import { useCallback, useEffect, useState } from 'react';
 
-import { storage } from '../storage';
+import { getItem, setItem } from '@/lib/storage';
 
 const IS_FIRST_TIME = 'IS_FIRST_TIME';
 
 export function useIsFirstTime() {
-  const [isFirstTime, setIsFirstTime] = useMMKVBoolean(IS_FIRST_TIME, storage);
-  if (isFirstTime === undefined) {
-    return [true, setIsFirstTime] as const;
-  }
-  return [isFirstTime, setIsFirstTime] as const;
+  const [isFirstTime, setIsFirstTimeState] = useState<boolean | undefined>(undefined);
+
+  useEffect(() => {
+    getItem<boolean>(IS_FIRST_TIME).then((value) => {
+      // null means key not set — treat as first time
+      setIsFirstTimeState(value ?? true);
+    });
+  }, []);
+
+  const setIsFirstTime = useCallback((value: boolean) => {
+    setIsFirstTimeState(value);
+    setItem(IS_FIRST_TIME, value);
+  }, []);
+
+  // While loading from storage, default to `true` so no redirect fires prematurely
+  return [isFirstTime ?? true, setIsFirstTime] as const;
 }

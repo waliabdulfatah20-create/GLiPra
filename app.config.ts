@@ -8,8 +8,8 @@ import 'tsx/cjs';
 // eslint-disable-next-line perfectionist/sort-imports
 import Env from './env';
 
-const EXPO_ACCOUNT_OWNER = 'obytes';
-const EAS_PROJECT_ID = 'c3e1075b-6fe7-4686-aa49-35b46a229044';
+const EXPO_ACCOUNT_OWNER = 'waliabdul';
+const EAS_PROJECT_ID = '046b4b41-452b-4b54-94ae-9ab38736222c';
 
 const appIconBadgeConfig: AppIconBadgeConfig = {
   enabled: Env.EXPO_PUBLIC_APP_ENV !== 'production',
@@ -33,7 +33,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   description: `${Env.EXPO_PUBLIC_NAME} Mobile App`,
   owner: EXPO_ACCOUNT_OWNER,
   scheme: Env.EXPO_PUBLIC_SCHEME,
-  slug: 'dosepath',
+  slug: 'glipra',
   version: Env.EXPO_PUBLIC_VERSION.toString(),
   orientation: 'portrait',
   icon: './assets/icon.png',
@@ -41,6 +41,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   newArchEnabled: true,
   updates: {
     fallbackToCacheTimeout: 0,
+    url: `https://u.expo.dev/${EAS_PROJECT_ID}`,
+  },
+  runtimeVersion: {
+    policy: 'appVersion',
   },
   assetBundlePatterns: ['**/*'],
   ios: {
@@ -116,6 +120,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-router',
     ['app-icon-badge', appIconBadgeConfig],
     ['react-native-edge-to-edge'],
+    '@sentry/react-native',
+    '@react-native-community/datetimepicker',
   ],
   extra: {
     eas: {

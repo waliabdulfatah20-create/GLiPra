@@ -4,9 +4,7 @@ import type { RecursiveKeyOf } from './types';
 import i18n from 'i18next';
 import memoize from 'lodash.memoize';
 import { useCallback, useEffect, useState } from 'react';
-import { I18nManager, NativeModules, Platform } from 'react-native';
-
-import RNRestart from 'react-native-restart';
+import { I18nManager } from 'react-native';
 
 import { getItem, setItem } from '@/lib/storage';
 
@@ -28,18 +26,13 @@ export function changeLanguage(lang: Language) {
   i18n.changeLanguage(lang);
   if (lang === 'ar') {
     I18nManager.forceRTL(true);
-  }
-  else {
+  } else {
     I18nManager.forceRTL(false);
   }
-  if (Platform.OS === 'ios' || Platform.OS === 'android') {
-    if (__DEV__)
-      NativeModules.DevSettings.reload();
-    else RNRestart.restart();
-  }
-  else if (Platform.OS === 'web') {
-    window.location.reload();
-  }
+  // Clear memoize cache so translate() calls outside hooks return updated strings.
+  // No restart needed — i18n.changeLanguage() triggers re-renders on all
+  // useTranslation() consumers automatically via react-i18next.
+  translate.cache.clear?.();
 }
 
 export function useSelectedLanguage() {
@@ -54,8 +47,8 @@ export function useSelectedLanguage() {
   const setLanguage = useCallback(
     (lang: Language) => {
       setLang(lang);
-      setItem(LOCAL, lang);
-      changeLanguage(lang);
+      setItem(LOCAL, lang); // fire-and-forget — no restart, no race condition
+      changeLanguage(lang); // triggers immediate re-render via i18next reactivity
     },
     [],
   );

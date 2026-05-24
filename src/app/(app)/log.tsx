@@ -1,0 +1,483 @@
+// Log Hub Screen — food logging entry point.
+// Route: /(app)/log
+// Provides Manual entry, Barcode scanning, and AI Photo modes.
+// Barcode scanning is always free (never paywalled).
+// AI Photo Recognition is Pro-only (gated via PhotoCaptureButton → ProGate).
+// DisclaimerBanner tier={2} required per Rule 8 (clinical screen).
+
+import * as React from 'react';
+import {
+  FlatList,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { useTranslation } from 'react-i18next';
+
+import { BarcodeScannerSheet } from '@/components/log/barcode-scanner-sheet';
+import { PhotoCaptureButton } from '@/components/log/photo-capture-button';
+import { ManualEntryForm } from '@/components/log/manual-entry-form';
+import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
+import type { BarcodeProduct } from '@/features/food-log/barcode-lookup';
+import { DailyMacroCard } from '@/features/food-log/daily-macro-card';
+import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useTodayFoodLogs } from '@/features/food-log/hooks';
+import { PhotoReviewSheet } from '@/features/food-log/photo-review-sheet';
+import type { FoodLogEntry, ManualFoodEntry } from '@/features/food-log/types';
+import { colors, radius, spacing } from '@/theme/colors';
+
+type LogMode = 'manual' | 'barcode' | 'photo';
+
+export default function LogScreen() {
+  const { t } = useTranslation();
+  const [mode, setMode] = React.useState<LogMode>('manual');
+  const [scannerVisible, setScannerVisible] = React.useState(false);
+
+  const { logs, isLoading: logsLoading } = useTodayFoodLogs();
+  const { mutate: insertManual, isLoading: insertingManual } = useInsertFoodLog();
+  const { mutate: insertBarcode, isLoading: insertingBarcode } = useInsertBarcodeFoodLog();
+  const {
+    recognize,
+    pendingResult,
+    clearPending,
+    isLoading: recognizing,
+  } = usePhotoFoodLog();
+
+  function handleManualSubmit(entry: ManualFoodEntry) {
+    insertManual(entry);
+  }
+
+  function handleBarcodeMode() {
+    setMode('barcode');
+    setScannerVisible(true);
+  }
+
+  function handlePhotoMode() {
+    setMode('photo');
+  }
+
+  function handleProductFound(product: BarcodeProduct) {
+    insertBarcode({
+      name: product.name,
+      servingDescription: product.servingDescription,
+      proteinG: product.proteinG,
+      fiberG: product.fiberG ?? undefined,
+      caloriesKcal: product.caloriesKcal ?? undefined,
+      barcodeEan: product.ean,
+    });
+  }
+
+  function handleScannerClose() {
+    setScannerVisible(false);
+    setMode('manual');
+  }
+
+  function handlePhotoReviewClose() {
+    clearPending();
+    // Stay on photo mode so user can take another photo
+  }
+
+  const totalProteinToday = logs.reduce((sum, entry) => sum + entry.proteinG, 0);
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <FlatList
+        data={logs}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={
+          <>
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={styles.headerTitle}>{t('log.title')}</Text>
+              {logs.length > 0 && (
+                <Text style={styles.headerSubtitle}>
+                  {t('log.protein_today', { amount: totalProteinToday.toFixed(1) })}
+                </Text>
+              )}
+            </View>
+
+            {/* Daily macro summary card — shown when there are entries today */}
+            {logs.length > 0 && <DailyMacroCard />}
+
+            {/* Mode toggle — Manual | Barcode | Photo */}
+            <View style={styles.modeToggleRow}>
+              <Pressable
+                style={[styles.modeButton, mode === 'manual' && styles.modeButtonActive]}
+                onPress={() => setMode('manual')}
+                accessibilityRole="button"
+                accessibilityLabel="Manual entry mode"
+                accessibilityState={{ selected: mode === 'manual' }}
+              >
+                <Text
+                  style={[
+                    styles.modeButtonText,
+                    mode === 'manual' && styles.modeButtonTextActive,
+                  ]}
+                >
+                  {t('log.mode_manual')}
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.modeButton, mode === 'barcode' && styles.modeButtonActive]}
+                onPress={handleBarcodeMode}
+                accessibilityRole="button"
+                accessibilityLabel="Barcode scanner mode"
+                accessibilityState={{ selected: mode === 'barcode' }}
+              >
+                <Text
+                  style={[
+                    styles.modeButtonText,
+                    mode === 'barcode' && styles.modeButtonTextActive,
+                  ]}
+                >
+                  {t('log.mode_barcode')}
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.modeButton, mode === 'photo' && styles.modeButtonActive]}
+                onPress={handlePhotoMode}
+                accessibilityRole="button"
+                accessibilityLabel="AI photo recognition mode (Pro)"
+                accessibilityState={{ selected: mode === 'photo' }}
+              >
+                <Text
+                  style={[
+                    styles.modeButtonText,
+                    mode === 'photo' && styles.modeButtonTextActive,
+                  ]}
+                >
+                  {t('log.mode_photo')}
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* Manual entry form */}
+            {mode === 'manual' && (
+              <ManualEntryForm
+                onSubmit={handleManualSubmit}
+                isLoading={insertingManual || insertingBarcode}
+              />
+            )}
+
+            {/* AI Photo mode — PhotoCaptureButton wrapped in ProGate internally */}
+            {mode === 'photo' && (
+              <View style={styles.photoModeContainer}>
+                <PhotoCaptureButton
+                  onImageSelected={(base64, mimeType) => recognize(base64, mimeType)}
+                  isLoading={recognizing}
+                />
+                <Text style={styles.photoHint}>{t('log.photo_hint')}</Text>
+              </View>
+            )}
+
+            {/* Today's log section header */}
+            {logs.length > 0 && (
+              <Text style={styles.sectionTitle}>{t('log.todays_log')}</Text>
+            )}
+
+            {logsLoading && logs.length === 0 && (
+              <Text style={styles.emptyText}>{t('log.loading')}</Text>
+            )}
+
+            {!logsLoading && logs.length === 0 && (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyStateIcon}>🍽</Text>
+                <Text style={styles.emptyStateTitle}>{t('log.nothing_logged')}</Text>
+                <Text style={styles.emptyStateBody}>{t('log.nothing_logged_body')}</Text>
+              </View>
+            )}
+          </>
+        }
+        renderItem={({ item }) => <FoodLogRow entry={item} />}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ListFooterComponent={
+          <View style={styles.footer}>
+            <DisclaimerBanner tier={2}>
+              <Text style={styles.disclaimerText}>{t('log.disclaimer')}</Text>
+            </DisclaimerBanner>
+          </View>
+        }
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+      />
+
+      {/* Barcode scanner sheet */}
+      <BarcodeScannerSheet
+        visible={scannerVisible}
+        onClose={handleScannerClose}
+        onProductFound={handleProductFound}
+      />
+
+      {/* Photo review sheet — slides up after AI recognition */}
+      <PhotoReviewSheet
+        result={pendingResult}
+        onClose={handlePhotoReviewClose}
+      />
+    </SafeAreaView>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Sub-component: FoodLogRow
+// ---------------------------------------------------------------------------
+interface FoodLogRowProps {
+  entry: FoodLogEntry;
+}
+
+function FoodLogRow({ entry }: FoodLogRowProps) {
+  const { t } = useTranslation();
+  const sourceBadgeStyle =
+    entry.source === 'barcode'
+      ? styles.sourceBadgeBarcode
+      : entry.source === 'photo'
+        ? styles.sourceBadgePhoto
+        : styles.sourceBadgeManual;
+  const sourceBadgeTextStyle =
+    entry.source === 'barcode'
+      ? styles.sourceBadgeTextBarcode
+      : entry.source === 'photo'
+        ? styles.sourceBadgeTextPhoto
+        : styles.sourceBadgeTextManual;
+
+  return (
+    <View style={styles.logRow}>
+      <View style={styles.logRowLeft}>
+        <Text style={styles.logRowName} numberOfLines={1}>
+          {entry.name}
+        </Text>
+        <Text style={styles.logRowServing} numberOfLines={1}>
+          {entry.servingDescription}
+        </Text>
+        <View style={styles.logRowBadgeRow}>
+          <View style={[styles.sourceBadge, sourceBadgeStyle]}>
+            <Text style={[styles.sourceBadgeText, sourceBadgeTextStyle]}>
+              {entry.source === 'photo' ? t('log.source_ai') : entry.source === 'barcode' ? t('log.source_barcode') : t('log.source_manual')}
+            </Text>
+          </View>
+          {/* Show carbs + fat inline if available */}
+          {(entry.carbsG != null || entry.fatG != null) && (
+            <Text style={styles.logRowMacroHint}>
+              {[
+                entry.carbsG != null && `${entry.carbsG.toFixed(0)}g carbs`,
+                entry.fatG != null && `${entry.fatG.toFixed(0)}g fat`,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </Text>
+          )}
+        </View>
+      </View>
+
+      <View style={styles.logRowRight}>
+        <Text style={styles.logRowProtein}>{entry.proteinG.toFixed(1)}g</Text>
+        <Text style={styles.logRowProteinLabel}>protein</Text>
+        {entry.caloriesKcal != null && (
+          <Text style={styles.logRowCalories}>{entry.caloriesKcal.toFixed(0)} kcal</Text>
+        )}
+      </View>
+    </View>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Styles
+// ---------------------------------------------------------------------------
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  listContent: {
+    paddingBottom: spacing.xl,
+  },
+  header: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: colors.textPrimary,
+    letterSpacing: -0.5,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: colors.primary,
+    fontWeight: '600',
+    marginTop: spacing.xs,
+  },
+  modeToggleRow: {
+    flexDirection: 'row',
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    backgroundColor: colors.gray100,
+    borderRadius: radius.lg,
+    padding: 4,
+    gap: 4,
+  },
+  modeButton: {
+    flex: 1,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    alignItems: 'center',
+  },
+  modeButtonActive: {
+    backgroundColor: colors.white,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  modeButtonText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.textSecondary,
+  },
+  modeButtonTextActive: {
+    color: colors.textPrimary,
+    fontWeight: '700',
+  },
+  photoModeContainer: {
+    alignItems: 'center',
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.md,
+    gap: spacing.sm,
+  },
+  photoHint: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 19,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+    marginHorizontal: spacing.md,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: colors.textDisabled,
+    textAlign: 'center',
+    marginTop: spacing.xl,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingTop: spacing.xl,
+    paddingHorizontal: spacing.xl,
+    gap: spacing.sm,
+  },
+  emptyStateIcon: {
+    fontSize: 40,
+  },
+  emptyStateTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.textPrimary,
+  },
+  emptyStateBody: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginHorizontal: spacing.md,
+  },
+  logRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surface,
+  },
+  logRowLeft: {
+    flex: 1,
+    gap: 2,
+  },
+  logRowName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+  logRowServing: {
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
+  logRowBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: 4,
+  },
+  sourceBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: radius.sm,
+  },
+  sourceBadgeManual: {
+    backgroundColor: colors.gray100,
+  },
+  sourceBadgeBarcode: {
+    backgroundColor: colors.primaryLight,
+  },
+  sourceBadgePhoto: {
+    backgroundColor: colors.primary + '18',
+    borderWidth: 1,
+    borderColor: colors.primary + '40',
+  },
+  sourceBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
+  sourceBadgeTextManual: {
+    color: colors.textSecondary,
+  },
+  sourceBadgeTextBarcode: {
+    color: colors.primary,
+  },
+  sourceBadgeTextPhoto: {
+    color: colors.primary,
+  },
+  logRowMacroHint: {
+    fontSize: 11,
+    color: colors.textDisabled,
+  },
+  logRowRight: {
+    alignItems: 'flex-end',
+    gap: 2,
+  },
+  logRowProtein: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.proteinGood,
+  },
+  logRowProteinLabel: {
+    fontSize: 11,
+    color: colors.textSecondary,
+  },
+  logRowCalories: {
+    fontSize: 12,
+    color: colors.textDisabled,
+    marginTop: 2,
+  },
+  footer: {
+    marginTop: spacing.lg,
+  },
+  disclaimerText: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    lineHeight: 17,
+  },
+});

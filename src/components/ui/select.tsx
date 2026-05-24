@@ -11,6 +11,7 @@ import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import colors from '@/components/ui/colors';
+import { colors as themeColors } from '@/theme/colors';
 
 import { CaretDown } from '@/components/ui/icons';
 import { Modal, useModal } from './modal';
@@ -55,9 +56,52 @@ const styles = StyleSheet.create({
   },
 });
 
+const optionStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: themeColors.border,
+  },
+  rowPressed: {
+    backgroundColor: themeColors.primaryLight,
+  },
+  label: {
+    fontSize: 16,
+    color: themeColors.textPrimary,
+  },
+  labelSelected: {
+    fontWeight: '600',
+    color: themeColors.primary,
+  },
+  // Non-selectable section header inside the dropdown list
+  headerRow: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: themeColors.border,
+  },
+  headerLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1,
+    color: themeColors.primary,
+    textTransform: 'uppercase',
+  },
+});
+
 const List = Platform.OS === 'web' ? FlashList : BottomSheetFlatList;
 
-export type OptionType = { label: string; value: string | number };
+export type OptionType = {
+  label: string;
+  value: string | number;
+  /** When true, renders as a non-pressable section header inside the dropdown. */
+  disabled?: boolean;
+};
 
 type OptionsProps = {
   options: OptionType[];
@@ -71,20 +115,31 @@ function keyExtractor(item: OptionType) {
 }
 
 export function Options({ ref, options, onSelect, value, testID }: OptionsProps & { ref?: React.RefObject<BottomSheetModal | null> }) {
-  const height = options.length * 70 + 100;
+  // Headers count as shorter rows (~36px); selectable rows are ~70px each.
+  const height = options.reduce((sum, o) => sum + (o.disabled ? 36 : 70), 0) + 100;
   const snapPoints = React.useMemo(() => [height], [height]);
   const isDark = false;
 
   const renderSelectItem = React.useCallback(
-    ({ item }: { item: OptionType }) => (
-      <Option
-        key={`select-item-${item.value}`}
-        label={item.label}
-        selected={value === item.value}
-        onPress={() => onSelect(item)}
-        testID={testID ? `${testID}-item-${item.value}` : undefined}
-      />
-    ),
+    ({ item }: { item: OptionType }) => {
+      if (item.disabled) {
+        // Non-selectable section header
+        return (
+          <View style={optionStyles.headerRow}>
+            <Text style={optionStyles.headerLabel}>{item.label}</Text>
+          </View>
+        );
+      }
+      return (
+        <Option
+          key={`select-item-${item.value}`}
+          label={item.label}
+          selected={value === item.value}
+          onPress={() => onSelect(item)}
+          testID={testID ? `${testID}-item-${item.value}` : undefined}
+        />
+      );
+    },
     [onSelect, value, testID],
   );
 
@@ -119,10 +174,16 @@ const Option = React.memo(
   }) => {
     return (
       <Pressable
+        style={({ pressed }) => [
+          optionStyles.row,
+          pressed && optionStyles.rowPressed,
+        ]}
         {...props}
       >
-        <Text>{label}</Text>
-        {selected && <Check />}
+        <Text style={[optionStyles.label, selected && optionStyles.labelSelected]}>
+          {label}
+        </Text>
+        {selected && <Check stroke={themeColors.primary} />}
       </Pressable>
     );
   },
@@ -163,7 +224,9 @@ export function Select(props: SelectProps) {
   const textValue = React.useMemo(
     () =>
       value !== undefined
-        ? (options?.filter(t => t.value === value)?.[0]?.label ?? placeholder)
+        // Exclude disabled/header items from label resolution so they never
+        // show as the selected value in the trigger button.
+        ? (options?.filter(t => !t.disabled && t.value === value)?.[0]?.label ?? placeholder)
         : placeholder,
     [value, options, placeholder],
   );

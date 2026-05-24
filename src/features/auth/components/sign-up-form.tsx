@@ -13,6 +13,8 @@ import Animated, { FadeInDown, FadeInUp, LinearTransition } from 'react-native-r
 import { useForm } from '@tanstack/react-form';
 import * as z from 'zod';
 
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/ui';
 import { getFieldError } from '@/components/ui/form-utils';
 import { colors } from '@/theme/colors';
@@ -82,6 +84,7 @@ function PasswordStrengthBar({ password }: { password: string }) {
 
 export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [passwordValue, setPasswordValue] = useState('');
   const [appleAvailable, setAppleAvailable] = useState(false);
@@ -103,8 +106,8 @@ export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
       entering={FadeInUp.duration(400)}
       style={styles.container}
     >
-      <Text style={styles.heading}>Create account</Text>
-      <Text style={styles.subheading}>Join DosePath — it's free</Text>
+      <Text style={styles.heading}>{t('auth.sign_up_heading')}</Text>
+      <Text style={styles.subheading}>{t('auth.sign_up_subheading')}</Text>
 
       {apiError ? (
         <Animated.View entering={FadeInDown.duration(200)} style={styles.apiErrorBox}>
@@ -118,7 +121,7 @@ export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
           const error = getFieldError(field);
           return (
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>EMAIL</Text>
+              <Text style={styles.label}>{t('auth.email_label')}</Text>
               <TextInput
                 testID="sign-up-email"
                 value={field.state.value}
@@ -152,7 +155,7 @@ export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
           const error = getFieldError(field);
           return (
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>PASSWORD</Text>
+              <Text style={styles.label}>{t('auth.password_label')}</Text>
               <TextInput
                 testID="sign-up-password"
                 value={field.state.value}
@@ -187,7 +190,7 @@ export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
         children={([isSubmitting]) => (
           <Button
             testID="sign-up-submit"
-            label="Create Account"
+            label={t('auth.sign_up')}
             onPress={form.handleSubmit}
             loading={isSubmitting}
           />
@@ -205,9 +208,9 @@ export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
       )}
 
       <View style={styles.crossLink}>
-        <Text style={styles.crossLinkText}>Already have an account? </Text>
+        <Text style={styles.crossLinkText}>{t('auth.have_account')}</Text>
         <Pressable onPress={() => router.push('/(auth)/sign-in')}>
-          <Text style={styles.crossLinkAction}>Sign in</Text>
+          <Text style={styles.crossLinkAction}>{t('auth.sign_in_link')}</Text>
         </Pressable>
       </View>
     </Animated.View>

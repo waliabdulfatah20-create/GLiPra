@@ -1,36 +1,97 @@
-import type { TxKeyPath } from '@/lib/i18n';
-
 import * as React from 'react';
-import { Pressable, Text, View } from '@/components/ui';
-import { ArrowRight } from '@/components/ui/icons';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-type ItemProps = {
-  text: TxKeyPath;
+import { colors, spacing } from '@/theme/colors';
+
+// ─── SettingsRow ──────────────────────────────────────────────────────────────
+// Replaces the Obytes SettingsItem (which used NativeWind className).
+// A single pressable row inside a SettingsSection card.
+
+interface SettingsRowProps {
+  label: string;
+  /** Static value displayed on the right (e.g. version number). */
   value?: string;
+  /** Navigation or action handler. Omit for non-interactive info rows. */
   onPress?: () => void;
-  icon?: React.ReactNode;
-};
+  /** Renders label in error red — used for destructive actions like Sign Out. */
+  destructive?: boolean;
+  /** Suppresses the bottom separator on the last row in a section. */
+  isLast?: boolean;
+}
 
-export function SettingsItem({ text, value, icon, onPress }: ItemProps) {
+export function SettingsRow({
+  label,
+  value,
+  onPress,
+  destructive = false,
+  isLast = false,
+}: SettingsRowProps) {
   const isPressable = onPress !== undefined;
+
   return (
     <Pressable
       onPress={onPress}
-      pointerEvents={isPressable ? 'auto' : 'none'}
-      className="flex-1 flex-row items-center justify-between px-4 py-2"
+      disabled={!isPressable}
+      style={({ pressed }) => [
+        styles.row,
+        !isLast && styles.rowBorder,
+        pressed && isPressable && styles.rowPressed,
+      ]}
+      accessibilityRole={isPressable ? 'button' : 'text'}
+      accessibilityLabel={label}
     >
-      <View className="flex-row items-center">
-        {icon && <View className="pr-2">{icon}</View>}
-        <Text tx={text} />
-      </View>
-      <View className="flex-row items-center">
-        <Text className="text-neutral-600 dark:text-white">{value}</Text>
-        {isPressable && (
-          <View className="pl-2">
-            <ArrowRight />
-          </View>
+      <Text style={[styles.label, destructive && styles.labelDestructive]}>
+        {label}
+      </Text>
+      <View style={styles.right}>
+        {value !== undefined && (
+          <Text style={styles.value}>{value}</Text>
+        )}
+        {isPressable && value === undefined && (
+          <Text style={styles.chevron}>›</Text>
         )}
       </View>
     </Pressable>
   );
 }
+
+// Keep old name exported for backward compatibility.
+export { SettingsRow as SettingsItem };
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
+    paddingVertical: 14,
+    backgroundColor: colors.surface,
+  },
+  rowBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  rowPressed: {
+    backgroundColor: colors.gray50,
+  },
+  label: {
+    fontSize: 15,
+    color: colors.textPrimary,
+  },
+  labelDestructive: {
+    color: colors.error,
+  },
+  right: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  value: {
+    fontSize: 14,
+    color: colors.textSecondary,
+  },
+  chevron: {
+    fontSize: 22,
+    color: colors.gray300,
+    lineHeight: 26,
+  },
+});

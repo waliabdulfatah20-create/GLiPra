@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import * as React from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -9,6 +10,7 @@ import { colors } from '@/theme/colors';
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleGetStarted = () => {
     if (Platform.OS === 'ios') {
@@ -36,8 +38,8 @@ export default function WelcomeScreen() {
           <Animated.View entering={FadeInDown.duration(600)} style={styles.logoSection}>
             {/* @ts-expect-error experimental_backgroundImage */}
             <View style={styles.logoBox} />
-            <Text style={styles.appName}>DosePath</Text>
-            <Text style={styles.tagline}>Your GLP-1 nutrition companion</Text>
+            <Text style={styles.appName}>Glipra</Text>
+            <Text style={styles.tagline}>{t('auth.welcome_tagline')}</Text>
           </Animated.View>
 
           {/* Buttons — FadeInUp with delay */}
@@ -56,7 +58,7 @@ export default function WelcomeScreen() {
             >
               {/* @ts-expect-error experimental_backgroundImage */}
               <View style={styles.primaryButtonGradient}>
-                <Text style={styles.primaryButtonText}>Get Started</Text>
+                <Text style={styles.primaryButtonText}>{t('auth.get_started')}</Text>
               </View>
             </Pressable>
 
@@ -68,7 +70,7 @@ export default function WelcomeScreen() {
               ]}
               testID="welcome-sign-in"
             >
-              <Text style={styles.ghostButtonText}>Sign In</Text>
+              <Text style={styles.ghostButtonText}>{t('auth.sign_in')}</Text>
             </Pressable>
           </Animated.View>
         </View>
@@ -79,9 +81,7 @@ export default function WelcomeScreen() {
           entering={FadeInUp.delay(400).duration(500)}
           style={styles.badgeContainer}
         >
-          <Text style={styles.badgeText}>
-            Designed by a licensed pharmacist · Not medical advice
-          </Text>
+          <Text style={styles.badgeText}>{t('auth.pharmacist_badge')}</Text>
         </Animated.View>
       </SafeAreaView>
     </View>

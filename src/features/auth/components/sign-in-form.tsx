@@ -13,6 +13,8 @@ import Animated, { FadeInDown, FadeInUp, LinearTransition } from 'react-native-r
 import { useForm } from '@tanstack/react-form';
 import * as z from 'zod';
 
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/ui';
 import { getFieldError } from '@/components/ui/form-utils';
 import { colors } from '@/theme/colors';
@@ -34,6 +36,7 @@ export type SignInFormProps = {
 
 export function SignInForm({ onSubmit, apiError }: SignInFormProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [appleAvailable, setAppleAvailable] = useState(false);
 
@@ -54,8 +57,8 @@ export function SignInForm({ onSubmit, apiError }: SignInFormProps) {
       entering={FadeInUp.duration(400)}
       style={styles.container}
     >
-      <Text style={styles.heading}>Welcome back</Text>
-      <Text style={styles.subheading}>Sign in to your DosePath account</Text>
+      <Text style={styles.heading}>{t('auth.sign_in_heading')}</Text>
+      <Text style={styles.subheading}>{t('auth.sign_in_subheading')}</Text>
 
       {apiError ? (
         <Animated.View entering={FadeInDown.duration(200)} style={styles.apiErrorBox}>
@@ -70,7 +73,7 @@ export function SignInForm({ onSubmit, apiError }: SignInFormProps) {
           const error = getFieldError(field);
           return (
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>EMAIL</Text>
+              <Text style={styles.label}>{t('auth.email_label')}</Text>
               <TextInput
                 testID="sign-in-email"
                 value={field.state.value}
@@ -109,9 +112,9 @@ export function SignInForm({ onSubmit, apiError }: SignInFormProps) {
           return (
             <View style={styles.fieldContainer}>
               <View style={styles.labelRow}>
-                <Text style={styles.label}>PASSWORD</Text>
+                <Text style={styles.label}>{t('auth.password_label')}</Text>
                 <Pressable onPress={() => router.push('/(auth)/forgot-password')}>
-                  <Text style={styles.forgotLink}>Forgot password?</Text>
+                  <Text style={styles.forgotLink}>{t('auth.forgot_password')}</Text>
                 </Pressable>
               </View>
               <TextInput
@@ -148,7 +151,7 @@ export function SignInForm({ onSubmit, apiError }: SignInFormProps) {
         children={([isSubmitting]) => (
           <Button
             testID="sign-in-submit"
-            label="Sign In"
+            label={t('auth.sign_in')}
             onPress={form.handleSubmit}
             loading={isSubmitting}
           />
@@ -168,9 +171,9 @@ export function SignInForm({ onSubmit, apiError }: SignInFormProps) {
 
       {/* Cross-link */}
       <View style={styles.crossLink}>
-        <Text style={styles.crossLinkText}>Don't have an account? </Text>
+        <Text style={styles.crossLinkText}>{t('auth.no_account')}</Text>
         <Pressable onPress={() => router.push('/(auth)/sign-up')}>
-          <Text style={styles.crossLinkAction}>Sign up</Text>
+          <Text style={styles.crossLinkAction}>{t('auth.sign_up_link')}</Text>
         </Pressable>
       </View>
     </Animated.View>

@@ -17,9 +17,11 @@ export async function signInWithEmail(
 export async function signUpWithEmail(
   email: string,
   password: string,
-): Promise<{ error: string | null }> {
-  const { error } = await supabase.auth.signUp({ email, password });
-  return { error: error?.message ?? null };
+): Promise<{ error: string | null; needsEmailConfirmation: boolean; userId?: string }> {
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  if (error) return { error: error.message, needsEmailConfirmation: false };
+  const needsEmailConfirmation = data.session === null;
+  return { error: null, needsEmailConfirmation, userId: data.user?.id };
 }
 
 export async function signInWithApple(): Promise<{ error: string | null }> {

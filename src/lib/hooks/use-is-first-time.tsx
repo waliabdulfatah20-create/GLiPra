@@ -19,6 +19,7 @@ export function useIsFirstTime() {
     setItem(IS_FIRST_TIME, value);
   }, []);
 
-  // While loading from storage, default to `true` so no redirect fires prematurely
-  return [isFirstTime ?? true, setIsFirstTime] as const;
+  // Return raw value including undefined (= still loading).
+  // Callers must handle undefined to avoid premature redirects.
+  return [isFirstTime, setIsFirstTime] as const;
 }

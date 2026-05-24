@@ -6,6 +6,8 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useForm } from '@tanstack/react-form';
 import * as z from 'zod';
 
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@/components/ui';
 import { getFieldError } from '@/components/ui/form-utils';
 import { colors } from '@/theme/colors';
@@ -25,6 +27,7 @@ export type ForgotPasswordFormProps = {
 
 export function ForgotPasswordForm({ onSubmit, showSuccess, apiError }: ForgotPasswordFormProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const form = useForm({
@@ -38,12 +41,10 @@ export function ForgotPasswordForm({ onSubmit, showSuccess, apiError }: ForgotPa
   if (showSuccess) {
     return (
       <Animated.View entering={FadeInUp.duration(400)} style={styles.container}>
-        <Text style={styles.heading}>Check your email</Text>
-        <Text style={styles.subheading}>
-          We sent a password reset link. Check your inbox and follow the link to set a new password.
-        </Text>
+        <Text style={styles.heading}>{t('auth.forgot_success_heading')}</Text>
+        <Text style={styles.subheading}>{t('auth.forgot_success_subheading')}</Text>
         <Pressable onPress={() => router.back()} style={styles.backLink}>
-          <Text style={styles.backLinkText}>← Back to sign in</Text>
+          <Text style={styles.backLinkText}>{t('auth.back_to_sign_in')}</Text>
         </Pressable>
       </Animated.View>
     );
@@ -51,10 +52,8 @@ export function ForgotPasswordForm({ onSubmit, showSuccess, apiError }: ForgotPa
 
   return (
     <Animated.View entering={FadeInUp.duration(400)} style={styles.container}>
-      <Text style={styles.heading}>Forgot password?</Text>
-      <Text style={styles.subheading}>
-        Enter your email and we'll send a reset link.
-      </Text>
+      <Text style={styles.heading}>{t('auth.forgot_heading')}</Text>
+      <Text style={styles.subheading}>{t('auth.forgot_subheading')}</Text>
 
       {apiError ? (
         <Animated.View entering={FadeInDown.duration(200)} style={styles.apiErrorBox}>
@@ -68,7 +67,7 @@ export function ForgotPasswordForm({ onSubmit, showSuccess, apiError }: ForgotPa
           const error = getFieldError(field);
           return (
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>EMAIL</Text>
+              <Text style={styles.label}>{t('auth.email_label')}</Text>
               <TextInput
                 testID="forgot-email"
                 value={field.state.value}
@@ -101,7 +100,7 @@ export function ForgotPasswordForm({ onSubmit, showSuccess, apiError }: ForgotPa
         children={([isSubmitting]) => (
           <Button
             testID="forgot-submit"
-            label="Send Reset Link"
+            label={t('auth.send_reset_link')}
             onPress={form.handleSubmit}
             loading={isSubmitting}
           />
@@ -109,7 +108,7 @@ export function ForgotPasswordForm({ onSubmit, showSuccess, apiError }: ForgotPa
       />
 
       <Pressable onPress={() => router.back()} style={styles.backLink}>
-        <Text style={styles.backLinkText}>← Back to sign in</Text>
+        <Text style={styles.backLinkText}>{t('auth.back_to_sign_in')}</Text>
       </Pressable>
     </Animated.View>
   );

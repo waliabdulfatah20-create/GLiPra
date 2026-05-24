@@ -4,9 +4,11 @@ import * as React from 'react';
 import { useEffect } from 'react';
 
 import { useAuthStore } from '@/features/auth/use-auth-store';
+import { useConsentStore } from '@/features/consent/use-consent-store';
 
 export default function AuthLayout() {
   const status = useAuthStore.use.status();
+  const [hasAgreed] = useConsentStore();
 
   // Hide splash screen for signed-out users (who never visit (app)/_layout.tsx)
   useEffect(() => {
@@ -16,8 +18,9 @@ export default function AuthLayout() {
   }, [status]);
 
   if (status === 'signIn') {
-    // Already authenticated — go straight to main app
-    // TODO: route new users to consent flow (Month 1 Item 2)
+    // Still loading consent state from AsyncStorage — hold until resolved
+    if (hasAgreed === undefined) return null;
+    if (!hasAgreed) return <Redirect href="/(auth)/consent" />;
     return <Redirect href="/(app)/" />;
   }
 

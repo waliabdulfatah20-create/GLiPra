@@ -1,4 +1,10 @@
 {
   "name": "dosepath",
-  "slug": "dosepath"
+  "slug": "dosepath",
+  "extra": {
+    "router": {},
+    "eas": {
+      "projectId": "046b4b41-452b-4b54-94ae-9ab38736222c"
+    }
+  }
 }

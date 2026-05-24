@@ -1,3 +1,5 @@
+import '@/lib/i18n';
+
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
@@ -12,7 +14,11 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { useThemeConfig } from '@/components/ui/use-theme-config';
 import { hydrateAuth, setSession } from '@/features/auth/use-auth-store';
 import { APIProvider } from '@/lib/api';
+import { analytics } from '@/lib/analytics';
+import { errorTracking } from '@/lib/error-tracking';
 import { loadSelectedTheme } from '@/lib/hooks/use-selected-theme';
+import { AnalyticsProvider } from '@/lib/posthog-provider';
+import { initializeRevenueCat } from '@/lib/revenue-cat';
 import { supabase } from '@/lib/supabase';
 
 export { ErrorBoundary } from 'expo-router';
@@ -32,14 +38,30 @@ SplashScreen.setOptions({
 
 export default function RootLayout() {
   useEffect(() => {
+    // Initialize Sentry error tracking (single call, free tier, no PII).
+    errorTracking.init();
+
     // Hydrate from persisted session (AsyncStorage)
     hydrateAuth();
 
     // Single source of truth for auth state. Never unsubscribed (app lifetime).
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
+      // Initialize RevenueCat as soon as the user is authenticated.
+      // Passing the Supabase user ID links the RevenueCat customer record.
+      // Safe to call multiple times — RevenueCat de-dupes configure() calls.
+      if (event === 'SIGNED_IN' && session?.user?.id) {
+        initializeRevenueCat(session.user.id);
+        // Identify user anonymously — user.id only, NEVER email (CLAUDE.md Rule 2)
+        analytics.identify(session.user.id);
+        errorTracking.setUser(session.user.id);
+      }
+      if (event === 'SIGNED_OUT') {
+        analytics.reset();
+        errorTracking.clearUser();
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -60,16 +82,18 @@ function Providers({ children }: { children: React.ReactNode }) {
   const theme = useThemeConfig();
   return (
     <GestureHandlerRootView style={styles.container}>
-      <KeyboardProvider>
-        <ThemeProvider value={theme}>
-          <APIProvider>
-            <BottomSheetModalProvider>
-              {children}
-              <FlashMessage position="top" />
-            </BottomSheetModalProvider>
-          </APIProvider>
-        </ThemeProvider>
-      </KeyboardProvider>
+      <AnalyticsProvider>
+        <KeyboardProvider>
+          <ThemeProvider value={theme}>
+            <APIProvider>
+              <BottomSheetModalProvider>
+                {children}
+                <FlashMessage position="top" />
+              </BottomSheetModalProvider>
+            </APIProvider>
+          </ThemeProvider>
+        </KeyboardProvider>
+      </AnalyticsProvider>
     </GestureHandlerRootView>
   );
 }

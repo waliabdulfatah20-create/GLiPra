@@ -43,7 +43,7 @@ export const colors = {
   gray900: '#111827',
 
   // Backgrounds
-  background: '#F9FAFB',
+  background: '#FAF8F5',      // warm cream — clinical warmth, not cold gray
   surface: '#FFFFFF',
   surfaceElevated: '#FFFFFF',
 
@@ -54,7 +54,7 @@ export const colors = {
   textInverse: '#FFFFFF',
 
   // Borders
-  border: '#E5E7EB',
+  border: '#E8E4DD',          // warm border — matches cream background
   borderFocus: '#2D6BE4',
 
   // Clinical / Safety
@@ -84,25 +84,25 @@ export const radius = {
 
 export const shadows = {
   sm: {
-    shadowColor: colors.black,
+    shadowColor: '#2A1F0F',    // warm-tinted black for natural shadows
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowOpacity: 0.08,       // slightly stronger — more definition
+    shadowRadius: 3,
+    elevation: 2,
   },
   md: {
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowColor: '#2A1F0F',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.11,
+    shadowRadius: 10,
+    elevation: 4,
   },
   lg: {
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    elevation: 6,
+    shadowColor: '#2A1F0F',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.14,
+    shadowRadius: 20,
+    elevation: 8,
   },
 } as const;
 

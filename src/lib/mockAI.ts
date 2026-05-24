@@ -19,18 +19,26 @@ export const isMockAIEnabled = (): boolean =>
 
 export const MOCK_MEAL_RECOGNITION = {
   foods: [
-    { name: 'Grilled chicken breast', protein_g: 31, calories: 165, serving_g: 100 },
-    { name: 'Brown rice', protein_g: 2.6, calories: 112, serving_g: 100 },
-    { name: 'Steamed broccoli', protein_g: 2.8, calories: 34, serving_g: 100 },
+    { name: 'Grilled chicken breast', protein_g: 31, carbs_g: 0, fat_g: 3.6, calories: 165, serving_g: 100 },
+    { name: 'Brown rice', protein_g: 2.6, carbs_g: 23, fat_g: 0.9, calories: 112, serving_g: 100 },
+    { name: 'Steamed broccoli', protein_g: 2.8, carbs_g: 7, fat_g: 0.4, calories: 34, serving_g: 100 },
   ],
   total_protein_g: 36.4,
+  total_carbs_g: 30,
+  total_fat_g: 4.9,
+  total_fiber_g: 5.2,
   total_calories: 311,
+  // GLP-1 watch nutrients (estimated by AI)
+  b12_mcg: 0.3,
+  vitamin_d_iu: 4,
+  magnesium_mg: 58,
+  zinc_mg: 1.1,
   confidence: 0.87,
 } as const;
 
 export const MOCK_DAILY_GUIDANCE = {
   message:
-    'Today is your adjustment phase — appetite suppression is at its strongest. ' +
+    'Today is your adjustment phase. Appetite suppression is at its strongest. ' +
     'Focus on hitting your protein floor with high-density sources like eggs, ' +
     'cottage cheese, or Greek yogurt. Aim for 25–30g per meal to preserve muscle.',
   protein_tip: 'Greek yogurt (17g per 150g serving) is easy on nausea days.',
@@ -56,3 +64,12 @@ export const MOCK_VOICE_PARSE = {
   total_protein_g: 37,
   total_calories: 270,
 } as const;
+
+// Mock visit prep questions — returned when EXPO_PUBLIC_USE_MOCK_AI=true.
+// Represents realistic AI-generated questions based on sample GLP-1 metrics.
+export const MOCK_VISIT_PREP_QUESTIONS: string[] = [
+  'My nausea has been averaging 3.8/5 over the past 14 days. Should we consider adjusting my dose or timing?',
+  'I\'ve been losing weight steadily. At what point should we discuss a maintenance dose?',
+  'My energy scores have been low (2.1/5 on average). Could this be related to my current injection phase?',
+  'It has been 9 days since my last injection. What is the best approach to get back on schedule?',
+];

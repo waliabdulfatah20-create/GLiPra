@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { signUpWithEmail } from '@/features/auth/api';
 import { SignUpForm } from '@/features/auth/components/sign-up-form';
+import { setOnboardingData } from '@/features/onboarding/use-onboarding-store';
 import { colors } from '@/theme/colors';
 
 export default function SignUpScreen() {
@@ -12,12 +13,21 @@ export default function SignUpScreen() {
 
   const handleSubmit = async (data: { email: string; password: string }) => {
     setApiError(null);
-    const { error } = await signUpWithEmail(data.email, data.password);
+    const { error, needsEmailConfirmation, userId } = await signUpWithEmail(data.email, data.password);
     if (error) {
       setApiError(error);
+      return;
     }
-    // On success, onAuthStateChange fires → setSession → (auth) layout redirects to (app)/
-    // TODO: route new users to consent flow (Month 1 Item 2)
+    if (needsEmailConfirmation) {
+      setApiError('Check your email and click the confirmation link, then sign in.');
+      return;
+    }
+    // Store userId in onboarding store so reveal.tsx never needs to re-fetch the session.
+    // This survives Fast Refresh resets and AsyncStorage race conditions.
+    if (userId) {
+      setOnboardingData({ userId });
+    }
+    // onAuthStateChange fires → setSession → (auth) layout redirects to (app)/
   };
 
   return (

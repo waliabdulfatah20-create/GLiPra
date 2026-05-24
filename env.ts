@@ -18,10 +18,14 @@ const envSchema = z.object({
   // only available for app.config.ts usage
   APP_BUILD_ONLY_VAR: z.string().optional(),
 
-  // === DosePath-specific vars ===
+  // === Glipra-specific vars ===
   EXPO_PUBLIC_SUPABASE_URL: z.string().url().or(z.literal('')).optional(),
   EXPO_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
   EXPO_PUBLIC_USE_MOCK_AI: z.enum(['true', 'false']).default('true'),
+  EXPO_PUBLIC_REVENUECAT_IOS_KEY: z.string().default(''),
+  EXPO_PUBLIC_REVENUECAT_ANDROID_KEY: z.string().default(''),
+  EXPO_PUBLIC_POSTHOG_API_KEY: z.string().default(''),
+  EXPO_PUBLIC_SENTRY_DSN: z.string().default(''),
 });
 
 // Config records per environment
@@ -29,24 +33,24 @@ const EXPO_PUBLIC_APP_ENV = (process.env.EXPO_PUBLIC_APP_ENV
   ?? 'development') as z.infer<typeof envSchema>['EXPO_PUBLIC_APP_ENV'];
 
 const BUNDLE_IDS = {
-  development: 'com.dosepath.development',
-  preview: 'com.dosepath.preview',
-  production: 'com.dosepath',
+  development: 'com.glipra.development',
+  preview: 'com.glipra.preview',
+  production: 'com.glipra',
 } as const;
 
 const PACKAGES = {
-  development: 'com.dosepath.development',
-  preview: 'com.dosepath.preview',
-  production: 'com.dosepath',
+  development: 'com.glipra.development',
+  preview: 'com.glipra.preview',
+  production: 'com.glipra',
 } as const;
 
 const SCHEMES = {
-  development: 'dosepath',
-  preview: 'dosepath.preview',
-  production: 'dosepath',
+  development: 'glipra',
+  preview: 'glipra.preview',
+  production: 'glipra',
 } as const;
 
-const NAME = 'DosePath';
+const NAME = 'Glipra';
 
 // Check if strict validation is required (before prebuild)
 const STRICT_ENV_VALIDATION = process.env.STRICT_ENV_VALIDATION === '1';
@@ -65,10 +69,14 @@ const _env: z.infer<typeof envSchema> = {
   EXPO_PUBLIC_VAR_BOOL: process.env.EXPO_PUBLIC_VAR_BOOL === 'true',
   APP_BUILD_ONLY_VAR: process.env.APP_BUILD_ONLY_VAR,
 
-  // === DosePath vars ===
+  // === Glipra vars ===
   EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL ?? '',
   EXPO_PUBLIC_SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
   EXPO_PUBLIC_USE_MOCK_AI: (process.env.EXPO_PUBLIC_USE_MOCK_AI ?? 'true') as 'true' | 'false',
+  EXPO_PUBLIC_REVENUECAT_IOS_KEY: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ?? '',
+  EXPO_PUBLIC_REVENUECAT_ANDROID_KEY: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY ?? '',
+  EXPO_PUBLIC_POSTHOG_API_KEY: process.env.EXPO_PUBLIC_POSTHOG_API_KEY ?? '',
+  EXPO_PUBLIC_SENTRY_DSN: process.env.EXPO_PUBLIC_SENTRY_DSN ?? '',
 };
 
 function getValidatedEnv(env: z.infer<typeof envSchema>) {

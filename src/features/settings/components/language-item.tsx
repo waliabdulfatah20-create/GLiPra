@@ -5,7 +5,7 @@ import * as React from 'react';
 import { Options, useModal } from '@/components/ui';
 import { translate, useSelectedLanguage } from '@/lib/i18n';
 
-import { SettingsItem } from './settings-item';
+import { SettingsRow } from './settings-item';
 
 export function LanguageItem() {
   const { language, setLanguage } = useSelectedLanguage();
@@ -21,7 +21,7 @@ export function LanguageItem() {
   const langs = React.useMemo(
     () => [
       { label: translate('settings.english'), value: 'en' },
-      { label: translate('settings.arabic'), value: 'ar' },
+      { label: translate('settings.spanish'), value: 'es' },
     ],
     [],
   );
@@ -33,10 +33,11 @@ export function LanguageItem() {
 
   return (
     <>
-      <SettingsItem
-        text="settings.language"
+      <SettingsRow
+        label={translate('settings.language')}
         value={selectedLanguage?.label}
         onPress={modal.present}
+        isLast
       />
       <Options
         ref={modal.ref}

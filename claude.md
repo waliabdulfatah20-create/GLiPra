@@ -46,7 +46,9 @@ The Obytes template ships with several patterns that DosePath explicitly rejects
 
 - `EXPO_PUBLIC_USE_MOCK_AI=true` is the default (zero OpenAI spend)
 - All native-only packages deferred (RevenueCat, HealthKit, PostHog, Sentry) — added at first EAS dev build
-- Local Supabase via Docker (free)
+- Supabase cloud project (free tier) — project ID cuxndkreewlcmijxlgyg
+  - Local Docker Supabase abandoned: unreachable from physical device (127.0.0.1 is PC localhost)
+  - 11 migrations applied and live on cloud
 
 ## Commands (pnpm, not npm)
 

@@ -1,0 +1,347 @@
+import { useRouter } from 'expo-router';
+import * as React from 'react';
+import { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { saveOnboardingProfile } from '@/features/onboarding/api';
+import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
+import { useAuthStore } from '@/features/auth/use-auth-store';
+import { setItem } from '@/lib/storage';
+import { supabase } from '@/lib/supabase';
+import { colors, radius, shadows, spacing } from '@/theme/colors';
+import type { GLP1MedicationId } from '@/types';
+
+// ─── Display maps ────────────────────────────────────────────────────────────
+
+const MEDICATION_LABELS: Record<GLP1MedicationId, string> = {
+  semaglutide_wegovy: 'Wegovy (Semaglutide)',
+  semaglutide_ozempic: 'Ozempic (Semaglutide)',
+  tirzepatide_zepbound: 'Zepbound (Tirzepatide)',
+  tirzepatide_mounjaro: 'Mounjaro (Tirzepatide)',
+  liraglutide_saxenda: 'Saxenda (Liraglutide)',
+  liraglutide_victoza: 'Victoza (Liraglutide)',
+  dulaglutide_trulicity: 'Trulicity (Dulaglutide)',
+  compounded_semaglutide: 'Compounded Semaglutide',
+  compounded_tirzepatide: 'Compounded Tirzepatide',
+  compounded_glp1_gip: 'Compounded GLP-1/GIP',
+};
+
+const GOAL_LABELS: Record<string, string> = {
+  muscle_preservation: 'Preserve muscle',
+  weight_management: 'Lose fat',
+  both: 'Preserve muscle & lose fat',
+};
+
+const WHAT_HAPPENS_NEXT = [
+  'Log your meals daily — 30 seconds with voice or barcode',
+  'Track protein toward your daily floor',
+  'Get injection-cycle-aware guidance every day',
+  'Red-flag safety monitoring — always free',
+];
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
+export default function RevealScreen() {
+  const router = useRouter();
+  const formData = useOnboardingStore.use.formData();
+  // Auth store is the most reliable source — set reactively by onAuthStateChange
+  // at sign-up time and stays in memory throughout onboarding.
+  const storeSession = useAuthStore.use.session();
+
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const medicationLabel =
+    formData.medicationId !== undefined
+      ? MEDICATION_LABELS[formData.medicationId]
+      : 'Not specified';
+
+  const goalLabel =
+    formData.goal !== undefined ? (GOAL_LABELS[formData.goal] ?? 'Not specified') : 'Not specified';
+
+  const handleStart = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+
+    try {
+      // 1. Onboarding store — userId written immediately at sign-up, most reliable.
+      let userId: string | undefined = formData.userId;
+
+      // 2. Auth store — set by onAuthStateChange at sign-up, lives in memory.
+      if (!userId) userId = storeSession?.user?.id;
+
+      // 3. getSession() — reads AsyncStorage (may lag on first launch).
+      if (!userId) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        userId = sessionData.session?.user?.id;
+      }
+
+      // 4. getUser() — live network call, last resort.
+      if (!userId) {
+        const { data: userData } = await supabase.auth.getUser();
+        userId = userData.user?.id;
+      }
+
+      if (!userId) {
+        setErrorMessage('Your session was lost. Please sign in again.');
+        router.replace('/(auth)/sign-in');
+        return;
+      }
+
+      const { error } = await saveOnboardingProfile(userId, formData);
+      if (error) {
+        setErrorMessage(`Profile save failed: ${error}`);
+        return;
+      }
+
+      // Await the AsyncStorage write BEFORE navigating so (app)/_layout
+      // reads isFirstTime=false on its first render and does not redirect back.
+      await setItem('IS_FIRST_TIME', false);
+      router.replace('/(app)/');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      setErrorMessage(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Step indicator — no progress bar on final reveal */}
+        <View style={styles.stepBadge}>
+          <Text style={styles.stepBadgeText}>Step 10 of 10</Text>
+        </View>
+
+        <Text style={styles.heading}>You're all set</Text>
+        <Text style={styles.subheading}>Here's what Glipra will do for you every day.</Text>
+
+        {/* Summary cards */}
+        <View style={styles.summarySection}>
+          <SummaryCard
+            label="Your protein floor"
+            value={
+              formData.proteinFloorG !== undefined ? `${formData.proteinFloorG}g/day` : '—'
+            }
+            accent
+          />
+          <SummaryCard label="Your medication" value={medicationLabel} />
+          <SummaryCard label="Your goal" value={goalLabel} />
+        </View>
+
+        {/* What happens next */}
+        <View style={styles.nextSection}>
+          <Text style={styles.nextTitle}>What happens next</Text>
+          {WHAT_HAPPENS_NEXT.map((item, index) => (
+            <View key={index} style={styles.bulletRow}>
+              <View style={styles.bulletDot} />
+              <Text style={styles.bulletText}>{item}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Inline error */}
+        {errorMessage !== null && (
+          <View style={styles.errorBanner}>
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Single full-width CTA — no Back button on final step */}
+      <View style={styles.footer}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.startButton,
+            pressed && styles.startButtonPressed,
+            loading && styles.startButtonLoading,
+          ]}
+          onPress={handleStart}
+          disabled={loading}
+          accessibilityRole="button"
+          accessibilityLabel="Start Glipra"
+          accessibilityState={{ busy: loading }}
+        >
+          <Text style={styles.startButtonText}>
+            {loading ? 'Setting up your profile…' : 'Start Glipra →'}
+          </Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+// ─── Summary card sub-component ──────────────────────────────────────────────
+
+interface SummaryCardProps {
+  label: string;
+  value: string;
+  accent?: boolean;
+}
+
+function SummaryCard({ label, value, accent = false }: SummaryCardProps) {
+  return (
+    <View style={[summaryStyles.card, accent && summaryStyles.cardAccent]}>
+      <Text style={[summaryStyles.label, accent && summaryStyles.labelAccent]}>{label}</Text>
+      <Text style={[summaryStyles.value, accent && summaryStyles.valueAccent]}>{value}</Text>
+    </View>
+  );
+}
+
+const summaryStyles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    ...shadows.sm,
+  },
+  cardAccent: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primaryLight,
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: spacing.xs,
+  },
+  labelAccent: {
+    color: colors.primary,
+  },
+  value: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.textPrimary,
+  },
+  valueAccent: {
+    fontSize: 22,
+    color: colors.primary,
+  },
+});
+
+// ─── Main styles ─────────────────────────────────────────────────────────────
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+  scroll: { flex: 1 },
+  scrollContent: { padding: spacing.lg, paddingBottom: spacing.xl },
+
+  stepBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.primaryLight,
+    borderRadius: radius.full,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    marginBottom: spacing.md,
+  },
+  stepBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+
+  heading: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
+  },
+  subheading: {
+    fontSize: 15,
+    color: colors.textSecondary,
+    lineHeight: 22,
+    marginBottom: spacing.lg,
+  },
+
+  summarySection: {
+    marginBottom: spacing.lg,
+  },
+
+  // What happens next
+  nextSection: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+    ...shadows.sm,
+  },
+  nextTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
+  },
+  bulletRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: spacing.sm,
+    gap: spacing.sm,
+  },
+  bulletDot: {
+    width: 6,
+    height: 6,
+    borderRadius: radius.full,
+    backgroundColor: colors.primary,
+    marginTop: 7,
+    flexShrink: 0,
+  },
+  bulletText: {
+    flex: 1,
+    fontSize: 14,
+    color: colors.textPrimary,
+    lineHeight: 22,
+  },
+
+  // Error banner
+  errorBanner: {
+    backgroundColor: colors.errorLight,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.error,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  errorText: {
+    fontSize: 14,
+    color: colors.error,
+    lineHeight: 20,
+  },
+
+  // Footer
+  footer: {
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  startButton: {
+    paddingVertical: 16,
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+  },
+  startButtonPressed: {
+    backgroundColor: colors.primaryDark,
+  },
+  startButtonLoading: {
+    backgroundColor: colors.gray400,
+  },
+  startButtonText: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: colors.white,
+  },
+});

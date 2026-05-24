@@ -60,4 +60,17 @@ export type DisclaimerTier = 1 | 2;
 
 // Red flag severity — used internally in redFlagDetector.ts
 // Internal type codes only — never rendered to user as condition names (Rule 9)
-export type RedFlagSeverity = 'watch' | 'escalate' | 'emergency';
+export type RedFlagSeverity = 'low' | 'medium' | 'high';
+
+// Injection site codes — 6 stomach quadrants per pharmacist-recommended rotation.
+// FDA/AACE guidance: stay ≥5cm from the navel. We split the abdomen into 4
+// quadrants around the navel (Upper Left/Right, Lower Left/Right) plus the
+// vertical midline strips (Upper Mid, Lower Mid). Thighs are deferred to a
+// later release per simplified form UX.
+export type SiteCode =
+  | 'stomach_upper_left'
+  | 'stomach_upper_mid'
+  | 'stomach_upper_right'
+  | 'stomach_lower_left'
+  | 'stomach_lower_mid'
+  | 'stomach_lower_right';

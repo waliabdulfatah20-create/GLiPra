@@ -43,3 +43,16 @@ coverage/
 *.tsbuildinfo
 
 app-example
+
+# Stray CLI artifacts
+Configure
+Get
+Manifest
+Run
+Task
+Unit)
+eas
+.planning/
+.superpowers/
+.claude/
+docs/superpowers/

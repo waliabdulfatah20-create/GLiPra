@@ -46,5 +46,67 @@ export async function insertInjectionLog(
     .single();
 
   if (error || !data) return null;
+
+  // Keep profiles.last_injection_date in sync so the injection-phase banner
+  // on the Today screen reflects real shots. Only update if this shot is more
+  // recent than the stored value (guards against overwriting when back-filling
+  // an older shot).
+  const injectedDate = input.injectedAt.slice(0, 10); // YYYY-MM-DD
+  await supabase
+    .from('profiles')
+    .update({ last_injection_date: injectedDate })
+    .eq('user_id', userId)
+    .or(`last_injection_date.is.null,last_injection_date.lt.${injectedDate}`);
+
   return data as unknown as InjectionLog;
+}
+
+/**
+ * Update an existing injection log in-place.
+ * Re-syncs profiles.last_injection_date using the same "only if newer" guard
+ * as insertInjectionLog so the phase banner stays accurate.
+ */
+export async function updateInjectionLog(
+  userId: string,
+  logId: string,
+  input: InjectionLogInput,
+): Promise<InjectionLog | null> {
+  const { data, error } = await supabase
+    .from('injection_logs')
+    .update({
+      injected_at:     input.injectedAt,
+      site_code:       input.siteCode,
+      medication_name: input.medicationName,
+      dosage_strength: input.dosageStrength ?? null,
+      pain_level:      input.painLevel,
+      notes:           input.notes ?? null,
+    })
+    .eq('id', logId)
+    .eq('user_id', userId)   // belt-and-suspenders RLS guard
+    .select()
+    .single();
+
+  if (error || !data) return null;
+
+  const injectedDate = input.injectedAt.slice(0, 10);
+  await supabase
+    .from('profiles')
+    .update({ last_injection_date: injectedDate })
+    .eq('user_id', userId)
+    .or(`last_injection_date.is.null,last_injection_date.lt.${injectedDate}`);
+
+  return data as unknown as InjectionLog;
+}
+
+/** Hard-delete a single injection log row. Returns true on success. */
+export async function deleteInjectionLog(
+  userId: string,
+  logId: string,
+): Promise<boolean> {
+  const { error } = await supabase
+    .from('injection_logs')
+    .delete()
+    .eq('id', logId)
+    .eq('user_id', userId);
+  return !error;
 }

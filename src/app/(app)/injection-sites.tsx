@@ -143,8 +143,18 @@ export default function InjectionSitesScreen() {
 }
 
 function ShotRow({ log, isLast }: { log: InjectionLog; isLast: boolean }) {
+  const router = useRouter();
   return (
-    <View style={[styles.shotRow, !isLast && styles.shotRowBorder]}>
+    <Pressable
+      style={({ pressed }) => [
+        styles.shotRow,
+        !isLast && styles.shotRowBorder,
+        pressed && { opacity: 0.7 },
+      ]}
+      onPress={() => router.push(`/edit-shot?id=${log.id}`)}
+      accessibilityRole="button"
+      accessibilityLabel={`Edit shot at ${SITE_LABELS[log.site_code as SiteCode] ?? log.site_code}`}
+    >
       <View style={styles.shotMain}>
         <Text style={styles.shotSite}>
           {SITE_LABELS[log.site_code as SiteCode] ?? log.site_code}
@@ -163,7 +173,8 @@ function ShotRow({ log, isLast }: { log: InjectionLog; isLast: boolean }) {
         <Text style={styles.painBadgeLabel}>PAIN</Text>
         <Text style={styles.painBadgeValue}>{log.pain_level}</Text>
       </View>
-    </View>
+      <Text style={styles.chevron}>›</Text>
+    </Pressable>
   );
 }
 

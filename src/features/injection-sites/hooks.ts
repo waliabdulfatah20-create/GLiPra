@@ -3,8 +3,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 
 import {
+  deleteInjectionLog,
   fetchRecentInjectionLogs,
   insertInjectionLog,
+  updateInjectionLog,
   type InjectionLogInput,
 } from './api';
 import { computeNextSite } from './calculator';
@@ -40,6 +42,37 @@ export function useInjectionSiteRecommendation() {
   return { recommendation, allResting, isLoading };
 }
 
+export function useUpdateInjectionSite() {
+  const session = useAuthStore.use.session();
+  const userId = session?.user.id;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ logId, input }: { logId: string; input: InjectionLogInput }) =>
+      updateInjectionLog(userId!, logId, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY, userId] });
+      queryClient.invalidateQueries({ queryKey: ['injection-logs-curve', userId] });
+      queryClient.invalidateQueries({ queryKey: ['today-profile', userId] });
+    },
+  });
+}
+
+export function useDeleteInjectionSite() {
+  const session = useAuthStore.use.session();
+  const userId = session?.user.id;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (logId: string) => deleteInjectionLog(userId!, logId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY, userId] });
+      queryClient.invalidateQueries({ queryKey: ['injection-logs-curve', userId] });
+      queryClient.invalidateQueries({ queryKey: ['today-profile', userId] });
+    },
+  });
+}
+
 export function useLogInjectionSite(lastInjectionDate?: string) {
   const session = useAuthStore.use.session();
   const userId = session?.user.id;
@@ -50,6 +83,9 @@ export function useLogInjectionSite(lastInjectionDate?: string) {
       insertInjectionLog(userId!, input),
     onSuccess: (_data, input) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY, userId] });
+      // Refresh the curve and phase banner caches so both update immediately
+      queryClient.invalidateQueries({ queryKey: ['injection-logs-curve', userId] });
+      queryClient.invalidateQueries({ queryKey: ['today-profile', userId] });
       // Unlock injection_day_warrior if the user logged on their scheduled injection day
       if (userId && lastInjectionDate) {
         const injectedDay = input.injectedAt.slice(0, 10);

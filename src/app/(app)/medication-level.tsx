@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { differenceInCalendarDays, format, parseISO } from 'date-fns';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import {
@@ -68,6 +68,8 @@ export default function MedicationLevelScreen() {
     medicationId,
     doseMg,
     injectionIntervalDays,
+    lastInjectionDate,
+    injectionDates,
   } = useMedicationLevelCurve();
 
   const isLoading = profileLoading || curveLoading;
@@ -82,22 +84,34 @@ export default function MedicationLevelScreen() {
   const currentLevelMg = todayPoint?.levelMg ?? null;
 
   // Recompute the visible curve whenever the view range changes.
-  // Uses real hook data when available; falls back to placeholder 1.0mg dose for shape.
+  // lastInjectionDate comes from real injection logs (via useMedicationLevelCurve),
+  // not from the profiles table, so it always reflects the actual last shot.
   const displayCurve = React.useMemo(() => {
-    const lastInj = profile?.lastInjectionDate;
-    if (!lastInj) return null;
+    if (!lastInjectionDate) return null;
     const med = (medicationId ?? profile?.medicationId ?? 'semaglutide_ozempic') as GLP1MedicationId;
     const dose = doseMg ?? 1.0;
+
+    // Anchor the past window to actual injection history so the chart doesn't
+    // show synthetic pre-history peaks before the user's first logged shot.
+    // Start 7 days before the oldest logged injection (visual breathing room),
+    // capped at config.pastDays so the toggle still controls the max window.
+    let effectivePastDays = config.pastDays;
+    if (injectionDates.length > 0) {
+      const oldestDate = injectionDates[injectionDates.length - 1]; // least recent
+      const daysSinceOldest = differenceInCalendarDays(parseISO(today), parseISO(oldestDate));
+      effectivePastDays = Math.min(config.pastDays, daysSinceOldest + 7);
+    }
+
     return generateSteadyStateCurve(
       dose,
       med,
-      lastInj,
+      lastInjectionDate,
       injectionIntervalDays,
       today,
       config.projectDays,
-      config.pastDays,
+      effectivePastDays,
     );
-  }, [profile, medicationId, doseMg, injectionIntervalDays, today, config]);
+  }, [lastInjectionDate, medicationId, profile?.medicationId, doseMg, injectionIntervalDays, injectionDates, today, config]);
 
   const displayTodayOffset = displayCurve?.find((p) => p.date === today)?.dayOffset ?? 0;
 
@@ -109,7 +123,7 @@ export default function MedicationLevelScreen() {
     );
   }
 
-  const hasData = !!profile?.lastInjectionDate;
+  const hasData = !!lastInjectionDate;
   const medId = medicationId ?? ((profile?.medicationId ?? 'semaglutide_ozempic') as GLP1MedicationId);
   const medName = MEDICATION_DISPLAY_NAMES[medId] ?? 'GLP-1 Medication';
   const doseLabel = doseMg ? `${doseMg}mg` : '—';
@@ -169,7 +183,7 @@ export default function MedicationLevelScreen() {
                 <LevelChart
                   curve={displayCurve}
                   todayOffset={displayTodayOffset}
-                  injectionIntervalDays={injectionIntervalDays}
+                  injectionDates={injectionDates}
                   labelIntervalDays={config.labelIntervalDays}
                   width={chartWidth}
                   height={220}

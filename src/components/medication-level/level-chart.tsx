@@ -8,7 +8,8 @@ import { colors, spacing } from '@/theme/colors';
 interface LevelChartProps {
   curve: Array<{ date: string; dayOffset: number; levelMg: number }>;
   todayOffset: number; // dayOffset value that represents "today"
-  injectionIntervalDays?: number; // for dot placement — default 7
+  /** Actual logged injection dates (YYYY-MM-DD). Dots are placed on these dates. */
+  injectionDates?: string[];
   labelIntervalDays?: number; // x-axis label frequency — default 7
   width: number;
   height: number;
@@ -50,7 +51,7 @@ function toY(
 export function LevelChart({
   curve,
   todayOffset,
-  injectionIntervalDays = 7,
+  injectionDates,
   labelIntervalDays = 7,
   width,
   height,
@@ -106,12 +107,12 @@ export function LevelChart({
     ? toX(todayPoint.dayOffset, minOffset, maxOffset, chartInnerWidth)
     : null;
 
-  // Injection dots — every injectionIntervalDays
-  const injectionDots = curve.filter((p) => {
-    const fromLastInjection = p.dayOffset % injectionIntervalDays;
-    // Show dots where dayOffset aligns with an injection (dayOffset % interval === 0)
-    return fromLastInjection === 0;
-  });
+  // Injection dots — placed at actual logged dates when available,
+  // otherwise no dots (removes the misleading synthetic-interval fallback)
+  const injectionDateSet = new Set(injectionDates ?? []);
+  const injectionDots = injectionDates && injectionDates.length > 0
+    ? curve.filter((p) => injectionDateSet.has(p.date))
+    : [];
 
   const axisY = PADDING_TOP + chartInnerHeight;
 

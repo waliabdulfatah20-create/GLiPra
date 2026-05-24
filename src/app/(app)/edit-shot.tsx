@@ -1,8 +1,8 @@
 import DateTimePicker, {
   type DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import { format, setHours, setMinutes, setSeconds } from 'date-fns';
-import { useRouter } from 'expo-router';
+import { format, parseISO, setHours, setMinutes, setSeconds } from 'date-fns';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as React from 'react';
 import {
   Alert,
@@ -23,14 +23,13 @@ import {
   type SiteCode,
 } from '@/features/injection-sites/constants';
 import {
-  useInjectionSiteRecommendation,
-  useLogInjectionSite,
+  useDeleteInjectionSite,
+  useInjectionLogs,
+  useUpdateInjectionSite,
 } from '@/features/injection-sites/hooks';
-import { useTodayData } from '@/features/today/hooks';
 import { colors, radius, shadows, spacing } from '@/theme/colors';
 import type { GLP1MedicationId } from '@/types';
 
-// Medication display names
 const MEDICATION_DISPLAY_NAMES: Record<GLP1MedicationId, string> = {
   semaglutide_ozempic: 'Ozempic',
   semaglutide_wegovy: 'Wegovy',
@@ -48,7 +47,6 @@ const MEDICATION_OPTIONS = Object.values(MEDICATION_DISPLAY_NAMES).map(
   (name) => ({ label: name, value: name }),
 );
 
-// Dosage options per medication (branded FDA-approved doses + common compounded ranges)
 const DOSAGE_OPTIONS_BY_MEDICATION: Record<string, string[]> = {
   'Ozempic':                ['0.25 mg', '0.5 mg', '1 mg', '2 mg'],
   'Wegovy':                 ['0.25 mg', '0.5 mg', '1 mg', '1.7 mg', '2.4 mg'],
@@ -73,48 +71,49 @@ function combineDateAndTime(date: Date, time: Date): Date {
   return merged;
 }
 
-export default function AddShotScreen() {
+export default function EditShotScreen() {
   const router = useRouter();
-  const { profile } = useTodayData();
-  const { recommendation, isLoading: recLoading } = useInjectionSiteRecommendation();
-  const { mutate: logShot, isPending } = useLogInjectionSite(profile?.lastInjectionDate ?? undefined);
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { logs, isLoading } = useInjectionLogs();
+  const log = logs.find((l) => l.id === id) ?? null;
 
+  const { mutate: updateShot, isPending: isUpdating } = useUpdateInjectionSite();
+  const { mutate: deleteShot, isPending: isDeleting } = useDeleteInjectionSite();
+  const isPending = isUpdating || isDeleting;
+
+  // Form state — defaults, filled once the log arrives from cache
   const [date, setDate] = React.useState<Date>(new Date());
   const [time, setTime] = React.useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [showTimePicker, setShowTimePicker] = React.useState(false);
-
-  // Default medication = user's onboarded medication (if any)
-  const defaultMedicationLabel = React.useMemo(() => {
-    const id = profile?.medicationId as GLP1MedicationId | undefined;
-    return id ? MEDICATION_DISPLAY_NAMES[id] : '';
-  }, [profile?.medicationId]);
-
-  const [medication, setMedication] = React.useState<string>(defaultMedicationLabel);
+  const [medication, setMedication] = React.useState('');
   const [dosageStrength, setDosageStrength] = React.useState('');
-
-  // Default site = rotation recommendation
   const [siteCode, setSiteCode] = React.useState<SiteCode | ''>('');
-  React.useEffect(() => {
-    if (!siteCode && !recLoading) setSiteCode(recommendation);
-  }, [recommendation, recLoading, siteCode]);
-
-  // Fill medication once profile loads
-  React.useEffect(() => {
-    if (!medication && defaultMedicationLabel) setMedication(defaultMedicationLabel);
-  }, [defaultMedicationLabel, medication]);
-
-  // Reset dosage whenever medication changes
-  React.useEffect(() => {
-    setDosageStrength('');
-  }, [medication]);
-
   const [painLevel, setPainLevel] = React.useState(0);
   const [notes, setNotes] = React.useState('');
+  const [initialized, setInitialized] = React.useState(false);
 
-  // Dosage options for the currently selected medication
+  // Pre-fill once the log arrives (usually from React Query cache — no network call)
+  React.useEffect(() => {
+    if (log && !initialized) {
+      const parsed = parseISO(log.injected_at);
+      setDate(parsed);
+      setTime(parsed);
+      setMedication(log.medication_name ?? '');
+      setDosageStrength(log.dosage_strength ?? '');
+      setSiteCode((log.site_code as SiteCode) ?? '');
+      setPainLevel(log.pain_level ?? 0);
+      setNotes(log.notes ?? '');
+      setInitialized(true);
+    }
+  }, [log, initialized]);
+
   const dosageOptions = React.useMemo(
-    () => (DOSAGE_OPTIONS_BY_MEDICATION[medication] ?? []).map((d) => ({ label: d, value: d })),
+    () =>
+      (DOSAGE_OPTIONS_BY_MEDICATION[medication] ?? []).map((d) => ({
+        label: d,
+        value: d,
+      })),
     [medication],
   );
 
@@ -131,16 +130,19 @@ export default function AddShotScreen() {
   const canSave = !!medication && !!siteCode && !isPending;
 
   function handleSave() {
-    if (!canSave || !siteCode) return;
+    if (!canSave || !siteCode || !id) return;
     const injectedAt = combineDateAndTime(date, time).toISOString();
-    logShot(
+    updateShot(
       {
-        siteCode: siteCode as SiteCode,
-        medicationName: medication,
-        dosageStrength: dosageStrength || undefined,
-        painLevel,
-        notes: notes.trim() || undefined,
-        injectedAt,
+        logId: id,
+        input: {
+          siteCode: siteCode as SiteCode,
+          medicationName: medication,
+          dosageStrength: dosageStrength || undefined,
+          painLevel,
+          notes: notes.trim() || undefined,
+          injectedAt,
+        },
       },
       {
         onSuccess: () => router.back(),
@@ -151,18 +153,77 @@ export default function AddShotScreen() {
     );
   }
 
-  // Site options — "Active Rotation" header at top of dropdown
-  const siteOptions = React.useMemo(() => {
-    if (!recommendation) return SITE_OPTIONS;
-    return [
-      { label: 'Active Rotation', value: '__active_rotation_header__', disabled: true as const },
-      ...SITE_OPTIONS,
-    ];
-  }, [recommendation]);
+  function handleDelete() {
+    if (!id) return;
+    Alert.alert('Delete Shot', 'This cannot be undone.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          deleteShot(id, {
+            onSuccess: () => router.back(),
+            onError: (err) => {
+              Alert.alert(
+                'Could not delete',
+                err.message ?? 'Please try again.',
+              );
+            },
+          });
+        },
+      },
+    ]);
+  }
+
+  // Loading state — logs still resolving from cache
+  if (isLoading && !log) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => router.back()}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel="Cancel"
+          >
+            <Text style={styles.cancel}>Cancel</Text>
+          </Pressable>
+          <Text style={styles.title}>Edit Shot</Text>
+          <View style={styles.headerSpacer} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Log not found guard (deep-link to a deleted/unknown ID)
+  if (!isLoading && !log) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => router.back()}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Text style={styles.cancel}>Back</Text>
+          </Pressable>
+          <Text style={styles.title}>Edit Shot</Text>
+          <View style={styles.headerSpacer} />
+        </View>
+        <View style={styles.notFound}>
+          <Text style={styles.notFoundTitle}>Shot not found</Text>
+          <Text style={styles.notFoundBody}>
+            This shot may have already been deleted.
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      {/* Header — Cancel | Add Shot | Save */}
+      {/* Header — Cancel | Edit Shot | Save */}
       <View style={styles.header}>
         <Pressable
           onPress={() => router.back()}
@@ -172,16 +233,16 @@ export default function AddShotScreen() {
         >
           <Text style={styles.cancel}>Cancel</Text>
         </Pressable>
-        <Text style={styles.title}>Add Shot</Text>
+        <Text style={styles.title}>Edit Shot</Text>
         <Pressable
           onPress={handleSave}
           disabled={!canSave}
           hitSlop={12}
           accessibilityRole="button"
-          accessibilityLabel="Save shot"
+          accessibilityLabel="Save changes"
         >
           <Text style={[styles.save, !canSave && styles.saveDisabled]}>
-            {isPending ? 'Saving…' : 'Save'}
+            {isUpdating ? 'Saving…' : 'Save'}
           </Text>
         </Pressable>
       </View>
@@ -248,7 +309,7 @@ export default function AddShotScreen() {
           options={MEDICATION_OPTIONS}
           onSelect={(v) => setMedication(String(v))}
           placeholder="Select medication"
-          testID="add-shot-medication"
+          testID="edit-shot-medication"
         />
 
         <Select
@@ -258,16 +319,16 @@ export default function AddShotScreen() {
           onSelect={(v) => setDosageStrength(String(v))}
           placeholder={medication ? 'Select dose' : 'Select medication first'}
           disabled={!medication || dosageOptions.length === 0}
-          testID="add-shot-dosage"
+          testID="edit-shot-dosage"
         />
 
         <Select
           label="Injection Site"
           value={siteCode}
-          options={siteOptions}
+          options={SITE_OPTIONS}
           onSelect={(v) => setSiteCode(v as SiteCode)}
           placeholder="Select injection site"
-          testID="add-shot-site"
+          testID="edit-shot-site"
         />
 
         <PainLevelSlider value={painLevel} onChange={setPainLevel} />
@@ -286,6 +347,22 @@ export default function AddShotScreen() {
           maxLength={500}
           accessibilityLabel="Shot notes"
         />
+
+        {/* Delete Shot — destructive action with confirmation */}
+        <Pressable
+          style={({ pressed }) => [
+            styles.deleteBtn,
+            pressed && styles.deleteBtnPressed,
+          ]}
+          onPress={handleDelete}
+          disabled={isPending}
+          accessibilityRole="button"
+          accessibilityLabel="Delete this shot"
+        >
+          <Text style={styles.deleteBtnText}>
+            {isDeleting ? 'Deleting…' : 'Delete Shot'}
+          </Text>
+        </Pressable>
 
         {/* Rule 8: clinical screen — Tier 2 disclaimer */}
         <DisclaimerBanner tier={2}>
@@ -315,6 +392,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     backgroundColor: colors.surface,
+  },
+  headerSpacer: {
+    width: 48,
   },
   cancel: {
     fontSize: 16,
@@ -391,6 +471,41 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.textPrimary,
     ...shadows.sm,
+  },
+
+  deleteBtn: {
+    backgroundColor: colors.errorLight,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    marginTop: spacing.md,
+  },
+  deleteBtnPressed: {
+    opacity: 0.7,
+  },
+  deleteBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.error,
+  },
+
+  notFound: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.xl,
+  },
+  notFoundTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
+  },
+  notFoundBody: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
   },
 
   disclaimerText: {

@@ -1,5 +1,7 @@
 // Route: /coach
-// AI Nutrition Coach screen — hidden from tab bar, accessible via Today screen CTA.
+// AI Nutrition Coach screen — registered as a permanent 5th tab in the bottom nav.
+// Free users can read the welcome message; the send input is wrapped in ProGate
+// so unsubscribed users see the Pro upgrade card as a teaser.
 //
 // Rule 8: DisclaimerBanner tier={2} is rendered between the header and message list.
 // Rule 10: Medication keyword blocking is enforced in the edge function, not here.
@@ -19,7 +21,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { useAiCoach } from '@/features/ai-coach/hooks';
@@ -107,16 +108,8 @@ export default function CoachScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
-        {/* Header */}
+        {/* Header — tab root, no back button */}
         <View style={styles.header}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => router.back()}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-          >
-            <Text style={styles.backButtonText}>← Back</Text>
-          </Pressable>
           <View style={styles.headerTitles}>
             <Text style={styles.headerTitle}>Nutrition Coach</Text>
             <Text style={styles.headerSubtitle}>Powered by pharmacist guidelines</Text>
@@ -195,22 +188,11 @@ const styles = StyleSheet.create({
 
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
-  },
-  backButton: {
-    paddingRight: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  backButtonText: {
-    fontSize: 15,
-    color: colors.primary,
-    fontWeight: '500',
   },
   headerTitles: {
     flex: 1,

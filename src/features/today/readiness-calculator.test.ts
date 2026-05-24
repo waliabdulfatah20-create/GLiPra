@@ -195,7 +195,7 @@ describe('calculateReadinessScore — guidance strings', () => {
       proteinProgress: 0.5,
       hourOfDay: 9,
     });
-    expect(guidance).toBe('Moderate day — pace yourself');
+    expect(guidance).toBe('Moderate day, pace yourself');
   });
 
   it('score 40–59 → take it easy guidance', () => {
@@ -205,7 +205,7 @@ describe('calculateReadinessScore — guidance strings', () => {
       hourOfDay: 9,
     });
     // 70 - 15 = 55 → "Take it easy"
-    expect(guidance).toBe('Take it easy — focus on hydration');
+    expect(guidance).toBe('Take it easy and focus on hydration');
   });
 
   it('score < 40 → rest and recover guidance', () => {

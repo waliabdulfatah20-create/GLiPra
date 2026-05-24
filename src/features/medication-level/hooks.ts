@@ -1,25 +1,57 @@
-import { format } from 'date-fns';
+import { differenceInCalendarDays, format, parseISO } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/features/auth/use-auth-store';
+import { fetchRecentInjectionLogs } from '@/features/injection-sites/api';
+import type { InjectionLog } from '@/features/injection-sites/types';
 import { fetchTodayProfile } from '@/features/today/api';
 import { generateSteadyStateCurve } from '@/features/medication-level/calculator';
 import type { GLP1MedicationId } from '@/types';
 
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
 /**
- * Maps the onboarding injectionFrequency string to a number of days.
+ * Parse a dosage-strength string (e.g. "0.5 mg", "1 mg", "2.4mg") to a float.
+ * Returns null if the string is absent or in an unrecognised format.
  */
-function frequencyToDays(frequency: string | null | undefined): number {
-  switch (frequency) {
-    case 'daily':
-      return 1;
-    case 'biweekly':
-      return 14;
-    case 'weekly':
-    default:
-      return 7;
-  }
+function parseDoseMg(dosageStrength: string | null | undefined): number | null {
+  if (!dosageStrength) return null;
+  const match = dosageStrength.match(/^([\d.]+)\s*mg/i);
+  return match ? parseFloat(match[1]) : null;
 }
+
+/**
+ * Derive injection interval from the calendar gap between the last two DISTINCT
+ * injection dates. Deduplicates by calendar date first so that two entries
+ * logged on the same day (e.g. a correction or a test shot) don't collapse the
+ * gap to 0 and produce a spurious "daily" result.
+ *
+ * Uses date-fns differenceInCalendarDays (Rule 6 — no raw Date arithmetic).
+ * Falls back to 7 (weekly) when fewer than 2 distinct dates exist.
+ */
+function deriveIntervalDays(logs: InjectionLog[]): number {
+  // Deduplicate: keep only the first occurrence of each calendar date
+  const seen = new Set<string>();
+  const uniqueDates: string[] = [];
+  for (const log of logs) {
+    const d = log.injected_at.slice(0, 10);
+    if (!seen.has(d)) { seen.add(d); uniqueDates.push(d); }
+  }
+
+  if (uniqueDates.length < 2) return 7;
+  const gap = Math.abs(
+    differenceInCalendarDays(parseISO(uniqueDates[0]), parseISO(uniqueDates[1])),
+  );
+  if (gap <= 2) return 1;   // daily (liraglutide pattern)
+  if (gap <= 10) return 7;  // weekly
+  return 14;                // biweekly
+}
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
 export interface MedicationLevelCurveResult {
   curve: Array<{ date: string; dayOffset: number; levelMg: number }> | null;
@@ -28,71 +60,85 @@ export interface MedicationLevelCurveResult {
   medicationId: GLP1MedicationId | null;
   doseMg: number | null;
   injectionIntervalDays: number;
+  /** YYYY-MM-DD of the most recent injection (from logs, not profile) */
+  lastInjectionDate: string | null;
+  /** Deduplicated YYYY-MM-DD strings for all logged injection dates, most-recent-first */
+  injectionDates: string[];
 }
+
+// ---------------------------------------------------------------------------
+// Hook
+// ---------------------------------------------------------------------------
 
 /**
  * React Query hook that derives the steady-state pharmacokinetic level curve
- * from the user's profile data.
+ * from the user's actual injection logs.
  *
- * Returns null curve when required fields (lastInjectionDate, doseMg) are missing.
+ * Data flow:
+ *   - `medicationId`         ← profiles table (set during onboarding)
+ *   - `lastInjectionDate`    ← injection_logs[0].injected_at  (most recent shot)
+ *   - `doseMg`               ← injection_logs[0].dosage_strength  (parsed to float)
+ *   - `injectionIntervalDays`← gap between injection_logs[0] and [1], or 7 (default)
+ *
+ * Returns `curve: null` when required fields are absent (no logs, or no dosage_strength
+ * on the most recent log). The UI renders a "Log your injection to view your curve" CTA
+ * in that case.
  */
 export function useMedicationLevelCurve(): MedicationLevelCurveResult {
   const session = useAuthStore.use.session();
   const userId = session?.user.id;
 
-  const { data: profile, isLoading } = useQuery({
+  // Profile — needed only for medicationId
+  const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['today-profile', userId],
     queryFn: () => fetchTodayProfile(userId!),
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 
+  // Injection logs — primary data source for curve inputs
+  const { data: logs = [], isLoading: logsLoading } = useQuery({
+    queryKey: ['injection-logs-curve', userId],
+    queryFn: () => fetchRecentInjectionLogs(userId!, 10), // 10 shots covers ~4 weekly cycles
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const isLoading = profileLoading || logsLoading;
   const today = format(new Date(), 'yyyy-MM-dd');
 
-  // Required fields check
-  if (
-    !profile ||
-    !profile.lastInjectionDate ||
-    !(profile as Record<string, unknown>)['doseMg']
-  ) {
-    // Try to extract doseMg and injectionFrequency from the profile with loose access
-    // The profile type from today/api.ts doesn't include doseMg — we use it if present.
-    return {
-      curve: null,
-      todayOffset: 0,
-      isLoading,
-      medicationId: null,
-      doseMg: null,
-      injectionIntervalDays: 7,
-    };
+  // Deduplicated injection dates for dot placement on the chart (most-recent-first)
+  const seenDates = new Set<string>();
+  const injectionDates: string[] = [];
+  for (const log of logs) {
+    const d = log.injected_at.slice(0, 10);
+    if (!seenDates.has(d)) { seenDates.add(d); injectionDates.push(d); }
   }
 
-  const rawProfile = profile as Record<string, unknown>;
-  const doseMg = typeof rawProfile['doseMg'] === 'number' ? rawProfile['doseMg'] : null;
-  const injectionFrequency =
-    typeof rawProfile['injectionFrequency'] === 'string'
-      ? rawProfile['injectionFrequency']
-      : null;
+  // Derive curve inputs from real log data
+  const mostRecentLog = logs[0] ?? null;
+  const lastInjectionDate = injectionDates[0] ?? null;
+  const doseMg = parseDoseMg(mostRecentLog?.dosage_strength ?? null);
+  const medicationId = (profile?.medicationId ?? null) as GLP1MedicationId | null;
+  const injectionIntervalDays = deriveIntervalDays(logs);
 
-  const medicationId = (profile.medicationId ?? null) as GLP1MedicationId | null;
-
-  if (!doseMg || !medicationId || !profile.lastInjectionDate) {
+  if (!lastInjectionDate || !doseMg || !medicationId) {
     return {
       curve: null,
       todayOffset: 0,
       isLoading,
       medicationId,
       doseMg,
-      injectionIntervalDays: 7,
+      injectionIntervalDays,
+      lastInjectionDate,
+      injectionDates,
     };
   }
-
-  const injectionIntervalDays = frequencyToDays(injectionFrequency);
 
   const curve = generateSteadyStateCurve(
     doseMg,
     medicationId,
-    profile.lastInjectionDate,
+    lastInjectionDate,
     injectionIntervalDays,
     today,
   );
@@ -107,5 +153,7 @@ export function useMedicationLevelCurve(): MedicationLevelCurveResult {
     medicationId,
     doseMg,
     injectionIntervalDays,
+    lastInjectionDate,
+    injectionDates,
   };
 }

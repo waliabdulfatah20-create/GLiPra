@@ -4,6 +4,7 @@ import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
+  ChatBubble as CoachIcon,
   Home as HomeIcon,
   PlusCircle as LogIcon,
   Settings as SettingsIcon,
@@ -87,6 +88,16 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        name="coach"
+        options={{
+          title: t('tabs.coach'),
+          headerShown: false,
+          tabBarIcon: ({ color }) => <CoachIcon color={color} />,
+          tabBarButtonTestID: 'coach-tab',
+        }}
+      />
+
+      <Tabs.Screen
         name="settings"
         options={{
           title: t('tabs.settings'),
@@ -109,11 +120,6 @@ export default function TabLayout() {
       {/* Weight tracking screen — accessible from Settings, not a visible tab */}
       <Tabs.Screen
         name="weight"
-        options={{ href: null, headerShown: false }}
-      />
-      {/* AI Nutrition Coach — accessible from Today screen CTA, not a visible tab */}
-      <Tabs.Screen
-        name="coach"
         options={{ href: null, headerShown: false }}
       />
       {/* Medication Level — accessible from Settings, not a visible tab */}
@@ -154,6 +160,11 @@ export default function TabLayout() {
       {/* Add Shot form — opens as modal from Injection Sites tab */}
       <Tabs.Screen
         name="add-shot"
+        options={{ href: null, headerShown: false }}
+      />
+      {/* Edit Shot form — opens when tapping a row in Recent Shots list */}
+      <Tabs.Screen
+        name="edit-shot"
         options={{ href: null, headerShown: false }}
       />
       {/* Paywall — full-screen, opened programmatically; never shown in tab bar */}

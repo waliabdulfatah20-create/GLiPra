@@ -307,23 +307,7 @@ export function TodayScreen() {
           <Text style={styles.rowChevron}>›</Text>
         </TouchableOpacity>
 
-        {/* Nutrition Coach */}
-        <TouchableOpacity
-          style={[styles.ctaCard, styles.ctaCardCoach]}
-          onPress={() => router.push('/coach')}
-          activeOpacity={0.75}
-          accessibilityRole="button"
-          accessibilityLabel="Open Nutrition Coach"
-        >
-          <View style={[styles.actionIconCircle, styles.actionIconCircleCoach]}>
-            <Text style={styles.actionEmoji}>💬</Text>
-          </View>
-          <View style={styles.actionContent}>
-            <Text style={styles.actionTitle}>{t('coach.title')}</Text>
-            <Text style={styles.actionBody}>{t('today.coach_subtitle')}</Text>
-          </View>
-          <Text style={[styles.rowChevron, { color: colors.primary }]}>›</Text>
-        </TouchableOpacity>
+        {/* Nutrition Coach moved to its own bottom-nav tab — CTA removed 2026-05-24 */}
 
         {/* ── Pharmacist Content ────────────────────────────────── */}
         <SectionLabel label={t('today.pharmacist_content')} />
@@ -572,10 +556,6 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     ...shadows.sm,
   },
-  ctaCardCoach: {
-    backgroundColor: colors.primaryLight,
-    borderColor: colors.primary + '30',
-  },
   actionIconCircle: {
     width: 40,
     height: 40,
@@ -591,9 +571,6 @@ const styles = StyleSheet.create({
   },
   actionIconCirclePending: {
     backgroundColor: colors.primaryLight,
-  },
-  actionIconCircleCoach: {
-    backgroundColor: colors.primary + '18',
   },
   actionEmoji: {
     fontSize: 18,

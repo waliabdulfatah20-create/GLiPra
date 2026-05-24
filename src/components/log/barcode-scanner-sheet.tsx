@@ -6,14 +6,26 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 
 import { lookupBarcode } from '@/features/food-log/barcode-lookup';
 import type { BarcodeProduct } from '@/features/food-log/barcode-lookup';
+import {
+  useBarcodeCorrectionLookup,
+  useSaveBarcodeCorrection,
+} from '@/features/food-log/hooks';
+import { useAuthStore } from '@/features/auth/use-auth-store';
 import { colors, radius, spacing } from '@/theme/colors';
 
 // Barcode scanning is ALWAYS free — never gated by subscription (CLAUDE.md).
+
+// Brand purple for protein field highlight (Clean Clinical design)
+const BRAND = '#5b21b6';
+const BRAND_LIGHT = 'rgba(91,33,182,0.08)';
+const AMBER = '#d97706';
+const AMBER_LIGHT = 'rgba(217,119,6,0.10)';
 
 export interface BarcodeScannerSheetProps {
   visible: boolean;
@@ -23,6 +35,12 @@ export interface BarcodeScannerSheetProps {
 
 type ScanState = 'scanning' | 'loading' | 'result' | 'not_found';
 
+const SOURCE_LABEL: Record<BarcodeProduct['dataSource'], string> = {
+  open_food_facts: 'Open Food Facts',
+  usda: 'USDA FoodData Central',
+  user_corrected: 'Your verified data',
+};
+
 export function BarcodeScannerSheet({
   visible,
   onClose,
@@ -31,20 +49,47 @@ export function BarcodeScannerSheet({
   const [permission, requestPermission] = useCameraPermissions();
   const [scanState, setScanState] = React.useState<ScanState>('scanning');
   const [product, setProduct] = React.useState<BarcodeProduct | null>(null);
+  const [scannedEan, setScannedEan] = React.useState<string | null>(null);
   const scannedRef = React.useRef(false);
+
+  // Editable fields
+  const [editedProtein, setEditedProtein] = React.useState('');
+  const [editedFiber, setEditedFiber] = React.useState('');
+  const [editedCalories, setEditedCalories] = React.useState('');
+
+  // Correction memory hooks
+  const { correction, isLoading: correctionLoading } = useBarcodeCorrectionLookup(
+    scanState === 'result' ? scannedEan : null,
+  );
+  const { mutate: saveCorrection } = useSaveBarcodeCorrection();
 
   // Reset state each time the sheet opens
   React.useEffect(() => {
     if (visible) {
       setScanState('scanning');
       setProduct(null);
+      setScannedEan(null);
+      setEditedProtein('');
+      setEditedFiber('');
+      setEditedCalories('');
       scannedRef.current = false;
     }
   }, [visible]);
 
+  // When correction loads (or product arrives), pre-fill edit fields
+  React.useEffect(() => {
+    if (scanState !== 'result') return;
+    const source = correction ?? product;
+    if (!source) return;
+    setEditedProtein(source.proteinG.toFixed(1));
+    setEditedFiber(source.fiberG != null ? source.fiberG.toFixed(1) : '');
+    setEditedCalories(source.caloriesKcal != null ? source.caloriesKcal.toFixed(0) : '');
+  }, [correction, product, scanState]);
+
   async function handleBarcodeScan({ data }: { data: string }) {
     if (scannedRef.current) return;
     scannedRef.current = true;
+    setScannedEan(data);
     setScanState('loading');
     const result = await lookupBarcode(data);
     if (result) {
@@ -56,15 +101,51 @@ export function BarcodeScannerSheet({
   }
 
   function handleConfirm() {
-    if (product) {
-      onProductFound(product);
-      handleClose();
+    const displayProduct = correction ?? product;
+    if (!displayProduct) return;
+
+    const proteinG = parseFloat(editedProtein) || 0;
+    const fiberG = editedFiber !== '' ? parseFloat(editedFiber) : null;
+    const caloriesKcal = editedCalories !== '' ? parseFloat(editedCalories) : null;
+
+    const finalProduct: BarcodeProduct = {
+      ...displayProduct,
+      proteinG,
+      fiberG,
+      caloriesKcal,
+      dataSource: correction ? 'user_corrected' : displayProduct.dataSource,
+    };
+
+    // Check if user changed any value vs what was originally shown
+    const original = correction ?? product!;
+    const userEdited =
+      proteinG !== original.proteinG ||
+      fiberG !== original.fiberG ||
+      caloriesKcal !== original.caloriesKcal;
+
+    if (userEdited && scannedEan) {
+      saveCorrection({
+        ean: scannedEan,
+        product: {
+          name: finalProduct.name,
+          proteinG,
+          fiberG,
+          caloriesKcal,
+        },
+      });
     }
+
+    onProductFound(finalProduct);
+    handleClose();
   }
 
   function handleClose() {
     setScanState('scanning');
     setProduct(null);
+    setScannedEan(null);
+    setEditedProtein('');
+    setEditedFiber('');
+    setEditedCalories('');
     scannedRef.current = false;
     onClose();
   }
@@ -72,8 +153,24 @@ export function BarcodeScannerSheet({
   function handleScanAgain() {
     setScanState('scanning');
     setProduct(null);
+    setScannedEan(null);
+    setEditedProtein('');
+    setEditedFiber('');
+    setEditedCalories('');
     scannedRef.current = false;
   }
+
+  // Derive the product to display (user correction wins over raw lookup)
+  const displayProduct = (scanState === 'result' && !correctionLoading)
+    ? (correction ?? product)
+    : product;
+
+  // Show protein warning when no correction and protein is 0
+  const showProteinWarning =
+    scanState === 'result' &&
+    !correction &&
+    displayProduct?.proteinG === 0 &&
+    displayProduct?.dataSource !== 'user_corrected';
 
   return (
     <Modal
@@ -168,23 +265,54 @@ export function BarcodeScannerSheet({
           </View>
         )}
 
-        {/* Product found — confirm */}
-        {permission?.granted && scanState === 'result' && product && (
+        {/* Product found — editable result */}
+        {permission?.granted && scanState === 'result' && displayProduct && (
           <View style={styles.resultContent}>
-            <Text style={styles.productName}>{product.name}</Text>
-            <Text style={styles.productServing}>{product.servingDescription}</Text>
-
-            <View style={styles.macroRow}>
-              <MacroChip label="Protein" value={product.proteinG} unit="g" highlight />
-              {product.fiberG != null && (
-                <MacroChip label="Fiber" value={product.fiberG} unit="g" />
-              )}
-              {product.caloriesKcal != null && (
-                <MacroChip label="Calories" value={product.caloriesKcal} unit="kcal" />
+            {/* Product name + source badge */}
+            <Text style={styles.productName}>{displayProduct.name}</Text>
+            <View style={styles.sourceRow}>
+              {displayProduct.dataSource === 'user_corrected' ? (
+                <View style={styles.verifiedBadge}>
+                  <Text style={styles.verifiedBadgeText}>✓ Your verified data</Text>
+                </View>
+              ) : (
+                <Text style={styles.sourceLabel}>
+                  {SOURCE_LABEL[displayProduct.dataSource]} · {displayProduct.servingDescription}
+                </Text>
               )}
             </View>
 
-            <Text style={styles.per100gNote}>Values per 100g</Text>
+            {/* Protein warning when data is likely missing */}
+            {showProteinWarning && (
+              <View style={styles.proteinWarning}>
+                <Text style={styles.proteinWarningText}>
+                  ⚠ Protein data may be missing — verify against the label
+                </Text>
+              </View>
+            )}
+
+            {/* Editable nutrition fields */}
+            <Text style={styles.fieldsNote}>Per 100g — edit to match the label</Text>
+            <View style={styles.fieldsRow}>
+              <EditableField
+                label="Protein (g)"
+                value={editedProtein}
+                onChangeText={setEditedProtein}
+                highlight
+              />
+              <EditableField
+                label="Fiber (g)"
+                value={editedFiber}
+                onChangeText={setEditedFiber}
+                placeholder="—"
+              />
+              <EditableField
+                label="Calories"
+                value={editedCalories}
+                onChangeText={setEditedCalories}
+                placeholder="—"
+              />
+            </View>
 
             <Pressable
               style={({ pressed }) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}
@@ -205,23 +333,35 @@ export function BarcodeScannerSheet({
   );
 }
 
-interface MacroChipProps {
+// ─── Editable nutrition field ────────────────────────────────────────────────
+
+interface EditableFieldProps {
   label: string;
-  value: number;
-  unit: string;
+  value: string;
+  onChangeText: (v: string) => void;
   highlight?: boolean;
+  placeholder?: string;
 }
 
-function MacroChip({ label, value, unit, highlight = false }: MacroChipProps) {
+function EditableField({ label, value, onChangeText, highlight, placeholder }: EditableFieldProps) {
   return (
-    <View style={[styles.macroChip, highlight && styles.macroChipHighlight]}>
-      <Text style={[styles.macroValue, highlight && styles.macroValueHighlight]}>
-        {value.toFixed(1)}{unit}
-      </Text>
-      <Text style={[styles.macroLabel, highlight && styles.macroLabelHighlight]}>{label}</Text>
+    <View style={[styles.fieldCard, highlight && styles.fieldCardHighlight]}>
+      <TextInput
+        style={[styles.fieldInput, highlight && styles.fieldInputHighlight]}
+        value={value}
+        onChangeText={onChangeText}
+        keyboardType="decimal-pad"
+        returnKeyType="done"
+        placeholder={placeholder ?? '0'}
+        placeholderTextColor={colors.textDisabled}
+        accessibilityLabel={label}
+      />
+      <Text style={[styles.fieldLabel, highlight && styles.fieldLabelHighlight]}>{label}</Text>
     </View>
   );
 }
+
+// ─── Styles ──────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   backdrop: {
@@ -235,7 +375,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
     paddingTop: spacing.sm,
-    minHeight: 380,
+    minHeight: 400,
   },
   handle: {
     width: 40,
@@ -313,6 +453,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: spacing.md,
   },
+
+  // Result view
   resultContent: {
     gap: spacing.md,
   },
@@ -321,46 +463,82 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.textPrimary,
   },
-  productServing: {
-    fontSize: 14,
-    color: colors.textSecondary,
+  sourceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  macroRow: {
+  sourceLabel: {
+    fontSize: 12,
+    color: colors.textDisabled,
+  },
+  verifiedBadge: {
+    backgroundColor: 'rgba(5,150,105,0.10)',
+    borderRadius: radius.full,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+  },
+  verifiedBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#059669',
+  },
+
+  // Protein warning
+  proteinWarning: {
+    backgroundColor: AMBER_LIGHT,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  proteinWarningText: {
+    fontSize: 12,
+    color: AMBER,
+    fontWeight: '600',
+    lineHeight: 18,
+  },
+
+  // Editable fields
+  fieldsNote: {
+    fontSize: 11,
+    color: colors.textDisabled,
+  },
+  fieldsRow: {
     flexDirection: 'row',
     gap: spacing.sm,
-    marginTop: spacing.xs,
   },
-  macroChip: {
+  fieldCard: {
     flex: 1,
     backgroundColor: colors.gray100,
     borderRadius: radius.md,
     paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xs,
     alignItems: 'center',
+    gap: 2,
   },
-  macroChipHighlight: {
-    backgroundColor: colors.primaryLight,
+  fieldCardHighlight: {
+    backgroundColor: BRAND_LIGHT,
   },
-  macroValue: {
-    fontSize: 16,
+  fieldInput: {
+    fontSize: 18,
     fontWeight: '700',
     color: colors.textPrimary,
+    textAlign: 'center',
+    minWidth: 60,
+    paddingVertical: 0,
   },
-  macroValueHighlight: {
-    color: colors.primary,
+  fieldInputHighlight: {
+    color: BRAND,
   },
-  macroLabel: {
-    fontSize: 11,
+  fieldLabel: {
+    fontSize: 10,
     color: colors.textSecondary,
-    marginTop: 2,
+    textAlign: 'center',
   },
-  macroLabelHighlight: {
-    color: colors.primary,
+  fieldLabelHighlight: {
+    color: BRAND,
   },
-  per100gNote: {
-    fontSize: 12,
-    color: colors.textDisabled,
-    textAlign: 'right',
-  },
+
+  // Buttons
   primaryButton: {
     backgroundColor: colors.primary,
     borderRadius: radius.md,

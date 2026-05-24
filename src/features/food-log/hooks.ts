@@ -16,6 +16,8 @@ import {
   saveFoodCorrection,
   upsertFoodDefault,
 } from './api';
+import { fetchBarcodeCorrection, saveBarcodeCorrection } from './barcode-corrections';
+import type { BarcodeProduct } from './barcode-lookup';
 import { usePhotoFoodRecognition, type RecognitionResult } from './photo-recognition';
 import type { FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
 
@@ -262,6 +264,56 @@ export function useUserFoodDefault(foodNameKey: string): {
     defaults: data ?? null,
     isLoading,
   };
+}
+
+// ---------------------------------------------------------------------------
+// useBarcodeCorrectionLookup
+// Fetches the user's saved correction for a given EAN (if any).
+// Used by the scanner to pre-fill result fields with previously verified values.
+// staleTime: Infinity — corrections only change when the user explicitly updates them.
+// ---------------------------------------------------------------------------
+export function useBarcodeCorrectionLookup(ean: string | null): {
+  correction: BarcodeProduct | null;
+  isLoading: boolean;
+} {
+  const session = useAuthStore.use.session();
+  const userId = session?.user.id;
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['barcode-correction', userId, ean],
+    queryFn: () => fetchBarcodeCorrection(userId!, ean!),
+    enabled: !!userId && ean !== null,
+    staleTime: Infinity,
+  });
+
+  return { correction: data ?? null, isLoading };
+}
+
+// ---------------------------------------------------------------------------
+// useSaveBarcodeCorrection
+// Persists a user-verified correction for a barcode EAN.
+// Invalidates the correction cache so future lookups reload.
+// ---------------------------------------------------------------------------
+export function useSaveBarcodeCorrection() {
+  const queryClient = useQueryClient();
+  const session = useAuthStore.use.session();
+  const userId = session?.user.id;
+
+  return useMutation({
+    mutationFn: ({
+      ean,
+      product,
+    }: {
+      ean: string;
+      product: Pick<BarcodeProduct, 'name' | 'proteinG' | 'fiberG' | 'caloriesKcal'>;
+    }) => {
+      if (!userId) throw new Error('Not authenticated');
+      return saveBarcodeCorrection(userId, ean, product);
+    },
+    onSuccess: (_data, { ean }) => {
+      queryClient.invalidateQueries({ queryKey: ['barcode-correction', userId, ean] });
+    },
+  });
 }
 
 // ---------------------------------------------------------------------------

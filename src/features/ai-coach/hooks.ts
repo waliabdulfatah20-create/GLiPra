@@ -14,6 +14,8 @@ import { useCallback, useState } from 'react';
 import { analytics, EVENTS } from '@/lib/analytics';
 import { isMockAIEnabled, MOCK_DAILY_GUIDANCE } from '@/lib/mockAI';
 import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/features/auth/use-auth-store';
+import { unlockMilestone } from '@/features/journey-cards/api';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -38,6 +40,9 @@ export interface CoachContext {
 // ---------------------------------------------------------------------------
 
 export function useAiCoach() {
+  const session = useAuthStore.use.session();
+  const userId = session?.user.id;
+
   // Messages are local-only — not persisted to Supabase.
   const [messages, setMessages] = useState<CoachMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -100,6 +105,11 @@ export function useAiCoach() {
         };
 
         setMessages((prev) => [...prev, assistantMsg]);
+
+        // Unlock coach_conversation milestone (idempotent — safe every message)
+        if (userId) {
+          unlockMilestone(userId, 'coach_conversation').catch(() => {});
+        }
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Something went wrong';
         setError(message);
@@ -116,7 +126,7 @@ export function useAiCoach() {
         setIsLoading(false);
       }
     },
-    [],
+    [userId],
   );
 
   return { messages, sendMessage, isLoading, error };

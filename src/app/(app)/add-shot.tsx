@@ -78,7 +78,7 @@ export default function AddShotScreen() {
   const router = useRouter();
   const { profile } = useTodayData();
   const { recommendation, isLoading: recLoading } = useInjectionSiteRecommendation();
-  const { mutate: logShot, isPending } = useLogInjectionSite();
+  const { mutate: logShot, isPending } = useLogInjectionSite(profile?.lastInjectionDate ?? undefined);
 
   // Display-only until next EAS build restores native pickers
   const [date] = React.useState<Date>(new Date());

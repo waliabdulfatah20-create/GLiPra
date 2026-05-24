@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/features/auth/use-auth-store';
-import { fetchWeightLogs, insertWeightLog } from '@/features/weight/api';
+import { fetchWeightLogs, fetchWeightLogCount, insertWeightLog } from '@/features/weight/api';
 import type { WeightLogEntry } from '@/features/weight/api';
 import { analytics, EVENTS } from '@/lib/analytics';
 import { applyEwma } from '@/utils/ewma';
+import { unlockMilestone } from '@/features/journey-cards/api';
 
 const WEIGHT_LOGS_KEY = 'weight-logs';
 
@@ -72,6 +73,16 @@ export function useInsertWeightLog(): {
       // No weight value in properties — Rule 2 (no health metrics in analytics)
       analytics.capture(EVENTS.WEIGHT_LOGGED);
       queryClient.invalidateQueries({ queryKey: [WEIGHT_LOGS_KEY, userId] });
+      // Check weight_logged_10x milestone (idempotent unlock)
+      if (userId) {
+        fetchWeightLogCount(userId).then((count) => {
+          if (count >= 10) {
+            unlockMilestone(userId, 'weight_logged_10x')
+              .then(() => queryClient.invalidateQueries({ queryKey: ['journey-cards', userId] }))
+              .catch(() => {});
+          }
+        }).catch(() => {});
+      }
     },
   });
 

@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { fetchTodayCheckIn, upsertCheckIn, fetchCheckInHistory } from '@/features/check-in/api';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { analytics, EVENTS } from '@/lib/analytics';
+import { unlockMilestone } from '@/features/journey-cards/api';
 
 import type { CheckInEntry, CheckInRecord, CheckInHistoryEntry } from '@/features/check-in/api';
 
@@ -56,6 +57,12 @@ export function useUpsertCheckIn(): {
       queryClient.invalidateQueries({
         queryKey: ['today-profile', userId],
       });
+      // Unlock first_checkin milestone (idempotent — safe to call every time)
+      if (userId) {
+        unlockMilestone(userId, 'first_checkin')
+          .then(() => queryClient.invalidateQueries({ queryKey: ['journey-cards', userId] }))
+          .catch(() => {});
+      }
     },
   });
 

@@ -9,6 +9,7 @@ import {
 } from './api';
 import { computeNextSite } from './calculator';
 import type { InjectionLog } from './types';
+import { unlockMilestone } from '@/features/journey-cards/api';
 
 const QUERY_KEY = 'injection-logs';
 
@@ -39,7 +40,7 @@ export function useInjectionSiteRecommendation() {
   return { recommendation, allResting, isLoading };
 }
 
-export function useLogInjectionSite() {
+export function useLogInjectionSite(lastInjectionDate?: string) {
   const session = useAuthStore.use.session();
   const userId = session?.user.id;
   const queryClient = useQueryClient();
@@ -47,8 +48,20 @@ export function useLogInjectionSite() {
   return useMutation({
     mutationFn: (input: InjectionLogInput) =>
       insertInjectionLog(userId!, input),
-    onSuccess: () => {
+    onSuccess: (_data, input) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY, userId] });
+      // Unlock injection_day_warrior if the user logged on their scheduled injection day
+      if (userId && lastInjectionDate) {
+        const injectedDay = input.injectedAt.slice(0, 10);
+        const injectionDay = lastInjectionDate.slice(0, 10);
+        if (injectedDay === injectionDay) {
+          unlockMilestone(userId, 'injection_day_warrior')
+            .then(() =>
+              queryClient.invalidateQueries({ queryKey: ['journey-cards', userId] }),
+            )
+            .catch(() => {});
+        }
+      }
     },
   });
 }

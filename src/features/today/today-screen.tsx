@@ -18,8 +18,11 @@ import { MedLevelBanner } from '@/components/today/med-level-banner';
 import { PhaseBadge } from '@/components/today/phase-badge';
 import { ProteinRing } from '@/components/today/protein-ring';
 import { StreakCard } from '@/components/today/streak-card';
+import { MilestoneToast } from '@/components/ui/milestone-toast';
 import { useTodayCheckIn } from '@/features/check-in/hooks';
 import { getActiveCards } from '@/features/content-cards/data';
+import { useCheckAndUnlockMilestones } from '@/features/journey-cards/hooks';
+import { MILESTONES, type Milestone, type MilestoneId } from '@/features/journey-cards/milestones';
 import { useTodayData } from '@/features/today/hooks';
 import { colors, radius, shadows, spacing } from '@/theme/colors';
 import type { InjectionPhase } from '@/types';
@@ -60,6 +63,20 @@ export function TodayScreen() {
   const { checkIn } = useTodayCheckIn();
   const hasCheckedInToday = checkIn !== null;
 
+  // Milestone toast state — shows the first newly unlocked milestone.
+  const [toastMilestone, setToastMilestone] = React.useState<Milestone | null>(null);
+
+  const handleMilestonesUnlocked = React.useCallback((ids: MilestoneId[]) => {
+    const first = ids[0];
+    if (first) {
+      const m = MILESTONES[first];
+      if (m) setToastMilestone(m);
+    }
+  }, []);
+
+  // Auto-check and unlock time-based milestones (week_1, 3_months, streak).
+  useCheckAndUnlockMilestones(profile?.createdAt, handleMilestonesUnlocked);
+
   const dateLabel = format(new Date(), 'EEEE, MMMM d');
   const phaseAccentColor = injectionCycle
     ? (PHASE_ACCENT[injectionCycle.phase] ?? colors.primary)
@@ -92,6 +109,12 @@ export function TodayScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      {/* Milestone unlock toast — floats above content, auto-dismisses */}
+      <MilestoneToast
+        milestone={toastMilestone}
+        onDismiss={() => setToastMilestone(null)}
+      />
+
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}

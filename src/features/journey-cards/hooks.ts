@@ -79,6 +79,7 @@ export function useJourneyCards(): {
  */
 export function useCheckAndUnlockMilestones(
   profileCreatedAt: string | null | undefined,
+  onUnlock?: (ids: MilestoneId[]) => void,
 ) {
   const session = useAuthStore.use.session();
   const userId = session?.user.id;
@@ -116,6 +117,7 @@ export function useCheckAndUnlockMilestones(
     Promise.all(toUnlock.map((id) => unlockMilestone(userId, id)))
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ['journey-cards', userId] });
+        onUnlock?.(toUnlock);
       })
       .catch(
         // Silently swallow — milestone unlock is best-effort and non-critical

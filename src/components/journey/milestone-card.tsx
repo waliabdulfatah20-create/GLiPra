@@ -4,7 +4,7 @@
  */
 
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
 import { format } from 'date-fns';
 
 import { colors, radius, shadows, spacing } from '@/theme/colors';
@@ -46,6 +46,16 @@ export function MilestoneCard({ milestone, unlockedAt, isNew = false }: Mileston
 
       {/* Footer */}
       <Text style={styles.unlockedDate}>Unlocked on {unlockedDateStr}</Text>
+
+      {/* Share button */}
+      <Pressable
+        style={styles.shareBtn}
+        onPress={() => Share.share({ message: milestone.shareText })}
+        accessibilityRole="button"
+        accessibilityLabel="Share this milestone"
+      >
+        <Text style={styles.shareBtnText}>Share</Text>
+      </Pressable>
     </View>
   );
 }
@@ -126,6 +136,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 'auto',
     paddingTop: spacing.xs,
+  },
+
+  // Share button
+  shareBtn: {
+    marginTop: spacing.sm,
+    backgroundColor: colors.primaryLight,
+    borderRadius: radius.full,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs + 2,
+  },
+  shareBtnText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.primary,
+    textAlign: 'center',
   },
 
   // Locked card

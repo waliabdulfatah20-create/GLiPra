@@ -36,6 +36,20 @@ export async function insertWeightLog(
 }
 
 /**
+ * Count total weight logs for a user (all-time).
+ * Used to check the weight_logged_10x milestone.
+ */
+export async function fetchWeightLogCount(userId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from('weight_logs')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId);
+
+  if (error) return 0;
+  return count ?? 0;
+}
+
+/**
  * Fetch weight logs for a user, ordered chronologically.
  * Defaults to the last 90 days.
  */

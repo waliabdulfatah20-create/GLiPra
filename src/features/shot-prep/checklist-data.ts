@@ -11,7 +11,7 @@ export const SHOT_DAY_CHECKLIST: ChecklistItem[] = [
     id: 'site-rotation',
     title: 'Site rotation',
     detail:
-      'Choose an injection site different from last week. Rotate between abdomen, thigh, and upper arm.',
+      'Choose an abdomen site different from last week. Glipra will recommend the next site in your rotation.',
     isPharmacistNote: false,
   },
   {
@@ -67,7 +67,7 @@ export const SHOT_DAY_CHECKLIST: ChecklistItem[] = [
     id: 'log-injection',
     title: 'Log your injection',
     detail:
-      'Update your injection date in Glipra settings after completing your injection.',
+      'Tap the Sites tab and use Add Shot to record today\'s injection site, dose, and any notes.',
     isPharmacistNote: false,
   },
   {

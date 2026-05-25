@@ -26,7 +26,8 @@ import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { useTodayProfile } from '@/features/today/hooks';
 import { useWeightLogs } from '@/features/weight/hooks';
-import { colors, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 type Range = '7D' | '30D' | '90D' | 'All';
 const RANGES: Range[] = ['7D', '30D', '90D', 'All'];
@@ -34,6 +35,9 @@ const RANGE_DAYS: Record<Range, number> = { '7D': 7, '30D': 30, '90D': 90, 'All'
 
 export default function ProgressScreen() {
   const { t } = useTranslation();
+  const { colors, spacing } = useTheme();
+  const styles = React.useMemo(() => makeStyles({ colors, spacing }), [colors, spacing]);
+
   const { width: screenWidth } = useWindowDimensions();
   const [range, setRange] = React.useState<Range>('30D');
   const days = RANGE_DAYS[range];
@@ -87,42 +91,51 @@ export default function ProgressScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-    gap: spacing.md,
-  },
-  rangeRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  disclaimerText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 17,
-  },
-});
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+}
+
+function makeStyles({ colors, spacing }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.sm,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      letterSpacing: -0.5,
+    },
+    subtitle: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+      gap: spacing.md,
+    },
+    rangeRow: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+    },
+    disclaimerText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 17,
+    },
+  });
+}

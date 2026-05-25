@@ -117,6 +117,159 @@ export const CONTENT_CARDS: ContentCard[] = [
     tier: 2,
     sortOrder: 10,
   },
+
+  // ── Batch 2 (cards 11–25) ─────────────────────────────────────────────────
+
+  {
+    id: 'resistance-training',
+    title: 'Resistance Training: The Muscle Protector',
+    body:
+      'Even two resistance training sessions per week — body-weight squats, resistance bands, or light dumbbells — can significantly reduce the amount of muscle lost during caloric restriction. GLP-1 medications accelerate fat loss; resistance training is the lever that keeps muscle in place while that fat loss happens. You do not need to become an athlete. Consistency at moderate intensity matters far more than intensity alone, and even short sessions count.',
+    cardType: 'tip',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 11,
+  },
+  {
+    id: 'protein-shake-strategy',
+    title: 'Protein Shakes: Your Low-Appetite Lifeline',
+    body:
+      'On days when appetite is near zero, a protein shake can be the difference between hitting your protein floor and falling well short. A 30–40 g shake takes under two minutes, produces almost no gastric volume, and is easy on a slowed stomach. Look for options with at least 25 g of protein per serving and under 5 g of sugar. Whey, casein, and pea protein all have strong evidence for muscle protein synthesis; choose whichever you tolerate best.',
+    cardType: 'tip',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 12,
+  },
+  {
+    id: 'eating-out',
+    title: 'Eating Out on GLP-1',
+    body:
+      'A few simple strategies make restaurant meals work: order protein first (grilled fish, chicken, lean steak), ask for sauces and dressings on the side, and choose a side salad or vegetables over refined carbs. Restaurant portions are almost always two to three times a correct portion size — boxing half before eating is a practical move, not a restriction. Pharmacist note: You will likely feel satisfied much sooner than your dining companions; that is the medication working, not a reason to keep eating.',
+    cardType: 'tip',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 13,
+  },
+  {
+    id: 'alcohol-glp1',
+    title: 'Alcohol and GLP-1: What to Know',
+    body:
+      'GLP-1 medications slow how quickly your stomach empties, which means alcohol enters your bloodstream more slowly and then more abruptly than usual — the effect can feel unpredictable. Alcohol also displaces protein and key nutrients from the meal, which is especially costly on days when appetite is already reduced. If you do drink, eat a protein-containing meal first, pace drinks slowly, and match each drink with a glass of water. Pharmacist note: Contact your prescriber if you have questions about how alcohol interacts with your specific medication.',
+    cardType: 'warning',
+    medicationIds: [],
+    tier: 1,
+    sortOrder: 14,
+  },
+  {
+    id: 'b-vitamins',
+    title: 'B Vitamins: The Hidden Shortfall',
+    body:
+      'Significant reductions in food intake — common on GLP-1 medications — can cause B12, B6, and thiamine levels to drop below optimal without obvious symptoms in the early months. Fatigue, tingling in the hands or feet, and difficulty concentrating can all be early signs. A daily B-complex or a high-quality multivitamin is a simple insurance policy. Pharmacist note: Talk to your prescriber about testing if you notice any of these symptoms.',
+    cardType: 'warning',
+    medicationIds: [],
+    tier: 1,
+    sortOrder: 15,
+  },
+  {
+    id: 'iron-zinc',
+    title: 'Iron and Zinc: Easy to Miss',
+    body:
+      'Red meat, shellfish, poultry, and legumes are the primary food sources of both iron and zinc — nutrients directly involved in immune function, wound healing, and energy metabolism. When food volume drops significantly, these are among the first minerals to fall short. If you notice more frequent infections, slower wound healing, or unusual hair shedding, it is worth asking your prescriber about a simple blood panel.',
+    cardType: 'tip',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 16,
+  },
+  {
+    id: 'calcium-bone',
+    title: 'Calcium and Bone Health',
+    body:
+      'Muscle and bone health are closely linked — both depend on resistance exercise, adequate protein, and sufficient calcium and vitamin D. Adults need 1,000–1,200 mg of calcium daily, which typically requires deliberate food choices (dairy, fortified plant milks, leafy greens, sardines) or a supplement when food intake is low. Vitamin D enhances calcium absorption and is frequently insufficient even in people with normal diets. Both are worth keeping in view during any period of significant caloric reduction.',
+    cardType: 'education',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 17,
+  },
+  {
+    id: 'plateau-perspective',
+    title: 'Weight Plateau: What It Really Means',
+    body:
+      'A weight plateau — weeks without a scale change despite consistent effort — is a normal feature of physiology, not a sign of failure. The body adapts to caloric deficits by reducing its metabolic rate over time, and short-term water retention (especially after strength training) can mask fat loss entirely. The most productive response is to focus on inputs you can control: protein consistency, resistance training, and hydration. Pharmacist note: Plateaus on GLP-1 often precede renewed progress; the worst response is reducing food intake further and risking more muscle loss.',
+    cardType: 'education',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 18,
+  },
+  {
+    id: 'pre-injection-prep',
+    title: 'The Day Before Your Injection',
+    body:
+      'The day before your injection is an ideal time to intentionally front-load protein and top up your electrolytes, because the next 24–48 hours will bring the strongest appetite suppression of your cycle. Think of it as preparation: get a full day of protein in, hydrate well, and avoid alcohol. A high-protein dinner the night before your injection means you are starting the peak suppression phase with your muscles already fueled, not in deficit.',
+    cardType: 'tip',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 19,
+  },
+  {
+    id: 'soft-foods-list',
+    title: 'Soft Foods for Low-Appetite Days',
+    body:
+      'On days when eating feels like an effort, food texture matters enormously. Soft, easy-to-manage options that are high in protein: Greek yogurt, cottage cheese, scrambled eggs, soft tofu, smooth nut butters, ricotta, hummus, well-cooked fish, and blended soups with added protein powder. These foods require almost no gastric volume and are easy to manage even when nausea is mild. Aim to build at least two of these into every high-suppression day as a baseline.',
+    cardType: 'tip',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 20,
+  },
+  {
+    id: 'adjustment-phase',
+    title: 'Navigating the Adjustment Phase',
+    body:
+      'Days 3–4 after your injection are when GI adjustment symptoms are most noticeable — bloating, irregular digestion, and general discomfort are most common during this window as your body adapts to a slower-moving digestive system. Lower-fiber, easier-to-digest foods (white rice, banana, well-cooked vegetables, eggs) tend to cause fewer symptoms during this window. Hydration and gentle movement, such as a 20-minute walk after meals, are the two best non-dietary tools for managing this phase.',
+    cardType: 'education',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 21,
+  },
+  {
+    id: 'sleep-recovery',
+    title: 'Sleep: The Overlooked Muscle Builder',
+    body:
+      'The majority of muscle repair and growth happens during deep sleep, when growth hormone is released in its highest concentrations. Consistently getting fewer than 7 hours of sleep raises cortisol, accelerates muscle breakdown, and blunts the protein synthesis your body needs to protect lean mass during caloric restriction. A high-protein snack 30–60 minutes before bed — cottage cheese or a casein shake — provides a slow-release amino acid supply that your muscles can use through the night.',
+    cardType: 'education',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 22,
+  },
+  {
+    id: 'social-eating',
+    title: 'Social Eating Without the Stress',
+    body:
+      'Social meals can feel complicated on a GLP-1 medication, but a few mental reframes help: your satiety signals are now calibrated correctly, not broken. You are not being difficult by eating less — you are eating the right amount for your body right now. Protein-forward ordering, eating slowly, and stopping when satisfied (not when the plate is empty) are the three habits that make social eating manageable over time. Most people around you will not notice what or how much you are eating.',
+    cardType: 'tip',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 23,
+  },
+  {
+    id: 'logging-accuracy',
+    title: 'Why Logging Accuracy Matters',
+    body:
+      'Protein is the one macro where consistency of tracking directly predicts muscle preservation outcomes. Even a systematic underestimate of 15–20 g per day adds up to over 100 g per week of missing protein your muscles needed. Common undercount sources: cooking oils added to protein foods, sauces with hidden protein, underestimating portion size on high-protein items. Weighing food occasionally — not obsessively, just for a week — recalibrates your eye and makes subsequent visual estimates far more accurate.',
+    cardType: 'tip',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 24,
+  },
+  {
+    id: 'maintenance-nutrition',
+    title: 'Nutrition When You Reach Your Goal',
+    body:
+      'Reaching your goal weight does not mean stopping the habits that got you there — it means recalibrating them. Protein remains just as important in maintenance because muscle mass still requires regular stimulus and amino acid supply to stay in place. Glipra\'s maintenance mode adjusts your protein floor by 10% to reflect reduced caloric needs, while keeping the floor high enough to protect the muscle you worked to preserve. This transition is a success, not an endpoint.',
+    cardType: 'education',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 25,
+  },
 ];
 
 /**

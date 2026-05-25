@@ -140,7 +140,11 @@
     "pharmacist_note_label": "NOTA DEL FARMACÉUTICO",
     "browse_all_tips": "Ver todos los consejos →",
     "read_full_note": "Leer la nota completa →",
-    "clinical_note_label": "⚠ Nota clínica: léala antes de su inyección"
+    "clinical_note_label": "⚠ Nota clínica: léala antes de su inyección",
+    "cycle_title": "CICLO DE INYECCIÓN",
+    "cycle_today_badge": "HOY",
+    "cycle_next_dose": "Próxima: {{date}}",
+    "cycle_overdue_label": "ATRASADA"
   },
   "content_card": {
     "tip": "CONSEJO",

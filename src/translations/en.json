@@ -140,7 +140,11 @@
     "pharmacist_note_label": "PHARMACIST'S NOTE",
     "browse_all_tips": "Browse all tips →",
     "read_full_note": "Read the full note →",
-    "clinical_note_label": "⚠ Clinical note: read before your injection"
+    "clinical_note_label": "⚠ Clinical note: read before your injection",
+    "cycle_title": "INJECTION CYCLE",
+    "cycle_today_badge": "TODAY",
+    "cycle_next_dose": "Next: {{date}}",
+    "cycle_overdue_label": "OVERDUE"
   },
   "content_card": {
     "tip": "TIP",

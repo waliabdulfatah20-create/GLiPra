@@ -1,4 +1,5 @@
 import { differenceInCalendarDays, format } from 'date-fns';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import * as React from 'react';
 import {
@@ -67,7 +68,7 @@ function SectionLabel({ label }: { label: string }) {
 
 export function TodayScreen() {
   const { t } = useTranslation();
-  const { colors, spacing, radius, shadows } = useTheme();
+  const { colors, spacing, radius, shadows, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
     [colors, spacing, radius, shadows],
@@ -172,7 +173,11 @@ export function TodayScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    // SafeAreaView background = gradient start so the status-bar area matches the hero.
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
+      edges={['top', 'bottom']}
+    >
       {/* Milestone unlock toast — floats above content, auto-dismisses */}
       <MilestoneToast
         milestone={toastMilestone}
@@ -182,17 +187,29 @@ export function TodayScreen() {
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
+        style={{ backgroundColor: colors.background }}
       >
-        {/* ── Header ───────────────────────────────────────────── */}
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <Text style={styles.greeting}>{greeting}</Text>
-            <Text style={styles.greetingDate}>{dateLabel}</Text>
+        {/* ── Gradient hero ────────────────────────────────────── */}
+        {/* Full-bleed: negative margins cancel the scroll padding, internal padding re-adds it. */}
+        <LinearGradient
+          colors={gradients.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroGradient}
+        >
+          <View style={styles.header}>
+            <View style={styles.headerLeft}>
+              <Text style={styles.greeting}>{greeting}</Text>
+              <Text style={styles.greetingDate}>{dateLabel}</Text>
+            </View>
+            <View style={styles.rxBadge}>
+              <Text style={styles.rxBadgeText}>Rx</Text>
+            </View>
           </View>
-          <View style={styles.rxBadge}>
-            <Text style={styles.rxBadgeText}>Rx</Text>
-          </View>
-        </View>
+        </LinearGradient>
+
+        {/* ── Content area — padded, sits below the gradient hero ─ */}
+        <View style={styles.contentArea}>
 
         {/* ── Conditional banners ───────────────────────────────── */}
         {profile?.phase === 'maintenance' && (
@@ -391,6 +408,8 @@ export function TodayScreen() {
         </Pressable>
         {showCarousel && <CardsCarousel cards={getActiveCards()} />}
         <ContentCardSheet card={sheetCard} onClose={() => setSheetCard(null)} />
+
+        </View>{/* end contentArea */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -409,7 +428,12 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      // backgroundColor is set inline to gradients.hero[0] so the status-bar
+      // area behind the notch matches the gradient start color.
+    },
+    contentArea: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.lg,
     },
     loadingContainer: {
       flex: 1,
@@ -418,16 +442,24 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       backgroundColor: colors.background,
     },
     scroll: {
-      padding: spacing.lg,
+      // No top/horizontal padding — the gradient hero is full-bleed.
+      // Individual content sections apply their own padding.
       paddingBottom: spacing.xxl,
     },
 
-    // ── Header ──────────────────────────────────────────────────
+    // ── Gradient hero ────────────────────────────────────────────
+    // Negative margins bleed past the ScrollView's zero padding to fill edge-to-edge.
+    heroGradient: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.xl + spacing.sm,  // generous bottom so curve feels spacious
+    },
+
+    // ── Header (lives inside the gradient) ──────────────────────
     header: {
       flexDirection: 'row',
       alignItems: 'flex-start',
       justifyContent: 'space-between',
-      marginBottom: spacing.lg,
     },
     headerLeft: {
       flex: 1,
@@ -435,28 +467,28 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     greeting: {
       fontSize: 30,
       fontWeight: '800',
-      color: colors.textPrimary,
+      color: '#ffffff',          // always white — sits on dark gradient
       letterSpacing: -0.5,
       marginBottom: 4,
     },
     greetingDate: {
       fontSize: 14,
-      color: colors.textSecondary,
+      color: 'rgba(255,255,255,0.75)',
       fontWeight: '400',
     },
     rxBadge: {
-      backgroundColor: colors.primaryLight,
+      backgroundColor: 'rgba(255,255,255,0.18)',
       borderRadius: radius.full,
       paddingHorizontal: spacing.sm + 2,
       paddingVertical: spacing.xs,
       borderWidth: 1,
-      borderColor: colors.primary + '30',
+      borderColor: 'rgba(255,255,255,0.35)',
       marginTop: 4,
     },
     rxBadgeText: {
       fontSize: 12,
       fontWeight: '700',
-      color: colors.primary,
+      color: '#ffffff',
       letterSpacing: 0.5,
     },
 

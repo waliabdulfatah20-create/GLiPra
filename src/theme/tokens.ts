@@ -86,8 +86,14 @@ export interface GlipraShadowTokens {
   };
 }
 
+export interface GlipraGradients {
+  /** Hero header gradient — purple → blue → teal. Always dark; text on top should be white. */
+  hero: readonly [string, string, string];
+}
+
 export interface GlipraTokens {
   colors: GlipraColorTokens;
+  gradients: GlipraGradients;
   spacing: typeof spacing;
   radius: typeof radius;
   shadows: GlipraShadowTokens;
@@ -100,6 +106,9 @@ export const lightTokens: GlipraTokens = {
   isDark: false,
   spacing,
   radius,
+  gradients: {
+    hero: ['#6d28d9', '#2563eb', '#0284c7'],
+  },
   shadows: {
     sm: {
       shadowColor: '#3b1f8f',
@@ -176,6 +185,9 @@ export const darkTokens: GlipraTokens = {
   isDark: true,
   spacing,
   radius,
+  gradients: {
+    hero: ['#3b0764', '#1e3a8a', '#0c4a6e'],
+  },
   shadows: {
     sm: {
       shadowColor: '#000000',

@@ -31,3 +31,18 @@ test('light and dark tokens have identical color key sets', () => {
   const darkKeys = Object.keys(darkTokens.colors).sort();
   expect(lightKeys).toEqual(darkKeys);
 });
+
+describe('gradients', () => {
+  test('light hero gradient starts with Direction B purple', () => {
+    expect(lightTokens.gradients.hero[0]).toBe('#6d28d9');
+  });
+  test('light hero gradient ends at sky blue', () => {
+    expect(lightTokens.gradients.hero[2]).toBe('#0284c7');
+  });
+  test('dark hero gradient starts with deep purple-black', () => {
+    expect(darkTokens.gradients.hero[0]).toBe('#3b0764');
+  });
+  test('dark hero gradient has 3 stops', () => {
+    expect(darkTokens.gradients.hero).toHaveLength(3);
+  });
+});

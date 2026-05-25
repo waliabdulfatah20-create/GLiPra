@@ -452,7 +452,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     heroGradient: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.md,
-      paddingBottom: spacing.xl + spacing.sm,  // generous bottom so curve feels spacious
+      paddingBottom: spacing.xl + spacing.sm,
     },
 
     // ── Header (lives inside the gradient) ──────────────────────

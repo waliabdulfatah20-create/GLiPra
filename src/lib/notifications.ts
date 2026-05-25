@@ -20,13 +20,20 @@ import * as Notifications from 'expo-notifications';
 import { addDays, isFuture, parseISO, setHours, setMinutes, setSeconds } from 'date-fns';
 
 // Show alerts even when the app is in the foreground.
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
+// Wrapped in try/catch: if the native module isn't initialized (e.g. during
+// Expo Router route discovery before the native layer is ready), this fails
+// silently instead of crashing the entire module import chain.
+try {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
+} catch {
+  // no-op — handler will be registered on next render cycle
+}
 
 export type NotificationId = 'injection-reminder' | 'daily-protein-nudge';
 

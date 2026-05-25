@@ -21,6 +21,7 @@ import { PharmacistSpotlightCard } from '@/components/today/pharmacist-spotlight
 import { MedLevelBanner } from '@/components/today/med-level-banner';
 import { PhaseBadge } from '@/components/today/phase-badge';
 import { ProteinRing } from '@/components/today/protein-ring';
+import { InjectionCycleCard } from '@/components/today/injection-cycle-card';
 import { StreakCard } from '@/components/today/streak-card';
 import { MilestoneToast } from '@/components/ui/milestone-toast';
 import { useTodayCheckIn } from '@/features/check-in/hooks';
@@ -307,6 +308,16 @@ export function TodayScreen() {
             </View>
           )}
         </View>
+
+        {/* ── Injection Cycle Strip (D4) ───────────────────────── */}
+        {profile?.medicationStatus !== 'discontinued' &&
+          profile?.lastInjectionDate &&
+          injectionCycle && (
+            <InjectionCycleCard
+              lastInjectionDate={profile.lastInjectionDate}
+              injectionCycle={injectionCycle}
+            />
+          )}
 
         {/* ── Shot Day Prep (injection day only) ────────────────── */}
         {injectionCycle?.phase === 'injection_day' && (

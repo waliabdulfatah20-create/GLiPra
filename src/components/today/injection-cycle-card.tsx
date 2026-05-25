@@ -135,10 +135,12 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       fontWeight: '700',
       color: colors.textSecondary,
       letterSpacing: 1,
+      textTransform: 'uppercase',
     },
     stripRow: {
       flexDirection: 'row',
       paddingHorizontal: spacing.md,
+      paddingBottom: spacing.sm,
       gap: 4,
     },
     cellUnit: {
@@ -187,7 +189,6 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       paddingBottom: spacing.md,
       borderTopWidth: 1,
       borderTopColor: colors.border,
-      marginTop: spacing.sm,
     },
     footerText: {
       fontSize: 12,

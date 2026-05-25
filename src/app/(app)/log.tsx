@@ -1,8 +1,18 @@
-// Log Hub Screen — food logging entry point.
+// Nutrition Log Screen — food logging entry point.
 // Route: /(app)/log
-// Provides Manual entry, Barcode scanning, and AI Photo modes.
+//
+// Layout (top to bottom):
+//   1. Header — "Nutrition Log" title + compact protein ring
+//   2. DailyMacroCard (when entries exist)
+//   3. MealChipRow — Breakfast / Lunch / Dinner / Snack time-based filter
+//   4. PhotoCaptureButton — always-visible AI hero card (Pro-gated internally)
+//   5. 2-tab toggle — Manual | Barcode (Photo removed; lives in the AI card)
+//   6. ManualEntryForm (when mode === 'manual')
+//   7. Today's log / filtered section header
+//   8. FoodLogRow list (filtered by selectedMeal)
+//
 // Barcode scanning is always free (never paywalled).
-// AI Photo Recognition is Pro-only (gated via PhotoCaptureButton → ProGate).
+// AI Photo Recognition is Pro-only (gated via PhotoCaptureButton internally).
 // DisclaimerBanner tier={2} required per Rule 8 (clinical screen).
 
 import * as React from 'react';
@@ -17,22 +27,44 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import { BarcodeScannerSheet } from '@/components/log/barcode-scanner-sheet';
-import { PhotoCaptureButton } from '@/components/log/photo-capture-button';
 import { ManualEntryForm } from '@/components/log/manual-entry-form';
+import { MealChipRow } from '@/components/log/meal-chip-row';
+import type { MealSlot } from '@/components/log/meal-chip-row';
+import { NutritionHeaderRing } from '@/components/log/nutrition-header-ring';
+import { PhotoCaptureButton } from '@/components/log/photo-capture-button';
+import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import type { BarcodeProduct } from '@/features/food-log/barcode-lookup';
 import { DailyMacroCard } from '@/features/food-log/daily-macro-card';
 import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useTodayFoodLogs } from '@/features/food-log/hooks';
 import { PhotoReviewSheet } from '@/features/food-log/photo-review-sheet';
 import type { FoodLogEntry, ManualFoodEntry } from '@/features/food-log/types';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTodayData } from '@/features/today/hooks';
+import { colors, radius, shadows, spacing } from '@/theme/colors';
 
-type LogMode = 'manual' | 'barcode' | 'photo';
+// ---------------------------------------------------------------------------
+// Meal slot helper — client-side time-based filter, no DB column needed.
+// ---------------------------------------------------------------------------
+function getMealSlot(loggedAt: string): MealSlot {
+  const hour = new Date(loggedAt).getHours(); // local time
+  if (hour >= 5 && hour < 11) return 'breakfast';
+  if (hour >= 11 && hour < 15) return 'lunch';
+  if (hour >= 15 && hour < 21) return 'dinner';
+  return 'snack';
+}
+
+type LogMode = 'manual' | 'barcode';
 
 export default function LogScreen() {
   const { t } = useTranslation();
   const [mode, setMode] = React.useState<LogMode>('manual');
   const [scannerVisible, setScannerVisible] = React.useState(false);
+  const [selectedMeal, setSelectedMeal] = React.useState<MealSlot | null>(null);
+  // Holds the captured image until the user fills in optional comment context.
+  const [pendingCapture, setPendingCapture] = React.useState<{
+    base64: string;
+    mimeType: 'image/jpeg' | 'image/png' | 'image/webp';
+  } | null>(null);
 
   const { logs, isLoading: logsLoading } = useTodayFoodLogs();
   const { mutate: insertManual, isLoading: insertingManual } = useInsertFoodLog();
@@ -43,6 +75,11 @@ export default function LogScreen() {
     clearPending,
     isLoading: recognizing,
   } = usePhotoFoodLog();
+  const { proteinFloorG } = useTodayData();
+
+  // ---------------------------------------------------------------------------
+  // Handlers
+  // ---------------------------------------------------------------------------
 
   function handleManualSubmit(entry: ManualFoodEntry) {
     insertManual(entry);
@@ -51,10 +88,6 @@ export default function LogScreen() {
   function handleBarcodeMode() {
     setMode('barcode');
     setScannerVisible(true);
-  }
-
-  function handlePhotoMode() {
-    setMode('photo');
   }
 
   function handleProductFound(product: BarcodeProduct) {
@@ -75,32 +108,68 @@ export default function LogScreen() {
 
   function handlePhotoReviewClose() {
     clearPending();
-    // Stay on photo mode so user can take another photo
+    // Stay on the log screen so user can take another photo if needed
   }
 
+  function handleAnalyze(comment?: string) {
+    if (!pendingCapture) return;
+    recognize(pendingCapture.base64, pendingCapture.mimeType, comment);
+    setPendingCapture(null);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Derived values
+  // ---------------------------------------------------------------------------
+
   const totalProteinToday = logs.reduce((sum, entry) => sum + entry.proteinG, 0);
+
+  const filteredLogs = selectedMeal
+    ? logs.filter((log) => getMealSlot(log.loggedAt) === selectedMeal)
+    : logs;
+
+  const sectionLabel = selectedMeal
+    ? selectedMeal.toUpperCase()
+    : t('log.todays_log').toUpperCase();
+
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <FlatList
-        data={logs}
+        data={filteredLogs}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <>
-            {/* Header */}
+            {/* 1. Header — title + compact protein ring */}
             <View style={styles.header}>
-              <Text style={styles.headerTitle}>{t('log.title')}</Text>
-              {logs.length > 0 && (
-                <Text style={styles.headerSubtitle}>
-                  {t('log.protein_today', { amount: totalProteinToday.toFixed(1) })}
-                </Text>
-              )}
+              <View style={styles.headerText}>
+                <Text style={styles.headerTitle}>{t('log.title')}</Text>
+                {logs.length > 0 && (
+                  <Text style={styles.headerSubtitle}>
+                    {t('log.protein_today', { amount: totalProteinToday.toFixed(1) })}
+                  </Text>
+                )}
+              </View>
+              <NutritionHeaderRing consumed={totalProteinToday} floor={proteinFloorG} />
             </View>
 
-            {/* Daily macro summary card — shown when there are entries today */}
+            {/* 2. Daily macro summary card — shown when there are entries today */}
             {logs.length > 0 && <DailyMacroCard />}
 
-            {/* Mode toggle — Manual | Barcode | Photo */}
+            {/* 3. Meal context chips */}
+            <MealChipRow active={selectedMeal} onSelect={setSelectedMeal} />
+
+            {/* 4. AI Photo hero card — always visible */}
+            <PhotoCaptureButton
+              onImageSelected={(base64, mimeType) =>
+                setPendingCapture({ base64, mimeType })
+              }
+              isLoading={recognizing}
+            />
+
+            {/* 5. 2-tab toggle — Manual | Barcode */}
             <View style={styles.modeToggleRow}>
               <Pressable
                 style={[styles.modeButton, mode === 'manual' && styles.modeButtonActive]}
@@ -135,26 +204,9 @@ export default function LogScreen() {
                   {t('log.mode_barcode')}
                 </Text>
               </Pressable>
-
-              <Pressable
-                style={[styles.modeButton, mode === 'photo' && styles.modeButtonActive]}
-                onPress={handlePhotoMode}
-                accessibilityRole="button"
-                accessibilityLabel="AI photo recognition mode (Pro)"
-                accessibilityState={{ selected: mode === 'photo' }}
-              >
-                <Text
-                  style={[
-                    styles.modeButtonText,
-                    mode === 'photo' && styles.modeButtonTextActive,
-                  ]}
-                >
-                  {t('log.mode_photo')}
-                </Text>
-              </Pressable>
             </View>
 
-            {/* Manual entry form */}
+            {/* 6. Manual entry form (mode === 'manual') */}
             {mode === 'manual' && (
               <ManualEntryForm
                 onSubmit={handleManualSubmit}
@@ -162,31 +214,30 @@ export default function LogScreen() {
               />
             )}
 
-            {/* AI Photo mode — PhotoCaptureButton wrapped in ProGate internally */}
-            {mode === 'photo' && (
-              <View style={styles.photoModeContainer}>
-                <PhotoCaptureButton
-                  onImageSelected={(base64, mimeType) => recognize(base64, mimeType)}
-                  isLoading={recognizing}
-                />
-                <Text style={styles.photoHint}>{t('log.photo_hint')}</Text>
-              </View>
-            )}
-
-            {/* Today's log section header */}
+            {/* 7. Today's log section header — label reflects active meal chip */}
             {logs.length > 0 && (
-              <Text style={styles.sectionTitle}>{t('log.todays_log')}</Text>
+              <Text style={styles.sectionTitle}>{sectionLabel}</Text>
             )}
 
             {logsLoading && logs.length === 0 && (
               <Text style={styles.emptyText}>{t('log.loading')}</Text>
             )}
 
-            {!logsLoading && logs.length === 0 && (
+            {/* 8. Empty state */}
+            {!logsLoading && filteredLogs.length === 0 && logs.length === 0 && (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyStateIcon}>🍽</Text>
                 <Text style={styles.emptyStateTitle}>{t('log.nothing_logged')}</Text>
                 <Text style={styles.emptyStateBody}>{t('log.nothing_logged_body')}</Text>
+              </View>
+            )}
+
+            {/* 8b. Empty state for filtered view with entries */}
+            {!logsLoading && filteredLogs.length === 0 && logs.length > 0 && (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyStateBody}>
+                  No entries for {selectedMeal} yet
+                </Text>
               </View>
             )}
           </>
@@ -209,6 +260,13 @@ export default function LogScreen() {
         visible={scannerVisible}
         onClose={handleScannerClose}
         onProductFound={handleProductFound}
+      />
+
+      {/* Comment sheet — slides up immediately after capture, before AI call */}
+      <PhotoCommentSheet
+        visible={!!pendingCapture}
+        onAnalyze={handleAnalyze}
+        onDismiss={() => setPendingCapture(null)}
       />
 
       {/* Photo review sheet — slides up after AI recognition */}
@@ -294,9 +352,15 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
     paddingBottom: spacing.md,
+  },
+  headerText: {
+    flex: 1,
   },
   headerTitle: {
     fontSize: 28,
@@ -313,6 +377,7 @@ const styles = StyleSheet.create({
   modeToggleRow: {
     flexDirection: 'row',
     marginHorizontal: spacing.md,
+    marginTop: spacing.md,
     marginBottom: spacing.sm,
     backgroundColor: colors.gray100,
     borderRadius: radius.lg,
@@ -327,11 +392,7 @@ const styles = StyleSheet.create({
   },
   modeButtonActive: {
     backgroundColor: colors.white,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 2,
+    ...shadows.sm,
   },
   modeButtonText: {
     fontSize: 13,
@@ -342,22 +403,11 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontWeight: '700',
   },
-  photoModeContainer: {
-    alignItems: 'center',
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.md,
-    gap: spacing.sm,
-  },
-  photoHint: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 19,
-  },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 11,
     fontWeight: '700',
-    color: colors.textPrimary,
+    color: colors.textSecondary,
+    letterSpacing: 1,
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
     marginHorizontal: spacing.md,

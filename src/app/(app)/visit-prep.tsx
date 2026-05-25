@@ -23,6 +23,7 @@ import {
   useVisitPrep,
   useGeneratePdf,
 } from '@/features/visit-prep/hooks';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, shadows, spacing } from '@/theme/colors';
 
 // Static fallback questions shown before AI generation runs.
@@ -82,10 +83,12 @@ export default function VisitPrepScreen() {
     aiQuestions !== null ? aiQuestions : STATIC_QUESTIONS;
 
   const handleGenerateQuestions = React.useCallback(async () => {
+    haptics.medium();
     await generateQuestions(data);
   }, [data, generateQuestions]);
 
   const handleExport = React.useCallback(async () => {
+    haptics.medium();
     if (!isPro) return;
 
     const pdfBase64 = await generate(data);

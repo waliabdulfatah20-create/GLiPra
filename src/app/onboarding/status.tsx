@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme/colors';
 
 type MedicationStatus = 'starting' | 'active' | 'tapering' | 'maintenance' | 'discontinued';
@@ -61,6 +62,7 @@ export default function StatusScreen() {
 
   const handleNext = () => {
     if (!canProceed) return;
+    haptics.medium();
     setFormData({ medicationStatus, activityLevel });
     router.push('/onboarding/protein-target');
   };

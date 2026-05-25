@@ -1,18 +1,35 @@
 import { Redirect, SplashScreen, Tabs } from 'expo-router';
 import * as React from 'react';
 import { useCallback, useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import {
   ChatBubble as CoachIcon,
   Home as HomeIcon,
-  PlusCircle as LogIcon,
+  Camera as LogIcon,
   Settings as SettingsIcon,
   Syringe as SyringeIcon,
+  TrendingUp as ProgressIcon,
 } from '@/components/ui/icons';
 import { useAuthStore as useAuth } from '@/features/auth/use-auth-store';
 import { useIsFirstTime } from '@/lib/hooks/use-is-first-time';
+import { haptics } from '@/lib/haptics';
 import { colors } from '@/theme/colors';
+
+// Active tab icon pill — soft brand capsule behind the focused icon
+const tabIconStyles = StyleSheet.create({
+  wrapper: {
+    width: 40,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
+  },
+  wrapperActive: {
+    backgroundColor: colors.primaryLight,
+  },
+});
 
 export default function TabLayout() {
   const { t } = useTranslation();
@@ -43,9 +60,12 @@ export default function TabLayout() {
   }
   return (
     <Tabs
+      screenListeners={{
+        tabPress: () => haptics.tap(),
+      }}
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.gray400,
+        tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
@@ -55,15 +75,36 @@ export default function TabLayout() {
           fontSize: 11,
           fontWeight: '600',
         },
+        tabBarItemStyle: {
+          flex: 1,
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: t('tabs.today'),
-          tabBarIcon: ({ color }) => <HomeIcon color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[tabIconStyles.wrapper, focused && tabIconStyles.wrapperActive]}>
+              <HomeIcon color={color} />
+            </View>
+          ),
           headerShown: false,
           tabBarButtonTestID: 'today-tab',
+        }}
+      />
+
+      <Tabs.Screen
+        name="progress"
+        options={{
+          title: t('tabs.progress'),
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[tabIconStyles.wrapper, focused && tabIconStyles.wrapperActive]}>
+              <ProgressIcon color={color} />
+            </View>
+          ),
+          tabBarButtonTestID: 'progress-tab',
         }}
       />
 
@@ -72,7 +113,11 @@ export default function TabLayout() {
         options={{
           title: t('tabs.nutrition'),
           headerShown: false,
-          tabBarIcon: ({ color }) => <LogIcon color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[tabIconStyles.wrapper, focused && tabIconStyles.wrapperActive]}>
+              <LogIcon color={color} />
+            </View>
+          ),
           tabBarButtonTestID: 'log-tab',
         }}
       />
@@ -82,7 +127,11 @@ export default function TabLayout() {
         options={{
           title: t('tabs.sites'),
           headerShown: false,
-          tabBarIcon: ({ color }) => <SyringeIcon color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[tabIconStyles.wrapper, focused && tabIconStyles.wrapperActive]}>
+              <SyringeIcon color={color} />
+            </View>
+          ),
           tabBarButtonTestID: 'sites-tab',
         }}
       />
@@ -92,7 +141,11 @@ export default function TabLayout() {
         options={{
           title: t('tabs.coach'),
           headerShown: false,
-          tabBarIcon: ({ color }) => <CoachIcon color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[tabIconStyles.wrapper, focused && tabIconStyles.wrapperActive]}>
+              <CoachIcon color={color} />
+            </View>
+          ),
           tabBarButtonTestID: 'coach-tab',
         }}
       />
@@ -102,7 +155,11 @@ export default function TabLayout() {
         options={{
           title: t('tabs.settings'),
           headerShown: false,
-          tabBarIcon: ({ color }) => <SettingsIcon color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[tabIconStyles.wrapper, focused && tabIconStyles.wrapperActive]}>
+              <SettingsIcon color={color} />
+            </View>
+          ),
           tabBarButtonTestID: 'settings-tab',
         }}
       />
@@ -110,7 +167,7 @@ export default function TabLayout() {
       {/* Style tab removed — was an Obytes template placeholder, not a real screen */}
       <Tabs.Screen
         name="style"
-        options={{ headerShown: false, tabBarButton: () => null }}
+        options={{ href: null, headerShown: false }}
       />
       {/* Hidden modal screen — not visible in tab bar */}
       <Tabs.Screen
@@ -165,6 +222,16 @@ export default function TabLayout() {
       {/* Edit Shot form — opens when tapping a row in Recent Shots list */}
       <Tabs.Screen
         name="edit-shot"
+        options={{ href: null, headerShown: false }}
+      />
+      {/* Goal Weight edit — accessible from Settings > Body Metrics, not a visible tab */}
+      <Tabs.Screen
+        name="goal-weight"
+        options={{ href: null, headerShown: false }}
+      />
+      {/* GLP-1 Status update — accessible from Settings > Preferences, not a visible tab */}
+      <Tabs.Screen
+        name="update-status"
         options={{ href: null, headerShown: false }}
       />
       {/* Paywall — full-screen, opened programmatically; never shown in tab bar */}

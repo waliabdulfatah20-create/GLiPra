@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, shadows, spacing } from '@/theme/colors';
 import { calculateProteinFloor } from '@/utils/protein';
 import type { ProteinResult } from '@/utils/protein';
@@ -54,6 +55,7 @@ export default function ProteinTargetScreen() {
 
   const handleNext = () => {
     if (!canProceed || result === null) return;
+    haptics.medium();
     setFormData({ proteinFloorG: result.proteinFloorG, proteinFloorAcknowledged: true });
     router.push('/onboarding/import');
   };

@@ -87,6 +87,7 @@ export function usePhotoFoodRecognition() {
       imageBase64: string,
       mimeType: 'image/jpeg' | 'image/png' | 'image/webp',
       recentCorrections?: Array<{ originalName: string; correctedName: string }>,
+      userComment?: string,
     ): Promise<RecognitionResult | null> => {
       setIsLoading(true);
       setError(null);
@@ -105,10 +106,11 @@ export function usePhotoFoodRecognition() {
             body: {
               imageBase64,
               mimeType,
-              // Rule 2: only food names passed — never user ID or email
+              // Rule 2: only food names + food-context comment — never user ID or email
               ...(recentCorrections && recentCorrections.length > 0
                 ? { recentCorrections }
                 : {}),
+              ...(userComment ? { userComment } : {}),
             },
           },
         );

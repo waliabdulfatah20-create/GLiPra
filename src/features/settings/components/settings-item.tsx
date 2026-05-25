@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { haptics } from '@/lib/haptics';
 import { colors, spacing } from '@/theme/colors';
 
 // ─── SettingsRow ──────────────────────────────────────────────────────────────
@@ -30,7 +31,7 @@ export function SettingsRow({
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => { if (isPressable) { haptics.tap(); onPress?.(); } }}
       disabled={!isPressable}
       style={({ pressed }) => [
         styles.row,

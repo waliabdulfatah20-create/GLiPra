@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { LOCAL, changeLanguage } from '@/lib/i18n/utils';
 import { setItem } from '@/lib/storage';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, shadows, spacing } from '@/theme/colors';
 import type { Language } from '@/lib/i18n/resources';
 
@@ -19,6 +20,7 @@ export default function LanguageScreen() {
   const [selected, setSelected] = React.useState<Language>('en');
 
   const handleContinue = () => {
+    haptics.medium();
     setItem(LOCAL, selected);
     changeLanguage(selected);
     router.push('/onboarding/medication');

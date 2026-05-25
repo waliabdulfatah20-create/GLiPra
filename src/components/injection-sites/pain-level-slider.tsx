@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme/colors';
 
 interface PainLevelSliderProps {
@@ -32,7 +33,7 @@ export function PainLevelSlider({ value, onChange }: PainLevelSliderProps) {
           return (
             <Pressable
               key={v}
-              onPress={() => onChange(v)}
+              onPress={() => { haptics.selection(); onChange(v); }}
               style={[styles.dot, isActive && styles.dotActive]}
               accessibilityRole="adjustable"
               accessibilityLabel={`Pain level ${v}`}

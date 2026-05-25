@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme/colors';
 import type { GLP1MedicationId } from '@/types';
 
@@ -38,6 +39,7 @@ export default function MedicationScreen() {
 
   const handleNext = () => {
     if (!selectedId) return;
+    haptics.medium();
     setFormData({
       medicationId: selectedId,
       isCompounded: selectedId.startsWith('compounded'),

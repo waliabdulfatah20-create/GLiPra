@@ -45,7 +45,59 @@
     "nutrition": "Nutrition",
     "sites": "Log GLP-1",
     "coach": "Coach",
+    "progress": "Progress",
     "settings": "Settings"
+  },
+  "progress": {
+    "title": "Progress",
+    "subtitle": "Your trends over time",
+    "loading": "Loading…",
+    "disclaimer": "Trends are based on what you've logged. Inaccurate or missing logs will produce inaccurate trends. For medical decisions, consult your prescriber.",
+    "results_card": {
+      "label": "WEIGHT RESULTS",
+      "total_lost": "Total Lost",
+      "weekly_avg": "Weekly Avg",
+      "bmi": "BMI",
+      "to_goal": "To Goal",
+      "empty": "Log at least 2 weights to see results"
+    },
+    "weight_card": {
+      "label": "WEIGHT TREND",
+      "empty": "Log at least 2 weights to see your trend"
+    },
+    "protein_card": {
+      "label": "PROTEIN HIT RATE",
+      "subtitle": "of the last {{days}} days hit your floor",
+      "no_floor": "Set your protein floor in onboarding to see your hit rate"
+    },
+    "streak_card": {
+      "label": "DAILY HITS",
+      "legend_hit": "Hit floor",
+      "legend_miss": "Missed",
+      "legend_none": "No log"
+    },
+    "adherence_card": {
+      "label": "INJECTION ADHERENCE",
+      "subtitle": "{{count}} shots logged · {{interval}}",
+      "empty": "Log your first shot to see adherence",
+      "daily": "daily",
+      "weekly": "weekly",
+      "biweekly": "biweekly",
+      "custom": "custom"
+    },
+    "symptoms_card": {
+      "label": "SYMPTOM TRENDS",
+      "empty": "Complete a daily check-in to see your symptoms",
+      "nausea": "Nausea",
+      "energy": "Energy"
+    },
+    "tips": {
+      "weight": "Your trend line is smoothed to filter day-to-day noise from hydration and food timing. Look at the slope over weeks, not single days.",
+      "protein": "Hitting 80% or more of your protein floor protects lean muscle while GLP-1 does its job. Aim for consistency over perfection.",
+      "streak": "Every green day fueled your muscle preservation goal. A missed day doesn't undo progress — keep going tomorrow.",
+      "injection": "Consistent timing keeps medication levels stable. Shifting your dose day within a 24-hour window is clinically fine.",
+      "symptoms": "Symptoms usually settle as your body adjusts. Symptoms persisting beyond two weeks or sharply worsening deserve a prescriber conversation."
+    }
   },
   "today": {
     "greeting_morning": "Good morning",
@@ -67,6 +119,7 @@
     "streak_empty": "Start your streak today!",
     "streak_day": "day streak",
     "streak_best": "BEST",
+    "streak_start": "Log protein today to earn your first day",
     "journey_title": "Your Journey",
     "journey_subtitle": "Milestones and progress",
     "coach_subtitle": "Protein, meals & hydration",
@@ -75,6 +128,7 @@
     "next_injection": "Next injection in",
     "injection_overdue_inline": "Injection overdue",
     "no_injection_data": "Log your injection date in settings",
+    "injection_discontinued": "Injection tracking paused",
     "shot_day_title": "Shot Day Prep",
     "shot_day_body": "Open your injection day checklist",
     "maintenance_banner": "Maintenance phase: protein floor adjusted",
@@ -103,7 +157,7 @@
     "overdue_pill": "Contact prescriber"
   },
   "log": {
-    "title": "Log a Meal",
+    "title": "Nutrition Log",
     "protein_today": "{{amount}}g protein today",
     "mode_manual": "Manual",
     "mode_barcode": "Barcode",
@@ -119,7 +173,12 @@
     "source_manual": "manual",
     "source_barcode": "barcode",
     "source_ai": "AI",
-    "disclaimer": "Nutrition values are estimated from the information you or the barcode database provide. AI photo values are estimates, so always verify with your prescriber or a registered dietitian."
+    "disclaimer": "Nutrition values are estimated from the information you or the barcode database provide. AI photo values are estimates, so always verify with your prescriber or a registered dietitian.",
+    "photo_comment_title": "Add context for better accuracy",
+    "photo_comment_subtitle": "Optional — helps AI estimate portion and ingredients",
+    "photo_comment_placeholder": "e.g. large bowl, extra cheese, half portion…",
+    "photo_comment_skip": "Skip",
+    "photo_comment_analyze": "Analyze"
   },
   "checkin": {
     "title": "Daily Check-in",
@@ -166,18 +225,26 @@
     "account": "Account",
     "english": "English",
     "spanish": "Español",
+    "body_metrics": "Body Metrics",
+    "goal_weight": "Goal Weight",
     "weight_tracking": "Weight Tracking",
     "medication_level": "Medication Level",
     "visit_prep": "Prescriber Visit Prep",
     "injection_sites": "Injection Site Tracker",
     "health_import": "Health Import",
+    "medication_status": "GLP-1 Status",
     "maintenance_mode": "Maintenance Mode",
     "life_after_glp1": "Life After GLP-1",
     "version": "Version",
     "app_name": "App Name",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "logout": "Sign Out"
+    "logout": "Sign Out",
+    "notifications": "Notifications",
+    "notif_injection": "Injection day reminder",
+    "notif_injection_subtitle": "8 AM on your dose day",
+    "notif_protein": "Daily protein nudge",
+    "notif_protein_subtitle": "7 PM reminder to hit your goal"
   },
   "medication": {
     "title": "Medication Level",

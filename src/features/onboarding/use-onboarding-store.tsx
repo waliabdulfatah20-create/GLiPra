@@ -17,6 +17,7 @@ export type OnboardingFormData = {
   // Step 3 — body
   weightKg?: number;
   heightCm?: number;
+  goalWeightKg?: number;
   // Step 4 — safety
   hasKidneyDisease?: boolean;
   isPregnant?: boolean;

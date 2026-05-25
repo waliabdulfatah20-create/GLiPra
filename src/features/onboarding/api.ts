@@ -20,6 +20,7 @@ export async function saveOnboardingProfile(
     last_injection_date: data.lastInjectionDate ?? null,
     weight_kg: data.weightKg ?? null,
     height_cm: data.heightCm ?? null,
+    goal_weight_kg: data.goalWeightKg ?? null,
     bmi,
     has_kidney_disease: data.hasKidneyDisease ?? false,
     is_pregnant: data.isPregnant ?? false,

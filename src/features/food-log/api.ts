@@ -244,6 +244,51 @@ export async function getFoodDefault(
 // Fetch today's food log entries for a user.
 // `today` is an ISO date string 'YYYY-MM-DD'.
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// fetchFoodLogsInRange
+// Fetch food log entries within an inclusive local-date range.
+// Both `startDate` and `endDate` are 'YYYY-MM-DD' local-date strings.
+// Used by the Progress tab to compute per-day protein totals over a window.
+// Reuses the same local-midnight-vs-UTC fix as fetchTodayFoodLogs.
+// ---------------------------------------------------------------------------
+export async function fetchFoodLogsInRange(
+  userId: string,
+  startDate: string,
+  endDate: string,
+): Promise<FoodLogEntry[]> {
+  const [sy, sm, sd] = startDate.split('-').map(Number);
+  const [ey, em, ed] = endDate.split('-').map(Number);
+  const localStart = new Date(sy, sm - 1, sd);
+  const localEnd = new Date(ey, em - 1, ed);
+  const rangeStart = getStartOfDay(localStart).toISOString();
+  const rangeEnd = getEndOfDay(localEnd).toISOString();
+
+  const { data, error } = await supabase
+    .from('food_logs')
+    .select(
+      'id, user_id, logged_at, name, serving_description, ' +
+      'protein_g, carbs_g, fat_g, fiber_g, calories_kcal, ' +
+      'b12_mcg, vitamin_d_iu, magnesium_mg, zinc_mg, ' +
+      'barcode_ean, source, created_at',
+    )
+    .eq('user_id', userId)
+    .gte('logged_at', rangeStart)
+    .lte('logged_at', rangeEnd)
+    .order('logged_at', { ascending: true });
+
+  if (error) {
+    throw new Error(`fetchFoodLogsInRange failed: ${error.message}`);
+  }
+  if (!data) return [];
+
+  const entries: FoodLogEntry[] = [];
+  for (const row of data) {
+    const parsed = foodLogRowSchema.safeParse(row);
+    if (parsed.success) entries.push(rowToEntry(parsed.data));
+  }
+  return entries;
+}
+
 export async function fetchTodayFoodLogs(
   userId: string,
   today: string,

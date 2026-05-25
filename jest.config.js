@@ -2,6 +2,16 @@ module.exports = {
   preset: 'jest-expo',
   setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
   testMatch: ['**/?(*.)+(spec|test).ts?(x)'],
+  // Exclude pure-TS Vitest tests (pnpm test:utils).
+  // These import from 'vitest' and crash under jest-expo.
+  // Patterns mirror vitest.config.ts `include` globs exactly.
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/src/utils/.*\\.test\\.ts$',              // utils/protein, utils/ewma, …
+    '/src/features/.*calculator\\.test\\.ts$', // */calculator + */readiness-calculator
+    '/src/features/safety/.*\\.test\\.ts$',    // redFlagDetector, …
+    '/src/features/medication-level/.*\\.test\\.ts$',
+  ],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!**/coverage/**',

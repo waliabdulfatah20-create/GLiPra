@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Circle, Line, Polyline, Svg } from 'react-native-svg';
 
 import { useMedicationLevelCurve } from '@/features/medication-level/hooks';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, shadows, spacing } from '@/theme/colors';
 import type { InjectionPhase } from '@/types';
 
@@ -104,7 +105,7 @@ export function MedLevelBanner({ phase }: MedLevelBannerProps) {
     return (
       <TouchableOpacity
         style={styles.card}
-        onPress={() => router.push('/medication-level')}
+        onPress={() => { haptics.tap(); router.push('/medication-level'); }}
         activeOpacity={0.75}
         accessibilityRole="button"
         accessibilityLabel="Set up medication level"
@@ -130,7 +131,7 @@ export function MedLevelBanner({ phase }: MedLevelBannerProps) {
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => router.push('/medication-level')}
+      onPress={() => { haptics.tap(); router.push('/medication-level'); }}
       activeOpacity={0.75}
       accessibilityRole="button"
       accessibilityLabel="View medication level curve"

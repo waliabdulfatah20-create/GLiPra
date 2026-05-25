@@ -4,6 +4,7 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StepProgress } from '@/features/onboarding/components/step-progress';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, shadows, spacing } from '@/theme/colors';
 
 type ImportOption = {
@@ -42,6 +43,7 @@ export default function ImportScreen() {
   };
 
   const handleSkip = () => {
+    haptics.medium();
     router.push('/onboarding/reveal');
   };
 

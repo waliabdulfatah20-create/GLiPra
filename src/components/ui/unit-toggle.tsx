@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme/colors';
 
 interface UnitToggleProps {
@@ -22,7 +23,7 @@ export function UnitToggle({ options, active, onToggle }: UnitToggleProps) {
           <Pressable
             key={opt}
             style={[styles.btn, isActive && styles.btnActive]}
-            onPress={onToggle}
+            onPress={() => { haptics.selection(); onToggle(); }}
             accessibilityRole="button"
             accessibilityState={{ selected: isActive }}
             accessibilityLabel={`${opt} unit`}

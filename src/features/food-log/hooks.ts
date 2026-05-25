@@ -137,6 +137,7 @@ export function usePhotoFoodLog(): {
   recognize: (
     base64: string,
     mimeType: 'image/jpeg' | 'image/png' | 'image/webp',
+    userComment?: string,
   ) => Promise<void>;
   pendingResult: RecognitionResult | null;
   clearPending: () => void;
@@ -153,10 +154,11 @@ export function usePhotoFoodLog(): {
     async (
       base64: string,
       mimeType: 'image/jpeg' | 'image/png' | 'image/webp',
+      userComment?: string,
     ) => {
       // Fetch recent corrections to improve AI accuracy (Rule 2: food names only)
       const corrections = userId ? await getRecentCorrections(userId) : [];
-      const result = await recognizeRaw(base64, mimeType, corrections);
+      const result = await recognizeRaw(base64, mimeType, corrections, userComment);
       if (result) {
         setPendingResult(result);
       }

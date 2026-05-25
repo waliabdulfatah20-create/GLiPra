@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 
-import { colors, radius, spacing } from '@/theme/colors';
+import { colors, radius, shadows, spacing } from '@/theme/colors';
 import type { ManualFoodEntry } from '@/features/food-log/types';
 
 export interface ManualEntryFormProps {
@@ -41,7 +41,8 @@ export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
   const [focusedField, setFocusedField] = React.useState<string | null>(null);
 
   const proteinValue = parseFloat(form.proteinG);
-  const isValid = form.name.trim().length > 0 && !isNaN(proteinValue) && proteinValue > 0;
+  const hasProtein = !isNaN(proteinValue) && proteinValue > 0;
+  const isValid = form.name.trim().length > 0 && hasProtein;
 
   function handleChange(field: keyof FormState, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -161,7 +162,7 @@ export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
       <Pressable
         style={({ pressed }) => [
           styles.submitButton,
-          (!isValid || isLoading) && styles.submitButtonDisabled,
+          !hasProtein && styles.submitButtonEmpty,
           pressed && isValid && !isLoading && styles.submitButtonPressed,
         ]}
         onPress={handleSubmit}
@@ -187,6 +188,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginHorizontal: spacing.md,
     marginTop: spacing.md,
+    ...shadows.sm,
   },
   fieldGroup: {
     marginBottom: spacing.md,
@@ -229,8 +231,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: spacing.xs,
   },
-  submitButtonDisabled: {
-    backgroundColor: colors.gray300,
+  submitButtonEmpty: {
+    backgroundColor: colors.gray200,
   },
   submitButtonPressed: {
     backgroundColor: colors.primaryDark,

@@ -10,9 +10,11 @@ import { unlockMilestone } from '@/features/journey-cards/api';
 const WEIGHT_LOGS_KEY = 'weight-logs';
 
 /**
- * Fetch the last 90 days of weight logs for the current user.
+ * Fetch weight logs for the current user.
+ * @param days How many days back to fetch. Defaults to 90.
+ *             Pass 9999 to get all-time data (used by the "All" range selector).
  */
-export function useWeightLogs(): {
+export function useWeightLogs(days = 90): {
   logs: WeightLogEntry[];
   isLoading: boolean;
   refetch: () => void;
@@ -21,8 +23,8 @@ export function useWeightLogs(): {
   const userId = session?.user.id;
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: [WEIGHT_LOGS_KEY, userId],
-    queryFn: () => fetchWeightLogs(userId!),
+    queryKey: [WEIGHT_LOGS_KEY, userId, days],
+    queryFn: () => fetchWeightLogs(userId!, days),
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
   });
@@ -52,10 +54,14 @@ export function useInsertWeightLog(): {
     mutationFn: async (entry: { weightKg: number; notes?: string }) => {
       if (!userId) throw new Error('Not authenticated');
 
-      // Get the latest EWMA from the query cache (if available).
+      // Get the latest EWMA from the 90-day cache (if available).
+      // Always read the default-window key — that cache is always populated
+      // by the weight logging screen regardless of which range the user has
+      // selected in Progress.
       const cached = queryClient.getQueryData<WeightLogEntry[]>([
         WEIGHT_LOGS_KEY,
         userId,
+        90,
       ]);
       const latestEwma = cached?.length
         ? (cached[cached.length - 1]?.ewmaWeightKg ?? null)

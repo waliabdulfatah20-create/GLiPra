@@ -20,6 +20,7 @@ import {
   useHeightUnit,
   useWeightUnit,
 } from '@/lib/unit-preference';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme/colors';
 
 function parsePositiveNumber(value: string): number | null {
@@ -41,6 +42,8 @@ export default function BodyScreen() {
   // Imperial height
   const [ftText, setFtText] = useState('');
   const [inText, setInText] = useState('');
+  // Goal weight (optional)
+  const [goalWeightText, setGoalWeightText] = useState('');
 
   // Parsed weight in the user's chosen unit (kg or lbs)
   const weightRaw = parsePositiveNumber(weightText);
@@ -63,6 +66,7 @@ export default function BodyScreen() {
 
   const handleNext = () => {
     if (!canProceed || weightRaw === null) return;
+    haptics.medium();
 
     // Convert to metric for storage
     const weightKg = weightUnit === 'lbs' ? lbsToKg(weightRaw) : weightRaw;
@@ -76,7 +80,15 @@ export default function BodyScreen() {
       heightCm = ftInToCm(ft, inches);
     }
 
-    setFormData({ weightKg, heightCm });
+    const goalWeightRaw = parsePositiveNumber(goalWeightText);
+    const goalWeightKg =
+      goalWeightRaw !== null
+        ? weightUnit === 'lbs'
+          ? lbsToKg(goalWeightRaw)
+          : goalWeightRaw
+        : undefined;
+
+    setFormData({ weightKg, heightCm, goalWeightKg });
     router.push('/onboarding/safety');
   };
 
@@ -191,6 +203,22 @@ export default function BodyScreen() {
             )}
           </>
         )}
+        {/* Goal weight input (optional) */}
+        <View style={[styles.labelRow, { marginTop: spacing.lg }]}>
+          <Text style={styles.fieldLabel}>GOAL WEIGHT</Text>
+          <Text style={styles.optionalLabel}>Optional</Text>
+        </View>
+        <TextInput
+          style={styles.textInput}
+          value={goalWeightText}
+          onChangeText={setGoalWeightText}
+          placeholder={weightUnit === 'lbs' ? 'e.g. 160' : 'e.g. 72'}
+          placeholderTextColor={colors.textDisabled}
+          keyboardType="decimal-pad"
+          returnKeyType="done"
+          accessibilityLabel={`Goal weight in ${weightUnit}`}
+        />
+        <Text style={styles.hintText}>Helps track your progress toward your goal</Text>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -280,6 +308,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.textSecondary,
     minWidth: 18,
+  },
+  optionalLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textDisabled,
+    letterSpacing: 0.4,
+  },
+  hintText: {
+    fontSize: 12,
+    color: colors.textDisabled,
+    marginTop: spacing.xs,
   },
   footer: {
     flexDirection: 'row',

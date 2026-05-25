@@ -13,6 +13,8 @@ export interface EwmaChartProps {
   }>;
   width: number;
   height: number;
+  /** ISO date strings for each injection. Rendered as faint dashed vertical lines. */
+  injectionDates?: string[];
 }
 
 const PADDING = { top: 16, right: 8, bottom: 28, left: 40 };
@@ -21,7 +23,7 @@ const PADDING = { top: 16, right: 8, bottom: 28, left: 40 };
  * Simple SVG line chart showing raw weight dots and the EWMA trend line.
  * Built with react-native-svg primitives — no third-party charting library.
  */
-export function EwmaChart({ logs, width, height }: EwmaChartProps) {
+export function EwmaChart({ logs, width, height, injectionDates }: EwmaChartProps) {
   if (logs.length < 2) {
     return (
       <View style={[styles.empty, { width, height }]}>
@@ -30,11 +32,8 @@ export function EwmaChart({ logs, width, height }: EwmaChartProps) {
     );
   }
 
-  // ── Clamp to last 30 entries (30-day window) ──────────────────────────────
-  const visible = logs.slice(-30);
-
   // ── Compute value range ───────────────────────────────────────────────────
-  const allValues: number[] = visible.flatMap((l) =>
+  const allValues: number[] = logs.flatMap((l) =>
     l.ewmaWeightKg != null ? [l.weightKg, l.ewmaWeightKg] : [l.weightKg],
   );
   const rawMin = Math.min(...allValues);
@@ -44,7 +43,7 @@ export function EwmaChart({ logs, width, height }: EwmaChartProps) {
   const maxVal = rawMax + pad;
 
   // ── Compute time range ────────────────────────────────────────────────────
-  const timestamps = visible.map((l) => parseISO(l.loggedAt).getTime());
+  const timestamps = logs.map((l) => parseISO(l.loggedAt).getTime());
   const minTime = Math.min(...timestamps);
   const maxTime = Math.max(...timestamps);
   const timeRange = maxTime - minTime || 1;
@@ -62,7 +61,7 @@ export function EwmaChart({ logs, width, height }: EwmaChartProps) {
   }
 
   // ── Build EWMA polyline points ────────────────────────────────────────────
-  const ewmaPoints = visible
+  const ewmaPoints = logs
     .filter((l) => l.ewmaWeightKg != null)
     .map((l) => {
       const ts = parseISO(l.loggedAt).getTime();
@@ -124,8 +123,28 @@ export function EwmaChart({ logs, width, height }: EwmaChartProps) {
           />
         )}
 
+        {/* Dose marker lines — faint dashed verticals at each injection date */}
+        {injectionDates?.map((isoDate) => {
+          const ts = parseISO(isoDate).getTime();
+          if (ts < minTime || ts > maxTime) return null;
+          const x = toX(ts);
+          return (
+            <Line
+              key={isoDate}
+              x1={x}
+              y1={PADDING.top}
+              x2={x}
+              y2={PADDING.top + plotH}
+              stroke={colors.primary}
+              strokeWidth={1}
+              strokeDasharray="3,3"
+              opacity={0.35}
+            />
+          );
+        })}
+
         {/* Raw weight dots */}
-        {visible.map((log, i) => {
+        {logs.map((log, i) => {
           const ts = parseISO(log.loggedAt).getTime();
           return (
             <Circle

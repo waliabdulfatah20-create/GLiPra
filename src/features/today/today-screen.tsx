@@ -24,6 +24,7 @@ import { getActiveCards } from '@/features/content-cards/data';
 import { useCheckAndUnlockMilestones } from '@/features/journey-cards/hooks';
 import { MILESTONES, type Milestone, type MilestoneId } from '@/features/journey-cards/milestones';
 import { useTodayData } from '@/features/today/hooks';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, shadows, spacing } from '@/theme/colors';
 import type { InjectionPhase } from '@/types';
 
@@ -142,7 +143,7 @@ export function TodayScreen() {
         {profile?.medicationStatus === 'discontinued' && (
           <TouchableOpacity
             style={styles.discontinuedBanner}
-            onPress={() => router.push('/discontinuation-mode')}
+            onPress={() => { haptics.tap(); router.push('/discontinuation-mode'); }}
             activeOpacity={0.75}
             accessibilityRole="button"
             accessibilityLabel="Open Life After GLP-1 guidance"
@@ -191,40 +192,47 @@ export function TodayScreen() {
             </View>
           </View>
 
-          {/* Injection phase — top accent in current phase color */}
-          <View style={[styles.phaseCard, { borderTopColor: phaseAccentColor }]}>
-            <Text style={styles.cardLabel}>{t('today.injection_label')}</Text>
-            {injectionCycle ? (
-              <>
-                <PhaseBadge
-                  phase={injectionCycle.phase}
-                  daysSinceInjection={injectionCycle.daysSinceInjection}
-                />
-                {injectionCycle.daysUntilNextInjection !== null && (
-                  <Text style={styles.nextInjection}>
-                    {t('today.next_injection')}{'\n'}
-                    <Text style={styles.nextInjectionDays}>
-                      {injectionCycle.daysUntilNextInjection}d
+          {/* Injection phase — hidden when discontinued */}
+          {profile?.medicationStatus === 'discontinued' ? (
+            <View style={[styles.phaseCard, { borderTopColor: colors.textDisabled }]}>
+              <Text style={styles.cardLabel}>{t('today.injection_label')}</Text>
+              <Text style={styles.noDataText}>{t('today.injection_discontinued')}</Text>
+            </View>
+          ) : (
+            <View style={[styles.phaseCard, styles.phaseAccent, { borderTopColor: phaseAccentColor }]}>
+              <Text style={styles.cardLabel}>{t('today.injection_label')}</Text>
+              {injectionCycle ? (
+                <>
+                  <PhaseBadge
+                    phase={injectionCycle.phase}
+                    daysSinceInjection={injectionCycle.daysSinceInjection}
+                  />
+                  {injectionCycle.daysUntilNextInjection !== null && (
+                    <Text style={styles.nextInjection}>
+                      {t('today.next_injection')}{'\n'}
+                      <Text style={styles.nextInjectionDays}>
+                        {injectionCycle.daysUntilNextInjection}d
+                      </Text>
                     </Text>
-                  </Text>
-                )}
-                {injectionCycle.isOverdue && (
-                  <Text style={styles.overdueText}>{t('today.injection_overdue_inline')}</Text>
-                )}
-              </>
-            ) : (
-              <Text style={styles.noDataText}>
-                {t('today.no_injection_data')}
-              </Text>
-            )}
-          </View>
+                  )}
+                  {injectionCycle.isOverdue && (
+                    <Text style={styles.overdueText}>{t('today.injection_overdue_inline')}</Text>
+                  )}
+                </>
+              ) : (
+                <Text style={styles.noDataText}>
+                  {t('today.no_injection_data')}
+                </Text>
+              )}
+            </View>
+          )}
         </View>
 
         {/* ── Shot Day Prep (injection day only) ────────────────── */}
         {injectionCycle?.phase === 'injection_day' && (
           <TouchableOpacity
             style={styles.shotDayCard}
-            onPress={() => router.push('/shot-prep')}
+            onPress={() => { haptics.tap(); router.push('/shot-prep'); }}
             activeOpacity={0.75}
             accessibilityRole="button"
             accessibilityLabel="Open injection day checklist"
@@ -245,41 +253,34 @@ export function TodayScreen() {
 
         {/* Check-in */}
         <TouchableOpacity
-          style={styles.checkInCard}
-          onPress={() => router.push('/check-in')}
+          style={[
+            styles.actionCard,
+            { borderTopColor: hasCheckedInToday ? colors.success : colors.primary },
+          ]}
+          onPress={() => { haptics.tap(); router.push('/check-in'); }}
           activeOpacity={0.75}
           accessibilityRole="button"
           accessibilityLabel={
             hasCheckedInToday ? "Edit today's check-in" : 'Start daily check-in'
           }
         >
-          <View
-            style={[
-              styles.actionIconCircle,
-              hasCheckedInToday
-                ? styles.actionIconCircleDone
-                : styles.actionIconCirclePending,
-            ]}
-          >
-            {hasCheckedInToday ? (
-              <Text style={styles.actionCheckmark}>✓</Text>
-            ) : (
-              <Text style={styles.actionEmoji}>📋</Text>
-            )}
-          </View>
-          <View style={styles.actionContent}>
-            <Text style={styles.actionTitle}>{t('today.checkin_title')}</Text>
-            <Text style={styles.actionBody}>
-              {hasCheckedInToday
-                ? t('today.checkin_logged')
-                : t('today.checkin_action')}
-            </Text>
+          <View style={styles.actionTextBlock}>
+            <Text style={styles.actionHeadline}>{t('today.checkin_title')}</Text>
+            <View style={[styles.actionPill, hasCheckedInToday && styles.actionPillDone]}>
+              <Text style={[styles.actionPillText, hasCheckedInToday && styles.actionPillTextDone]}>
+                {hasCheckedInToday ? t('today.checkin_logged') : t('today.checkin_action')}
+              </Text>
+            </View>
           </View>
           <Text style={styles.rowChevron}>›</Text>
         </TouchableOpacity>
 
-        {/* Medication Level */}
-        <MedLevelBanner phase={injectionCycle?.phase ?? null} />
+        {/* Medication Level — hidden when discontinued (injection-cycle-aware, not relevant post-discontinuation) */}
+        {profile?.medicationStatus !== 'discontinued' && (
+          <View style={styles.bannerWrapper}>
+            <MedLevelBanner phase={injectionCycle?.phase ?? null} />
+          </View>
+        )}
 
         {/* Streak */}
         {!isStreakLoading && (
@@ -291,18 +292,17 @@ export function TodayScreen() {
 
         {/* Journey */}
         <TouchableOpacity
-          style={styles.ctaCard}
-          onPress={() => router.push('/journey')}
+          style={[styles.actionCard, { borderTopColor: colors.primary }]}
+          onPress={() => { haptics.tap(); router.push('/journey'); }}
           activeOpacity={0.75}
           accessibilityRole="button"
           accessibilityLabel="View your journey milestones"
         >
-          <View style={styles.actionIconCircle}>
-            <Text style={styles.actionEmoji}>🏆</Text>
-          </View>
-          <View style={styles.actionContent}>
-            <Text style={styles.actionTitle}>{t('today.journey_title')}</Text>
-            <Text style={styles.actionBody}>{t('today.journey_subtitle')}</Text>
+          <View style={styles.actionTextBlock}>
+            <Text style={styles.actionHeadline}>{t('today.journey_title')}</Text>
+            <View style={styles.actionPill}>
+              <Text style={styles.actionPillText}>{t('today.journey_subtitle')}</Text>
+            </View>
           </View>
           <Text style={styles.rowChevron}>›</Text>
         </TouchableOpacity>
@@ -444,22 +444,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
-    padding: spacing.md,
+    padding: spacing.lg,
     alignItems: 'center',
     borderTopWidth: 3,
     borderWidth: 1,
     borderColor: colors.border,
-    ...shadows.sm,
+    ...shadows.md,
   },
   phaseCard: {
     flex: 1,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
-    padding: spacing.md,
+    padding: spacing.lg,
     borderTopWidth: 3,
     borderWidth: 1,
     borderColor: colors.border,
-    ...shadows.sm,
+    ...shadows.md,
+  },
+  phaseAccent: {
+    backgroundColor: colors.primaryLight,
   },
   cardLabel: {
     fontSize: 11,
@@ -479,9 +482,10 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   nextInjectionDays: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 32,
+    fontWeight: '800',
     color: colors.textPrimary,
+    lineHeight: 36,
   },
   overdueText: {
     fontSize: 12,
@@ -540,7 +544,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     padding: spacing.md,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
     ...shadows.sm,
@@ -551,10 +555,56 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     padding: spacing.md,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
     ...shadows.sm,
+  },
+  bannerWrapper: {
+    marginBottom: spacing.md,
+  },
+
+  // ── Unified action card (headline + pill pattern) ────────────
+  actionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    borderTopWidth: 2,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: spacing.sm,
+    ...shadows.sm,
+  },
+  actionTextBlock: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  actionHeadline: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    letterSpacing: -0.2,
+  },
+  actionPill: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.primaryLight,
+    borderRadius: radius.full,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+  },
+  actionPillDone: {
+    backgroundColor: colors.successLight,
+  },
+  actionPillText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  actionPillTextDone: {
+    color: colors.success,
   },
   actionIconCircle: {
     width: 40,

@@ -9,6 +9,8 @@ import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { setItem } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
+import { haptics } from '@/lib/haptics';
+import { notifications } from '@/lib/notifications';
 import { colors, radius, shadows, spacing } from '@/theme/colors';
 import type { GLP1MedicationId } from '@/types';
 
@@ -61,6 +63,7 @@ export default function RevealScreen() {
     formData.goal !== undefined ? (GOAL_LABELS[formData.goal] ?? 'Not specified') : 'Not specified';
 
   const handleStart = async () => {
+    haptics.medium();
     setLoading(true);
     setErrorMessage(null);
 
@@ -98,6 +101,13 @@ export default function RevealScreen() {
       // Await the AsyncStorage write BEFORE navigating so (app)/_layout
       // reads isFirstTime=false on its first render and does not redirect back.
       await setItem('IS_FIRST_TIME', false);
+
+      // Request notification permission at the ideal moment — user has just
+      // completed onboarding and understands the app's value proposition.
+      // Fire-and-forget: no-op if denied. User can configure reminders in
+      // Settings → Notifications.
+      notifications.requestPermission().catch(() => {});
+
       router.replace('/(app)/');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';

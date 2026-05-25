@@ -63,6 +63,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: '#2E3C4B',
     },
     package: Env.EXPO_PUBLIC_PACKAGE,
+    // 26 required by react-native-health-link (Health Connect API).
+    // Re-add the package with `pnpm expo install react-native-health-link`
+    // when building the Health Import feature.
+    minSdkVersion: 26,
   },
   web: {
     favicon: './assets/favicon.png',
@@ -122,6 +126,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ['react-native-edge-to-edge'],
     '@sentry/react-native',
     '@react-native-community/datetimepicker',
+    'expo-notifications',
   ],
   extra: {
     eas: {

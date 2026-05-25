@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import { WeightUnit, kgToLbs, lbsToKg } from '@/lib/unit-preference';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme/colors';
 
 export interface WeightEntryFormProps {
@@ -37,6 +38,7 @@ export function WeightEntryForm({
 
   function handleSubmit() {
     if (!isValid) return;
+    haptics.medium();
     // Always store in kg — convert if user entered lbs
     const weightKg = weightUnit === 'lbs' ? lbsToKg(parsedInput) : parsedInput;
     onSubmit({

@@ -2,6 +2,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as React from 'react';
 import {
   ActivityIndicator,
+  Linking,
   Modal,
   Pressable,
   StyleSheet,
@@ -17,6 +18,7 @@ import {
   useSaveBarcodeCorrection,
 } from '@/features/food-log/hooks';
 import { useAuthStore } from '@/features/auth/use-auth-store';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme/colors';
 
 // Barcode scanning is ALWAYS free — never gated by subscription (CLAUDE.md).
@@ -46,7 +48,7 @@ export function BarcodeScannerSheet({
   onClose,
   onProductFound,
 }: BarcodeScannerSheetProps) {
-  const [permission, requestPermission] = useCameraPermissions();
+  const [permission, requestPermission, getPermission] = useCameraPermissions();
   const [scanState, setScanState] = React.useState<ScanState>('scanning');
   const [product, setProduct] = React.useState<BarcodeProduct | null>(null);
   const [scannedEan, setScannedEan] = React.useState<string | null>(null);
@@ -93,6 +95,7 @@ export function BarcodeScannerSheet({
     setScanState('loading');
     const result = await lookupBarcode(data);
     if (result) {
+      haptics.success();
       setProduct(result);
       setScanState('result');
     } else {
@@ -208,9 +211,25 @@ export function BarcodeScannerSheet({
                 <Text style={styles.primaryButtonText}>Allow Camera Access</Text>
               </Pressable>
             ) : (
-              <Text style={styles.permissionDeniedNote}>
-                Please enable camera access in your device Settings.
-              </Text>
+              <View style={styles.settingsActions}>
+                <Text style={styles.permissionDeniedNote}>
+                  Please enable camera access in your device Settings, then tap below.
+                </Text>
+                <Pressable
+                  style={({ pressed }) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}
+                  onPress={() => void Linking.openSettings()}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.primaryButtonText}>Open Settings</Text>
+                </Pressable>
+                <Pressable
+                  style={styles.cancelButton}
+                  onPress={() => void getPermission()}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.cancelButtonText}>I've enabled it — check again</Text>
+                </Pressable>
+              </View>
             )}
             <Pressable style={styles.cancelButton} onPress={handleClose} accessibilityRole="button">
               <Text style={styles.cancelButtonText}>Cancel</Text>
@@ -221,16 +240,17 @@ export function BarcodeScannerSheet({
         {/* Camera live — scanning */}
         {permission?.granted && scanState === 'scanning' && (
           <View style={styles.cameraContent}>
-            <CameraView
-              style={styles.camera}
-              facing="back"
-              onBarcodeScanned={handleBarcodeScan}
-              barcodeScannerSettings={{ barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e', 'code128', 'code39'] }}
-            >
+            <View style={styles.cameraWrapper}>
+              <CameraView
+                style={styles.camera}
+                facing="back"
+                onBarcodeScanned={handleBarcodeScan}
+                barcodeScannerSettings={{ barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e', 'code128', 'code39'] }}
+              />
               <View style={styles.scanOverlay}>
                 <View style={styles.scanFrame} />
               </View>
-            </CameraView>
+            </View>
             <Text style={styles.scanHint}>Point camera at a barcode</Text>
             <Pressable style={styles.cancelButton} onPress={handleClose} accessibilityRole="button">
               <Text style={styles.cancelButtonText}>Cancel</Text>
@@ -408,6 +428,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
   },
+  settingsActions: {
+    width: '100%',
+    gap: spacing.sm,
+  },
   permissionDeniedNote: {
     fontSize: 13,
     color: colors.textSecondary,
@@ -419,14 +443,22 @@ const styles = StyleSheet.create({
   cameraContent: {
     gap: spacing.md,
   },
-  camera: {
+  cameraWrapper: {
     width: '100%',
     height: 260,
     borderRadius: radius.lg,
     overflow: 'hidden',
   },
+  camera: {
+    width: '100%',
+    height: '100%',
+  },
   scanOverlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },

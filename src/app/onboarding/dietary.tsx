@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme/colors';
 
 type DietaryPattern = 'omnivore' | 'vegetarian' | 'vegan' | 'pescatarian' | 'other';
@@ -29,6 +30,7 @@ export default function DietaryScreen() {
 
   const handleNext = () => {
     if (!canProceed) return;
+    haptics.medium();
     setFormData({ dietaryPattern: selected });
     router.push('/onboarding/goals');
   };

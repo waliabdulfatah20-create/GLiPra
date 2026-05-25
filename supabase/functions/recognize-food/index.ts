@@ -33,6 +33,10 @@ const InputSchema = z.object({
     )
     .max(10)
     .optional(),
+  // Optional free-text context typed by the user before analysis (portion size,
+  // preparation method, additions). Max 300 chars to guard against prompt injection.
+  // Rule 2: must describe food only — never user identity or health conditions.
+  userComment: z.string().max(300).optional(),
 });
 
 const OutputSchema = z.object({
@@ -202,7 +206,7 @@ serve(async (req: Request) => {
       );
     }
 
-    const { imageBase64, mimeType, recentCorrections } = inputParse.data;
+    const { imageBase64, mimeType, recentCorrections, userComment } = inputParse.data;
 
     // 5. Call OpenAI GPT-4o with the image.
     //    Rule 2: The prompt contains NO user-identifying information.
@@ -231,8 +235,13 @@ serve(async (req: Request) => {
             },
             {
               type: 'text',
-              text: 'Identify this food and estimate protein, carbs, fat, fiber, calories, ' +
-                    'and GLP-1 relevant micronutrients (B12, vitamin D, magnesium, zinc) per typical serving.',
+              // If the user added context before scanning, prepend it so the model
+              // uses it when estimating portion size, preparation, and additions.
+              // Rule 2: userComment contains food context only, never user identity.
+              text: userComment
+                ? `The user noted: "${userComment}". Using this context, identify the food and estimate protein, carbs, fat, fiber, calories, and GLP-1 relevant micronutrients (B12, vitamin D, magnesium, zinc) per the described serving.`
+                : 'Identify this food and estimate protein, carbs, fat, fiber, calories, ' +
+                  'and GLP-1 relevant micronutrients (B12, vitamin D, magnesium, zinc) per typical serving.',
             },
           ],
         },

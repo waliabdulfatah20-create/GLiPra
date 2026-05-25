@@ -18,6 +18,7 @@ import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { useUpsertCheckIn, useTodayCheckIn } from '@/features/check-in/hooks';
 import { useInsertWeightLog, useWeightLogs } from '@/features/weight/hooks';
 import { kgToLbs, lbsToKg, useWeightUnit } from '@/lib/unit-preference';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, shadows, spacing } from '@/theme/colors';
 
 const WATER_DROPS = 8; // 8 × 250 ml = 2000 ml max (easy UI)
@@ -67,6 +68,7 @@ export default function CheckInScreen() {
   // Navigate back after successful save
   React.useEffect(() => {
     if (isSuccess) {
+      haptics.success();
       router.back();
     }
   }, [isSuccess]);
@@ -83,6 +85,7 @@ export default function CheckInScreen() {
   }
 
   function handleSubmit() {
+    haptics.medium();
     // Log weight first if a valid value was entered (optional field)
     const parsedWeight = parseFloat(weightInput);
     if (!isNaN(parsedWeight) && parsedWeight > 0) {

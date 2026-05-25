@@ -27,6 +27,7 @@ import {
   useInjectionLogs,
   useUpdateInjectionSite,
 } from '@/features/injection-sites/hooks';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, shadows, spacing } from '@/theme/colors';
 import type { GLP1MedicationId } from '@/types';
 
@@ -131,6 +132,7 @@ export default function EditShotScreen() {
 
   function handleSave() {
     if (!canSave || !siteCode || !id) return;
+    haptics.medium();
     const injectedAt = combineDateAndTime(date, time).toISOString();
     updateShot(
       {
@@ -155,6 +157,7 @@ export default function EditShotScreen() {
 
   function handleDelete() {
     if (!id) return;
+    haptics.warning();
     Alert.alert('Delete Shot', 'This cannot be undone.', [
       { text: 'Cancel', style: 'cancel' },
       {

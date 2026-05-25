@@ -1,7 +1,9 @@
+import { router } from 'expo-router';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { haptics } from '@/lib/haptics';
 import { colors, radius, shadows, spacing } from '@/theme/colors';
 
 export interface StreakCardProps {
@@ -11,24 +13,38 @@ export interface StreakCardProps {
 
 export function StreakCard({ currentStreak, longestStreak }: StreakCardProps) {
   const { t } = useTranslation();
+  const hasStreak = currentStreak > 0;
+
   return (
-    <View style={styles.container}>
-      <View style={styles.left}>
-        <Text style={styles.flame}>🔥</Text>
-        {currentStreak === 0 ? (
-          <Text style={styles.emptyText}>{t('today.streak_empty')}</Text>
-        ) : (
-          <>
-            <Text style={styles.streakNumber}>{currentStreak}</Text>
-            <Text style={styles.streakLabel}>{t('today.streak_day')}</Text>
-          </>
-        )}
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() => { haptics.tap(); router.push('/log'); }}
+      activeOpacity={0.75}
+      accessibilityRole="button"
+      accessibilityLabel={
+        hasStreak
+          ? `${currentStreak} day streak — view nutrition log`
+          : 'Start your streak — open nutrition log'
+      }
+    >
+      <View style={styles.row}>
+        <View style={styles.textBlock}>
+          <Text style={styles.headline}>
+            {hasStreak
+              ? `🔥 ${currentStreak} ${t('today.streak_day')}`
+              : t('today.streak_empty')}
+          </Text>
+          <View style={[styles.pill, hasStreak && styles.pillActive]}>
+            <Text style={[styles.pillText, hasStreak && styles.pillTextActive]}>
+              {hasStreak
+                ? `${t('today.streak_best')}: ${longestStreak}d`
+                : t('today.streak_start')}
+            </Text>
+          </View>
+        </View>
+        <Text style={styles.chevron}>›</Text>
       </View>
-      <View style={styles.right}>
-        <Text style={styles.bestLabel}>{t('today.streak_best')}</Text>
-        <Text style={styles.bestValue}>{longestStreak}d</Text>
-      </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -37,52 +53,49 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     padding: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     marginBottom: spacing.md,
+    borderTopWidth: 2,
+    borderTopColor: colors.warning,
+    borderWidth: 1,
+    borderColor: colors.border,
     ...shadows.sm,
   },
-  left: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
   },
-  flame: {
-    fontSize: 32,
+  textBlock: {
+    flex: 1,
+    gap: spacing.xs,
   },
-  streakNumber: {
-    fontSize: 40,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    lineHeight: 44,
-  },
-  streakLabel: {
+  headline: {
     fontSize: 13,
-    color: colors.textSecondary,
-    fontWeight: '500',
-    alignSelf: 'flex-end',
-    marginBottom: 4,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    fontWeight: '500',
-    flexShrink: 1,
-  },
-  right: {
-    alignItems: 'flex-end',
-  },
-  bestLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-  },
-  bestValue: {
-    fontSize: 20,
     fontWeight: '700',
     color: colors.textPrimary,
+    letterSpacing: -0.2,
+  },
+  pill: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.primaryLight,
+    borderRadius: radius.full,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+  },
+  pillActive: {
+    backgroundColor: colors.warningLight,
+  },
+  pillText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  pillTextActive: {
+    color: colors.warning,
+  },
+  chevron: {
+    fontSize: 22,
+    color: colors.textDisabled,
+    fontWeight: '300',
   },
 });

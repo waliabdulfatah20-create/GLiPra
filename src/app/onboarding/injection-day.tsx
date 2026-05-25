@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme/colors';
 
 type Frequency = 'weekly' | 'biweekly' | 'daily';
@@ -78,6 +79,7 @@ export default function InjectionDayScreen() {
 
   const handleNext = () => {
     if (!frequency || !isoDate) return;
+    haptics.medium();
     setFormData({
       injectionFrequency: frequency,
       injectionDayOfWeek: needsDayPicker && dayOfWeek !== null ? dayOfWeek : undefined,

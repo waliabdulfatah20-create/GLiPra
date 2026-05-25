@@ -1,6 +1,9 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { addDays, differenceInCalendarDays, parseISO } from 'date-fns';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/features/auth/use-auth-store';
+import { notifications } from '@/lib/notifications';
 
 import {
   deleteInjectionLog,
@@ -86,6 +89,25 @@ export function useLogInjectionSite(lastInjectionDate?: string) {
       // Refresh the curve and phase banner caches so both update immediately
       queryClient.invalidateQueries({ queryKey: ['injection-logs-curve', userId] });
       queryClient.invalidateQueries({ queryKey: ['today-profile', userId] });
+      // Reschedule the injection day reminder for the next cycle (fire-and-forget).
+      // Uses the gap between the new shot and the previous shot as the interval.
+      if (lastInjectionDate) {
+        const gapDays = differenceInCalendarDays(
+          parseISO(input.injectedAt),
+          parseISO(lastInjectionDate),
+        );
+        if (gapDays > 0) {
+          AsyncStorage.getItem('NOTIF_INJECTION_ENABLED')
+            .then((enabled) => {
+              if (enabled === 'true') {
+                const nextDate = addDays(parseISO(input.injectedAt), gapDays);
+                return notifications.scheduleInjectionReminder(nextDate.toISOString());
+              }
+            })
+            .catch(() => {}); // non-critical — silent fail
+        }
+      }
+
       // Unlock injection_day_warrior if the user logged on their scheduled injection day
       if (userId && lastInjectionDate) {
         const injectedDay = input.injectedAt.slice(0, 10);

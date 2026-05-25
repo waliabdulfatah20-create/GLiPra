@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme/colors';
 
 type Goal = 'muscle_preservation' | 'weight_management' | 'both';
@@ -39,6 +40,7 @@ export default function GoalsScreen() {
 
   const handleNext = () => {
     if (!canProceed) return;
+    haptics.medium();
     setFormData({ goal: selected });
     router.push('/onboarding/status');
   };

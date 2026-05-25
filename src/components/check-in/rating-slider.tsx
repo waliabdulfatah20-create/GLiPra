@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme/colors';
 
 interface RatingSliderProps {
@@ -36,7 +37,7 @@ export function RatingSlider({
                 isSelected && styles.emojiButtonSelected,
                 pressed && !isSelected && styles.emojiButtonPressed,
               ]}
-              onPress={() => onChange(ratingValue)}
+              onPress={() => { haptics.selection(); onChange(ratingValue); }}
               accessibilityRole="button"
               accessibilityLabel={`${label}: ${ratingValue} of 5`}
               accessibilityState={{ selected: isSelected }}

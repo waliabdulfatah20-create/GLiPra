@@ -26,6 +26,7 @@ import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { useAiCoach } from '@/features/ai-coach/hooks';
 import type { CoachMessage } from '@/features/ai-coach/hooks';
 import { ProGate } from '@/features/subscription/pro-gate';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme/colors';
 
 // ---------------------------------------------------------------------------
@@ -90,6 +91,7 @@ export default function CoachScreen() {
     const text = inputText.trim();
     if (!text || isLoading) return;
 
+    haptics.medium();
     setInputText('');
     await sendMessage(text);
 

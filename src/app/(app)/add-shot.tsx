@@ -27,6 +27,7 @@ import {
   useLogInjectionSite,
 } from '@/features/injection-sites/hooks';
 import { useTodayData } from '@/features/today/hooks';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, shadows, spacing } from '@/theme/colors';
 import type { GLP1MedicationId } from '@/types';
 
@@ -132,6 +133,7 @@ export default function AddShotScreen() {
 
   function handleSave() {
     if (!canSave || !siteCode) return;
+    haptics.medium();
     const injectedAt = combineDateAndTime(date, time).toISOString();
     logShot(
       {

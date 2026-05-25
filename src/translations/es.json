@@ -45,7 +45,59 @@
     "nutrition": "Nutrición",
     "sites": "Log GLP-1",
     "coach": "Coach",
+    "progress": "Progreso",
     "settings": "Ajustes"
+  },
+  "progress": {
+    "title": "Progreso",
+    "subtitle": "Tus tendencias a lo largo del tiempo",
+    "loading": "Cargando…",
+    "disclaimer": "Las tendencias se basan en lo que has registrado. Registros inexactos o ausentes producirán tendencias inexactas. Consulta con tu médico para decisiones clínicas.",
+    "results_card": {
+      "label": "RESULTADOS DE PESO",
+      "total_lost": "Total perdido",
+      "weekly_avg": "Promedio semanal",
+      "bmi": "IMC",
+      "to_goal": "A la meta",
+      "empty": "Registra al menos 2 pesos para ver los resultados"
+    },
+    "weight_card": {
+      "label": "TENDENCIA DE PESO",
+      "empty": "Registra al menos 2 pesos para ver tu tendencia"
+    },
+    "protein_card": {
+      "label": "META DE PROTEÍNA",
+      "subtitle": "de los últimos {{days}} días alcanzaron tu mínimo",
+      "no_floor": "Configura tu mínimo de proteína en el onboarding para ver tu tasa"
+    },
+    "streak_card": {
+      "label": "DÍAS CUMPLIDOS",
+      "legend_hit": "Alcanzado",
+      "legend_miss": "No alcanzado",
+      "legend_none": "Sin registro"
+    },
+    "adherence_card": {
+      "label": "ADHERENCIA DE INYECCIÓN",
+      "subtitle": "{{count}} inyecciones · {{interval}}",
+      "empty": "Registra tu primera inyección para ver adherencia",
+      "daily": "diario",
+      "weekly": "semanal",
+      "biweekly": "quincenal",
+      "custom": "personalizado"
+    },
+    "symptoms_card": {
+      "label": "TENDENCIA DE SÍNTOMAS",
+      "empty": "Completa un check-in diario para ver tus síntomas",
+      "nausea": "Náusea",
+      "energy": "Energía"
+    },
+    "tips": {
+      "weight": "Tu línea de tendencia está suavizada para filtrar el ruido diario de hidratación y comidas. Observa la pendiente en semanas, no en días sueltos.",
+      "protein": "Cumplir el 80% o más de tu mínimo de proteína protege la masa muscular mientras GLP-1 hace su trabajo. Apunta a la consistencia, no a la perfección.",
+      "streak": "Cada día verde alimentó tu meta de preservación muscular. Un día perdido no borra el progreso — sigue mañana.",
+      "injection": "La constancia en el horario mantiene los niveles del medicamento estables. Mover tu día de dosis dentro de 24 horas es clínicamente aceptable.",
+      "symptoms": "Los síntomas suelen estabilizarse a medida que tu cuerpo se adapta. Síntomas que persisten más de dos semanas o que empeoran rápidamente merecen una conversación con tu médico."
+    }
   },
   "today": {
     "greeting_morning": "Buenos días",
@@ -67,6 +119,7 @@
     "streak_empty": "¡Empieza tu racha hoy!",
     "streak_day": "días de racha",
     "streak_best": "MEJOR",
+    "streak_start": "Registra proteína hoy para ganar tu primer día",
     "journey_title": "Tu progreso",
     "journey_subtitle": "Hitos y avances",
     "coach_subtitle": "Proteínas, comidas e hidratación",
@@ -75,6 +128,7 @@
     "next_injection": "Próxima inyección en",
     "injection_overdue_inline": "Inyección atrasada",
     "no_injection_data": "Registra tu fecha de inyección en ajustes",
+    "injection_discontinued": "Seguimiento de inyecciones pausado",
     "shot_day_title": "Preparación del día de inyección",
     "shot_day_body": "Abre tu lista de verificación",
     "maintenance_banner": "Fase de mantenimiento: objetivo de proteína ajustado",
@@ -103,7 +157,7 @@
     "overdue_pill": "Contacta a tu médico"
   },
   "log": {
-    "title": "Registrar comida",
+    "title": "Registro de Nutrición",
     "protein_today": "{{amount}}g de proteína hoy",
     "mode_manual": "Manual",
     "mode_barcode": "Código de barras",
@@ -119,7 +173,12 @@
     "source_manual": "manual",
     "source_barcode": "código",
     "source_ai": "IA",
-    "disclaimer": "Los valores nutricionales son estimaciones basadas en la información que tú o la base de datos de códigos de barras proporcionan. Los valores de fotos de IA son estimaciones, así que siempre verifica con tu médico prescriptor o un dietista registrado."
+    "disclaimer": "Los valores nutricionales son estimaciones basadas en la información que tú o la base de datos de códigos de barras proporcionan. Los valores de fotos de IA son estimaciones, así que siempre verifica con tu médico prescriptor o un dietista registrado.",
+    "photo_comment_title": "Agrega contexto para mayor precisión",
+    "photo_comment_subtitle": "Opcional — ayuda a la IA a estimar la porción e ingredientes",
+    "photo_comment_placeholder": "ej. tazón grande, queso extra, media porción…",
+    "photo_comment_skip": "Omitir",
+    "photo_comment_analyze": "Analizar"
   },
   "checkin": {
     "title": "Check-in diario",
@@ -166,18 +225,26 @@
     "account": "Cuenta",
     "english": "English",
     "spanish": "Español",
+    "body_metrics": "Métricas corporales",
+    "goal_weight": "Peso objetivo",
     "weight_tracking": "Seguimiento de peso",
     "medication_level": "Nivel de medicamento",
     "visit_prep": "Preparación para la consulta",
     "injection_sites": "Rastreador de sitios de inyección",
     "health_import": "Importar datos de salud",
+    "medication_status": "Estado del GLP-1",
     "maintenance_mode": "Modo de mantenimiento",
     "life_after_glp1": "Vida después del GLP-1",
     "version": "Versión",
     "app_name": "Nombre de la aplicación",
     "privacy": "Política de privacidad",
     "terms": "Términos de servicio",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "notifications": "Notificaciones",
+    "notif_injection": "Recordatorio de inyección",
+    "notif_injection_subtitle": "8 AM en tu día de dosis",
+    "notif_protein": "Recordatorio diario de proteína",
+    "notif_protein_subtitle": "7 PM si no has alcanzado tu meta"
   },
   "medication": {
     "title": "Nivel de medicamento",

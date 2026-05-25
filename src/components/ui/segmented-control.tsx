@@ -4,6 +4,7 @@
 import * as React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme/colors';
 
 interface SegmentedControlProps {
@@ -21,7 +22,7 @@ export function SegmentedControl({ options, active, onSelect }: SegmentedControl
           <Pressable
             key={opt}
             style={[styles.btn, isActive && styles.btnActive]}
-            onPress={() => onSelect(opt)}
+            onPress={() => { haptics.selection(); onSelect(opt); }}
             accessibilityRole="button"
             accessibilityState={{ selected: isActive }}
             accessibilityLabel={`${opt} view`}

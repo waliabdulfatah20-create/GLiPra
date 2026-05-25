@@ -248,7 +248,8 @@
     "notif_injection": "Injection day reminder",
     "notif_injection_subtitle": "8 AM on your dose day",
     "notif_protein": "Daily protein nudge",
-    "notif_protein_subtitle": "7 PM reminder to hit your goal"
+    "notif_protein_subtitle": "7 PM reminder to hit your goal",
+    "appearance_title": "APPEARANCE"
   },
   "medication": {
     "title": "Medication Level",

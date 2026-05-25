@@ -5,22 +5,23 @@
 import Env from 'env';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
-import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { useTodayProfile } from '@/features/today/hooks';
+import { haptics } from '@/lib/haptics';
+import { useTheme, useThemeSelector } from '@/lib/ThemeContext';
 import { formatWeight, useWeightUnit } from '@/lib/unit-preference';
 import { useNotificationSettings } from '@/lib/use-notification-settings';
-import { colors, spacing } from '@/theme/colors';
+import type { GlipraTokens } from '@/theme/tokens';
 
 import { SettingsSection } from './components/settings-container';
 import { SettingsRow } from './components/settings-item';
 import { LanguagePicker } from './language-picker';
 
 // ─── Notification toggle row ──────────────────────────────────────────────────
-// A settings row variant with a Switch on the right instead of a chevron.
 
 interface NotificationRowProps {
   label: string;
@@ -31,11 +32,27 @@ interface NotificationRowProps {
 }
 
 function NotificationRow({ label, subtitle, value, onToggle, isLast = false }: NotificationRowProps) {
+  const { colors, spacing } = useTheme();
   return (
-    <View style={[notifStyles.row, !isLast && notifStyles.rowBorder]}>
-      <View style={notifStyles.textBlock}>
-        <Text style={notifStyles.label}>{label}</Text>
-        <Text style={notifStyles.subtitle}>{subtitle}</Text>
+    <View
+      style={[
+        {
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: spacing.md,
+          paddingVertical: 12,
+          backgroundColor: colors.surface,
+        },
+        !isLast && {
+          borderBottomWidth: 1,
+          borderBottomColor: colors.border,
+        },
+      ]}
+    >
+      <View style={{ flex: 1, marginRight: spacing.md }}>
+        <Text style={{ fontSize: 15, color: colors.textPrimary }}>{label}</Text>
+        <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>{subtitle}</Text>
       </View>
       <Switch
         value={value}
@@ -50,34 +67,6 @@ function NotificationRow({ label, subtitle, value, onToggle, isLast = false }: N
   );
 }
 
-const notifStyles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: 12,
-    backgroundColor: colors.surface,
-  },
-  rowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  textBlock: {
-    flex: 1,
-    marginRight: spacing.md,
-  },
-  label: {
-    fontSize: 15,
-    color: colors.textPrimary,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-});
-
 // ─── Status labels ─────────────────────────────────────────────────────────────
 
 const STATUS_LABELS: Record<string, string> = {
@@ -88,14 +77,21 @@ const STATUS_LABELS: Record<string, string> = {
   discontinued: 'Discontinued',
 };
 
+// ─── Screen ───────────────────────────────────────────────────────────────────
+
 export function SettingsScreen() {
   const signOut = useAuthStore.use.signOut();
   const router = useRouter();
   const { t } = useTranslation();
   const { data: profile } = useTodayProfile();
   const { unit: weightUnit } = useWeightUnit();
-
   const { injectionEnabled, proteinEnabled, toggle } = useNotificationSettings();
+  const { colors, spacing, radius } = useTheme();
+  const { selectedTheme, setSelectedTheme } = useThemeSelector();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius],
+  );
 
   const goalWeightValue =
     profile?.goalWeightKg != null
@@ -172,6 +168,36 @@ export function SettingsScreen() {
           />
         </SettingsSection>
 
+        {/* ── Appearance ────────────────────────────────────────────── */}
+        <SettingsSection title={t('settings.appearance_title')}>
+          <View style={styles.themeRow}>
+            {(['light', 'dark', 'system'] as const).map((option, i) => (
+              <Pressable
+                key={option}
+                style={[
+                  styles.themeOption,
+                  selectedTheme === option && styles.themeOptionActive,
+                  i < 2 && styles.themeOptionBorder,
+                ]}
+                onPress={() => { haptics.tap(); setSelectedTheme(option); }}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: selectedTheme === option }}
+                accessibilityLabel={`${option} mode`}
+              >
+                <Text
+                  style={
+                    selectedTheme === option
+                      ? styles.themeOptionTextActive
+                      : styles.themeOptionText
+                  }
+                >
+                  {option.charAt(0).toUpperCase() + option.slice(1)}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </SettingsSection>
+
         {/* ── Language ──────────────────────────────────────────────── */}
         <SettingsSection title={t('settings.language')}>
           <LanguagePicker />
@@ -196,22 +222,66 @@ export function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    padding: spacing.lg,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    letterSpacing: -0.5,
-    marginBottom: spacing.lg,
-  },
-  bottomSpacer: {
-    height: spacing.xl,
-  },
-});
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      padding: spacing.lg,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      letterSpacing: -0.5,
+      marginBottom: spacing.lg,
+    },
+    bottomSpacer: {
+      height: spacing.xl,
+    },
+
+    // ── Appearance toggle ────────────────────────────────────────
+    themeRow: {
+      flexDirection: 'row',
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      overflow: 'hidden',
+      marginHorizontal: spacing.md,
+      marginVertical: spacing.sm,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    themeOption: {
+      flex: 1,
+      paddingVertical: 10,
+      alignItems: 'center',
+    },
+    themeOptionBorder: {
+      borderRightWidth: 1,
+      borderRightColor: colors.border,
+    },
+    themeOptionActive: {
+      backgroundColor: colors.primaryLight,
+    },
+    themeOptionText: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.textSecondary,
+    },
+    themeOptionTextActive: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.primary,
+    },
+  });
+}

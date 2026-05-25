@@ -248,7 +248,8 @@
     "notif_injection": "Recordatorio de inyección",
     "notif_injection_subtitle": "8 AM en tu día de dosis",
     "notif_protein": "Recordatorio diario de proteína",
-    "notif_protein_subtitle": "7 PM si no has alcanzado tu meta"
+    "notif_protein_subtitle": "7 PM si no has alcanzado tu meta",
+    "appearance_title": "APARIENCIA"
   },
   "medication": {
     "title": "Nivel de medicamento",

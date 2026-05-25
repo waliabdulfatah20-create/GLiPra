@@ -13,6 +13,7 @@ export default defineConfig({
     // Component tests and anything importing from 'react-native' must use jest-expo.
     include: [
       'src/utils/**/*.test.ts',
+      'src/theme/**/*.test.ts',
       'src/features/**/calculator.test.ts',
       'src/features/**/readiness-calculator.test.ts',
       'src/features/safety/**/*.test.ts',

@@ -12,6 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { useThemeConfig } from '@/components/ui/use-theme-config';
+import { GlipraThemeProvider } from '@/lib/ThemeContext';
 import { hydrateAuth, setSession } from '@/features/auth/use-auth-store';
 import { APIProvider } from '@/lib/api';
 import { analytics } from '@/lib/analytics';
@@ -78,23 +79,34 @@ export default function RootLayout() {
   );
 }
 
+// GlipraThemeProvider must be the outermost wrapper so ConnectedProviders
+// can call useTheme() via useThemeConfig() without a context violation.
 function Providers({ children }: { children: React.ReactNode }) {
-  const theme = useThemeConfig();
   return (
     <GestureHandlerRootView style={styles.container}>
-      <AnalyticsProvider>
-        <KeyboardProvider>
-          <ThemeProvider value={theme}>
-            <APIProvider>
-              <BottomSheetModalProvider>
-                {children}
-                <FlashMessage position="top" />
-              </BottomSheetModalProvider>
-            </APIProvider>
-          </ThemeProvider>
-        </KeyboardProvider>
-      </AnalyticsProvider>
+      <GlipraThemeProvider>
+        <ConnectedProviders>{children}</ConnectedProviders>
+      </GlipraThemeProvider>
     </GestureHandlerRootView>
+  );
+}
+
+// Inner providers — may safely consume useTheme() via useThemeConfig().
+function ConnectedProviders({ children }: { children: React.ReactNode }) {
+  const navTheme = useThemeConfig();
+  return (
+    <AnalyticsProvider>
+      <KeyboardProvider>
+        <ThemeProvider value={navTheme}>
+          <APIProvider>
+            <BottomSheetModalProvider>
+              {children}
+              <FlashMessage position="top" />
+            </BottomSheetModalProvider>
+          </APIProvider>
+        </ThemeProvider>
+      </KeyboardProvider>
+    </AnalyticsProvider>
   );
 }
 

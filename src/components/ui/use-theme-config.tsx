@@ -1,32 +1,30 @@
 import type { Theme } from '@react-navigation/native';
 import {
-  DarkTheme as _DarkTheme,
-  DefaultTheme,
+  DarkTheme as RNDarkTheme,
+  DefaultTheme as RNLightTheme,
 } from '@react-navigation/native';
 
-import colors from '@/components/ui/colors';
+import { useTheme } from '@/lib/ThemeContext';
 
-const DarkTheme: Theme = {
-  ..._DarkTheme,
-  colors: {
-    ..._DarkTheme.colors,
-    primary: colors.primary[200],
-    background: colors.charcoal[950],
-    text: colors.charcoal[100],
-    border: colors.charcoal[500],
-    card: colors.charcoal[850],
-  },
-};
+/**
+ * Returns a React Navigation Theme wired to the current Glipra theme.
+ * Must be called inside GlipraThemeProvider (see src/app/_layout.tsx).
+ */
+export function useThemeConfig(): Theme {
+  const { colors, isDark } = useTheme();
 
-const LightTheme: Theme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: colors.primary[400],
-    background: colors.white,
-  },
-};
+  const base = isDark ? RNDarkTheme : RNLightTheme;
 
-export function useThemeConfig() {
-  return LightTheme;
+  return {
+    ...base,
+    colors: {
+      ...base.colors,
+      primary: colors.primary,
+      background: colors.background,
+      text: colors.textPrimary,
+      border: colors.border,
+      card: colors.surface,
+      notification: colors.error,
+    },
+  };
 }

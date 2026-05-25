@@ -29,18 +29,11 @@ import { useCheckAndUnlockMilestones } from '@/features/journey-cards/hooks';
 import { MILESTONES, type Milestone, type MilestoneId } from '@/features/journey-cards/milestones';
 import { useTodayData } from '@/features/today/hooks';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import type { InjectionPhase } from '@/types';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-const PHASE_ACCENT: Record<InjectionPhase, string> = {
-  injection_day: colors.phaseInjectionDay,
-  peak_suppression: colors.phasePeakSuppression,
-  adjustment: colors.phaseAdjustment,
-  recovery_window: colors.phaseRecoveryWindow,
-  overdue: colors.phaseOverdue,
-};
 
 const PHASE_LABELS: Partial<Record<InjectionPhase, string>> = {
   injection_day: 'For your injection day',
@@ -52,13 +45,34 @@ const PHASE_LABELS: Partial<Record<InjectionPhase, string>> = {
 // ─── Section label ────────────────────────────────────────────────────────────
 
 function SectionLabel({ label }: { label: string }) {
-  return <Text style={styles.sectionLabel}>{label}</Text>;
+  const { colors, spacing } = useTheme();
+  return (
+    <Text
+      style={{
+        fontSize: 11,
+        fontWeight: '700',
+        color: colors.textSecondary,
+        letterSpacing: 1,
+        textTransform: 'uppercase',
+        marginTop: spacing.lg,
+        marginBottom: spacing.sm,
+      }}
+    >
+      {label}
+    </Text>
+  );
 }
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export function TodayScreen() {
   const { t } = useTranslation();
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
+
   const {
     isLoading,
     profile,
@@ -81,6 +95,18 @@ export function TodayScreen() {
   // Pharmacist spotlight state
   const [sheetCard, setSheetCard] = React.useState<ContentCard | null>(null);
   const [showCarousel, setShowCarousel] = React.useState(false);
+
+  // Phase accent colors — useMemo so they re-derive when theme changes
+  const phaseAccent = React.useMemo<Record<InjectionPhase, string>>(
+    () => ({
+      injection_day: colors.phaseInjectionDay,
+      peak_suppression: colors.phasePeakSuppression,
+      adjustment: colors.phaseAdjustment,
+      recovery_window: colors.phaseRecoveryWindow,
+      overdue: colors.phaseOverdue,
+    }),
+    [colors],
+  );
 
   // Phase-aware spotlight card selection — phase match first, then daily rotation
   const currentPhase = injectionCycle?.phase ?? null;
@@ -117,7 +143,7 @@ export function TodayScreen() {
 
   const dateLabel = format(new Date(), 'EEEE, MMMM d');
   const phaseAccentColor = injectionCycle
-    ? (PHASE_ACCENT[injectionCycle.phase] ?? colors.primary)
+    ? (phaseAccent[injectionCycle.phase] ?? colors.primary)
     : colors.primary;
 
   const greeting = hourOfDay < 12
@@ -217,7 +243,7 @@ export function TodayScreen() {
         {/* ── Today's Metrics ───────────────────────────────────── */}
         <SectionLabel label={t('today.metrics_title')} />
         <View style={styles.metricsRow}>
-          {/* Protein ring — top accent in primary blue */}
+          {/* Protein ring — top accent in primary */}
           <View style={[styles.ringCard, { borderTopColor: colors.primary }]}>
             <Text style={styles.cardLabel}>{t('today.protein_label')}</Text>
             <View style={styles.ringWrapper}>
@@ -236,7 +262,7 @@ export function TodayScreen() {
               <Text style={styles.noDataText}>{t('today.injection_discontinued')}</Text>
             </View>
           ) : (
-            <View style={[styles.phaseCard, styles.phaseAccent, { borderTopColor: phaseAccentColor }]}>
+            <View style={[styles.phaseCard, styles.phaseAccentBg, { borderTopColor: phaseAccentColor }]}>
               <Text style={styles.cardLabel}>{t('today.injection_label')}</Text>
               {injectionCycle ? (
                 <>
@@ -312,7 +338,7 @@ export function TodayScreen() {
           <Text style={styles.rowChevron}>›</Text>
         </TouchableOpacity>
 
-        {/* Medication Level — hidden when discontinued (injection-cycle-aware, not relevant post-discontinuation) */}
+        {/* Medication Level — hidden when discontinued */}
         {profile?.medicationStatus !== 'discontinued' && (
           <View style={styles.bannerWrapper}>
             <MedLevelBanner phase={injectionCycle?.phase ?? null} />
@@ -372,395 +398,393 @@ export function TodayScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  // ── Section label ───────────────────────────────────────────
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    loadingContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+    },
 
-  // ── Header ──────────────────────────────────────────────────
-  header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    marginBottom: spacing.lg,
-  },
-  headerLeft: {
-    flex: 1,
-  },
-  greeting: {
-    fontSize: 30,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    letterSpacing: -0.5,
-    marginBottom: 4,
-  },
-  greetingDate: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    fontWeight: '400',
-  },
-  rxBadge: {
-    backgroundColor: colors.primaryLight,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm + 2,
-    paddingVertical: spacing.xs,
-    borderWidth: 1,
-    borderColor: colors.primary + '30',
-    marginTop: 4,
-  },
-  rxBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.primary,
-    letterSpacing: 0.5,
-  },
+    // ── Header ──────────────────────────────────────────────────
+    header: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
+      marginBottom: spacing.lg,
+    },
+    headerLeft: {
+      flex: 1,
+    },
+    greeting: {
+      fontSize: 30,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      letterSpacing: -0.5,
+      marginBottom: 4,
+    },
+    greetingDate: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      fontWeight: '400',
+    },
+    rxBadge: {
+      backgroundColor: colors.primaryLight,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.sm + 2,
+      paddingVertical: spacing.xs,
+      borderWidth: 1,
+      borderColor: colors.primary + '30',
+      marginTop: 4,
+    },
+    rxBadgeText: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: colors.primary,
+      letterSpacing: 0.5,
+    },
 
-  // ── Readiness card ──────────────────────────────────────────
-  readinessCard: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.xl,
-    padding: spacing.lg,
-    alignItems: 'center',
-    marginBottom: spacing.md,
-    ...shadows.md,
-  },
-  readinessLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.7)',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    marginBottom: spacing.xs,
-  },
-  readinessScore: {
-    fontSize: 80,
-    fontWeight: '800',
-    color: colors.white,
-    lineHeight: 88,
-    letterSpacing: -2,
-  },
-  readinessDivider: {
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignSelf: 'stretch',
-    marginVertical: spacing.sm,
-  },
-  readinessGuidance: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.9)',
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: spacing.sm,
-  },
-  readinessTrustBadge: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  readinessTrustText: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.75)',
-    fontWeight: '600',
-    letterSpacing: 0.3,
-  },
+    // ── Readiness card ──────────────────────────────────────────
+    readinessCard: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.xl,
+      padding: spacing.lg,
+      alignItems: 'center',
+      marginBottom: spacing.md,
+      ...shadows.md,
+    },
+    readinessLabel: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: 'rgba(255,255,255,0.7)',
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+      marginBottom: spacing.xs,
+    },
+    readinessScore: {
+      fontSize: 80,
+      fontWeight: '800',
+      color: colors.white,
+      lineHeight: 88,
+      letterSpacing: -2,
+    },
+    readinessDivider: {
+      height: 1,
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      alignSelf: 'stretch',
+      marginVertical: spacing.sm,
+    },
+    readinessGuidance: {
+      fontSize: 14,
+      color: 'rgba(255,255,255,0.9)',
+      textAlign: 'center',
+      lineHeight: 20,
+      marginBottom: spacing.sm,
+    },
+    readinessTrustBadge: {
+      backgroundColor: 'rgba(255,255,255,0.15)',
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+    },
+    readinessTrustText: {
+      fontSize: 11,
+      color: 'rgba(255,255,255,0.75)',
+      fontWeight: '600',
+      letterSpacing: 0.3,
+    },
 
-  // ── Metrics row ─────────────────────────────────────────────
-  metricsRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  ringCard: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    alignItems: 'center',
-    borderTopWidth: 3,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.md,
-  },
-  phaseCard: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    borderTopWidth: 3,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.md,
-  },
-  phaseAccent: {
-    backgroundColor: colors.primaryLight,
-  },
-  cardLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-    marginBottom: spacing.sm,
-  },
-  ringWrapper: {
-    marginTop: spacing.xs,
-  },
-  nextInjection: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: spacing.sm,
-    lineHeight: 18,
-  },
-  nextInjectionDays: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    lineHeight: 36,
-  },
-  overdueText: {
-    fontSize: 12,
-    color: colors.phaseOverdue,
-    fontWeight: '600',
-    marginTop: spacing.sm,
-  },
-  noDataText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 18,
-  },
+    // ── Metrics row ─────────────────────────────────────────────
+    metricsRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+      marginBottom: spacing.md,
+    },
+    ringCard: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      alignItems: 'center',
+      borderTopWidth: 3,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...shadows.md,
+    },
+    phaseCard: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      borderTopWidth: 3,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...shadows.md,
+    },
+    phaseAccentBg: {
+      backgroundColor: colors.primaryLight,
+    },
+    cardLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.5,
+      textTransform: 'uppercase',
+      marginBottom: spacing.sm,
+    },
+    ringWrapper: {
+      marginTop: spacing.xs,
+    },
+    nextInjection: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: spacing.sm,
+      lineHeight: 18,
+    },
+    nextInjectionDays: {
+      fontSize: 32,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      lineHeight: 36,
+    },
+    overdueText: {
+      fontSize: 12,
+      color: colors.phaseOverdue,
+      fontWeight: '600',
+      marginTop: spacing.sm,
+    },
+    noDataText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 18,
+    },
 
-  // ── Shot Day card ────────────────────────────────────────────
-  shotDayCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F0FF',
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.phaseInjectionDay + '40',
-    ...shadows.sm,
-  },
-  shotDayLeft: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.phaseInjectionDay + '20',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.md,
-  },
-  shotDayEmoji: {
-    fontSize: 20,
-  },
-  shotDayContent: {
-    flex: 1,
-  },
-  shotDayTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.phaseInjectionDay,
-  },
-  shotDayBody: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
+    // ── Shot Day card ────────────────────────────────────────────
+    shotDayCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.primaryLight,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      borderWidth: 1,
+      borderColor: colors.phaseInjectionDay + '40',
+      ...shadows.sm,
+    },
+    shotDayLeft: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.phaseInjectionDay + '20',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.md,
+    },
+    shotDayEmoji: {
+      fontSize: 20,
+    },
+    shotDayContent: {
+      flex: 1,
+    },
+    shotDayTitle: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.phaseInjectionDay,
+    },
+    shotDayBody: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
 
-  // ── Shared action row styles ─────────────────────────────────
-  checkInCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
-  },
-  ctaCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
-  },
-  bannerWrapper: {
-    marginBottom: spacing.md,
-  },
+    // ── Shared action row styles ─────────────────────────────────
+    checkInCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...shadows.sm,
+    },
+    ctaCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...shadows.sm,
+    },
+    bannerWrapper: {
+      marginBottom: spacing.md,
+    },
 
-  // ── Unified action card (headline + pill pattern) ────────────
-  actionCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    borderTopWidth: 2,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: spacing.sm,
-    ...shadows.sm,
-  },
-  actionTextBlock: {
-    flex: 1,
-    gap: spacing.xs,
-  },
-  actionHeadline: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    letterSpacing: -0.2,
-  },
-  actionPill: {
-    alignSelf: 'flex-start',
-    backgroundColor: colors.primaryLight,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
-  },
-  actionPillDone: {
-    backgroundColor: colors.successLight,
-  },
-  actionPillText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.primary,
-  },
-  actionPillTextDone: {
-    color: colors.success,
-  },
-  actionIconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.gray100,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.md,
-    flexShrink: 0,
-  },
-  actionIconCircleDone: {
-    backgroundColor: colors.success,
-  },
-  actionIconCirclePending: {
-    backgroundColor: colors.primaryLight,
-  },
-  actionEmoji: {
-    fontSize: 18,
-  },
-  actionCheckmark: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: colors.white,
-    lineHeight: 20,
-  },
-  actionContent: {
-    flex: 1,
-  },
-  actionTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  actionBody: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  rowChevron: {
-    fontSize: 22,
-    color: colors.gray300,
-    lineHeight: 26,
-  },
+    // ── Unified action card (headline + pill pattern) ────────────
+    actionCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      borderTopWidth: 2,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: spacing.sm,
+      ...shadows.sm,
+    },
+    actionTextBlock: {
+      flex: 1,
+      gap: spacing.xs,
+    },
+    actionHeadline: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      letterSpacing: -0.2,
+    },
+    actionPill: {
+      alignSelf: 'flex-start',
+      backgroundColor: colors.primaryLight,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 3,
+    },
+    actionPillDone: {
+      backgroundColor: colors.successLight,
+    },
+    actionPillText: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.primary,
+    },
+    actionPillTextDone: {
+      color: colors.success,
+    },
+    actionIconCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.gray100,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.md,
+      flexShrink: 0,
+    },
+    actionIconCircleDone: {
+      backgroundColor: colors.success,
+    },
+    actionIconCirclePending: {
+      backgroundColor: colors.primaryLight,
+    },
+    actionEmoji: {
+      fontSize: 18,
+    },
+    actionCheckmark: {
+      fontSize: 16,
+      fontWeight: '800',
+      color: colors.white,
+      lineHeight: 20,
+    },
+    actionContent: {
+      flex: 1,
+    },
+    actionTitle: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textPrimary,
+    },
+    actionBody: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    rowChevron: {
+      fontSize: 22,
+      color: colors.gray300,
+      lineHeight: 26,
+    },
 
-  // ── Banners ──────────────────────────────────────────────────
-  maintenanceBanner: {
-    backgroundColor: colors.successLight,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.success,
-  },
-  maintenanceBannerText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.success,
-  },
-  discontinuedBanner: {
-    backgroundColor: colors.primaryLight,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary,
-  },
-  discontinuedBannerText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.primary,
-  },
+    // ── Banners ──────────────────────────────────────────────────
+    maintenanceBanner: {
+      backgroundColor: colors.successLight,
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      marginBottom: spacing.md,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.success,
+    },
+    maintenanceBannerText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.success,
+    },
+    discontinuedBanner: {
+      backgroundColor: colors.primaryLight,
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      marginBottom: spacing.md,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.primary,
+    },
+    discontinuedBannerText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.primary,
+    },
 
-  // ── Empty state ──────────────────────────────────────────────
-  emptyState: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.xl,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  emptyBody: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
+    // ── Empty state ──────────────────────────────────────────────
+    emptyState: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: spacing.xl,
+    },
+    emptyTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    emptyBody: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
 
-  // ── Browse all tips link ─────────────────────────────────────
-  browseAllLink: {
-    paddingVertical: spacing.sm,
-    alignItems: 'flex-start',
-  },
-  browseAllText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.primary,
-  },
-});
+    // ── Browse all tips link ─────────────────────────────────────
+    browseAllLink: {
+      paddingVertical: spacing.sm,
+      alignItems: 'flex-start',
+    },
+    browseAllText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.primary,
+    },
+  });
+}

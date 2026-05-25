@@ -2,6 +2,7 @@
   "common": {
     "save": "Guardar",
     "cancel": "Cancelar",
+    "close": "Cerrar",
     "done": "Listo",
     "back": "← Atrás",
     "next": "Siguiente",
@@ -135,7 +136,10 @@
     "discontinued_banner": "Vida después del GLP-1: toca para ver tu guía →",
     "readiness_trust": "Algoritmo diseñado por farmacéutico",
     "setup_title": "Completa tu configuración",
-    "setup_body": "Completa el proceso de configuración para ver tu pantalla personalizada."
+    "setup_body": "Completa el proceso de configuración para ver tu pantalla personalizada.",
+    "pharmacist_note_label": "NOTA DEL FARMACÉUTICO",
+    "browse_all_tips": "Ver todos los consejos →",
+    "read_full_note": "Leer la nota completa →"
   },
   "content_card": {
     "tip": "CONSEJO",

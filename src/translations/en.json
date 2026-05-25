@@ -2,6 +2,7 @@
   "common": {
     "save": "Save",
     "cancel": "Cancel",
+    "close": "Close",
     "done": "Done",
     "back": "← Back",
     "next": "Next",
@@ -135,7 +136,10 @@
     "discontinued_banner": "Life After GLP-1: tap to see your guidance →",
     "readiness_trust": "Pharmacist-designed algorithm",
     "setup_title": "Complete your setup",
-    "setup_body": "Finish the onboarding flow to see your personalized Today screen."
+    "setup_body": "Finish the onboarding flow to see your personalized Today screen.",
+    "pharmacist_note_label": "PHARMACIST'S NOTE",
+    "browse_all_tips": "Browse all tips →",
+    "read_full_note": "Read the full note →"
   },
   "content_card": {
     "tip": "TIP",

@@ -1,8 +1,9 @@
-import { format } from 'date-fns';
+import { differenceInCalendarDays, format } from 'date-fns';
 import { router } from 'expo-router';
 import * as React from 'react';
 import {
   ActivityIndicator,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,12 +15,15 @@ import { useTranslation } from 'react-i18next';
 
 import { EscalationCard } from '@/components/safety/escalation-card';
 import { CardsCarousel } from '@/components/today/cards-carousel';
+import { ContentCardSheet } from '@/components/today/content-card-sheet';
+import { PharmacistSpotlightCard } from '@/components/today/pharmacist-spotlight-card';
 import { MedLevelBanner } from '@/components/today/med-level-banner';
 import { PhaseBadge } from '@/components/today/phase-badge';
 import { ProteinRing } from '@/components/today/protein-ring';
 import { StreakCard } from '@/components/today/streak-card';
 import { MilestoneToast } from '@/components/ui/milestone-toast';
 import { useTodayCheckIn } from '@/features/check-in/hooks';
+import type { ContentCard } from '@/features/content-cards/data';
 import { getActiveCards } from '@/features/content-cards/data';
 import { useCheckAndUnlockMilestones } from '@/features/journey-cards/hooks';
 import { MILESTONES, type Milestone, type MilestoneId } from '@/features/journey-cards/milestones';
@@ -36,6 +40,13 @@ const PHASE_ACCENT: Record<InjectionPhase, string> = {
   adjustment: colors.phaseAdjustment,
   recovery_window: colors.phaseRecoveryWindow,
   overdue: colors.phaseOverdue,
+};
+
+const PHASE_LABELS: Partial<Record<InjectionPhase, string>> = {
+  injection_day: 'For your injection day',
+  peak_suppression: 'For your peak suppression days',
+  adjustment: 'For your adjustment phase',
+  recovery_window: 'For your recovery window',
 };
 
 // ─── Section label ────────────────────────────────────────────────────────────
@@ -66,6 +77,32 @@ export function TodayScreen() {
 
   // Milestone toast state — shows the first newly unlocked milestone.
   const [toastMilestone, setToastMilestone] = React.useState<Milestone | null>(null);
+
+  // Pharmacist spotlight state
+  const [sheetCard, setSheetCard] = React.useState<ContentCard | null>(null);
+  const [showCarousel, setShowCarousel] = React.useState(false);
+
+  // Phase-aware spotlight card selection — phase match first, then daily rotation
+  const currentPhase = injectionCycle?.phase ?? null;
+  const spotlightCard = React.useMemo(() => {
+    const all = getActiveCards();
+    if (currentPhase) {
+      const phaseMatch = all.find(
+        (c) => c.phases?.includes(currentPhase as InjectionPhase),
+      );
+      if (phaseMatch) return phaseMatch;
+    }
+    // Fallback: rotate universal cards by day-of-year so it changes daily
+    const universal = all.filter((c) => !c.phases?.length);
+    const dayOfYear = differenceInCalendarDays(
+      new Date(),
+      new Date(new Date().getFullYear(), 0, 0),
+    );
+    return universal[dayOfYear % universal.length] ?? all[0];
+  }, [currentPhase]);
+  const spotlightPhaseLabel = currentPhase
+    ? (PHASE_LABELS[currentPhase as InjectionPhase] ?? undefined)
+    : undefined;
 
   const handleMilestonesUnlocked = React.useCallback((ids: MilestoneId[]) => {
     const first = ids[0];
@@ -311,7 +348,23 @@ export function TodayScreen() {
 
         {/* ── Pharmacist Content ────────────────────────────────── */}
         <SectionLabel label={t('today.pharmacist_content')} />
-        <CardsCarousel cards={getActiveCards()} />
+        {spotlightCard && (
+          <PharmacistSpotlightCard
+            card={spotlightCard}
+            phaseLabel={spotlightPhaseLabel}
+            onReadMore={() => setSheetCard(spotlightCard)}
+          />
+        )}
+        <Pressable
+          style={styles.browseAllLink}
+          onPress={() => setShowCarousel((v) => !v)}
+          accessibilityRole="button"
+          accessibilityLabel="Browse all pharmacist tips"
+        >
+          <Text style={styles.browseAllText}>{t('today.browse_all_tips')}</Text>
+        </Pressable>
+        {showCarousel && <CardsCarousel cards={getActiveCards()} />}
+        <ContentCardSheet card={sheetCard} onClose={() => setSheetCard(null)} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -698,5 +751,16 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
+  },
+
+  // ── Browse all tips link ─────────────────────────────────────
+  browseAllLink: {
+    paddingVertical: spacing.sm,
+    alignItems: 'flex-start',
+  },
+  browseAllText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.primary,
   },
 });

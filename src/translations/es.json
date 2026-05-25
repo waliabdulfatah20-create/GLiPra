@@ -139,7 +139,8 @@
     "setup_body": "Completa el proceso de configuración para ver tu pantalla personalizada.",
     "pharmacist_note_label": "NOTA DEL FARMACÉUTICO",
     "browse_all_tips": "Ver todos los consejos →",
-    "read_full_note": "Leer la nota completa →"
+    "read_full_note": "Leer la nota completa →",
+    "clinical_note_label": "⚠ Nota clínica: léala antes de su inyección"
   },
   "content_card": {
     "tip": "CONSEJO",

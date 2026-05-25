@@ -139,7 +139,8 @@
     "setup_body": "Finish the onboarding flow to see your personalized Today screen.",
     "pharmacist_note_label": "PHARMACIST'S NOTE",
     "browse_all_tips": "Browse all tips →",
-    "read_full_note": "Read the full note →"
+    "read_full_note": "Read the full note →",
+    "clinical_note_label": "⚠ Clinical note: read before your injection"
   },
   "content_card": {
     "tip": "TIP",

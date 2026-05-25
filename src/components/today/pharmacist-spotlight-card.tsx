@@ -74,7 +74,7 @@ export function PharmacistSpotlightCard({
           {card.tier === 1 && (
             <View style={styles.warningStripe}>
               <Text style={styles.warningText}>
-                ⚠ Clinical note — read before injection
+                {t('today.clinical_note_label')}
               </Text>
             </View>
           )}
@@ -133,6 +133,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     outer: {
       marginBottom: spacing.sm,
       borderRadius: radius.lg,
+      backgroundColor: colors.surface,
       ...shadows.md,
     },
     inner: {
@@ -224,7 +225,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     // Ruled lines container
     ruledContainer: {
       position: 'relative',
-      minHeight: LINE_HEIGHT * 2,
+      minHeight: LINE_HEIGHT * RULE_COUNT,
       overflow: 'hidden',
     },
     rule: {

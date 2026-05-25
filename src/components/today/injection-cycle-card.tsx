@@ -68,8 +68,8 @@ export function InjectionCycleCard({ lastInjectionDate, injectionCycle }: Inject
         </View>
 
         <View style={styles.stripRow}>
-          {cells.map(({ dayLabel, isPast, isToday, phaseColor }, i) => (
-            <View key={i} style={styles.cellUnit}>
+          {cells.map(({ dayLabel, isPast, isToday, phaseColor }) => (
+            <View key={dayLabel} style={styles.cellUnit}>
               <Text style={[styles.todayBadge, isToday && styles.todayBadgeVisible]}>
                 {t('today.cycle_today_badge')}
               </Text>
@@ -141,7 +141,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       flexDirection: 'row',
       paddingHorizontal: spacing.md,
       paddingBottom: spacing.sm,
-      gap: 4,
+      gap: spacing.xs,
     },
     cellUnit: {
       flex: 1,

@@ -3,10 +3,10 @@
 // Never use hardcoded color strings or spacing numbers in components.
 
 export const colors = {
-  // Brand
-  primary: '#2D6BE4',       // Main CTA, active states
-  primaryDark: '#1A4FB5',   // Pressed state
-  primaryLight: '#EBF1FD',  // Tinted backgrounds
+  // Brand — Direction B deep purple
+  primary: '#6d28d9',       // Main CTA, active states
+  primaryDark: '#5b21b6',   // Pressed state
+  primaryLight: 'rgba(109, 40, 217, 0.08)',  // Tinted backgrounds
 
   // Semantic
   success: '#22C55E',
@@ -55,7 +55,7 @@ export const colors = {
 
   // Borders
   border: '#E8E4DD',          // warm border — matches cream background
-  borderFocus: '#2D6BE4',
+  borderFocus: '#6d28d9',
 
   // Clinical / Safety
   escalationBg: '#FEF2F2',

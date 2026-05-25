@@ -11,6 +11,7 @@ module.exports = {
     '/src/features/.*calculator\\.test\\.ts$', // */calculator + */readiness-calculator
     '/src/features/safety/.*\\.test\\.ts$',    // redFlagDetector, …
     '/src/features/medication-level/.*\\.test\\.ts$',
+    '/src/theme/.*\\.test\\.ts$',              // theme/tokens, …
   ],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',

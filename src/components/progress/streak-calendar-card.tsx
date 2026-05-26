@@ -68,8 +68,10 @@ export function StreakCalendarCard({ width }: StreakCalendarCardProps) {
   const slots = React.useMemo(
     () =>
       Array.from({ length: TOTAL_DAYS }, (_, i) => {
-        const date = format(addDays(gridStart, i), 'yyyy-MM-dd');
-        return { date, ...historyMap[date] };
+        const dateObj = addDays(gridStart, i);
+        const date = format(dateObj, 'yyyy-MM-dd');
+        const dayNum = format(dateObj, 'd');
+        return { date, dayNum, ...historyMap[date] };
       }),
     [gridStart, historyMap],
   );
@@ -127,7 +129,21 @@ export function StreakCalendarCard({ width }: StreakCalendarCardProps) {
                         ? 'missed'
                         : 'no log'
                     }`}
-                  />
+                  >
+                    <Text
+                      style={[
+                        styles.dayNum,
+                        {
+                          color:
+                            !d.hasData || isFuture
+                              ? colors.textDisabled
+                              : colors.white,
+                        },
+                      ]}
+                    >
+                      {d.dayNum}
+                    </Text>
+                  </View>
                 );
               })}
             </View>
@@ -208,6 +224,13 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
     cell: {
       borderRadius: radius.sm,
       borderWidth: 1.5,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    dayNum: {
+      fontSize: 9,
+      fontWeight: '700',
+      lineHeight: 11,
     },
     legend: {
       flexDirection: 'row',

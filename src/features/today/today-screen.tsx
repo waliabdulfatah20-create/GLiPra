@@ -127,6 +127,25 @@ export function TodayScreen() {
   const [sheetCard, setSheetCard] = React.useState<ContentCard | null>(null);
   const [showCarousel, setShowCarousel] = React.useState(false);
 
+  // Readiness score count-up animation — ticks 0 → score over 1.2 s when data arrives
+  const [displayScore, setDisplayScore] = React.useState(0);
+  React.useEffect(() => {
+    if (!readiness?.score) return;
+    const target = readiness.score;
+    const DURATION_MS = 1200;
+    const STEPS = 36;
+    const stepMs = DURATION_MS / STEPS;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      const t = step / STEPS;
+      const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+      setDisplayScore(Math.round(eased * target));
+      if (step >= STEPS) clearInterval(timer);
+    }, stepMs);
+    return () => clearInterval(timer);
+  }, [readiness?.score]);
+
   // Phase accent colors — useMemo so they re-derive when theme changes
   const phaseAccent = React.useMemo<Record<InjectionPhase, string>>(
     () => ({
@@ -293,7 +312,7 @@ export function TodayScreen() {
         {readiness && (
           <View style={styles.readinessCard}>
             <Text style={styles.readinessLabel}>{t('today.readiness_title')}</Text>
-            <Text style={styles.readinessScore}>{readiness.score}</Text>
+            <Text style={styles.readinessScore}>{displayScore}</Text>
             <View style={styles.readinessDivider} />
             <Text style={styles.readinessGuidance}>{readiness.guidance}</Text>
             <View style={styles.readinessTrustBadge}>

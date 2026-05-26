@@ -1,9 +1,17 @@
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Circle, Svg } from 'react-native-svg';
+import Animated, {
+  useSharedValue,
+  withSpring,
+  useAnimatedProps,
+} from 'react-native-reanimated';
 
 import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
+
+// Animated SVG circle — animates strokeDashoffset on the UI thread via Reanimated
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 interface ProteinRingProps {
   proteinConsumedG: number;
@@ -22,9 +30,9 @@ export function ProteinRing({
     [colors],
   );
 
-  function arcColor(progress: number): string {
-    if (progress >= 0.9) return colors.proteinGood;
-    if (progress >= 0.6) return colors.proteinMid;
+  function arcColor(p: number): string {
+    if (p >= 0.9) return colors.proteinGood;
+    if (p >= 0.6) return colors.proteinMid;
     return colors.proteinLow;
   }
 
@@ -32,9 +40,23 @@ export function ProteinRing({
   const strokeWidth = 10;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference * (1 - progress);
   const center = size / 2;
   const fill = arcColor(progress);
+
+  // Spring-fill animation: dashOffset starts at circumference (empty ring) and springs
+  // to the target offset whenever progress changes (on mount or new data).
+  const dashOffset = useSharedValue(circumference);
+
+  React.useEffect(() => {
+    dashOffset.value = withSpring(circumference * (1 - progress), {
+      damping: 18,
+      stiffness: 80,
+    });
+  }, [progress, circumference]);
+
+  const animatedArcProps = useAnimatedProps(() => ({
+    strokeDashoffset: dashOffset.value,
+  }));
 
   return (
     <View style={[styles.container, { width: size, height: size }]}>
@@ -48,8 +70,8 @@ export function ProteinRing({
           strokeWidth={strokeWidth}
           fill="none"
         />
-        {/* Progress arc — starts at top (rotate -90deg) */}
-        <Circle
+        {/* Progress arc — springs from empty to target on mount / data change */}
+        <AnimatedCircle
           cx={center}
           cy={center}
           r={radius}
@@ -57,10 +79,10 @@ export function ProteinRing({
           strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
           rotation="-90"
           origin={`${center}, ${center}`}
+          animatedProps={animatedArcProps}
         />
       </Svg>
       <View style={styles.center}>

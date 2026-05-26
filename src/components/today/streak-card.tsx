@@ -2,6 +2,12 @@ import { router } from 'expo-router';
 import * as React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import Animated, {
+  useSharedValue,
+  withSpring,
+  withTiming,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 
 import { Bolt } from '@/components/ui/icons';
 import { haptics } from '@/lib/haptics';
@@ -22,39 +28,55 @@ export function StreakCard({ currentStreak, longestStreak }: StreakCardProps) {
   );
   const hasStreak = currentStreak > 0;
 
+  // Pop-in: scale 0.85 → 1.0 (spring) + opacity 0 → 1 on mount
+  const scale = useSharedValue(0.85);
+  const opacity = useSharedValue(0);
+
+  React.useEffect(() => {
+    scale.value = withSpring(1, { damping: 14, stiffness: 120 });
+    opacity.value = withTiming(1, { duration: 280 });
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+
   return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={() => { haptics.tap(); router.push('/log'); }}
-      activeOpacity={0.75}
-      accessibilityRole="button"
-      accessibilityLabel={
-        hasStreak
-          ? `${currentStreak} day streak — view nutrition log`
-          : 'Start your streak — open nutrition log'
-      }
-    >
-      <View style={styles.row}>
-        <View style={styles.iconCircle}>
-          <Bolt color={colors.warning} width={20} height={20} />
-        </View>
-        <View style={styles.textBlock}>
-          <Text style={styles.headline}>
-            {hasStreak
-              ? `🔥 ${currentStreak} ${t('today.streak_day')}`
-              : t('today.streak_empty')}
-          </Text>
-          <View style={[styles.pill, hasStreak && styles.pillActive]}>
-            <Text style={[styles.pillText, hasStreak && styles.pillTextActive]}>
-              {hasStreak
-                ? `${t('today.streak_best')}: ${longestStreak}d`
-                : t('today.streak_start')}
-            </Text>
+    <Animated.View style={animatedStyle}>
+      <TouchableOpacity
+        style={styles.container}
+        onPress={() => { haptics.tap(); router.push('/log'); }}
+        activeOpacity={0.75}
+        accessibilityRole="button"
+        accessibilityLabel={
+          hasStreak
+            ? `${currentStreak} day streak — view nutrition log`
+            : 'Start your streak — open nutrition log'
+        }
+      >
+        <View style={styles.row}>
+          <View style={styles.iconCircle}>
+            <Bolt color={colors.warning} width={20} height={20} />
           </View>
+          <View style={styles.textBlock}>
+            <Text style={styles.headline}>
+              {hasStreak
+                ? `🔥 ${currentStreak} ${t('today.streak_day')}`
+                : t('today.streak_empty')}
+            </Text>
+            <View style={[styles.pill, hasStreak && styles.pillActive]}>
+              <Text style={[styles.pillText, hasStreak && styles.pillTextActive]}>
+                {hasStreak
+                  ? `${t('today.streak_best')}: ${longestStreak}d`
+                  : t('today.streak_start')}
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.chevron}>›</Text>
         </View>
-        <Text style={styles.chevron}>›</Text>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </Animated.View>
   );
 }
 

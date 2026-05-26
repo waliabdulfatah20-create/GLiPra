@@ -145,7 +145,7 @@
     "cycle_today_badge": "HOY",
     "cycle_next_dose": "Próxima: {{date}}",
     "cycle_overdue_label": "ATRASADA",
-    "settings_button_label": "Abrir ajustes"
+    "settings_button_label": "Abrir configuración"
   },
   "content_card": {
     "tip": "CONSEJO",

@@ -161,7 +161,7 @@ export function TodayScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.loadingContainer} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.loadingContainer} edges={['top']}>
         <ActivityIndicator size="large" color={colors.primary} />
       </SafeAreaView>
     );
@@ -169,7 +169,7 @@ export function TodayScreen() {
 
   if (!profile) {
     return (
-      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.emptyState}>
           <Text style={styles.emptyTitle}>{t('today.setup_title')}</Text>
           <Text style={styles.emptyBody}>{t('today.setup_body')}</Text>
@@ -182,7 +182,7 @@ export function TodayScreen() {
     // SafeAreaView background = gradient start so the status-bar area matches the hero.
     <SafeAreaView
       style={[styles.container, { backgroundColor: gradients.hero[0] }]}
-      edges={['top', 'bottom']}
+      edges={['top']}
     >
       {/* Milestone unlock toast — floats above content, auto-dismisses */}
       <MilestoneToast

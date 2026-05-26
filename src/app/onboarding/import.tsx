@@ -5,7 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 type ImportOption = {
   id: string;
@@ -33,6 +34,11 @@ const IMPORT_OPTIONS: ImportOption[] = [
 
 export default function ImportScreen() {
   const router = useRouter();
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
 
   const handleConnect = (option: ImportOption) => {
     Alert.alert(
@@ -104,103 +110,112 @@ export default function ImportScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  // Back header
-  backHeader: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  backArrow: {
-    alignSelf: 'flex-start',
-    paddingVertical: spacing.xs,
-  },
-  backArrowText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.primary,
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
 
-  scroll: { flex: 1 },
-  scrollContent: { padding: spacing.lg, paddingBottom: spacing.xl },
+    // Back header
+    backHeader: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    backArrow: {
+      alignSelf: 'flex-start',
+      paddingVertical: spacing.xs,
+    },
+    backArrowText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.primary,
+    },
 
-  heading: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  subheading: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    lineHeight: 22,
-    marginBottom: spacing.lg,
-  },
+    scroll: { flex: 1 },
+    scrollContent: { padding: spacing.lg, paddingBottom: spacing.xl },
 
-  // Import option card
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    ...shadows.sm,
-  },
-  cardContent: {
-    flex: 1,
-    marginRight: spacing.md,
-  },
-  cardName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: 2,
-  },
-  cardDescription: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    lineHeight: 18,
-  },
+    heading: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    subheading: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      lineHeight: 22,
+      marginBottom: spacing.lg,
+    },
 
-  // Connect button (outline style)
-  connectButton: {
-    paddingVertical: 8,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.md,
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-    alignItems: 'center',
-  },
-  connectButtonPressed: {
-    backgroundColor: colors.primaryLight,
-  },
-  connectButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.primary,
-  },
+    // Import option card
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      ...shadows.sm,
+    },
+    cardContent: {
+      flex: 1,
+      marginRight: spacing.md,
+    },
+    cardName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: 2,
+    },
+    cardDescription: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      lineHeight: 18,
+    },
 
-  // Skip link
-  skipLink: {
-    alignSelf: 'center',
-    marginTop: spacing.xl,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-  },
-  skipLinkPressed: {
-    opacity: 0.6,
-  },
-  skipLinkText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-});
+    // Connect button (outline style)
+    connectButton: {
+      paddingVertical: 8,
+      paddingHorizontal: spacing.md,
+      borderRadius: radius.md,
+      borderWidth: 1.5,
+      borderColor: colors.primary,
+      alignItems: 'center',
+    },
+    connectButtonPressed: {
+      backgroundColor: colors.primaryLight,
+    },
+    connectButtonText: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.primary,
+    },
+
+    // Skip link
+    skipLink: {
+      alignSelf: 'center',
+      marginTop: spacing.xl,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+    },
+    skipLinkPressed: {
+      opacity: 0.6,
+    },
+    skipLinkText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+  });
+}

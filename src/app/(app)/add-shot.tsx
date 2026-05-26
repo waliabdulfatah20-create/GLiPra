@@ -28,7 +28,8 @@ import {
 } from '@/features/injection-sites/hooks';
 import { useTodayData } from '@/features/today/hooks';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import type { GLP1MedicationId } from '@/types';
 
 // Medication display names
@@ -76,6 +77,11 @@ function combineDateAndTime(date: Date, time: Date): Date {
 
 export default function AddShotScreen() {
   const router = useRouter();
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
   const { profile } = useTodayData();
   const { recommendation, isLoading: recLoading } = useInjectionSiteRecommendation();
   const { mutate: logShot, isPending } = useLogInjectionSite(profile?.lastInjectionDate ?? undefined);
@@ -302,102 +308,111 @@ export default function AddShotScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  cancel: {
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  title: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  save: {
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  saveDisabled: {
-    color: colors.textDisabled,
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-    gap: spacing.sm,
-  },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    cancel: {
+      fontSize: 16,
+      color: colors.primary,
+      fontWeight: '500',
+    },
+    title: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    save: {
+      fontSize: 16,
+      color: colors.primary,
+      fontWeight: '600',
+    },
+    saveDisabled: {
+      color: colors.textDisabled,
+    },
 
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1,
-    color: colors.textSecondary,
-    marginTop: spacing.md,
-    marginBottom: spacing.xs,
-  },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+      gap: spacing.sm,
+    },
 
-  fieldRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  fieldLabelCol: {
-    gap: 2,
-  },
-  fieldLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    fontWeight: '500',
-  },
-  fieldValue: {
-    fontSize: 16,
-    color: colors.textPrimary,
-    fontWeight: '600',
-  },
-  fieldNote: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    fontWeight: '500',
-    fontStyle: 'italic',
-  },
+    sectionLabel: {
+      fontSize: 11,
+      fontWeight: '700',
+      letterSpacing: 1,
+      color: colors.textSecondary,
+      marginTop: spacing.md,
+      marginBottom: spacing.xs,
+    },
 
-  notesInput: {
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    padding: spacing.md,
-    minHeight: 96,
-    fontSize: 15,
-    color: colors.textPrimary,
-    ...shadows.sm,
-  },
+    fieldRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    fieldLabelCol: {
+      gap: 2,
+    },
+    fieldLabel: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      fontWeight: '500',
+    },
+    fieldValue: {
+      fontSize: 16,
+      color: colors.textPrimary,
+      fontWeight: '600',
+    },
+    fieldNote: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      fontWeight: '500',
+      fontStyle: 'italic',
+    },
 
-  disclaimerText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 18,
-  },
-});
+    notesInput: {
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+      padding: spacing.md,
+      minHeight: 96,
+      fontSize: 15,
+      color: colors.textPrimary,
+      ...shadows.sm,
+    },
+
+    disclaimerText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 18,
+    },
+  });
+}

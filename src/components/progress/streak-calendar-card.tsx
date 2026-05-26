@@ -1,43 +1,78 @@
 /**
- * StreakCalendarCard — calendar grid of the last N days.
+ * StreakCalendarCard — fixed 4-week calendar grid (7 cols × 4 rows).
+ *
+ * Always shows the last 4 complete weeks starting from Monday,
+ * regardless of the time-range selector. Day-of-week headers (M–S)
+ * let users spot weekly patterns at a glance.
  *
  * - Green = hit floor (≥ 80% of protein target)
  * - Amber = logged but missed
- * - Gray  = no log
+ * - Gray  = no log / future
  * - Today gets a purple outline
- *
- * Data source: useProteinHistoryPerDay — same hook the bar sparkline uses,
- * so the two cards are always consistent on the same window.
  */
 
-import { format } from 'date-fns';
+import { addDays, format, startOfWeek, subWeeks } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { useProteinHistoryPerDay } from '@/features/progress/hooks';
 import { tipI18nKey } from '@/features/progress/pharmacist-tips';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 import { CardShell } from './card-shell';
 import { PharmacistTip } from './pharmacist-tip';
 
+// Always fixed: 7 columns (Mon–Sun), 4 rows, 28 days
+const COLS = 7;
+const WEEKS = 4;
+const TOTAL_DAYS = COLS * WEEKS;
+const GAP = 4;
+const DAY_HEADERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
 interface StreakCalendarCardProps {
+  /** Passed by parent for the time-range selector — ignored here, we always show 4 weeks. */
   days: number;
   width: number;
 }
 
-const GAP = 4;
-
-export function StreakCalendarCard({ days, width }: StreakCalendarCardProps) {
+export function StreakCalendarCard({ width }: StreakCalendarCardProps) {
   const { t } = useTranslation();
-  const { history, isLoading } = useProteinHistoryPerDay(days);
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius],
+  );
 
-  // Auto-size cells to fit width. Target ~14 columns max for readability;
-  // 7 cols for a weekly grid feels too tall on 30/90D.
-  const COLS = days <= 14 ? days : 14;
-  const cellSize = Math.floor((width - GAP * (COLS - 1)) / COLS);
+  // Always fetch 28 days — enough to back-fill from the Monday 3 weeks ago
+  const { history, isLoading } = useProteinHistoryPerDay(TOTAL_DAYS);
+
+  // Build a date-keyed lookup from the hook data
+  const historyMap = React.useMemo(() => {
+    const m: Record<string, { hasData: boolean; hitFloor: boolean }> = {};
+    for (const d of history) m[d.date] = d;
+    return m;
+  }, [history]);
+
+  // Grid starts on Monday of the week 3 weeks ago
+  const gridStart = React.useMemo(() => {
+    const mondayThisWeek = startOfWeek(new Date(), { weekStartsOn: 1 });
+    return subWeeks(mondayThisWeek, WEEKS - 1);
+  }, []);
+
   const today = format(new Date(), 'yyyy-MM-dd');
+  const cellSize = Math.floor((width - GAP * (COLS - 1)) / COLS);
+
+  // Build all 28 date slots
+  const slots = React.useMemo(
+    () =>
+      Array.from({ length: TOTAL_DAYS }, (_, i) => {
+        const date = format(addDays(gridStart, i), 'yyyy-MM-dd');
+        return { date, ...historyMap[date] };
+      }),
+    [gridStart, historyMap],
+  );
 
   return (
     <CardShell
@@ -48,36 +83,72 @@ export function StreakCalendarCard({ days, width }: StreakCalendarCardProps) {
         <Text style={styles.placeholder}>{t('progress.loading')}</Text>
       ) : (
         <>
-          <View style={[styles.grid, { gap: GAP }]}>
-            {history.map((d) => {
-              let bg: string;
-              if (!d.hasData) bg = colors.gray200;
-              else if (d.hitFloor) bg = colors.success;
-              else bg = colors.warning;
-              return (
-                <View
-                  key={d.date}
-                  style={[
-                    styles.cell,
-                    {
-                      width: cellSize,
-                      height: cellSize,
-                      backgroundColor: bg,
-                      borderColor: d.date === today ? colors.primary : 'transparent',
-                    },
-                  ]}
-                  accessibilityLabel={`${d.date}: ${
-                    d.hitFloor ? 'hit' : d.hasData ? 'missed' : 'no log'
-                  }`}
-                />
-              );
-            })}
+          {/* Day-of-week headers */}
+          <View style={styles.headerRow}>
+            {DAY_HEADERS.map((h, i) => (
+              <Text
+                key={i}
+                style={[styles.dayHeader, { width: cellSize }]}
+              >
+                {h}
+              </Text>
+            ))}
           </View>
 
+          {/* 4-week grid — one row per week */}
+          {Array.from({ length: WEEKS }, (_, week) => (
+            <View key={week} style={[styles.weekRow, { gap: GAP }]}>
+              {slots.slice(week * COLS, week * COLS + COLS).map((d) => {
+                const isFuture = d.date > today;
+                let bg: string;
+                if (isFuture || !d.hasData) bg = colors.gray200;
+                else if (d.hitFloor) bg = colors.success;
+                else bg = colors.warning;
+
+                return (
+                  <View
+                    key={d.date}
+                    style={[
+                      styles.cell,
+                      {
+                        width: cellSize,
+                        height: cellSize,
+                        backgroundColor: bg,
+                        borderColor:
+                          d.date === today ? colors.primary : 'transparent',
+                      },
+                    ]}
+                    accessibilityLabel={`${d.date}: ${
+                      isFuture
+                        ? 'future'
+                        : d.hitFloor
+                        ? 'hit'
+                        : d.hasData
+                        ? 'missed'
+                        : 'no log'
+                    }`}
+                  />
+                );
+              })}
+            </View>
+          ))}
+
           <View style={styles.legend}>
-            <LegendDot color={colors.success} label={t('progress.streak_card.legend_hit')} />
-            <LegendDot color={colors.warning} label={t('progress.streak_card.legend_miss')} />
-            <LegendDot color={colors.gray200} label={t('progress.streak_card.legend_none')} />
+            <LegendDot
+              color={colors.success}
+              label={t('progress.streak_card.legend_hit')}
+              styles={styles}
+            />
+            <LegendDot
+              color={colors.warning}
+              label={t('progress.streak_card.legend_miss')}
+              styles={styles}
+            />
+            <LegendDot
+              color={colors.gray200}
+              label={t('progress.streak_card.legend_none')}
+              styles={styles}
+            />
           </View>
         </>
       )}
@@ -86,7 +157,15 @@ export function StreakCalendarCard({ days, width }: StreakCalendarCardProps) {
   );
 }
 
-function LegendDot({ color, label }: { color: string; label: string }) {
+function LegendDot({
+  color,
+  label,
+  styles,
+}: {
+  color: string;
+  label: string;
+  styles: ReturnType<typeof makeStyles>;
+}) {
   return (
     <View style={styles.legendItem}>
       <View style={[styles.legendDot, { backgroundColor: color }]} />
@@ -95,39 +174,60 @@ function LegendDot({ color, label }: { color: string; label: string }) {
   );
 }
 
-const styles = StyleSheet.create({
-  placeholder: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    paddingVertical: spacing.md,
-    textAlign: 'center',
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  cell: {
-    borderRadius: radius.sm,
-    borderWidth: 1.5,
-  },
-  legend: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
-    marginTop: spacing.sm,
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 2,
-  },
-  legendLabel: {
-    fontSize: 11,
-    color: colors.textSecondary,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    placeholder: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      paddingVertical: spacing.md,
+      textAlign: 'center',
+    },
+    headerRow: {
+      flexDirection: 'row',
+      gap: GAP,
+      marginBottom: 4,
+    },
+    dayHeader: {
+      fontSize: 9,
+      fontWeight: '700',
+      color: colors.textDisabled,
+      textAlign: 'center',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
+    weekRow: {
+      flexDirection: 'row',
+      marginBottom: GAP,
+    },
+    cell: {
+      borderRadius: radius.sm,
+      borderWidth: 1.5,
+    },
+    legend: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.md,
+      marginTop: spacing.sm,
+    },
+    legendItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    legendDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 2,
+    },
+    legendLabel: {
+      fontSize: 11,
+      color: colors.textSecondary,
+    },
+  });
+}

@@ -9,6 +9,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { LinearGradient } from 'expo-linear-gradient';
 import { haptics } from '@/lib/haptics';
 import { useTheme, useThemeSelector } from '@/lib/ThemeContext';
 import type { ColorSchemeType } from '@/lib/hooks/use-selected-theme';
@@ -44,7 +45,7 @@ const THEME_OPTIONS: ThemeOption[] = [
 
 export default function AppearanceScreen() {
   const { t } = useTranslation();
-  const { colors, spacing, radius, shadows } = useTheme();
+  const { colors, spacing, radius, shadows, gradients } = useTheme();
   // useThemeSelector() is safe here — onboarding screens render inside GlipraThemeProvider.
   const { selectedTheme, setSelectedTheme } = useThemeSelector();
   const styles = React.useMemo(
@@ -58,15 +59,23 @@ export default function AppearanceScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
+      edges={['top', 'bottom']}
+    >
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
+        <LinearGradient
+          colors={gradients.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroGradient}
+        >
           <Text style={styles.heading}>{t('onboarding.appearance_title')}</Text>
           <Text style={styles.subheading}>{t('onboarding.appearance_subtitle')}</Text>
-        </View>
+        </LinearGradient>
 
         <View style={styles.options}>
           {THEME_OPTIONS.map((option) => {
@@ -136,21 +145,25 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       padding: spacing.lg,
       paddingBottom: spacing.xl,
     },
-    header: {
-      marginTop: spacing.xl,
-      marginBottom: spacing.xl,
+    heroGradient: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.xl,
+      paddingBottom: spacing.xl + spacing.sm,
+      marginTop: -spacing.lg,
+      marginHorizontal: -spacing.lg,
+      marginBottom: spacing.lg,
     },
     heading: {
       fontSize: 28,
       fontWeight: '800',
-      color: colors.textPrimary,
+      color: '#ffffff',
       letterSpacing: -0.5,
       marginBottom: spacing.xs,
     },
     subheading: {
       fontSize: 16,
       fontWeight: '400',
-      color: colors.textSecondary,
+      color: 'rgba(255,255,255,0.8)',
     },
     options: {
       gap: spacing.sm,

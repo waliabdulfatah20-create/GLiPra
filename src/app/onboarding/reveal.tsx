@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { LinearGradient } from 'expo-linear-gradient';
 import { saveOnboardingProfile } from '@/features/onboarding/api';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { useAuthStore } from '@/features/auth/use-auth-store';
@@ -55,10 +56,10 @@ export default function RevealScreen() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { colors, spacing, radius, shadows } = useTheme();
+  const { colors, spacing, radius, shadows, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows]
+    [colors, spacing, radius, shadows, gradients]
   );
 
   const medicationLabel =
@@ -125,19 +126,29 @@ export default function RevealScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
+      edges={['top', 'bottom']}
+    >
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Step indicator — no progress bar on final reveal */}
-        <View style={styles.stepBadge}>
-          <Text style={styles.stepBadgeText}>Step 10 of 10</Text>
-        </View>
+        <LinearGradient
+          colors={gradients.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroGradient}
+        >
+          {/* Step indicator — no progress bar on final reveal */}
+          <View style={styles.stepBadge}>
+            <Text style={styles.stepBadgeText}>Step 10 of 10</Text>
+          </View>
 
-        <Text style={styles.heading}>You're all set</Text>
-        <Text style={styles.subheading}>Here's what Glipra will do for you every day.</Text>
+          <Text style={styles.heading}>You're all set</Text>
+          <Text style={styles.subheading}>Here's what Glipra will do for you every day.</Text>
+        </LinearGradient>
 
         {/* Summary cards */}
         <View style={styles.summarySection}>
@@ -271,10 +282,18 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     container: { flex: 1, backgroundColor: colors.background },
     scroll: { flex: 1 },
     scrollContent: { padding: spacing.lg, paddingBottom: spacing.xl },
+    heroGradient: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.xl + spacing.sm,
+      marginTop: -spacing.lg,
+      marginHorizontal: -spacing.lg,
+      marginBottom: spacing.lg,
+    },
 
     stepBadge: {
       alignSelf: 'flex-start',
-      backgroundColor: colors.primaryLight,
+      backgroundColor: 'rgba(255,255,255,0.2)',
       borderRadius: radius.full,
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.xs,
@@ -283,20 +302,19 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     stepBadgeText: {
       fontSize: 12,
       fontWeight: '600',
-      color: colors.primary,
+      color: 'rgba(255,255,255,0.9)',
     },
 
     heading: {
       fontSize: 28,
       fontWeight: '800',
-      color: colors.textPrimary,
+      color: '#ffffff',
       marginBottom: spacing.sm,
     },
     subheading: {
       fontSize: 15,
-      color: colors.textSecondary,
+      color: 'rgba(255,255,255,0.8)',
       lineHeight: 22,
-      marginBottom: spacing.lg,
     },
 
     summarySection: {

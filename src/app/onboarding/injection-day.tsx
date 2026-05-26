@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { LinearGradient } from 'expo-linear-gradient';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { haptics } from '@/lib/haptics';
@@ -69,7 +70,7 @@ export default function InjectionDayScreen() {
   const [dayOfWeek, setDayOfWeek] = useState<number | null>(null);
   const [lastInjectionDate, setLastInjectionDate] = useState('');
 
-  const { colors, spacing, radius } = useTheme();
+  const { colors, spacing, radius, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
     [colors, spacing, radius]
@@ -96,17 +97,27 @@ export default function InjectionDayScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <StepProgress current={2} total={10} />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
+      edges={['top', 'bottom']}
+    >
+      <StepProgress current={2} total={10} onDark />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.heading}>When do you inject?</Text>
-        <Text style={styles.subheading}>
-          We use this to track your injection cycle and personalize daily guidance.
-        </Text>
+        <LinearGradient
+          colors={gradients.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroGradient}
+        >
+          <Text style={styles.heading}>When do you inject?</Text>
+          <Text style={styles.subheading}>
+            We use this to track your injection cycle and personalize daily guidance.
+          </Text>
+        </LinearGradient>
 
         {/* Frequency selector */}
         <Text style={styles.sectionLabel}>INJECTION FREQUENCY</Text>
@@ -222,17 +233,24 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       padding: spacing.lg,
       paddingBottom: spacing.sm,
     },
+    heroGradient: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.xl + spacing.sm,
+      marginTop: -spacing.lg,
+      marginHorizontal: -spacing.lg,
+      marginBottom: spacing.lg,
+    },
     heading: {
       fontSize: 24,
       fontWeight: '700',
-      color: colors.textPrimary,
+      color: '#ffffff',
       marginBottom: spacing.sm,
     },
     subheading: {
       fontSize: 15,
-      color: colors.textSecondary,
+      color: 'rgba(255,255,255,0.8)',
       lineHeight: 22,
-      marginBottom: spacing.xl,
     },
     sectionLabel: {
       fontSize: 11,

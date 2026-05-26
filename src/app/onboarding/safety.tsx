@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { LinearGradient } from 'expo-linear-gradient';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { haptics } from '@/lib/haptics';
@@ -45,10 +46,10 @@ export default function SafetyScreen() {
     isPregnant: undefined,
   });
 
-  const { colors, spacing, radius } = useTheme();
+  const { colors, spacing, radius, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius]
+    [colors, spacing, radius, gradients]
   );
 
   const setAnswer = (id: keyof Answers, value: YesNo) => {
@@ -69,17 +70,27 @@ export default function SafetyScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <StepProgress current={4} total={10} />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
+      edges={['top', 'bottom']}
+    >
+      <StepProgress current={4} total={10} onDark />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.heading}>Safety check</Text>
-        <Text style={styles.subheading}>
-          These questions affect your protein target calculation. Answer honestly — your safety
-          depends on it.
-        </Text>
+        <LinearGradient
+          colors={gradients.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroGradient}
+        >
+          <Text style={styles.heading}>Safety check</Text>
+          <Text style={styles.subheading}>
+            These questions affect your protein target calculation. Answer honestly — your safety
+            depends on it.
+          </Text>
+        </LinearGradient>
 
         {SAFETY_QUESTIONS.map((q) => {
           const answer = answers[q.id];
@@ -164,17 +175,24 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       padding: spacing.lg,
       paddingBottom: spacing.sm,
     },
+    heroGradient: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.xl + spacing.sm,
+      marginTop: -spacing.lg,
+      marginHorizontal: -spacing.lg,
+      marginBottom: spacing.lg,
+    },
     heading: {
       fontSize: 24,
       fontWeight: '700',
-      color: colors.textPrimary,
+      color: '#ffffff',
       marginBottom: spacing.sm,
     },
     subheading: {
       fontSize: 15,
-      color: colors.textSecondary,
+      color: 'rgba(255,255,255,0.8)',
       lineHeight: 22,
-      marginBottom: spacing.xl,
     },
     questionCard: {
       backgroundColor: colors.surface,

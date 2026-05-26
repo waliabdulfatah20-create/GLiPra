@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { LinearGradient } from 'expo-linear-gradient';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
@@ -20,10 +21,10 @@ export default function ProteinTargetScreen() {
 
   const [acknowledged, setAcknowledged] = useState(false);
 
-  const { colors, spacing, radius, shadows } = useTheme();
+  const { colors, spacing, radius, shadows, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows]
+    [colors, spacing, radius, shadows, gradients]
   );
 
   const result = useMemo<ProteinResult | null>(() => {
@@ -68,18 +69,28 @@ export default function ProteinTargetScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <StepProgress current={8} total={10} />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
+      edges={['top', 'bottom']}
+    >
+      <StepProgress current={8} total={10} onDark />
 
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.heading}>Your protein target</Text>
-        <Text style={styles.subheading}>
-          Based on your body metrics and health information.
-        </Text>
+        <LinearGradient
+          colors={gradients.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroGradient}
+        >
+          <Text style={styles.heading}>Your protein target</Text>
+          <Text style={styles.subheading}>
+            Based on your body metrics and health information.
+          </Text>
+        </LinearGradient>
 
         {/* Result card */}
         <View style={styles.resultCard}>
@@ -170,18 +181,25 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     container: { flex: 1, backgroundColor: colors.background },
     scroll: { flex: 1 },
     scrollContent: { padding: spacing.lg, paddingBottom: spacing.sm },
+    heroGradient: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.xl + spacing.sm,
+      marginTop: -spacing.lg,
+      marginHorizontal: -spacing.lg,
+      marginBottom: spacing.lg,
+    },
 
     heading: {
       fontSize: 24,
       fontWeight: '700',
-      color: colors.textPrimary,
+      color: '#ffffff',
       marginBottom: spacing.sm,
     },
     subheading: {
       fontSize: 15,
-      color: colors.textSecondary,
+      color: 'rgba(255,255,255,0.8)',
       lineHeight: 22,
-      marginBottom: spacing.lg,
     },
 
     // Result card

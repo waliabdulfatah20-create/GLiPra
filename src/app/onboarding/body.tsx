@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { LinearGradient } from 'expo-linear-gradient';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { UnitToggle } from '@/components/ui/unit-toggle';
@@ -46,7 +47,7 @@ export default function BodyScreen() {
   // Goal weight (optional)
   const [goalWeightText, setGoalWeightText] = useState('');
 
-  const { colors, spacing, radius } = useTheme();
+  const { colors, spacing, radius, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
     [colors, spacing, radius]
@@ -106,17 +107,27 @@ export default function BodyScreen() {
     : ftText.length > 0 && ftParsed === null;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <StepProgress current={3} total={10} />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
+      edges={['top', 'bottom']}
+    >
+      <StepProgress current={3} total={10} onDark />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.heading}>About your body</Text>
-        <Text style={styles.subheading}>
-          Used to calculate your personalized protein target. All data stays on your device.
-        </Text>
+        <LinearGradient
+          colors={gradients.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroGradient}
+        >
+          <Text style={styles.heading}>About your body</Text>
+          <Text style={styles.subheading}>
+            Used to calculate your personalized protein target. All data stays on your device.
+          </Text>
+        </LinearGradient>
 
         {/* Weight input */}
         <View style={styles.labelRow}>
@@ -262,17 +273,24 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       padding: spacing.lg,
       paddingBottom: spacing.sm,
     },
+    heroGradient: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.xl + spacing.sm,
+      marginTop: -spacing.lg,
+      marginHorizontal: -spacing.lg,
+      marginBottom: spacing.lg,
+    },
     heading: {
       fontSize: 24,
       fontWeight: '700',
-      color: colors.textPrimary,
+      color: '#ffffff',
       marginBottom: spacing.sm,
     },
     subheading: {
       fontSize: 15,
-      color: colors.textSecondary,
+      color: 'rgba(255,255,255,0.8)',
       lineHeight: 22,
-      marginBottom: spacing.xl,
     },
     labelRow: {
       flexDirection: 'row',

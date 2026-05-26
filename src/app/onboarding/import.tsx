@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { LinearGradient } from 'expo-linear-gradient';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
@@ -34,10 +35,10 @@ const IMPORT_OPTIONS: ImportOption[] = [
 
 export default function ImportScreen() {
   const router = useRouter();
-  const { colors, spacing, radius, shadows } = useTheme();
+  const { colors, spacing, radius, shadows, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows],
+    [colors, spacing, radius, shadows, gradients],
   );
 
   const handleConnect = (option: ImportOption) => {
@@ -54,8 +55,11 @@ export default function ImportScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <StepProgress current={9} total={10} />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
+      edges={['top', 'bottom']}
+    >
+      <StepProgress current={9} total={10} onDark />
 
       {/* Back arrow in header area */}
       <View style={styles.backHeader}>
@@ -74,10 +78,17 @@ export default function ImportScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.heading}>Import your history</Text>
-        <Text style={styles.subheading}>
-          Already tracking somewhere else? Import to hit the ground running.
-        </Text>
+        <LinearGradient
+          colors={gradients.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroGradient}
+        >
+          <Text style={styles.heading}>Import your history</Text>
+          <Text style={styles.subheading}>
+            Already tracking somewhere else? Import to hit the ground running.
+          </Text>
+        </LinearGradient>
 
         {IMPORT_OPTIONS.map((option) => (
           <View key={option.id} style={styles.card}>
@@ -121,13 +132,12 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
 
-    // Back header
+    // Back header — transparent to blend with gradient background
     backHeader: {
       paddingHorizontal: spacing.lg,
       paddingVertical: spacing.sm,
-      backgroundColor: colors.surface,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+      backgroundColor: 'transparent',
+      borderBottomWidth: 0,
     },
     backArrow: {
       alignSelf: 'flex-start',
@@ -136,23 +146,30 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     backArrowText: {
       fontSize: 15,
       fontWeight: '600',
-      color: colors.primary,
+      color: 'rgba(255,255,255,0.9)',
     },
 
     scroll: { flex: 1 },
     scrollContent: { padding: spacing.lg, paddingBottom: spacing.xl },
+    heroGradient: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.xl + spacing.sm,
+      marginTop: -spacing.lg,
+      marginHorizontal: -spacing.lg,
+      marginBottom: spacing.lg,
+    },
 
     heading: {
       fontSize: 24,
       fontWeight: '700',
-      color: colors.textPrimary,
+      color: '#ffffff',
       marginBottom: spacing.sm,
     },
     subheading: {
       fontSize: 15,
-      color: colors.textSecondary,
+      color: 'rgba(255,255,255,0.8)',
       lineHeight: 22,
-      marginBottom: spacing.lg,
     },
 
     // Import option card

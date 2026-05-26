@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { LinearGradient } from 'expo-linear-gradient';
 import { LOCAL, changeLanguage } from '@/lib/i18n/utils';
 import { setItem } from '@/lib/storage';
 import { haptics } from '@/lib/haptics';
@@ -20,7 +21,7 @@ const LANGS: LangOption[] = [
 export default function LanguageScreen() {
   const [selected, setSelected] = React.useState<Language>('en');
 
-  const { colors, spacing, radius, shadows } = useTheme();
+  const { colors, spacing, radius, shadows, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
     [colors, spacing, radius, shadows]
@@ -34,15 +35,23 @@ export default function LanguageScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
+      edges={['top', 'bottom']}
+    >
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
+        <LinearGradient
+          colors={gradients.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroGradient}
+        >
           <Text style={styles.heading}>Choose your language</Text>
           <Text style={styles.subheading}>Elige tu idioma</Text>
-        </View>
+        </LinearGradient>
 
         <View style={styles.options}>
           {LANGS.map(lang => {
@@ -100,21 +109,25 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       padding: spacing.lg,
       paddingBottom: spacing.xl,
     },
-    header: {
-      marginTop: spacing.xl,
-      marginBottom: spacing.xl,
+    heroGradient: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.xl,
+      paddingBottom: spacing.xl + spacing.sm,
+      marginTop: -spacing.lg,
+      marginHorizontal: -spacing.lg,
+      marginBottom: spacing.lg,
     },
     heading: {
       fontSize: 28,
       fontWeight: '800',
-      color: colors.textPrimary,
+      color: '#ffffff',
       letterSpacing: -0.5,
       marginBottom: spacing.xs,
     },
     subheading: {
       fontSize: 18,
       fontWeight: '400',
-      color: colors.textSecondary,
+      color: 'rgba(255,255,255,0.8)',
     },
     options: {
       gap: spacing.sm,

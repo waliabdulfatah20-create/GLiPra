@@ -1,10 +1,12 @@
 /**
  * MilestoneToast — slide-in banner shown when a milestone unlocks.
  * Sits above the screen content (position: absolute), auto-dismisses after 3 s.
+ * Uses the Direction B purple-blue gradient to match unlocked MilestoneCard.
  */
 
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
@@ -25,7 +27,7 @@ interface MilestoneToastProps {
 // ---------------------------------------------------------------------------
 
 export function MilestoneToast({ milestone, onDismiss }: MilestoneToastProps) {
-  const { colors, spacing, radius, shadows } = useTheme();
+  const { colors, spacing, radius, shadows, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
     [colors, spacing, radius, shadows],
@@ -41,18 +43,27 @@ export function MilestoneToast({ milestone, onDismiss }: MilestoneToastProps) {
   if (!milestone) return null;
 
   return (
+    // Outer View: shadow carrier + absolute positioning.
+    // iOS requires an opaque backgroundColor on the shadow-hosting View.
     <View
-      style={styles.toast}
+      style={styles.toastOuter}
       accessibilityRole="alert"
       accessibilityLabel={`Milestone unlocked: ${milestone.title}`}
     >
-      <Text style={styles.emoji}>{milestone.emoji}</Text>
-      <View style={styles.textCol}>
-        <Text style={styles.label}>Milestone Unlocked!</Text>
-        <Text style={styles.title} numberOfLines={1}>
-          {milestone.title}
-        </Text>
-      </View>
+      <LinearGradient
+        colors={gradients.hero}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.toastInner}
+      >
+        <Text style={styles.emoji}>{milestone.emoji}</Text>
+        <View style={styles.textCol}>
+          <Text style={styles.label}>Milestone Unlocked!</Text>
+          <Text style={styles.title} numberOfLines={1}>
+            {milestone.title}
+          </Text>
+        </View>
+      </LinearGradient>
     </View>
   );
 }
@@ -70,22 +81,28 @@ interface StyleTokens {
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
-    toast: {
+    // Outer wrapper: absolute positioning + shadow host (iOS needs opaque bg)
+    toastOuter: {
       position: 'absolute',
       top: spacing.md,
       left: spacing.md,
       right: spacing.md,
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.surface,
       borderRadius: radius.lg,
-      borderLeftWidth: 4,
-      borderLeftColor: colors.primary,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm + 2,
+      backgroundColor: colors.surface,
       zIndex: 1000,
       ...shadows.lg,
     },
+
+    // Inner LinearGradient: visible face — clips gradient to rounded corners
+    toastInner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderRadius: radius.lg,
+      overflow: 'hidden',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm + 2,
+    },
+
     emoji: {
       fontSize: 28,
       marginRight: spacing.sm,
@@ -96,7 +113,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     label: {
       fontSize: 11,
       fontWeight: '700',
-      color: colors.primary,
+      color: 'rgba(255,255,255,0.8)',
       letterSpacing: 0.5,
       textTransform: 'uppercase',
       marginBottom: 2,
@@ -104,7 +121,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     title: {
       fontSize: 15,
       fontWeight: '700',
-      color: colors.textPrimary,
+      color: '#ffffff',
     },
   });
 }

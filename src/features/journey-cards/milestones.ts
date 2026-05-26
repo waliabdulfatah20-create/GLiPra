@@ -3,8 +3,6 @@
  * Each milestone is a shareable artifact that unlocks as the user progresses.
  */
 
-import { colors } from '@/theme/colors';
-
 export type MilestoneId =
   | 'week_1_complete'
   | 'protein_streak_7'
@@ -30,7 +28,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
     title: 'Week 1 Complete',
     subtitle: 'First 7 days on your GLP-1 journey',
     emoji: '🎯',
-    accentColor: colors.primary,
+    accentColor: '#6d28d9',
     shareText:
       'Week 1 on my GLP-1 journey complete! Tracking with Glipra to protect my muscle. 💪',
   },
@@ -40,7 +38,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
     title: 'Protein Streak: 7 Days',
     subtitle: 'Hit your protein goal 7 days in a row',
     emoji: '🔥',
-    accentColor: colors.proteinGood,
+    accentColor: '#22C55E',
     shareText:
       '7-day protein streak on Glipra! Staying consistent so GLP-1 works without stealing my muscle. 💪🥩',
   },
@@ -50,7 +48,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
     title: 'Protein Streak: 30 Days',
     subtitle: 'Hit your protein goal 30 days in a row',
     emoji: '⚡',
-    accentColor: colors.proteinGood,
+    accentColor: '#22C55E',
     shareText:
       '30-day protein streak: a full month of protecting my muscle while on GLP-1! Glipra keeps me honest. 💪⚡',
   },
@@ -60,7 +58,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
     title: 'First Check-in',
     subtitle: 'Logged your first daily check-in',
     emoji: '✅',
-    accentColor: colors.primary,
+    accentColor: '#6d28d9',
     shareText:
       'Logged my first daily check-in on Glipra. Designed by a licensed pharmacist to keep GLP-1 journeys safe. ✅',
   },
@@ -70,7 +68,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
     title: 'Tracking Champion',
     subtitle: 'Logged your weight 10 times',
     emoji: '📊',
-    accentColor: colors.phasePeakSuppression,
+    accentColor: '#3B82F6',
     shareText:
       '10 weight logs in: watching the trend, not the number. Glipra helps me track what matters on GLP-1. 📊',
   },
@@ -80,7 +78,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
     title: 'Injection Day Warrior',
     subtitle: 'Logged on your injection day',
     emoji: '💉',
-    accentColor: colors.phaseInjectionDay,
+    accentColor: '#8B5CF6',
     shareText:
       'Injection day and still showing up. Glipra helps me navigate every phase of my GLP-1 cycle. 💉💪',
   },
@@ -90,7 +88,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
     title: '3 Months Strong',
     subtitle: '90 days on your GLP-1 journey',
     emoji: '🏆',
-    accentColor: colors.primary,
+    accentColor: '#6d28d9',
     shareText:
       '3 months on my GLP-1 journey! Still going strong with Glipra keeping my nutrition dialed in. 🏆',
   },
@@ -100,7 +98,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
     title: 'First Coaching Session',
     subtitle: 'Had your first AI Nutrition Coach conversation',
     emoji: '💬',
-    accentColor: colors.primary,
+    accentColor: '#6d28d9',
     shareText:
       'Just got personalized nutrition guidance from the Glipra AI Coach, pharmacist-designed for GLP-1 users. 💬',
   },

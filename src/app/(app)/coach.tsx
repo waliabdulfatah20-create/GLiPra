@@ -27,7 +27,8 @@ import { useAiCoach } from '@/features/ai-coach/hooks';
 import type { CoachMessage } from '@/features/ai-coach/hooks';
 import { ProGate } from '@/features/subscription/pro-gate';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 // ---------------------------------------------------------------------------
 // Welcome message — pre-loaded before the user sends anything.
@@ -47,6 +48,11 @@ const WELCOME_MESSAGE: CoachMessage = {
 // ---------------------------------------------------------------------------
 
 function TypingIndicator() {
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius]
+  );
   return (
     <View style={styles.typingRow}>
       <View style={styles.assistantBubble}>
@@ -62,6 +68,11 @@ function TypingIndicator() {
 // ---------------------------------------------------------------------------
 
 function MessageBubble({ message }: { message: CoachMessage }) {
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius]
+  );
   const isUser = message.role === 'user';
 
   return (
@@ -83,6 +94,11 @@ export default function CoachScreen() {
   const { messages, sendMessage, isLoading } = useAiCoach();
   const [inputText, setInputText] = useState('');
   const flatListRef = useRef<FlatList<CoachMessage>>(null);
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius]
+  );
 
   // Combine the welcome message with live messages.
   const allMessages: CoachMessage[] = [WELCOME_MESSAGE, ...messages];
@@ -179,147 +195,155 @@ export default function CoachScreen() {
 // Styles
 // ---------------------------------------------------------------------------
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  keyboardAvoiding: {
-    flex: 1,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
 
-  // Header
-  header: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  headerTitles: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    keyboardAvoiding: {
+      flex: 1,
+    },
 
-  // Disclaimer
-  disclaimerText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 17,
-  },
+    // Header
+    header: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    headerTitles: {
+      flex: 1,
+    },
+    headerTitle: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    headerSubtitle: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
 
-  // Message list
-  messageList: {
-    padding: spacing.md,
-    paddingBottom: spacing.lg,
-    flexGrow: 1,
-  },
-  messageRow: {
-    marginBottom: spacing.sm,
-  },
-  userRow: {
-    alignItems: 'flex-end',
-  },
-  assistantRow: {
-    alignItems: 'flex-start',
-  },
+    // Disclaimer
+    disclaimerText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 17,
+    },
 
-  // Bubbles
-  bubble: {
-    maxWidth: '80%',
-    borderRadius: radius.lg,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  userBubble: {
-    backgroundColor: colors.primary,
-    borderBottomRightRadius: radius.sm,
-  },
-  assistantBubble: {
-    backgroundColor: colors.surface,
-    borderBottomLeftRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  bubbleText: {
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  userBubbleText: {
-    color: colors.textInverse,
-  },
-  assistantBubbleText: {
-    color: colors.textPrimary,
-  },
+    // Message list
+    messageList: {
+      padding: spacing.md,
+      paddingBottom: spacing.lg,
+      flexGrow: 1,
+    },
+    messageRow: {
+      marginBottom: spacing.sm,
+    },
+    userRow: {
+      alignItems: 'flex-end',
+    },
+    assistantRow: {
+      alignItems: 'flex-start',
+    },
 
-  // Typing indicator
-  typingRow: {
-    alignItems: 'flex-start',
-    marginBottom: spacing.sm,
-  },
-  typingText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginLeft: spacing.xs,
-  },
+    // Bubbles
+    bubble: {
+      maxWidth: '80%',
+      borderRadius: radius.lg,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+    },
+    userBubble: {
+      backgroundColor: colors.primary,
+      borderBottomRightRadius: radius.sm,
+    },
+    assistantBubble: {
+      backgroundColor: colors.surface,
+      borderBottomLeftRadius: radius.sm,
+      borderWidth: 1,
+      borderColor: colors.border,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    bubbleText: {
+      fontSize: 15,
+      lineHeight: 22,
+    },
+    userBubbleText: {
+      color: colors.textInverse,
+    },
+    assistantBubbleText: {
+      color: colors.textPrimary,
+    },
 
-  // Input row
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    gap: spacing.sm,
-  },
-  textInput: {
-    flex: 1,
-    minHeight: 40,
-    maxHeight: 120,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    fontSize: 15,
-    color: colors.textPrimary,
-    backgroundColor: colors.background,
-  },
-  sendButton: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  sendButtonDisabled: {
-    backgroundColor: colors.gray200,
-  },
-  sendButtonPressed: {
-    backgroundColor: colors.primaryDark,
-  },
-  sendButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textInverse,
-  },
-  sendButtonTextDisabled: {
-    color: colors.textDisabled,
-  },
-});
+    // Typing indicator
+    typingRow: {
+      alignItems: 'flex-start',
+      marginBottom: spacing.sm,
+    },
+    typingText: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      marginLeft: spacing.xs,
+    },
+
+    // Input row
+    inputRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      backgroundColor: colors.surface,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      gap: spacing.sm,
+    },
+    textInput: {
+      flex: 1,
+      minHeight: 40,
+      maxHeight: 120,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      fontSize: 15,
+      color: colors.textPrimary,
+      backgroundColor: colors.background,
+    },
+    sendButton: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    sendButtonDisabled: {
+      backgroundColor: colors.gray200,
+    },
+    sendButtonPressed: {
+      backgroundColor: colors.primaryDark,
+    },
+    sendButtonText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textInverse,
+    },
+    sendButtonTextDisabled: {
+      color: colors.textDisabled,
+    },
+  });
+}

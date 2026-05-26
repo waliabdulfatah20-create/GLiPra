@@ -40,7 +40,8 @@ import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useTodayFoo
 import { PhotoReviewSheet } from '@/features/food-log/photo-review-sheet';
 import type { FoodLogEntry, ManualFoodEntry } from '@/features/food-log/types';
 import { useTodayData } from '@/features/today/hooks';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 // ---------------------------------------------------------------------------
 // Meal slot helper — client-side time-based filter, no DB column needed.
@@ -76,6 +77,11 @@ export default function LogScreen() {
     isLoading: recognizing,
   } = usePhotoFoodLog();
   const { proteinFloorG } = useTodayData();
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows]
+  );
 
   // ---------------------------------------------------------------------------
   // Handlers
@@ -287,37 +293,43 @@ interface FoodLogRowProps {
 
 function FoodLogRow({ entry }: FoodLogRowProps) {
   const { t } = useTranslation();
+  const { colors, spacing, radius } = useTheme();
+  const rowStyles = React.useMemo(
+    () => makeFoodLogRowStyles({ colors, spacing, radius }),
+    [colors, spacing, radius]
+  );
+
   const sourceBadgeStyle =
     entry.source === 'barcode'
-      ? styles.sourceBadgeBarcode
+      ? rowStyles.sourceBadgeBarcode
       : entry.source === 'photo'
-        ? styles.sourceBadgePhoto
-        : styles.sourceBadgeManual;
+        ? rowStyles.sourceBadgePhoto
+        : rowStyles.sourceBadgeManual;
   const sourceBadgeTextStyle =
     entry.source === 'barcode'
-      ? styles.sourceBadgeTextBarcode
+      ? rowStyles.sourceBadgeTextBarcode
       : entry.source === 'photo'
-        ? styles.sourceBadgeTextPhoto
-        : styles.sourceBadgeTextManual;
+        ? rowStyles.sourceBadgeTextPhoto
+        : rowStyles.sourceBadgeTextManual;
 
   return (
-    <View style={styles.logRow}>
-      <View style={styles.logRowLeft}>
-        <Text style={styles.logRowName} numberOfLines={1}>
+    <View style={rowStyles.logRow}>
+      <View style={rowStyles.logRowLeft}>
+        <Text style={rowStyles.logRowName} numberOfLines={1}>
           {entry.name}
         </Text>
-        <Text style={styles.logRowServing} numberOfLines={1}>
+        <Text style={rowStyles.logRowServing} numberOfLines={1}>
           {entry.servingDescription}
         </Text>
-        <View style={styles.logRowBadgeRow}>
-          <View style={[styles.sourceBadge, sourceBadgeStyle]}>
-            <Text style={[styles.sourceBadgeText, sourceBadgeTextStyle]}>
+        <View style={rowStyles.logRowBadgeRow}>
+          <View style={[rowStyles.sourceBadge, sourceBadgeStyle]}>
+            <Text style={[rowStyles.sourceBadgeText, sourceBadgeTextStyle]}>
               {entry.source === 'photo' ? t('log.source_ai') : entry.source === 'barcode' ? t('log.source_barcode') : t('log.source_manual')}
             </Text>
           </View>
           {/* Show carbs + fat inline if available */}
           {(entry.carbsG != null || entry.fatG != null) && (
-            <Text style={styles.logRowMacroHint}>
+            <Text style={rowStyles.logRowMacroHint}>
               {[
                 entry.carbsG != null && `${entry.carbsG.toFixed(0)}g carbs`,
                 entry.fatG != null && `${entry.fatG.toFixed(0)}g fat`,
@@ -329,11 +341,11 @@ function FoodLogRow({ entry }: FoodLogRowProps) {
         </View>
       </View>
 
-      <View style={styles.logRowRight}>
-        <Text style={styles.logRowProtein}>{entry.proteinG.toFixed(1)}g</Text>
-        <Text style={styles.logRowProteinLabel}>protein</Text>
+      <View style={rowStyles.logRowRight}>
+        <Text style={rowStyles.logRowProtein}>{entry.proteinG.toFixed(1)}g</Text>
+        <Text style={rowStyles.logRowProteinLabel}>protein</Text>
         {entry.caloriesKcal != null && (
-          <Text style={styles.logRowCalories}>{entry.caloriesKcal.toFixed(0)} kcal</Text>
+          <Text style={rowStyles.logRowCalories}>{entry.caloriesKcal.toFixed(0)} kcal</Text>
         )}
       </View>
     </View>
@@ -343,191 +355,206 @@ function FoodLogRow({ entry }: FoodLogRowProps) {
 // ---------------------------------------------------------------------------
 // Styles
 // ---------------------------------------------------------------------------
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  listContent: {
-    paddingBottom: spacing.xl,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
-  },
-  headerText: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    letterSpacing: -0.5,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '600',
-    marginTop: spacing.xs,
-  },
-  modeToggleRow: {
-    flexDirection: 'row',
-    marginHorizontal: spacing.md,
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
-    backgroundColor: colors.gray100,
-    borderRadius: radius.lg,
-    padding: 4,
-    gap: 4,
-  },
-  modeButton: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.md,
-    alignItems: 'center',
-  },
-  modeButtonActive: {
-    backgroundColor: colors.white,
-    ...shadows.sm,
-  },
-  modeButtonText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: colors.textSecondary,
-  },
-  modeButtonTextActive: {
-    color: colors.textPrimary,
-    fontWeight: '700',
-  },
-  sectionTitle: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    letterSpacing: 1,
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-    marginHorizontal: spacing.md,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: colors.textDisabled,
-    textAlign: 'center',
-    marginTop: spacing.xl,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingTop: spacing.xl,
-    paddingHorizontal: spacing.xl,
-    gap: spacing.sm,
-  },
-  emptyStateIcon: {
-    fontSize: 40,
-  },
-  emptyStateTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  emptyStateBody: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginHorizontal: spacing.md,
-  },
-  logRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.surface,
-  },
-  logRowLeft: {
-    flex: 1,
-    gap: 2,
-  },
-  logRowName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  logRowServing: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  logRowBadgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginTop: 4,
-  },
-  sourceBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: radius.sm,
-  },
-  sourceBadgeManual: {
-    backgroundColor: colors.gray100,
-  },
-  sourceBadgeBarcode: {
-    backgroundColor: colors.primaryLight,
-  },
-  sourceBadgePhoto: {
-    backgroundColor: colors.primary + '18',
-    borderWidth: 1,
-    borderColor: colors.primary + '40',
-  },
-  sourceBadgeText: {
-    fontSize: 10,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
-  },
-  sourceBadgeTextManual: {
-    color: colors.textSecondary,
-  },
-  sourceBadgeTextBarcode: {
-    color: colors.primary,
-  },
-  sourceBadgeTextPhoto: {
-    color: colors.primary,
-  },
-  logRowMacroHint: {
-    fontSize: 11,
-    color: colors.textDisabled,
-  },
-  logRowRight: {
-    alignItems: 'flex-end',
-    gap: 2,
-  },
-  logRowProtein: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: colors.proteinGood,
-  },
-  logRowProteinLabel: {
-    fontSize: 11,
-    color: colors.textSecondary,
-  },
-  logRowCalories: {
-    fontSize: 12,
-    color: colors.textDisabled,
-    marginTop: 2,
-  },
-  footer: {
-    marginTop: spacing.lg,
-  },
-  disclaimerText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 17,
-  },
-});
+
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
+
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    listContent: {
+      paddingBottom: spacing.xl,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.md,
+    },
+    headerText: {
+      flex: 1,
+    },
+    headerTitle: {
+      fontSize: 28,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      letterSpacing: -0.5,
+    },
+    headerSubtitle: {
+      fontSize: 14,
+      color: colors.primary,
+      fontWeight: '600',
+      marginTop: spacing.xs,
+    },
+    modeToggleRow: {
+      flexDirection: 'row',
+      marginHorizontal: spacing.md,
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+      backgroundColor: colors.gray100,
+      borderRadius: radius.lg,
+      padding: 4,
+      gap: 4,
+    },
+    modeButton: {
+      flex: 1,
+      paddingVertical: spacing.sm,
+      borderRadius: radius.md,
+      alignItems: 'center',
+    },
+    modeButtonActive: {
+      backgroundColor: colors.white,
+      ...shadows.sm,
+    },
+    modeButtonText: {
+      fontSize: 13,
+      fontWeight: '500',
+      color: colors.textSecondary,
+    },
+    modeButtonTextActive: {
+      color: colors.textPrimary,
+      fontWeight: '700',
+    },
+    sectionTitle: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      letterSpacing: 1,
+      marginTop: spacing.lg,
+      marginBottom: spacing.sm,
+      marginHorizontal: spacing.md,
+    },
+    emptyText: {
+      fontSize: 14,
+      color: colors.textDisabled,
+      textAlign: 'center',
+      marginTop: spacing.xl,
+    },
+    emptyState: {
+      alignItems: 'center',
+      paddingTop: spacing.xl,
+      paddingHorizontal: spacing.xl,
+      gap: spacing.sm,
+    },
+    emptyStateIcon: {
+      fontSize: 40,
+    },
+    emptyStateTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    emptyStateBody: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    separator: {
+      height: 1,
+      backgroundColor: colors.border,
+      marginHorizontal: spacing.md,
+    },
+    footer: {
+      marginTop: spacing.lg,
+    },
+    disclaimerText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 17,
+    },
+  });
+}
+
+function makeFoodLogRowStyles({ colors, spacing, radius }: Pick<GlipraTokens, 'colors' | 'spacing' | 'radius'>) {
+  return StyleSheet.create({
+    logRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.surface,
+    },
+    logRowLeft: {
+      flex: 1,
+      gap: 2,
+    },
+    logRowName: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textPrimary,
+    },
+    logRowServing: {
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+    logRowBadgeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      marginTop: 4,
+    },
+    sourceBadge: {
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: radius.sm,
+    },
+    sourceBadgeManual: {
+      backgroundColor: colors.gray100,
+    },
+    sourceBadgeBarcode: {
+      backgroundColor: colors.primaryLight,
+    },
+    sourceBadgePhoto: {
+      backgroundColor: colors.primary + '18',
+      borderWidth: 1,
+      borderColor: colors.primary + '40',
+    },
+    sourceBadgeText: {
+      fontSize: 10,
+      fontWeight: '600',
+      textTransform: 'uppercase',
+      letterSpacing: 0.4,
+    },
+    sourceBadgeTextManual: {
+      color: colors.textSecondary,
+    },
+    sourceBadgeTextBarcode: {
+      color: colors.primary,
+    },
+    sourceBadgeTextPhoto: {
+      color: colors.primary,
+    },
+    logRowMacroHint: {
+      fontSize: 11,
+      color: colors.textDisabled,
+    },
+    logRowRight: {
+      alignItems: 'flex-end',
+      gap: 2,
+    },
+    logRowProtein: {
+      fontSize: 18,
+      fontWeight: '800',
+      color: colors.proteinGood,
+    },
+    logRowProteinLabel: {
+      fontSize: 11,
+      color: colors.textSecondary,
+    },
+    logRowCalories: {
+      fontSize: 12,
+      color: colors.textDisabled,
+      marginTop: 2,
+    },
+  });
+}

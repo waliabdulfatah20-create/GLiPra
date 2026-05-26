@@ -11,7 +11,8 @@ import { setItem } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
 import { haptics } from '@/lib/haptics';
 import { notifications } from '@/lib/notifications';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import type { GLP1MedicationId } from '@/types';
 
 // ─── Display maps ────────────────────────────────────────────────────────────
@@ -53,6 +54,12 @@ export default function RevealScreen() {
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows]
+  );
 
   const medicationLabel =
     formData.medicationId !== undefined
@@ -196,6 +203,12 @@ interface SummaryCardProps {
 }
 
 function SummaryCard({ label, value, accent = false }: SummaryCardProps) {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const summaryStyles = React.useMemo(
+    () => makeSummaryStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows]
+  );
+
   return (
     <View style={[summaryStyles.card, accent && summaryStyles.cardAccent]}>
       <Text style={[summaryStyles.label, accent && summaryStyles.labelAccent]}>{label}</Text>
@@ -204,154 +217,167 @@ function SummaryCard({ label, value, accent = false }: SummaryCardProps) {
   );
 }
 
-const summaryStyles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    ...shadows.sm,
-  },
-  cardAccent: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primaryLight,
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: spacing.xs,
-  },
-  labelAccent: {
-    color: colors.primary,
-  },
-  value: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  valueAccent: {
-    fontSize: 22,
-    color: colors.primary,
-  },
-});
+// ─── Style interfaces ─────────────────────────────────────────────────────────
+
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
+
+function makeSummaryStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      ...shadows.sm,
+    },
+    cardAccent: {
+      borderColor: colors.primary,
+      backgroundColor: colors.primaryLight,
+    },
+    label: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginBottom: spacing.xs,
+    },
+    labelAccent: {
+      color: colors.primary,
+    },
+    value: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    valueAccent: {
+      fontSize: 22,
+      color: colors.primary,
+    },
+  });
+}
 
 // ─── Main styles ─────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scroll: { flex: 1 },
-  scrollContent: { padding: spacing.lg, paddingBottom: spacing.xl },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    scroll: { flex: 1 },
+    scrollContent: { padding: spacing.lg, paddingBottom: spacing.xl },
 
-  stepBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: colors.primaryLight,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    marginBottom: spacing.md,
-  },
-  stepBadgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.primary,
-  },
+    stepBadge: {
+      alignSelf: 'flex-start',
+      backgroundColor: colors.primaryLight,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+      marginBottom: spacing.md,
+    },
+    stepBadgeText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.primary,
+    },
 
-  heading: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  subheading: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    lineHeight: 22,
-    marginBottom: spacing.lg,
-  },
+    heading: {
+      fontSize: 28,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    subheading: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      lineHeight: 22,
+      marginBottom: spacing.lg,
+    },
 
-  summarySection: {
-    marginBottom: spacing.lg,
-  },
+    summarySection: {
+      marginBottom: spacing.lg,
+    },
 
-  // What happens next
-  nextSection: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    marginBottom: spacing.lg,
-    ...shadows.sm,
-  },
-  nextTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
-  bulletRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: spacing.sm,
-    gap: spacing.sm,
-  },
-  bulletDot: {
-    width: 6,
-    height: 6,
-    borderRadius: radius.full,
-    backgroundColor: colors.primary,
-    marginTop: 7,
-    flexShrink: 0,
-  },
-  bulletText: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.textPrimary,
-    lineHeight: 22,
-  },
+    // What happens next
+    nextSection: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+      marginBottom: spacing.lg,
+      ...shadows.sm,
+    },
+    nextTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.md,
+    },
+    bulletRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      marginBottom: spacing.sm,
+      gap: spacing.sm,
+    },
+    bulletDot: {
+      width: 6,
+      height: 6,
+      borderRadius: radius.full,
+      backgroundColor: colors.primary,
+      marginTop: 7,
+      flexShrink: 0,
+    },
+    bulletText: {
+      flex: 1,
+      fontSize: 14,
+      color: colors.textPrimary,
+      lineHeight: 22,
+    },
 
-  // Error banner
-  errorBanner: {
-    backgroundColor: colors.errorLight,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.error,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  errorText: {
-    fontSize: 14,
-    color: colors.error,
-    lineHeight: 20,
-  },
+    // Error banner
+    errorBanner: {
+      backgroundColor: colors.errorLight,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.error,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    errorText: {
+      fontSize: 14,
+      color: colors.error,
+      lineHeight: 20,
+    },
 
-  // Footer
-  footer: {
-    padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  startButton: {
-    paddingVertical: 16,
-    borderRadius: radius.md,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-  },
-  startButtonPressed: {
-    backgroundColor: colors.primaryDark,
-  },
-  startButtonLoading: {
-    backgroundColor: colors.gray400,
-  },
-  startButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.white,
-  },
-});
+    // Footer
+    footer: {
+      padding: spacing.lg,
+      backgroundColor: colors.surface,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    startButton: {
+      paddingVertical: 16,
+      borderRadius: radius.md,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+    },
+    startButtonPressed: {
+      backgroundColor: colors.primaryDark,
+    },
+    startButtonLoading: {
+      backgroundColor: colors.gray400,
+    },
+    startButtonText: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: colors.white,
+    },
+  });
+}

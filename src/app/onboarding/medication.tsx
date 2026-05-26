@@ -7,7 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import type { GLP1MedicationId } from '@/types';
 
 type MedicationOption = {
@@ -34,6 +35,12 @@ export default function MedicationScreen() {
   const setFormData = useOnboardingStore.use.setFormData();
 
   const [selectedId, setSelectedId] = useState<GLP1MedicationId | null>(null);
+
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius]
+  );
 
   const canProceed = selectedId !== null;
 
@@ -95,80 +102,88 @@ export default function MedicationScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.sm,
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  subheading: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    lineHeight: 22,
-    marginBottom: spacing.xl,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  cardSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primaryLight,
-  },
-  cardBrand: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: 2,
-  },
-  cardBrandSelected: {
-    color: colors.primary,
-  },
-  cardMolecule: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  cardMoleculeSelected: {
-    color: colors.primary,
-  },
-  footer: {
-    flexDirection: 'row',
-    padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    gap: spacing.sm,
-  },
-  nextButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: radius.md,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-  },
-  nextButtonDisabled: {
-    backgroundColor: colors.gray200,
-  },
-  nextButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.white,
-  },
-  nextButtonTextDisabled: {
-    color: colors.textDisabled,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.sm,
+    },
+    heading: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    subheading: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      lineHeight: 22,
+      marginBottom: spacing.xl,
+    },
+    card: {
+      backgroundColor: colors.surface,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+      marginBottom: spacing.sm,
+    },
+    cardSelected: {
+      borderColor: colors.primary,
+      backgroundColor: colors.primaryLight,
+    },
+    cardBrand: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: 2,
+    },
+    cardBrandSelected: {
+      color: colors.primary,
+    },
+    cardMolecule: {
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+    cardMoleculeSelected: {
+      color: colors.primary,
+    },
+    footer: {
+      flexDirection: 'row',
+      padding: spacing.lg,
+      backgroundColor: colors.surface,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      gap: spacing.sm,
+    },
+    nextButton: {
+      flex: 1,
+      paddingVertical: 14,
+      borderRadius: radius.md,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+    },
+    nextButtonDisabled: {
+      backgroundColor: colors.gray200,
+    },
+    nextButtonText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.white,
+    },
+    nextButtonTextDisabled: {
+      color: colors.textDisabled,
+    },
+  });
+}

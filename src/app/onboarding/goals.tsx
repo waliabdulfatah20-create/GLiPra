@@ -7,7 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 type Goal = 'muscle_preservation' | 'weight_management' | 'both';
 
@@ -35,6 +36,12 @@ export default function GoalsScreen() {
   const existing = useOnboardingStore.use.formData().goal;
 
   const [selected, setSelected] = useState<Goal | undefined>(existing);
+
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius]
+  );
 
   const canProceed = selected !== undefined;
 
@@ -102,88 +109,96 @@ export default function GoalsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scroll: { flex: 1 },
-  scrollContent: { padding: spacing.lg, paddingBottom: spacing.sm },
-  heading: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  subheading: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    lineHeight: 22,
-    marginBottom: spacing.xl,
-  },
-  card: {
-    flexDirection: 'row',
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    marginBottom: spacing.sm,
-    overflow: 'hidden',
-  },
-  cardSelected: {
-    borderColor: colors.primary,
-  },
-  accentBar: {
-    width: 4,
-    backgroundColor: 'transparent',
-  },
-  accentBarVisible: {
-    backgroundColor: colors.primary,
-  },
-  cardContent: {
-    flex: 1,
-    padding: spacing.md,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: 4,
-  },
-  cardTitleSelected: {
-    color: colors.primary,
-  },
-  cardDescription: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    lineHeight: 20,
-  },
-  footer: {
-    flexDirection: 'row',
-    padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    gap: spacing.sm,
-  },
-  backButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-  },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  nextButton: {
-    flex: 2,
-    paddingVertical: 14,
-    borderRadius: radius.md,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-  },
-  nextButtonDisabled: { backgroundColor: colors.gray200 },
-  nextButtonText: { fontSize: 16, fontWeight: '600', color: colors.white },
-  nextButtonTextDisabled: { color: colors.textDisabled },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    scroll: { flex: 1 },
+    scrollContent: { padding: spacing.lg, paddingBottom: spacing.sm },
+    heading: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    subheading: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      lineHeight: 22,
+      marginBottom: spacing.xl,
+    },
+    card: {
+      flexDirection: 'row',
+      backgroundColor: colors.surface,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      marginBottom: spacing.sm,
+      overflow: 'hidden',
+    },
+    cardSelected: {
+      borderColor: colors.primary,
+    },
+    accentBar: {
+      width: 4,
+      backgroundColor: 'transparent',
+    },
+    accentBarVisible: {
+      backgroundColor: colors.primary,
+    },
+    cardContent: {
+      flex: 1,
+      padding: spacing.md,
+    },
+    cardTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: 4,
+    },
+    cardTitleSelected: {
+      color: colors.primary,
+    },
+    cardDescription: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    footer: {
+      flexDirection: 'row',
+      padding: spacing.lg,
+      backgroundColor: colors.surface,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      gap: spacing.sm,
+    },
+    backButton: {
+      flex: 1,
+      paddingVertical: 14,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+    },
+    backButtonText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+    nextButton: {
+      flex: 2,
+      paddingVertical: 14,
+      borderRadius: radius.md,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+    },
+    nextButtonDisabled: { backgroundColor: colors.gray200 },
+    nextButtonText: { fontSize: 16, fontWeight: '600', color: colors.white },
+    nextButtonTextDisabled: { color: colors.textDisabled },
+  });
+}

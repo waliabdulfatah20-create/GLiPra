@@ -8,7 +8,8 @@ import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import { calculateProteinFloor } from '@/utils/protein';
 import type { ProteinResult } from '@/utils/protein';
 
@@ -18,6 +19,12 @@ export default function ProteinTargetScreen() {
   const setFormData = useOnboardingStore.use.setFormData();
 
   const [acknowledged, setAcknowledged] = useState(false);
+
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows]
+  );
 
   const result = useMemo<ProteinResult | null>(() => {
     const { weightKg, heightCm, hasKidneyDisease, isPregnant, activityLevel, medicationStatus } =
@@ -151,151 +158,163 @@ export default function ProteinTargetScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scroll: { flex: 1 },
-  scrollContent: { padding: spacing.lg, paddingBottom: spacing.sm },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  heading: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  subheading: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    lineHeight: 22,
-    marginBottom: spacing.lg,
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    scroll: { flex: 1 },
+    scrollContent: { padding: spacing.lg, paddingBottom: spacing.sm },
 
-  // Result card
-  resultCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.xl,
-    alignItems: 'center',
-    marginBottom: spacing.md,
-    ...shadows.md,
-  },
-  proteinNumber: {
-    fontSize: 56,
-    fontWeight: '800',
-    color: colors.primary,
-    lineHeight: 64,
-  },
-  proteinLabel: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginTop: spacing.xs,
-    marginBottom: spacing.md,
-  },
+    heading: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    subheading: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      lineHeight: 22,
+      marginBottom: spacing.lg,
+    },
 
-  // Badges
-  badgeRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.xs,
-    justifyContent: 'center',
-  },
-  badgeNeutral: {
-    backgroundColor: colors.primaryLight,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-  },
-  badgeNeutralText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.primary,
-  },
-  badgeWarning: {
-    backgroundColor: colors.warningLight,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-  },
-  badgeWarningText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.warning,
-  },
+    // Result card
+    resultCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.xl,
+      alignItems: 'center',
+      marginBottom: spacing.md,
+      ...shadows.md,
+    },
+    proteinNumber: {
+      fontSize: 56,
+      fontWeight: '800',
+      color: colors.primary,
+      lineHeight: 64,
+    },
+    proteinLabel: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      marginTop: spacing.xs,
+      marginBottom: spacing.md,
+    },
 
-  // Disclaimer text — styled inside the Tier-1 banner container
-  disclaimerText: {
-    fontSize: 14,
-    color: '#9A3412',
-    lineHeight: 20,
-  },
+    // Badges
+    badgeRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.xs,
+      justifyContent: 'center',
+    },
+    badgeNeutral: {
+      backgroundColor: colors.primaryLight,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+    },
+    badgeNeutralText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.primary,
+    },
+    badgeWarning: {
+      backgroundColor: colors.warningLight,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+    },
+    badgeWarningText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.warning,
+    },
 
-  // Acknowledgment checkbox
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginTop: spacing.lg,
-    gap: spacing.sm,
-  },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: radius.sm,
-    borderWidth: 2,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-    marginTop: 1,
-  },
-  checkboxChecked: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primary,
-  },
-  checkmark: {
-    color: colors.white,
-    fontSize: 13,
-    fontWeight: '700',
-    lineHeight: 16,
-  },
-  checkboxLabel: {
-    flex: 1,
-    fontSize: 15,
-    color: colors.textPrimary,
-    lineHeight: 22,
-  },
+    // Disclaimer text — styled inside the Tier-1 banner container
+    // NOTE: '#9A3412' is a hardcoded color literal (dark orange-red for disclaimer text).
+    // This does not map to a GlipraTokens key. Needs manual attention to add a
+    // disclaimerText token or use colors.escalationText instead.
+    disclaimerText: {
+      fontSize: 14,
+      color: '#9A3412',
+      lineHeight: 20,
+    },
 
-  // Footer
-  footer: {
-    flexDirection: 'row',
-    padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    gap: spacing.sm,
-  },
-  backButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-  },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  nextButton: {
-    flex: 2,
-    paddingVertical: 14,
-    borderRadius: radius.md,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-  },
-  nextButtonDisabled: { backgroundColor: colors.gray200 },
-  nextButtonText: { fontSize: 16, fontWeight: '600', color: colors.white },
-  nextButtonTextDisabled: { color: colors.textDisabled },
-});
+    // Acknowledgment checkbox
+    checkboxRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      marginTop: spacing.lg,
+      gap: spacing.sm,
+    },
+    checkbox: {
+      width: 22,
+      height: 22,
+      borderRadius: radius.sm,
+      borderWidth: 2,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexShrink: 0,
+      marginTop: 1,
+    },
+    checkboxChecked: {
+      borderColor: colors.primary,
+      backgroundColor: colors.primary,
+    },
+    checkmark: {
+      color: colors.white,
+      fontSize: 13,
+      fontWeight: '700',
+      lineHeight: 16,
+    },
+    checkboxLabel: {
+      flex: 1,
+      fontSize: 15,
+      color: colors.textPrimary,
+      lineHeight: 22,
+    },
+
+    // Footer
+    footer: {
+      flexDirection: 'row',
+      padding: spacing.lg,
+      backgroundColor: colors.surface,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      gap: spacing.sm,
+    },
+    backButton: {
+      flex: 1,
+      paddingVertical: 14,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+    },
+    backButtonText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+    nextButton: {
+      flex: 2,
+      paddingVertical: 14,
+      borderRadius: radius.md,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+    },
+    nextButtonDisabled: { backgroundColor: colors.gray200 },
+    nextButtonText: { fontSize: 16, fontWeight: '600', color: colors.white },
+    nextButtonTextDisabled: { color: colors.textDisabled },
+  });
+}

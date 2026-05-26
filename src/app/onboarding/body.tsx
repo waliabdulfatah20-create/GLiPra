@@ -21,7 +21,8 @@ import {
   useWeightUnit,
 } from '@/lib/unit-preference';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 function parsePositiveNumber(value: string): number | null {
   const num = parseFloat(value);
@@ -44,6 +45,12 @@ export default function BodyScreen() {
   const [inText, setInText] = useState('');
   // Goal weight (optional)
   const [goalWeightText, setGoalWeightText] = useState('');
+
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius]
+  );
 
   // Parsed weight in the user's chosen unit (kg or lbs)
   const weightRaw = parsePositiveNumber(weightText);
@@ -239,124 +246,132 @@ export default function BodyScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.sm,
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  subheading: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    lineHeight: 22,
-    marginBottom: spacing.xl,
-  },
-  labelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.sm,
-  },
-  fieldLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    letterSpacing: 0.8,
-  },
-  textInput: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    paddingVertical: 14,
-    paddingHorizontal: spacing.md,
-    fontSize: 16,
-    color: colors.textPrimary,
-  },
-  textInputError: {
-    borderColor: colors.error,
-  },
-  errorText: {
-    fontSize: 12,
-    color: colors.error,
-    marginTop: spacing.xs,
-  },
-  imperialRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  imperialInputGroup: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  imperialInput: {
-    flex: 1,
-  },
-  imperialUnit: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    minWidth: 18,
-  },
-  optionalLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textDisabled,
-    letterSpacing: 0.4,
-  },
-  hintText: {
-    fontSize: 12,
-    color: colors.textDisabled,
-    marginTop: spacing.xs,
-  },
-  footer: {
-    flexDirection: 'row',
-    padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    gap: spacing.sm,
-  },
-  backButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-  },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  nextButton: {
-    flex: 2,
-    paddingVertical: 14,
-    borderRadius: radius.md,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-  },
-  nextButtonDisabled: {
-    backgroundColor: colors.gray200,
-  },
-  nextButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.white,
-  },
-  nextButtonTextDisabled: {
-    color: colors.textDisabled,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.sm,
+    },
+    heading: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    subheading: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      lineHeight: 22,
+      marginBottom: spacing.xl,
+    },
+    labelRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: spacing.sm,
+    },
+    fieldLabel: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      letterSpacing: 0.8,
+    },
+    textInput: {
+      backgroundColor: colors.surface,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      paddingVertical: 14,
+      paddingHorizontal: spacing.md,
+      fontSize: 16,
+      color: colors.textPrimary,
+    },
+    textInputError: {
+      borderColor: colors.error,
+    },
+    errorText: {
+      fontSize: 12,
+      color: colors.error,
+      marginTop: spacing.xs,
+    },
+    imperialRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    imperialInputGroup: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    imperialInput: {
+      flex: 1,
+    },
+    imperialUnit: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      minWidth: 18,
+    },
+    optionalLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textDisabled,
+      letterSpacing: 0.4,
+    },
+    hintText: {
+      fontSize: 12,
+      color: colors.textDisabled,
+      marginTop: spacing.xs,
+    },
+    footer: {
+      flexDirection: 'row',
+      padding: spacing.lg,
+      backgroundColor: colors.surface,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      gap: spacing.sm,
+    },
+    backButton: {
+      flex: 1,
+      paddingVertical: 14,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+    },
+    backButtonText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+    nextButton: {
+      flex: 2,
+      paddingVertical: 14,
+      borderRadius: radius.md,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+    },
+    nextButtonDisabled: {
+      backgroundColor: colors.gray200,
+    },
+    nextButtonText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.white,
+    },
+    nextButtonTextDisabled: {
+      color: colors.textDisabled,
+    },
+  });
+}

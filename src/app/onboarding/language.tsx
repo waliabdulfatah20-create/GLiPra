@@ -6,7 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LOCAL, changeLanguage } from '@/lib/i18n/utils';
 import { setItem } from '@/lib/storage';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import type { Language } from '@/lib/i18n/resources';
 
 type LangOption = { code: Language; label: string; sublabel: string };
@@ -18,6 +19,12 @@ const LANGS: LangOption[] = [
 
 export default function LanguageScreen() {
   const [selected, setSelected] = React.useState<Language>('en');
+
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows]
+  );
 
   const handleContinue = () => {
     haptics.medium();
@@ -76,99 +83,108 @@ export default function LanguageScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xl,
-  },
-  header: {
-    marginTop: spacing.xl,
-    marginBottom: spacing.xl,
-  },
-  heading: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    letterSpacing: -0.5,
-    marginBottom: spacing.xs,
-  },
-  subheading: {
-    fontSize: 18,
-    fontWeight: '400',
-    color: colors.textSecondary,
-  },
-  options: {
-    gap: spacing.sm,
-  },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    ...shadows.sm,
-  },
-  optionSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primaryLight,
-  },
-  optionLeft: {
-    flex: 1,
-  },
-  optionLabel: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: 2,
-  },
-  optionLabelSelected: {
-    color: colors.primary,
-  },
-  optionSub: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  radio: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    borderColor: colors.gray300,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: spacing.md,
-  },
-  radioSelected: {
-    borderColor: colors.primary,
-  },
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.primary,
-  },
-  footer: {
-    padding: spacing.lg,
-    paddingBottom: spacing.lg,
-  },
-  continueBtn: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.lg,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-    ...shadows.sm,
-  },
-  continueBtnText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.white,
-    letterSpacing: 0.2,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
+
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xl,
+    },
+    header: {
+      marginTop: spacing.xl,
+      marginBottom: spacing.xl,
+    },
+    heading: {
+      fontSize: 28,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      letterSpacing: -0.5,
+      marginBottom: spacing.xs,
+    },
+    subheading: {
+      fontSize: 18,
+      fontWeight: '400',
+      color: colors.textSecondary,
+    },
+    options: {
+      gap: spacing.sm,
+    },
+    option: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      ...shadows.sm,
+    },
+    optionSelected: {
+      borderColor: colors.primary,
+      backgroundColor: colors.primaryLight,
+    },
+    optionLeft: {
+      flex: 1,
+    },
+    optionLabel: {
+      fontSize: 17,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: 2,
+    },
+    optionLabelSelected: {
+      color: colors.primary,
+    },
+    optionSub: {
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+    radio: {
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      borderWidth: 2,
+      borderColor: colors.gray300,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: spacing.md,
+    },
+    radioSelected: {
+      borderColor: colors.primary,
+    },
+    radioDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: colors.primary,
+    },
+    footer: {
+      padding: spacing.lg,
+      paddingBottom: spacing.lg,
+    },
+    continueBtn: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.lg,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+      ...shadows.sm,
+    },
+    continueBtnText: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.white,
+      letterSpacing: 0.2,
+    },
+  });
+}

@@ -6,12 +6,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { useConsentStore } from '@/features/consent/use-consent-store';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 export default function ConsentScreen() {
   const router = useRouter();
   const [, setHasAgreed] = useConsentStore();
   const [agreed, setAgreed] = useState(false);
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows]
+  );
 
   const handleContinue = () => {
     setHasAgreed(true);
@@ -114,123 +120,132 @@ export default function ConsentScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.sm,
-  },
-  header: {
-    marginBottom: spacing.lg,
-  },
-  heading: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  subheading: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    lineHeight: 22,
-  },
-  section: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    ...shadows.sm,
-  },
-  sectionTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  sectionBody: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    lineHeight: 21,
-  },
-  disclaimerBody: {
-    fontSize: 14,
-    color: '#7C2D12',
-    lineHeight: 21,
-  },
-  disclaimerBold: {
-    fontWeight: '700',
-  },
-  disclaimerBodySpaced: {
-    marginTop: spacing.sm,
-  },
-  bottomSpacer: {
-    height: spacing.md,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  // Footer
-  footer: {
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-    ...shadows.md,
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: spacing.md,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: radius.sm,
-    borderWidth: 2,
-    borderColor: colors.gray300,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
-    marginTop: 1,
-    flexShrink: 0,
-  },
-  checkboxChecked: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  checkboxTick: {
-    color: colors.white,
-    fontSize: 12,
-    fontWeight: '700',
-    lineHeight: 14,
-  },
-  checkboxLabel: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.textPrimary,
-    lineHeight: 20,
-  },
-  continueButton: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.md,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  continueButtonDisabled: {
-    backgroundColor: colors.gray200,
-  },
-  continueButtonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  continueButtonTextDisabled: {
-    color: colors.textDisabled,
-  },
-});
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.sm,
+    },
+    header: {
+      marginBottom: spacing.lg,
+    },
+    heading: {
+      fontSize: 28,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    subheading: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      lineHeight: 22,
+    },
+    section: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      ...shadows.sm,
+    },
+    sectionTitle: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    sectionBody: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      lineHeight: 21,
+    },
+    disclaimerBody: {
+      fontSize: 14,
+      color: '#7C2D12',
+      lineHeight: 21,
+    },
+    disclaimerBold: {
+      fontWeight: '700',
+    },
+    disclaimerBodySpaced: {
+      marginTop: spacing.sm,
+    },
+    bottomSpacer: {
+      height: spacing.md,
+    },
+
+    // Footer
+    footer: {
+      backgroundColor: colors.surface,
+      borderTopWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.sm,
+      ...shadows.md,
+    },
+    checkboxRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      marginBottom: spacing.md,
+    },
+    checkbox: {
+      width: 20,
+      height: 20,
+      borderRadius: radius.sm,
+      borderWidth: 2,
+      borderColor: colors.gray300,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.sm,
+      marginTop: 1,
+      flexShrink: 0,
+    },
+    checkboxChecked: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    checkboxTick: {
+      color: colors.white,
+      fontSize: 12,
+      fontWeight: '700',
+      lineHeight: 14,
+    },
+    checkboxLabel: {
+      flex: 1,
+      fontSize: 14,
+      color: colors.textPrimary,
+      lineHeight: 20,
+    },
+    continueButton: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.md,
+      paddingVertical: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    continueButtonDisabled: {
+      backgroundColor: colors.gray200,
+    },
+    continueButtonText: {
+      color: colors.white,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    continueButtonTextDisabled: {
+      color: colors.textDisabled,
+    },
+  });
+}

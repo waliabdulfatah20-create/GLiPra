@@ -5,11 +5,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { sendPasswordResetEmail } from '@/features/auth/api';
 import { ForgotPasswordForm } from '@/features/auth/components/forgot-password-form';
-import { colors } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 export default function ForgotPasswordScreen() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const { colors } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors }),
+    [colors]
+  );
 
   const handleSubmit = async (data: { email: string }) => {
     setApiError(null);
@@ -38,7 +44,13 @@ export default function ForgotPasswordScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scroll: { flexGrow: 1 },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+}
+
+function makeStyles({ colors }: StyleTokens) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    scroll: { flexGrow: 1 },
+  });
+}

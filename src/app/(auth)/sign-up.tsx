@@ -6,10 +6,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { signUpWithEmail } from '@/features/auth/api';
 import { SignUpForm } from '@/features/auth/components/sign-up-form';
 import { setOnboardingData } from '@/features/onboarding/use-onboarding-store';
-import { colors } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 export default function SignUpScreen() {
   const [apiError, setApiError] = useState<string | null>(null);
+  const { colors } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors }),
+    [colors]
+  );
 
   const handleSubmit = async (data: { email: string; password: string }) => {
     setApiError(null);
@@ -43,7 +49,13 @@ export default function SignUpScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scroll: { flexGrow: 1 },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+}
+
+function makeStyles({ colors }: StyleTokens) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    scroll: { flexGrow: 1 },
+  });
+}

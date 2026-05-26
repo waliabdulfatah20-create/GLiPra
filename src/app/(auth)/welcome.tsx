@@ -6,11 +6,17 @@ import { useTranslation } from 'react-i18next';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 export default function WelcomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors }),
+    [colors]
+  );
 
   const handleGetStarted = () => {
     if (Platform.OS === 'ios') {
@@ -88,109 +94,115 @@ export default function WelcomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.gray900,
-  },
-  glow: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    // @ts-expect-error experimental_backgroundImage
-    experimental_backgroundImage:
-      'radial-gradient(ellipse at 50% 25%, rgba(45,107,228,0.45) 0%, transparent 65%)',
-  },
-  safeArea: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    gap: 48,
-  },
-  logoSection: {
-    alignItems: 'center',
-    gap: 16,
-  },
-  logoBox: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    // @ts-expect-error borderCurve may not be in all TS versions
-    borderCurve: 'continuous',
-    // @ts-expect-error experimental_backgroundImage
-    experimental_backgroundImage: 'linear-gradient(135deg, #2D6BE4, #1A4FB5)',
-    // @ts-expect-error boxShadow string form is RN 0.76+ / New Arch
-    boxShadow: '0 8px 24px rgba(45,107,228,0.4)',
-  },
-  appName: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: colors.textInverse,
-    letterSpacing: -0.5,
-  },
-  tagline: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.6)',
-    textAlign: 'center',
-  },
-  buttonSection: {
-    width: '100%',
-    gap: 12,
-  },
-  primaryButton: {
-    borderRadius: 14,
-    // @ts-expect-error borderCurve
-    borderCurve: 'continuous',
-    overflow: 'hidden',
-  },
-  primaryButtonGradient: {
-    // @ts-expect-error experimental_backgroundImage
-    experimental_backgroundImage: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`,
-    // @ts-expect-error boxShadow string form
-    boxShadow: '0 4px 16px rgba(45,107,228,0.5)',
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  primaryButtonPressed: {
-    opacity: 0.9,
-  },
-  primaryButtonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  ghostButton: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
-    borderRadius: 14,
-    // @ts-expect-error borderCurve
-    borderCurve: 'continuous',
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  ghostButtonPressed: {
-    backgroundColor: 'rgba(255,255,255,0.12)',
-  },
-  ghostButtonText: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  badgeContainer: {
-    paddingHorizontal: 24,
-    paddingBottom: 8,
-    alignItems: 'center',
-  },
-  badgeText: {
-    color: 'rgba(255,255,255,0.3)',
-    fontSize: 12,
-    textAlign: 'center',
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+}
+
+function makeStyles({ colors }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.gray900,
+    },
+    glow: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      // @ts-expect-error experimental_backgroundImage
+      experimental_backgroundImage:
+        'radial-gradient(ellipse at 50% 25%, rgba(45,107,228,0.45) 0%, transparent 65%)',
+    },
+    safeArea: {
+      flex: 1,
+    },
+    content: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 24,
+      gap: 48,
+    },
+    logoSection: {
+      alignItems: 'center',
+      gap: 16,
+    },
+    logoBox: {
+      width: 56,
+      height: 56,
+      borderRadius: 16,
+      // @ts-expect-error borderCurve may not be in all TS versions
+      borderCurve: 'continuous',
+      // @ts-expect-error experimental_backgroundImage
+      experimental_backgroundImage: 'linear-gradient(135deg, #2D6BE4, #1A4FB5)',
+      // @ts-expect-error boxShadow string form is RN 0.76+ / New Arch
+      boxShadow: '0 8px 24px rgba(45,107,228,0.4)',
+    },
+    appName: {
+      fontSize: 32,
+      fontWeight: '700',
+      color: colors.textInverse,
+      letterSpacing: -0.5,
+    },
+    tagline: {
+      fontSize: 16,
+      color: 'rgba(255,255,255,0.6)',
+      textAlign: 'center',
+    },
+    buttonSection: {
+      width: '100%',
+      gap: 12,
+    },
+    primaryButton: {
+      borderRadius: 14,
+      // @ts-expect-error borderCurve
+      borderCurve: 'continuous',
+      overflow: 'hidden',
+    },
+    primaryButtonGradient: {
+      // @ts-expect-error experimental_backgroundImage
+      experimental_backgroundImage: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`,
+      // @ts-expect-error boxShadow string form
+      boxShadow: '0 4px 16px rgba(45,107,228,0.5)',
+      paddingVertical: 16,
+      alignItems: 'center',
+    },
+    primaryButtonPressed: {
+      opacity: 0.9,
+    },
+    primaryButtonText: {
+      color: colors.white,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    ghostButton: {
+      backgroundColor: 'rgba(255,255,255,0.08)',
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.12)',
+      borderRadius: 14,
+      // @ts-expect-error borderCurve
+      borderCurve: 'continuous',
+      paddingVertical: 16,
+      alignItems: 'center',
+    },
+    ghostButtonPressed: {
+      backgroundColor: 'rgba(255,255,255,0.12)',
+    },
+    ghostButtonText: {
+      color: 'rgba(255,255,255,0.85)',
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    badgeContainer: {
+      paddingHorizontal: 24,
+      paddingBottom: 8,
+      alignItems: 'center',
+    },
+    badgeText: {
+      color: 'rgba(255,255,255,0.3)',
+      fontSize: 12,
+      textAlign: 'center',
+    },
+  });
+}

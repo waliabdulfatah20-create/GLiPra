@@ -144,7 +144,8 @@
     "cycle_title": "INJECTION CYCLE",
     "cycle_today_badge": "TODAY",
     "cycle_next_dose": "Next: {{date}}",
-    "cycle_overdue_label": "OVERDUE"
+    "cycle_overdue_label": "OVERDUE",
+    "settings_button_label": "Open settings"
   },
   "content_card": {
     "tip": "TIP",

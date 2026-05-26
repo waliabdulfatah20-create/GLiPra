@@ -144,7 +144,8 @@
     "cycle_title": "CICLO DE INYECCIÓN",
     "cycle_today_badge": "HOY",
     "cycle_next_dose": "Próxima: {{date}}",
-    "cycle_overdue_label": "ATRASADA"
+    "cycle_overdue_label": "ATRASADA",
+    "settings_button_label": "Abrir ajustes"
   },
   "content_card": {
     "tip": "CONSEJO",

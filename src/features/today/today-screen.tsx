@@ -24,6 +24,7 @@ import { ProteinRing } from '@/components/today/protein-ring';
 import { InjectionCycleCard } from '@/components/today/injection-cycle-card';
 import { StreakCard } from '@/components/today/streak-card';
 import { MilestoneToast } from '@/components/ui/milestone-toast';
+import { Settings as SettingsIcon } from '@/components/ui/icons';
 import { useTodayCheckIn } from '@/features/check-in/hooks';
 import type { ContentCard } from '@/features/content-cards/data';
 import { getActiveCards } from '@/features/content-cards/data';
@@ -203,8 +204,19 @@ export function TodayScreen() {
               <Text style={styles.greeting}>{greeting}</Text>
               <Text style={styles.greetingDate}>{dateLabel}</Text>
             </View>
-            <View style={styles.rxBadge}>
-              <Text style={styles.rxBadgeText}>Rx</Text>
+            <View style={styles.headerActions}>
+              <Pressable
+                onPress={() => { haptics.tap(); router.push('/settings'); }}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={t('today.settings_button_label')}
+                style={styles.gearButton}
+              >
+                <SettingsIcon color="#ffffff" />
+              </Pressable>
+              <View style={styles.rxBadge}>
+                <Text style={styles.rxBadgeText}>Rx</Text>
+              </View>
             </View>
           </View>
         </LinearGradient>
@@ -494,13 +506,28 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       paddingVertical: spacing.xs,
       borderWidth: 1,
       borderColor: 'rgba(255,255,255,0.35)',
-      marginTop: 4,
     },
     rxBadgeText: {
       fontSize: 12,
       fontWeight: '700',
       color: '#ffffff',
       letterSpacing: 0.5,
+    },
+    headerActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+      marginTop: 4,
+    },
+    gearButton: {
+      width: 32,
+      height: 32,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: radius.full,
+      backgroundColor: 'rgba(255,255,255,0.15)',
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.25)',
     },
 
     // ── Readiness card ──────────────────────────────────────────

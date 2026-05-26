@@ -19,6 +19,7 @@ export interface BarcodeProduct {
   zincMg: number | null;
   b12Mcg: number | null;
   vitaminDIu: number | null;
+  servingWeightG: number | null;  // grams per serving from OFF serving_quantity; null for USDA
   ean: string;
   dataSource: BarcodeDataSource;
 }
@@ -45,6 +46,7 @@ const offProductSchema = z
   .object({
     product_name: z.string().optional(),
     serving_size: z.string().optional(),
+    serving_quantity: z.number().optional(),
     nutriments: offNutrimentsSchema.optional(),
   })
   .passthrough();
@@ -68,6 +70,10 @@ async function lookupBarcodeOFF(ean: string): Promise<BarcodeProduct | null> {
 
     const product = parsed.data.product;
     const nutriments = product.nutriments ?? {};
+    const servingWeightG =
+      product.serving_quantity != null && product.serving_quantity > 0
+        ? product.serving_quantity
+        : null;
 
     const n = nutriments;
     return {
@@ -84,6 +90,7 @@ async function lookupBarcodeOFF(ean: string): Promise<BarcodeProduct | null> {
       // Vitamins: OFF stores in g/100g → B12: ×1e6 for mcg; D: ×1e6×40 for IU
       b12Mcg:     n['vitamin-b12_100g'] != null ? Math.round(n['vitamin-b12_100g'] * 1_000_000 * 100) / 100 : null,
       vitaminDIu: n['vitamin-d_100g']   != null ? Math.round(n['vitamin-d_100g'] * 1_000_000 * 40) : null,
+      servingWeightG,
       ean,
       dataSource: 'open_food_facts',
     };
@@ -159,6 +166,7 @@ async function lookupBarcodeUSDA(ean: string): Promise<BarcodeProduct | null> {
       zincMg,
       b12Mcg,
       vitaminDIu,
+      servingWeightG: null,
       ean,
       dataSource: 'usda',
     };

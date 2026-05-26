@@ -108,18 +108,39 @@ export function BarcodeScannerSheet({
     if (scanState !== 'result') return;
     const source = correction ?? product;
     if (!source) return;
-    // Core fields: prefer saved correction (user's verified data)
-    setEditedProtein(source.proteinG.toFixed(1));
-    setEditedFiber(source.fiberG != null ? source.fiberG.toFixed(1) : '');
-    setEditedCalories(source.caloriesKcal != null ? source.caloriesKcal.toFixed(0) : '');
-    // New macro + micro fields: always use raw product (corrections don't store these)
+
+    // Scale factor: if OFF reported a specific serving weight, convert _100g values
+    // to per-serving amounts. mult=1 means values are left as-is (per 100g).
+    const mult =
+      product?.servingWeightG != null && product.servingWeightG !== 100
+        ? product.servingWeightG / 100
+        : 1;
+
+    // Core fields: prefer saved correction (user's verified data); apply mult
+    setEditedProtein(((source.proteinG ?? 0) * mult).toFixed(1));
+    setEditedFiber(source.fiberG != null ? (source.fiberG * mult).toFixed(1) : '');
+    setEditedCalories(
+      source.caloriesKcal != null
+        ? Math.round(source.caloriesKcal * mult).toString()
+        : '',
+    );
+    // Macro + micro: always from raw product (corrections don't store these)
     if (!product) return;
-    setEditedCarbs(product.carbsG != null ? product.carbsG.toFixed(1) : '');
-    setEditedFat(product.fatG != null ? product.fatG.toFixed(1) : '');
-    setEditedMagnesium(product.magnesiumMg != null ? product.magnesiumMg.toFixed(0) : '');
-    setEditedZinc(product.zincMg != null ? product.zincMg.toFixed(1) : '');
-    setEditedB12(product.b12Mcg != null ? product.b12Mcg.toFixed(1) : '');
-    setEditedVitD(product.vitaminDIu != null ? product.vitaminDIu.toFixed(0) : '');
+    setEditedCarbs(product.carbsG != null ? (product.carbsG * mult).toFixed(1) : '');
+    setEditedFat(product.fatG != null ? (product.fatG * mult).toFixed(1) : '');
+    // Micronutrients: also reported per-100g in OFF — scale by same mult
+    setEditedMagnesium(
+      product.magnesiumMg != null
+        ? Math.round(product.magnesiumMg * mult).toString()
+        : '',
+    );
+    setEditedZinc(product.zincMg != null ? (product.zincMg * mult).toFixed(1) : '');
+    setEditedB12(product.b12Mcg != null ? (product.b12Mcg * mult).toFixed(1) : '');
+    setEditedVitD(
+      product.vitaminDIu != null
+        ? Math.round(product.vitaminDIu * mult).toString()
+        : '',
+    );
   }, [correction, product, scanState]);
 
   async function handleBarcodeScan({ data }: { data: string }) {
@@ -216,6 +237,12 @@ export function BarcodeScannerSheet({
     !correction &&
     displayProduct?.proteinG === 0 &&
     displayProduct?.dataSource !== 'user_corrected';
+
+  // Dynamic note: show "Per serving (Xg)" when OFF provided a non-100g serving_quantity
+  const servingLabel =
+    product?.servingWeightG != null && product.servingWeightG !== 100
+      ? `Per serving (${product.servingWeightG}g) — edit to match the label`
+      : 'Per 100g — edit to match the label';
 
   // GLP-1 Watch section only shows when the API returned at least one micro value
   const hasMicroData =
@@ -365,7 +392,7 @@ export function BarcodeScannerSheet({
               </View>
             )}
 
-            <Text style={styles.fieldsNote}>Per 100g — edit to match the label</Text>
+            <Text style={styles.fieldsNote}>{servingLabel}</Text>
 
             {/* ── Protein hero ──────────────────────────────────── */}
             <View style={styles.proteinHero}>

@@ -3,8 +3,10 @@ import * as React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { Bolt } from '@/components/ui/icons';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 export interface StreakCardProps {
   currentStreak: number;
@@ -13,6 +15,11 @@ export interface StreakCardProps {
 
 export function StreakCard({ currentStreak, longestStreak }: StreakCardProps) {
   const { t } = useTranslation();
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
   const hasStreak = currentStreak > 0;
 
   return (
@@ -28,6 +35,9 @@ export function StreakCard({ currentStreak, longestStreak }: StreakCardProps) {
       }
     >
       <View style={styles.row}>
+        <View style={styles.iconCircle}>
+          <Bolt color={colors.warning} width={20} height={20} />
+        </View>
         <View style={styles.textBlock}>
           <Text style={styles.headline}>
             {hasStreak
@@ -48,54 +58,72 @@ export function StreakCard({ currentStreak, longestStreak }: StreakCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    borderTopWidth: 2,
-    borderTopColor: colors.warning,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  textBlock: {
-    flex: 1,
-    gap: spacing.xs,
-  },
-  headline: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    letterSpacing: -0.2,
-  },
-  pill: {
-    alignSelf: 'flex-start',
-    backgroundColor: colors.primaryLight,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
-  },
-  pillActive: {
-    backgroundColor: colors.warningLight,
-  },
-  pillText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.primary,
-  },
-  pillTextActive: {
-    color: colors.warning,
-  },
-  chevron: {
-    fontSize: 22,
-    color: colors.textDisabled,
-    fontWeight: '300',
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
+
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      borderTopWidth: 2,
+      borderTopColor: colors.warning,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...shadows.sm,
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    iconCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.warningLight,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexShrink: 0,
+    },
+    textBlock: {
+      flex: 1,
+      gap: spacing.xs,
+    },
+    headline: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      letterSpacing: -0.2,
+    },
+    pill: {
+      alignSelf: 'flex-start',
+      backgroundColor: colors.primaryLight,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 3,
+    },
+    pillActive: {
+      backgroundColor: colors.warningLight,
+    },
+    pillText: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.primary,
+    },
+    pillTextActive: {
+      color: colors.warning,
+    },
+    chevron: {
+      fontSize: 22,
+      color: colors.textDisabled,
+      fontWeight: '300',
+    },
+  });
+}

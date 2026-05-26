@@ -5,6 +5,7 @@ import {
   Linking,
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -17,17 +18,18 @@ import {
   useBarcodeCorrectionLookup,
   useSaveBarcodeCorrection,
 } from '@/features/food-log/hooks';
-import { useAuthStore } from '@/features/auth/use-auth-store';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 // Barcode scanning is ALWAYS free — never gated by subscription (CLAUDE.md).
 
-// Brand purple for protein field highlight (Clean Clinical design)
+// Brand tokens — not in GlipraTokens so kept as module constants
 const BRAND = '#5b21b6';
 const BRAND_LIGHT = 'rgba(91,33,182,0.08)';
 const AMBER = '#d97706';
 const AMBER_LIGHT = 'rgba(217,119,6,0.10)';
+const MICRO_BG = 'rgba(217,119,6,0.06)';
 
 export interface BarcodeScannerSheetProps {
   visible: boolean;
@@ -48,16 +50,29 @@ export function BarcodeScannerSheet({
   onClose,
   onProductFound,
 }: BarcodeScannerSheetProps) {
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius],
+  );
+
   const [permission, requestPermission, getPermission] = useCameraPermissions();
   const [scanState, setScanState] = React.useState<ScanState>('scanning');
   const [product, setProduct] = React.useState<BarcodeProduct | null>(null);
   const [scannedEan, setScannedEan] = React.useState<string | null>(null);
   const scannedRef = React.useRef(false);
 
-  // Editable fields
+  // Editable macro fields
   const [editedProtein, setEditedProtein] = React.useState('');
+  const [editedCarbs, setEditedCarbs] = React.useState('');
+  const [editedFat, setEditedFat] = React.useState('');
   const [editedFiber, setEditedFiber] = React.useState('');
   const [editedCalories, setEditedCalories] = React.useState('');
+  // Editable GLP-1 Watch fields
+  const [editedMagnesium, setEditedMagnesium] = React.useState('');
+  const [editedZinc, setEditedZinc] = React.useState('');
+  const [editedB12, setEditedB12] = React.useState('');
+  const [editedVitD, setEditedVitD] = React.useState('');
 
   // Correction memory hooks
   const { correction, isLoading: correctionLoading } = useBarcodeCorrectionLookup(
@@ -65,27 +80,46 @@ export function BarcodeScannerSheet({
   );
   const { mutate: saveCorrection } = useSaveBarcodeCorrection();
 
+  const resetFields = React.useCallback(() => {
+    setEditedProtein('');
+    setEditedCarbs('');
+    setEditedFat('');
+    setEditedFiber('');
+    setEditedCalories('');
+    setEditedMagnesium('');
+    setEditedZinc('');
+    setEditedB12('');
+    setEditedVitD('');
+  }, []);
+
   // Reset state each time the sheet opens
   React.useEffect(() => {
     if (visible) {
       setScanState('scanning');
       setProduct(null);
       setScannedEan(null);
-      setEditedProtein('');
-      setEditedFiber('');
-      setEditedCalories('');
+      resetFields();
       scannedRef.current = false;
     }
-  }, [visible]);
+  }, [visible, resetFields]);
 
   // When correction loads (or product arrives), pre-fill edit fields
   React.useEffect(() => {
     if (scanState !== 'result') return;
     const source = correction ?? product;
     if (!source) return;
+    // Core fields: prefer saved correction (user's verified data)
     setEditedProtein(source.proteinG.toFixed(1));
     setEditedFiber(source.fiberG != null ? source.fiberG.toFixed(1) : '');
     setEditedCalories(source.caloriesKcal != null ? source.caloriesKcal.toFixed(0) : '');
+    // New macro + micro fields: always use raw product (corrections don't store these)
+    if (!product) return;
+    setEditedCarbs(product.carbsG != null ? product.carbsG.toFixed(1) : '');
+    setEditedFat(product.fatG != null ? product.fatG.toFixed(1) : '');
+    setEditedMagnesium(product.magnesiumMg != null ? product.magnesiumMg.toFixed(0) : '');
+    setEditedZinc(product.zincMg != null ? product.zincMg.toFixed(1) : '');
+    setEditedB12(product.b12Mcg != null ? product.b12Mcg.toFixed(1) : '');
+    setEditedVitD(product.vitaminDIu != null ? product.vitaminDIu.toFixed(0) : '');
   }, [correction, product, scanState]);
 
   async function handleBarcodeScan({ data }: { data: string }) {
@@ -108,18 +142,30 @@ export function BarcodeScannerSheet({
     if (!displayProduct) return;
 
     const proteinG = parseFloat(editedProtein) || 0;
+    const carbsG = editedCarbs !== '' ? parseFloat(editedCarbs) : null;
+    const fatG = editedFat !== '' ? parseFloat(editedFat) : null;
     const fiberG = editedFiber !== '' ? parseFloat(editedFiber) : null;
     const caloriesKcal = editedCalories !== '' ? parseFloat(editedCalories) : null;
+    const magnesiumMg = editedMagnesium !== '' ? parseFloat(editedMagnesium) : null;
+    const zincMg = editedZinc !== '' ? parseFloat(editedZinc) : null;
+    const b12Mcg = editedB12 !== '' ? parseFloat(editedB12) : null;
+    const vitaminDIu = editedVitD !== '' ? parseFloat(editedVitD) : null;
 
     const finalProduct: BarcodeProduct = {
       ...displayProduct,
       proteinG,
+      carbsG,
+      fatG,
       fiberG,
       caloriesKcal,
+      magnesiumMg,
+      zincMg,
+      b12Mcg,
+      vitaminDIu,
       dataSource: correction ? 'user_corrected' : displayProduct.dataSource,
     };
 
-    // Check if user changed any value vs what was originally shown
+    // Save correction if user changed protein/fiber/calories vs what was shown
     const original = correction ?? product!;
     const userEdited =
       proteinG !== original.proteinG ||
@@ -146,9 +192,7 @@ export function BarcodeScannerSheet({
     setScanState('scanning');
     setProduct(null);
     setScannedEan(null);
-    setEditedProtein('');
-    setEditedFiber('');
-    setEditedCalories('');
+    resetFields();
     scannedRef.current = false;
     onClose();
   }
@@ -157,9 +201,7 @@ export function BarcodeScannerSheet({
     setScanState('scanning');
     setProduct(null);
     setScannedEan(null);
-    setEditedProtein('');
-    setEditedFiber('');
-    setEditedCalories('');
+    resetFields();
     scannedRef.current = false;
   }
 
@@ -174,6 +216,13 @@ export function BarcodeScannerSheet({
     !correction &&
     displayProduct?.proteinG === 0 &&
     displayProduct?.dataSource !== 'user_corrected';
+
+  // GLP-1 Watch section only shows when the API returned at least one micro value
+  const hasMicroData =
+    product?.magnesiumMg != null ||
+    product?.zincMg != null ||
+    product?.b12Mcg != null ||
+    product?.vitaminDIu != null;
 
   return (
     <Modal
@@ -287,7 +336,12 @@ export function BarcodeScannerSheet({
 
         {/* Product found — editable result */}
         {permission?.granted && scanState === 'result' && displayProduct && (
-          <View style={styles.resultContent}>
+          <ScrollView
+            style={styles.resultScroll}
+            contentContainerStyle={styles.resultContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
             {/* Product name + source badge */}
             <Text style={styles.productName}>{displayProduct.name}</Text>
             <View style={styles.sourceRow}>
@@ -311,28 +365,99 @@ export function BarcodeScannerSheet({
               </View>
             )}
 
-            {/* Editable nutrition fields */}
             <Text style={styles.fieldsNote}>Per 100g — edit to match the label</Text>
-            <View style={styles.fieldsRow}>
-              <EditableField
-                label="Protein (g)"
+
+            {/* ── Protein hero ──────────────────────────────────── */}
+            <View style={styles.proteinHero}>
+              <TextInput
+                style={styles.heroInput}
                 value={editedProtein}
                 onChangeText={setEditedProtein}
-                highlight
+                keyboardType="decimal-pad"
+                returnKeyType="done"
+                placeholder="0"
+                placeholderTextColor={BRAND}
+                accessibilityLabel="Protein grams"
               />
-              <EditableField
-                label="Fiber (g)"
-                value={editedFiber}
-                onChangeText={setEditedFiber}
-                placeholder="—"
-              />
+              <Text style={styles.heroLabel}>Protein · g</Text>
+              <Text style={styles.heroSub}>your GLP-1 priority</Text>
+            </View>
+
+            {/* ── Macro row (4 cells) ───────────────────────────── */}
+            <View style={styles.fieldsRow}>
               <EditableField
                 label="Calories"
+                unit="kcal"
                 value={editedCalories}
                 onChangeText={setEditedCalories}
-                placeholder="—"
+                styles={styles}
+              />
+              <EditableField
+                label="Carbs"
+                unit="g"
+                value={editedCarbs}
+                onChangeText={setEditedCarbs}
+                styles={styles}
+              />
+              <EditableField
+                label="Fat"
+                unit="g"
+                value={editedFat}
+                onChangeText={setEditedFat}
+                styles={styles}
+              />
+              <EditableField
+                label="Fiber"
+                unit="g"
+                value={editedFiber}
+                onChangeText={setEditedFiber}
+                styles={styles}
               />
             </View>
+
+            {/* ── GLP-1 Watch (conditional) ─────────────────────── */}
+            {hasMicroData && (
+              <>
+                <View style={styles.sectionLabelRow}>
+                  <Text style={styles.sectionLabel}>GLP-1 Watch</Text>
+                  <Text style={styles.sectionLabelSub}>Verify against label</Text>
+                </View>
+                <View style={[styles.fieldsRow, styles.microRow]}>
+                  <EditableField
+                    label="Magnesium"
+                    unit="mg"
+                    value={editedMagnesium}
+                    onChangeText={setEditedMagnesium}
+                    micro
+                    styles={styles}
+                  />
+                  <EditableField
+                    label="Zinc"
+                    unit="mg"
+                    value={editedZinc}
+                    onChangeText={setEditedZinc}
+                    micro
+                    styles={styles}
+                  />
+                  <EditableField
+                    label="Vit B12"
+                    unit="mcg"
+                    value={editedB12}
+                    onChangeText={setEditedB12}
+                    micro
+                    styles={styles}
+                  />
+                  <EditableField
+                    label="Vit D"
+                    unit="IU"
+                    value={editedVitD}
+                    onChangeText={setEditedVitD}
+                    micro
+                    styles={styles}
+                  />
+                </View>
+              </>
+            )}
 
             <Pressable
               style={({ pressed }) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}
@@ -346,7 +471,7 @@ export function BarcodeScannerSheet({
             <Pressable style={styles.cancelButton} onPress={handleScanAgain} accessibilityRole="button">
               <Text style={styles.cancelButtonText}>Scan again</Text>
             </Pressable>
-          </View>
+          </ScrollView>
         )}
       </View>
     </Modal>
@@ -357,240 +482,321 @@ export function BarcodeScannerSheet({
 
 interface EditableFieldProps {
   label: string;
+  unit: string;
   value: string;
   onChangeText: (v: string) => void;
-  highlight?: boolean;
-  placeholder?: string;
+  micro?: boolean;
+  styles: ReturnType<typeof makeStyles>;
 }
 
-function EditableField({ label, value, onChangeText, highlight, placeholder }: EditableFieldProps) {
+function EditableField({ label, unit, value, onChangeText, micro, styles }: EditableFieldProps) {
   return (
-    <View style={[styles.fieldCard, highlight && styles.fieldCardHighlight]}>
+    <View style={[styles.fieldCard, micro && styles.fieldCardMicro]}>
       <TextInput
-        style={[styles.fieldInput, highlight && styles.fieldInputHighlight]}
+        style={[styles.fieldInput, micro && styles.fieldInputMicro]}
         value={value}
         onChangeText={onChangeText}
         keyboardType="decimal-pad"
         returnKeyType="done"
-        placeholder={placeholder ?? '0'}
-        placeholderTextColor={colors.textDisabled}
-        accessibilityLabel={label}
+        placeholder="—"
+        placeholderTextColor={micro ? AMBER : '#9ca3af'}
+        accessibilityLabel={`${label} (${unit})`}
       />
-      <Text style={[styles.fieldLabel, highlight && styles.fieldLabelHighlight]}>{label}</Text>
+      <Text style={[styles.fieldLabel, micro && styles.fieldLabelMicro]}>{label}</Text>
+      <Text style={[styles.fieldUnit, micro && styles.fieldUnitMicro]}>{unit}</Text>
     </View>
   );
 }
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-  },
-  sheet: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: radius.xl,
-    borderTopRightRadius: radius.xl,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
-    paddingTop: spacing.sm,
-    minHeight: 400,
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: radius.full,
-    backgroundColor: colors.gray300,
-    alignSelf: 'center',
-    marginBottom: spacing.md,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.lg,
-    textAlign: 'center',
-  },
-  centerContent: {
-    alignItems: 'center',
-    paddingTop: spacing.xl,
-    gap: spacing.md,
-  },
-  permissionContent: {
-    gap: spacing.md,
-    alignItems: 'center',
-    paddingTop: spacing.md,
-  },
-  permissionText: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  settingsActions: {
-    width: '100%',
-    gap: spacing.sm,
-  },
-  permissionDeniedNote: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-  stubContent: {
-    gap: spacing.md,
-  },
-  cameraContent: {
-    gap: spacing.md,
-  },
-  cameraWrapper: {
-    width: '100%',
-    height: 260,
-    borderRadius: radius.lg,
-    overflow: 'hidden',
-  },
-  camera: {
-    width: '100%',
-    height: '100%',
-  },
-  scanOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scanFrame: {
-    width: 220,
-    height: 120,
-    borderWidth: 2,
-    borderColor: colors.white,
-    borderRadius: radius.md,
-    backgroundColor: 'transparent',
-  },
-  scanHint: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-  loadingText: {
-    fontSize: 15,
-    color: colors.textSecondary,
-  },
-  notFoundText: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginVertical: spacing.md,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
 
-  // Result view
-  resultContent: {
-    gap: spacing.md,
-  },
-  productName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  sourceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sourceLabel: {
-    fontSize: 12,
-    color: colors.textDisabled,
-  },
-  verifiedBadge: {
-    backgroundColor: 'rgba(5,150,105,0.10)',
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-  },
-  verifiedBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#059669',
-  },
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    backdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.4)',
+    },
+    sheet: {
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: radius.xl,
+      borderTopRightRadius: radius.xl,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.xxl,
+      paddingTop: spacing.sm,
+      maxHeight: '90%',
+    },
+    handle: {
+      width: 40,
+      height: 4,
+      borderRadius: radius.full,
+      backgroundColor: colors.gray300,
+      alignSelf: 'center',
+      marginBottom: spacing.md,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.lg,
+      textAlign: 'center',
+    },
+    centerContent: {
+      alignItems: 'center',
+      paddingTop: spacing.xl,
+      gap: spacing.md,
+    },
+    permissionContent: {
+      gap: spacing.md,
+      alignItems: 'center',
+      paddingTop: spacing.md,
+    },
+    permissionText: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+    settingsActions: {
+      width: '100%',
+      gap: spacing.sm,
+    },
+    permissionDeniedNote: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+    stubContent: {
+      gap: spacing.md,
+    },
+    cameraContent: {
+      gap: spacing.md,
+    },
+    cameraWrapper: {
+      width: '100%',
+      height: 260,
+      borderRadius: radius.lg,
+      overflow: 'hidden',
+    },
+    camera: {
+      width: '100%',
+      height: '100%',
+    },
+    scanOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    scanFrame: {
+      width: 220,
+      height: 120,
+      borderWidth: 2,
+      borderColor: colors.white,
+      borderRadius: radius.md,
+      backgroundColor: 'transparent',
+    },
+    scanHint: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+    loadingText: {
+      fontSize: 15,
+      color: colors.textSecondary,
+    },
+    notFoundText: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginVertical: spacing.md,
+    },
 
-  // Protein warning
-  proteinWarning: {
-    backgroundColor: AMBER_LIGHT,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  proteinWarningText: {
-    fontSize: 12,
-    color: AMBER,
-    fontWeight: '600',
-    lineHeight: 18,
-  },
+    // Result view
+    resultScroll: {
+      flexGrow: 0,
+    },
+    resultContent: {
+      gap: spacing.md,
+      paddingBottom: spacing.sm,
+    },
+    productName: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    sourceRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    sourceLabel: {
+      fontSize: 12,
+      color: colors.textDisabled,
+    },
+    verifiedBadge: {
+      backgroundColor: 'rgba(5,150,105,0.10)',
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 2,
+    },
+    verifiedBadgeText: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: '#059669',
+    },
 
-  // Editable fields
-  fieldsNote: {
-    fontSize: 11,
-    color: colors.textDisabled,
-  },
-  fieldsRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  fieldCard: {
-    flex: 1,
-    backgroundColor: colors.gray100,
-    borderRadius: radius.md,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.xs,
-    alignItems: 'center',
-    gap: 2,
-  },
-  fieldCardHighlight: {
-    backgroundColor: BRAND_LIGHT,
-  },
-  fieldInput: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    textAlign: 'center',
-    minWidth: 60,
-    paddingVertical: 0,
-  },
-  fieldInputHighlight: {
-    color: BRAND,
-  },
-  fieldLabel: {
-    fontSize: 10,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-  fieldLabelHighlight: {
-    color: BRAND,
-  },
+    // Protein warning
+    proteinWarning: {
+      backgroundColor: AMBER_LIGHT,
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+    },
+    proteinWarningText: {
+      fontSize: 12,
+      color: AMBER,
+      fontWeight: '600',
+      lineHeight: 18,
+    },
 
-  // Buttons
-  primaryButton: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.md,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  primaryButtonPressed: {
-    backgroundColor: colors.primaryDark,
-  },
-  primaryButtonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  cancelButton: {
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    color: colors.textSecondary,
-    fontSize: 15,
-  },
-});
+    fieldsNote: {
+      fontSize: 11,
+      color: colors.textDisabled,
+    },
+
+    // Protein hero card
+    proteinHero: {
+      backgroundColor: BRAND_LIGHT,
+      borderRadius: radius.lg,
+      borderWidth: 1.5,
+      borderColor: BRAND,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+      alignItems: 'center',
+      gap: 2,
+    },
+    heroInput: {
+      fontSize: 36,
+      fontWeight: '800',
+      color: BRAND,
+      textAlign: 'center',
+      paddingVertical: 0,
+      minWidth: 80,
+    },
+    heroLabel: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: BRAND,
+    },
+    heroSub: {
+      fontSize: 10,
+      color: BRAND,
+      opacity: 0.7,
+    },
+
+    // Macro + micro field rows
+    fieldsRow: {
+      flexDirection: 'row',
+      gap: spacing.xs,
+    },
+    microRow: {
+      backgroundColor: MICRO_BG,
+      borderRadius: radius.md,
+      padding: spacing.xs,
+    },
+    fieldCard: {
+      flex: 1,
+      backgroundColor: colors.gray100,
+      borderRadius: radius.md,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: 2,
+      alignItems: 'center',
+      gap: 1,
+    },
+    fieldCardMicro: {
+      backgroundColor: 'transparent',
+    },
+    fieldInput: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      textAlign: 'center',
+      minWidth: 44,
+      paddingVertical: 0,
+    },
+    fieldInputMicro: {
+      fontSize: 14,
+      color: AMBER,
+    },
+    fieldLabel: {
+      fontSize: 9,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+    fieldLabelMicro: {
+      color: AMBER,
+    },
+    fieldUnit: {
+      fontSize: 9,
+      color: colors.textDisabled,
+      textAlign: 'center',
+    },
+    fieldUnitMicro: {
+      color: AMBER,
+      opacity: 0.7,
+    },
+
+    // GLP-1 Watch section label
+    sectionLabelRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+      marginTop: spacing.xs,
+    },
+    sectionLabel: {
+      fontSize: 10,
+      fontWeight: '700',
+      letterSpacing: 0.8,
+      color: AMBER,
+      textTransform: 'uppercase',
+    },
+    sectionLabelSub: {
+      fontSize: 9,
+      color: colors.textDisabled,
+    },
+
+    // Buttons
+    primaryButton: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.md,
+      paddingVertical: 14,
+      alignItems: 'center',
+      marginTop: spacing.xs,
+    },
+    primaryButtonPressed: {
+      backgroundColor: colors.primaryDark,
+    },
+    primaryButtonText: {
+      color: colors.white,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    cancelButton: {
+      paddingVertical: spacing.sm,
+      alignItems: 'center',
+    },
+    cancelButtonText: {
+      color: colors.textSecondary,
+      fontSize: 15,
+    },
+  });
+}

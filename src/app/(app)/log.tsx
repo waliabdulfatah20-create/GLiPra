@@ -100,10 +100,16 @@ export default function LogScreen() {
     insertBarcode({
       name: product.name,
       servingDescription: product.servingDescription,
-      proteinG: product.proteinG,
-      fiberG: product.fiberG ?? undefined,
-      caloriesKcal: product.caloriesKcal ?? undefined,
       barcodeEan: product.ean,
+      proteinG: product.proteinG,
+      carbsG: product.carbsG,
+      fatG: product.fatG,
+      fiberG: product.fiberG,
+      caloriesKcal: product.caloriesKcal,
+      magnesiumMg: product.magnesiumMg,
+      zincMg: product.zincMg,
+      b12Mcg: product.b12Mcg,
+      vitaminDIu: product.vitaminDIu,
     });
   }
 

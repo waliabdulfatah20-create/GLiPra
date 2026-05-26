@@ -31,6 +31,25 @@ export interface ManualFoodEntry {
 }
 
 // ---------------------------------------------------------------------------
+// BarcodeFoodEntry — full macro + micronutrient entry for barcode-sourced logs.
+// Mirrors PhotoFoodEntry but includes barcodeEan.
+// ---------------------------------------------------------------------------
+export interface BarcodeFoodEntry {
+  name: string;
+  servingDescription: string;
+  barcodeEan: string;
+  proteinG: number;
+  carbsG: number | null;
+  fatG: number | null;
+  fiberG: number | null;
+  caloriesKcal: number | null;
+  magnesiumMg: number | null;
+  zincMg: number | null;
+  b12Mcg: number | null;
+  vitaminDIu: number | null;
+}
+
+// ---------------------------------------------------------------------------
 // PhotoFoodEntry — full macro + micronutrient entry for photo-sourced logs.
 // All nullable fields are truly optional (AI may not estimate all values).
 // ---------------------------------------------------------------------------

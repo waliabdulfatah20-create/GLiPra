@@ -11,6 +11,7 @@ import {
   fetchTodayFoodLogs,
   getFoodDefault,
   getRecentCorrections,
+  insertBarcodeFoodLog,
   insertFoodLog,
   insertPhotoFoodLog,
   saveFoodCorrection,
@@ -19,7 +20,7 @@ import {
 import { fetchBarcodeCorrection, saveBarcodeCorrection } from './barcode-corrections';
 import type { BarcodeProduct } from './barcode-lookup';
 import { usePhotoFoodRecognition, type RecognitionResult } from './photo-recognition';
-import type { FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
+import type { BarcodeFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
 
 // ---------------------------------------------------------------------------
 // Query key factory
@@ -98,7 +99,7 @@ export function useInsertFoodLog(): {
 // Always free — no paywall check needed per subscription rules.
 // ---------------------------------------------------------------------------
 export function useInsertBarcodeFoodLog(): {
-  mutate: (entry: ManualFoodEntry & { barcodeEan: string }) => void;
+  mutate: (entry: BarcodeFoodEntry) => void;
   isLoading: boolean;
 } {
   const queryClient = useQueryClient();
@@ -107,9 +108,9 @@ export function useInsertBarcodeFoodLog(): {
   const today = format(new Date(), 'yyyy-MM-dd');
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (entry: ManualFoodEntry & { barcodeEan: string }) => {
+    mutationFn: (entry: BarcodeFoodEntry) => {
       if (!userId) throw new Error('Not authenticated');
-      return insertFoodLog(userId, entry, 'barcode', entry.barcodeEan);
+      return insertBarcodeFoodLog(userId, entry);
     },
     onSuccess: () => {
       analytics.capture(EVENTS.FOOD_LOGGED_BARCODE, { source: 'barcode' });

@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import { supabase } from '@/lib/supabase';
 
-import type { FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
+import type { BarcodeFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
 
 // ---------------------------------------------------------------------------
 // Zod schema — validates rows coming out of the database
@@ -80,6 +80,41 @@ export async function insertFoodLog(
 
   if (error) {
     throw new Error(`insertFoodLog failed: ${error.message}`);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// insertBarcodeFoodLog
+// Insert a barcode-sourced food log entry with full macro + micronutrient data.
+// Always free — no paywall per subscription rules.
+// ---------------------------------------------------------------------------
+export async function insertBarcodeFoodLog(
+  userId: string,
+  entry: BarcodeFoodEntry,
+): Promise<void> {
+  const now = new Date().toISOString();
+
+  const { error } = await supabase.from('food_logs').insert({
+    user_id: userId,
+    logged_at: now,
+    name: entry.name,
+    serving_description: entry.servingDescription,
+    protein_g: entry.proteinG,
+    carbs_g: entry.carbsG,
+    fat_g: entry.fatG,
+    fiber_g: entry.fiberG,
+    calories_kcal: entry.caloriesKcal,
+    magnesium_mg: entry.magnesiumMg,
+    zinc_mg: entry.zincMg,
+    b12_mcg: entry.b12Mcg,
+    vitamin_d_iu: entry.vitaminDIu,
+    barcode_ean: entry.barcodeEan,
+    source: 'barcode',
+    created_at: now,
+  });
+
+  if (error) {
+    throw new Error(`insertBarcodeFoodLog failed: ${error.message}`);
   }
 }
 

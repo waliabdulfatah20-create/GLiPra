@@ -10,19 +10,34 @@ export interface BarcodeProduct {
   name: string;
   servingDescription: string;
   proteinG: number;
+  carbsG: number | null;
+  fatG: number | null;
   fiberG: number | null;
   caloriesKcal: number | null;
+  // GLP-1 Watch micronutrients — best-effort from API, user should verify against label
+  magnesiumMg: number | null;
+  zincMg: number | null;
+  b12Mcg: number | null;
+  vitaminDIu: number | null;
   ean: string;
   dataSource: BarcodeDataSource;
 }
 
 // ─── Open Food Facts ────────────────────────────────────────────────────────
 
+// OFF stores macros in g/100g; minerals in g/100g (×1000 for mg);
+// vitamins in g/100g (×1e6 for mcg; vit-D additionally ×40 for IU).
 const offNutrimentsSchema = z
   .object({
     proteins_100g: z.number().optional(),
+    carbohydrates_100g: z.number().optional(),
+    fat_100g: z.number().optional(),
     fiber_100g: z.number().optional(),
     'energy-kcal_100g': z.number().optional(),
+    magnesium_100g: z.number().optional(),
+    zinc_100g: z.number().optional(),
+    'vitamin-b12_100g': z.number().optional(),
+    'vitamin-d_100g': z.number().optional(),
   })
   .passthrough();
 
@@ -54,13 +69,21 @@ async function lookupBarcodeOFF(ean: string): Promise<BarcodeProduct | null> {
     const product = parsed.data.product;
     const nutriments = product.nutriments ?? {};
 
+    const n = nutriments;
     return {
       name: product.product_name?.trim() || 'Unknown Product',
       servingDescription: product.serving_size?.trim() || '100g',
-      proteinG: nutriments.proteins_100g ?? 0,
-      fiberG: nutriments.fiber_100g != null ? nutriments.fiber_100g : null,
-      caloriesKcal:
-        nutriments['energy-kcal_100g'] != null ? nutriments['energy-kcal_100g'] : null,
+      proteinG: n.proteins_100g ?? 0,
+      carbsG: n.carbohydrates_100g ?? null,
+      fatG: n.fat_100g ?? null,
+      fiberG: n.fiber_100g ?? null,
+      caloriesKcal: n['energy-kcal_100g'] ?? null,
+      // Minerals: OFF stores in g/100g → convert to mg
+      magnesiumMg: n.magnesium_100g != null ? Math.round(n.magnesium_100g * 1000 * 10) / 10 : null,
+      zincMg:      n.zinc_100g != null      ? Math.round(n.zinc_100g * 1000 * 100) / 100 : null,
+      // Vitamins: OFF stores in g/100g → B12: ×1e6 for mcg; D: ×1e6×40 for IU
+      b12Mcg:     n['vitamin-b12_100g'] != null ? Math.round(n['vitamin-b12_100g'] * 1_000_000 * 100) / 100 : null,
+      vitaminDIu: n['vitamin-d_100g']   != null ? Math.round(n['vitamin-d_100g'] * 1_000_000 * 40) : null,
       ean,
       dataSource: 'open_food_facts',
     };
@@ -109,16 +132,33 @@ async function lookupBarcodeUSDA(ean: string): Promise<BarcodeProduct | null> {
     if (!food) return null;
 
     const nutrientMap = new Map(food.foodNutrients.map((n) => [n.nutrientId, n.value]));
+    // USDA nutrient IDs: protein=1003, fat=1004, carbs=1005, calories=1008, fiber=1079
+    // Minerals (mg): magnesium=1090, zinc=1095
+    // Vitamins (µg): B12=1178, D(D2+D3)=1114 — multiply by 40 to get IU
+    const get = (id: number): number | null => nutrientMap.has(id) ? (nutrientMap.get(id) ?? null) : null;
     const proteinG = nutrientMap.get(1003) ?? 0;
-    const fiberG = nutrientMap.has(1079) ? (nutrientMap.get(1079) ?? null) : null;
-    const caloriesKcal = nutrientMap.has(1008) ? (nutrientMap.get(1008) ?? null) : null;
+    const carbsG      = get(1005);
+    const fatG        = get(1004);
+    const fiberG      = get(1079);
+    const caloriesKcal = get(1008);
+    const magnesiumMg  = get(1090);
+    const zincMg       = get(1095);
+    const b12Mcg       = get(1178);
+    const vitaminDRaw  = get(1114);
+    const vitaminDIu   = vitaminDRaw != null ? Math.round(vitaminDRaw * 40) : null;
 
     return {
       name: food.description,
       servingDescription: '100g',
       proteinG,
+      carbsG,
+      fatG,
       fiberG,
       caloriesKcal,
+      magnesiumMg,
+      zincMg,
+      b12Mcg,
+      vitaminDIu,
       ean,
       dataSource: 'usda',
     };

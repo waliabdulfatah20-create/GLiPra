@@ -4,14 +4,18 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Circle, Line, Polyline, Svg } from 'react-native-svg';
 
+import { Activity } from '@/components/ui/icons';
 import { useMedicationLevelCurve } from '@/features/medication-level/hooks';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import type { InjectionPhase } from '@/types';
 
 // Brand tokens for Clean Clinical design
 const BRAND = '#5b21b6';
 const AMBER = '#d97706';
+const MED_BLUE = '#60a5fa';
+const MED_BLUE_BG = 'rgba(37,99,235,0.12)';
 
 const PHASE_HEADLINE: Record<InjectionPhase, string> = {
   injection_day:     'Injection day — dose administered',
@@ -95,6 +99,11 @@ function CurveSparkline({
 
 export function MedLevelBanner({ phase }: MedLevelBannerProps) {
   const { t } = useTranslation();
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
   const { curve, todayOffset, injectionIntervalDays, isLoading } = useMedicationLevelCurve();
 
   // Still loading — don't flash a card yet
@@ -111,6 +120,9 @@ export function MedLevelBanner({ phase }: MedLevelBannerProps) {
         accessibilityLabel="Set up medication level"
       >
         <View style={styles.textRow}>
+          <View style={styles.iconCircle}>
+            <Activity color={MED_BLUE} width={20} height={20} />
+          </View>
           <View style={styles.textBlock}>
             <Text style={styles.headline} numberOfLines={1}>
               Medication level estimator
@@ -147,6 +159,9 @@ export function MedLevelBanner({ phase }: MedLevelBannerProps) {
 
       {/* Headline + pill */}
       <View style={styles.textRow}>
+        <View style={styles.iconCircle}>
+          <Activity color={MED_BLUE} width={20} height={20} />
+        </View>
         <View style={styles.textBlock}>
           <Text style={styles.headline} numberOfLines={1}>{headline}</Text>
           <View style={styles.pill}>
@@ -159,50 +174,68 @@ export function MedLevelBanner({ phase }: MedLevelBannerProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    gap: spacing.sm,
-    borderTopWidth: 2,
-    borderTopColor: BRAND,
-    ...shadows.sm,
-  },
-  sparklineRow: {
-    alignItems: 'flex-start',
-    overflow: 'hidden',
-  },
-  textRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  textBlock: {
-    flex: 1,
-    gap: spacing.xs,
-  },
-  headline: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    letterSpacing: -0.2,
-  },
-  pill: {
-    alignSelf: 'flex-start',
-    backgroundColor: `rgba(91,33,182,0.08)`,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
-  },
-  pillText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: BRAND,
-  },
-  chevron: {
-    fontSize: 22,
-    color: colors.textDisabled,
-    fontWeight: '300',
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
+
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      gap: spacing.sm,
+      borderTopWidth: 2,
+      borderTopColor: BRAND,
+      ...shadows.sm,
+    },
+    sparklineRow: {
+      alignItems: 'flex-start',
+      overflow: 'hidden',
+    },
+    textRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    iconCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: MED_BLUE_BG,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexShrink: 0,
+    },
+    textBlock: {
+      flex: 1,
+      gap: spacing.xs,
+    },
+    headline: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      letterSpacing: -0.2,
+    },
+    pill: {
+      alignSelf: 'flex-start',
+      backgroundColor: `rgba(91,33,182,0.08)`,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 3,
+    },
+    pillText: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: BRAND,
+    },
+    chevron: {
+      fontSize: 22,
+      color: colors.textDisabled,
+      fontWeight: '300',
+    },
+  });
+}

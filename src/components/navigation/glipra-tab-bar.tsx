@@ -1,9 +1,9 @@
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { CommonActions } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   ChatBubble as CoachIcon,
@@ -36,10 +36,9 @@ const TAB_CONFIG: Record<VisibleTabName, TabConfig> = {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function GlipraTabBar({ state, navigation }: BottomTabBarProps) {
+export function GlipraTabBar({ state, navigation, insets }: BottomTabBarProps) {
   const { t } = useTranslation();
   const { colors, spacing, gradients } = useTheme();
-  const insets = useSafeAreaInsets();
 
   const visibleRoutes = state.routes.filter(
     (r) => VISIBLE_TAB_NAMES.includes(r.name as VisibleTabName),
@@ -59,6 +58,7 @@ export function GlipraTabBar({ state, navigation }: BottomTabBarProps) {
       {visibleRoutes.map((route) => {
         const name = route.name as VisibleTabName;
         const config = TAB_CONFIG[name];
+        if (!config) return null;
         const isFocused =
           state.routes.findIndex((r) => r.key === route.key) === state.index;
 
@@ -70,7 +70,10 @@ export function GlipraTabBar({ state, navigation }: BottomTabBarProps) {
             canPreventDefault: true,
           });
           if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
+            navigation.dispatch({
+              ...CommonActions.navigate(route),
+              target: state.key,
+            });
           }
         };
 
@@ -81,6 +84,9 @@ export function GlipraTabBar({ state, navigation }: BottomTabBarProps) {
           <Pressable
             key={route.key}
             onPress={onPress}
+            onLongPress={() => {
+              navigation.emit({ type: 'tabLongPress', target: route.key });
+            }}
             testID={config.testID}
             style={styles.tabItem}
             accessibilityRole="tab"

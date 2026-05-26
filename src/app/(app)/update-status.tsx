@@ -18,7 +18,8 @@ import { useAuthStore } from '@/features/auth/use-auth-store';
 import { useTodayProfile } from '@/features/today/hooks';
 import { haptics } from '@/lib/haptics';
 import { supabase } from '@/lib/supabase';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import type { MedicationStatus } from '@/features/today/api';
 
 // ─── Options ─────────────────────────────────────────────────────────────────
@@ -42,6 +43,12 @@ export default function UpdateStatusScreen() {
     profile?.medicationStatus,
   );
   const [isSaving, setIsSaving] = React.useState(false);
+
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius]
+  );
 
   // Sync initial selection once profile loads
   React.useEffect(() => {
@@ -135,105 +142,113 @@ export default function UpdateStatusScreen() {
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
 
-  // Header
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  backText: {
-    fontSize: 17,
-    color: colors.primary,
-    width: 60,
-  },
-  title: {
-    flex: 1,
-    fontSize: 17,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    textAlign: 'center',
-  },
-  headerSpacer: {
-    width: 60,
-  },
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  // Scroll
-  scroll: { flex: 1 },
-  scrollContent: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xl,
-  },
+    // Header
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    backText: {
+      fontSize: 17,
+      color: colors.primary,
+      width: 60,
+    },
+    title: {
+      flex: 1,
+      fontSize: 17,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      textAlign: 'center',
+    },
+    headerSpacer: {
+      width: 60,
+    },
 
-  subheading: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    lineHeight: 20,
-    marginBottom: spacing.lg,
-  },
+    // Scroll
+    scroll: { flex: 1 },
+    scrollContent: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xl,
+    },
 
-  // Option cards
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  cardSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primaryLight,
-  },
-  cardLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: 2,
-  },
-  cardLabelSelected: {
-    color: colors.primary,
-  },
-  cardDescription: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    lineHeight: 18,
-  },
-  cardDescriptionSelected: {
-    color: colors.primary,
-  },
+    subheading: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      lineHeight: 20,
+      marginBottom: spacing.lg,
+    },
 
-  // Footer
-  footer: {
-    padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  saveButton: {
-    paddingVertical: 14,
-    borderRadius: radius.md,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-  },
-  saveButtonDisabled: {
-    backgroundColor: colors.gray200,
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.white,
-  },
-  saveButtonTextDisabled: {
-    color: colors.textDisabled,
-  },
-});
+    // Option cards
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    cardSelected: {
+      borderColor: colors.primary,
+      backgroundColor: colors.primaryLight,
+    },
+    cardLabel: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: 2,
+    },
+    cardLabelSelected: {
+      color: colors.primary,
+    },
+    cardDescription: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      lineHeight: 18,
+    },
+    cardDescriptionSelected: {
+      color: colors.primary,
+    },
+
+    // Footer
+    footer: {
+      padding: spacing.lg,
+      backgroundColor: colors.surface,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    saveButton: {
+      paddingVertical: 14,
+      borderRadius: radius.md,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+    },
+    saveButtonDisabled: {
+      backgroundColor: colors.gray200,
+    },
+    saveButtonText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.white,
+    },
+    saveButtonTextDisabled: {
+      color: colors.textDisabled,
+    },
+  });
+}

@@ -21,7 +21,8 @@ import { supabase } from '@/lib/supabase';
 import { formatWeight, kgToLbs, lbsToKg, useWeightUnit } from '@/lib/unit-preference';
 import { UnitToggle } from '@/components/ui/unit-toggle';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 function parsePositiveNumber(value: string): number | null {
   const num = parseFloat(value);
@@ -43,6 +44,12 @@ export default function GoalWeightScreen() {
     return String(displayed);
   });
   const [isSaving, setIsSaving] = React.useState(false);
+
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius]
+  );
 
   const goalRaw = parsePositiveNumber(goalText);
   const showError = goalText.length > 0 && goalRaw === null;
@@ -164,109 +171,117 @@ export default function GoalWeightScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  flex: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  backText: {
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '500',
-    minWidth: 60,
-  },
-  title: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    letterSpacing: -0.3,
-  },
-  headerSpacer: {
-    minWidth: 60,
-  },
-  body: {
-    padding: spacing.lg,
-  },
-  currentValue: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: spacing.lg,
-  },
-  labelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.sm,
-  },
-  fieldLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    letterSpacing: 0.8,
-  },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    paddingVertical: 14,
-    paddingHorizontal: spacing.md,
-    fontSize: 16,
-    color: colors.textPrimary,
-  },
-  inputError: {
-    borderColor: colors.error,
-  },
-  errorText: {
-    fontSize: 12,
-    color: colors.error,
-    marginTop: spacing.xs,
-  },
-  hint: {
-    fontSize: 12,
-    color: colors.textDisabled,
-    marginTop: spacing.sm,
-    marginBottom: spacing.lg,
-    lineHeight: 18,
-  },
-  saveButton: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.md,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  saveButtonDisabled: {
-    backgroundColor: colors.gray200,
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.white,
-  },
-  saveButtonTextDisabled: {
-    color: colors.textDisabled,
-  },
-  clearButton: {
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-  },
-  clearButtonText: {
-    fontSize: 14,
-    color: colors.error,
-    fontWeight: '500',
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    flex: {
+      flex: 1,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    backText: {
+      fontSize: 16,
+      color: colors.primary,
+      fontWeight: '500',
+      minWidth: 60,
+    },
+    title: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      letterSpacing: -0.3,
+    },
+    headerSpacer: {
+      minWidth: 60,
+    },
+    body: {
+      padding: spacing.lg,
+    },
+    currentValue: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: spacing.lg,
+    },
+    labelRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: spacing.sm,
+    },
+    fieldLabel: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      letterSpacing: 0.8,
+    },
+    input: {
+      backgroundColor: colors.surface,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      paddingVertical: 14,
+      paddingHorizontal: spacing.md,
+      fontSize: 16,
+      color: colors.textPrimary,
+    },
+    inputError: {
+      borderColor: colors.error,
+    },
+    errorText: {
+      fontSize: 12,
+      color: colors.error,
+      marginTop: spacing.xs,
+    },
+    hint: {
+      fontSize: 12,
+      color: colors.textDisabled,
+      marginTop: spacing.sm,
+      marginBottom: spacing.lg,
+      lineHeight: 18,
+    },
+    saveButton: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.md,
+      paddingVertical: 14,
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    saveButtonDisabled: {
+      backgroundColor: colors.gray200,
+    },
+    saveButtonText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.white,
+    },
+    saveButtonTextDisabled: {
+      color: colors.textDisabled,
+    },
+    clearButton: {
+      paddingVertical: spacing.sm,
+      alignItems: 'center',
+    },
+    clearButtonText: {
+      fontSize: 14,
+      color: colors.error,
+      fontWeight: '500',
+    },
+  });
+}

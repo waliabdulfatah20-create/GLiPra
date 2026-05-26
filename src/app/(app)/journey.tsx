@@ -12,7 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MilestoneCard, LockedMilestoneCard } from '@/components/journey/milestone-card';
 import { useJourneyCards } from '@/features/journey-cards/hooks';
 import { MILESTONES, type MilestoneId } from '@/features/journey-cards/milestones';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 // All milestone IDs in display order
 const ALL_MILESTONE_IDS: MilestoneId[] = [
@@ -36,6 +37,12 @@ export default function JourneyScreen() {
 
   const { entries, unlockedIds, isLoading } = useJourneyCards();
   const now = Date.now();
+
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows]
+  );
 
   const unlockedSet = new Set(unlockedIds);
 
@@ -127,98 +134,107 @@ export default function JourneyScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  backButton: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xs,
-  },
-  backButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.primary,
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-  },
+    backButton: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.xs,
+    },
+    backButtonText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.primary,
+    },
 
-  heading: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  subheading: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: spacing.xl,
-  },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+    },
 
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    marginBottom: spacing.md,
-  },
-  sectionLabelLocked: {
-    marginTop: spacing.xl,
-    color: colors.gray400,
-  },
+    heading: {
+      fontSize: 26,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      marginBottom: spacing.xs,
+    },
+    subheading: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: spacing.xl,
+    },
 
-  // Grid layout
-  grid: {
-    flexDirection: 'column',
-    gap: spacing.md,
-  },
-  gridTwoCol: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
-  },
-  gridItemOne: {
-    width: '100%',
-  },
-  gridItemTwo: {
-    // Each item gets ~half the width minus half the gap
-    flexBasis: '47%',
-    flexGrow: 1,
-  },
+    sectionLabel: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+      marginBottom: spacing.md,
+    },
+    sectionLabelLocked: {
+      marginTop: spacing.xl,
+      color: colors.gray400,
+    },
 
-  // Empty state
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: spacing.xxl,
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.xl,
-    ...shadows.sm,
-  },
-  emptyEmoji: {
-    fontSize: 40,
-    marginBottom: spacing.md,
-  },
-  emptyTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  emptyBody: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-    paddingHorizontal: spacing.lg,
-  },
-});
+    // Grid layout
+    grid: {
+      flexDirection: 'column',
+      gap: spacing.md,
+    },
+    gridTwoCol: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.md,
+    },
+    gridItemOne: {
+      width: '100%',
+    },
+    gridItemTwo: {
+      // Each item gets ~half the width minus half the gap
+      flexBasis: '47%',
+      flexGrow: 1,
+    },
+
+    // Empty state
+    emptyState: {
+      alignItems: 'center',
+      paddingVertical: spacing.xxl,
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: spacing.xl,
+      ...shadows.sm,
+    },
+    emptyEmoji: {
+      fontSize: 40,
+      marginBottom: spacing.md,
+    },
+    emptyTitle: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    emptyBody: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+      paddingHorizontal: spacing.lg,
+    },
+  });
+}

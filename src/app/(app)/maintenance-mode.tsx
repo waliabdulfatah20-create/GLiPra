@@ -13,7 +13,8 @@ import { router } from 'expo-router';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { MAINTENANCE_GUIDES } from '@/features/medication-status/maintenance-guidance';
 import { useTodayProfile } from '@/features/today/hooks';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 // MAINTENANCE_MULTIPLIER from CLAUDE.md: 10% reduction during maintenance
 const MAINTENANCE_MULTIPLIER = 0.9;
@@ -23,6 +24,12 @@ export default function MaintenanceModeScreen() {
 
   const baseProteinFloor = profile?.proteinFloorG ?? 0;
   const adjustedProteinFloor = Math.round(baseProteinFloor * MAINTENANCE_MULTIPLIER);
+
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows]
+  );
 
   function handleSwitchToActive() {
     Alert.alert(
@@ -118,153 +125,162 @@ export default function MaintenanceModeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  // Header
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  headerIcon: {
-    fontSize: 26,
-    marginRight: spacing.sm,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+    },
 
-  // Disclaimer
-  disclaimerText: {
-    fontSize: 13,
-    color: '#9A3412',
-    lineHeight: 20,
-  },
+    // Header
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    headerIcon: {
+      fontSize: 26,
+      marginRight: spacing.sm,
+    },
+    headerTitle: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
 
-  // Hero card
-  heroCard: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    marginTop: spacing.sm,
-    marginBottom: spacing.md,
-    ...shadows.md,
-  },
-  heroTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.white,
-    marginBottom: spacing.sm,
-  },
-  heroBody: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.9)',
-    lineHeight: 22,
-    marginBottom: spacing.sm,
-  },
-  heroCredit: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.65)',
-    fontStyle: 'italic',
-  },
+    // Disclaimer
+    disclaimerText: {
+      fontSize: 13,
+      color: '#9A3412',
+      lineHeight: 20,
+    },
 
-  // Protein floor card
-  proteinCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
-  },
-  proteinLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    marginBottom: spacing.sm,
-  },
-  proteinRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    marginBottom: spacing.sm,
-  },
-  proteinValue: {
-    fontSize: 48,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    marginRight: spacing.xs,
-  },
-  proteinUnit: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: colors.textSecondary,
-  },
-  proteinNote: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    lineHeight: 20,
-  },
-  proteinLoadingText: {
-    fontSize: 14,
-    color: colors.textDisabled,
-    paddingVertical: spacing.md,
-  },
+    // Hero card
+    heroCard: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      marginTop: spacing.sm,
+      marginBottom: spacing.md,
+      ...shadows.md,
+    },
+    heroTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.white,
+      marginBottom: spacing.sm,
+    },
+    heroBody: {
+      fontSize: 14,
+      color: 'rgba(255,255,255,0.9)',
+      lineHeight: 22,
+      marginBottom: spacing.sm,
+    },
+    heroCredit: {
+      fontSize: 12,
+      color: 'rgba(255,255,255,0.65)',
+      fontStyle: 'italic',
+    },
 
-  // Section heading
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
+    // Protein floor card
+    proteinCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      marginBottom: spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...shadows.sm,
+    },
+    proteinLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.8,
+      textTransform: 'uppercase',
+      marginBottom: spacing.sm,
+    },
+    proteinRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      marginBottom: spacing.sm,
+    },
+    proteinValue: {
+      fontSize: 48,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      marginRight: spacing.xs,
+    },
+    proteinUnit: {
+      fontSize: 18,
+      fontWeight: '500',
+      color: colors.textSecondary,
+    },
+    proteinNote: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    proteinLoadingText: {
+      fontSize: 14,
+      color: colors.textDisabled,
+      paddingVertical: spacing.md,
+    },
 
-  // Guidance cards
-  guideCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary,
-    ...shadows.sm,
-  },
-  guideTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  guideBody: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    lineHeight: 22,
-  },
+    // Section heading
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
 
-  // Switch back button
-  switchButton: {
-    marginTop: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    alignItems: 'center',
-  },
-  switchButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-});
+    // Guidance cards
+    guideCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.primary,
+      ...shadows.sm,
+    },
+    guideTitle: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: spacing.xs,
+    },
+    guideBody: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      lineHeight: 22,
+    },
+
+    // Switch back button
+    switchButton: {
+      marginTop: spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      alignItems: 'center',
+    },
+    switchButtonText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+  });
+}

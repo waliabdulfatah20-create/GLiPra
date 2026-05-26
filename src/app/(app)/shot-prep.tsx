@@ -14,7 +14,8 @@ import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { ChecklistItemRow } from '@/components/shot-prep/checklist-item-row';
 import { SHOT_DAY_CHECKLIST } from '@/features/shot-prep/checklist-data';
 import { useShotPrepChecklist } from '@/features/shot-prep/hooks';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 const TOTAL = SHOT_DAY_CHECKLIST.length;
 
@@ -27,6 +28,12 @@ export default function ShotPrepScreen() {
   const injectionDate = todayDateString();
   const { checkedIds, toggleItem, allChecked, completedCount } =
     useShotPrepChecklist(injectionDate);
+
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows]
+  );
 
   const progressFraction = TOTAL > 0 ? completedCount / TOTAL : 0;
 
@@ -116,125 +123,134 @@ export default function ShotPrepScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  // Back button
-  backButton: {
-    alignSelf: 'flex-start',
-    marginBottom: spacing.md,
-  },
-  backButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.primary,
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+    },
 
-  // Header
-  header: {
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  headerIcon: {
-    fontSize: 40,
-    marginBottom: spacing.sm,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
+    // Back button
+    backButton: {
+      alignSelf: 'flex-start',
+      marginBottom: spacing.md,
+    },
+    backButtonText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.primary,
+    },
 
-  // Progress
-  progressSection: {
-    marginBottom: spacing.md,
-  },
-  progressLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
-  },
-  progressTrack: {
-    height: 8,
-    backgroundColor: colors.gray200,
-    borderRadius: radius.full,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.phaseInjectionDay,
-    borderRadius: radius.full,
-  },
+    // Header
+    header: {
+      alignItems: 'center',
+      marginBottom: spacing.lg,
+    },
+    headerIcon: {
+      fontSize: 40,
+      marginBottom: spacing.sm,
+    },
+    headerTitle: {
+      fontSize: 24,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      marginBottom: spacing.xs,
+    },
+    headerSubtitle: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
 
-  // Disclaimer text child
-  disclaimerText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 18,
-  },
+    // Progress
+    progressSection: {
+      marginBottom: spacing.md,
+    },
+    progressLabel: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      marginBottom: spacing.xs,
+    },
+    progressTrack: {
+      height: 8,
+      backgroundColor: colors.gray200,
+      borderRadius: radius.full,
+      overflow: 'hidden',
+    },
+    progressFill: {
+      height: '100%',
+      backgroundColor: colors.phaseInjectionDay,
+      borderRadius: radius.full,
+    },
 
-  // Checklist card
-  listCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    paddingHorizontal: spacing.md,
-    marginTop: spacing.md,
-    ...shadows.sm,
-  },
+    // Disclaimer text child
+    disclaimerText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 18,
+    },
 
-  // Injection site tracker row
-  siteTrackerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginTop: spacing.md,
-    ...shadows.sm,
-  },
-  siteTrackerLeft: { flex: 1 },
-  siteTrackerTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: 2,
-  },
-  siteTrackerBody: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  siteTrackerChevron: {
-    fontSize: 22,
-    color: colors.phaseInjectionDay,
-    fontWeight: '300',
-  },
+    // Checklist card
+    listCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      paddingHorizontal: spacing.md,
+      marginTop: spacing.md,
+      ...shadows.sm,
+    },
 
-  // Completion banner
-  completionBanner: {
-    marginTop: spacing.lg,
-    backgroundColor: colors.phaseInjectionDay,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    alignItems: 'center',
-    ...shadows.md,
-  },
-  completionText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.white,
-    textAlign: 'center',
-  },
-});
+    // Injection site tracker row
+    siteTrackerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      marginTop: spacing.md,
+      ...shadows.sm,
+    },
+    siteTrackerLeft: { flex: 1 },
+    siteTrackerTitle: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: 2,
+    },
+    siteTrackerBody: {
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+    siteTrackerChevron: {
+      fontSize: 22,
+      color: colors.phaseInjectionDay,
+      fontWeight: '300',
+    },
+
+    // Completion banner
+    completionBanner: {
+      marginTop: spacing.lg,
+      backgroundColor: colors.phaseInjectionDay,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      alignItems: 'center',
+      ...shadows.md,
+    },
+    completionText: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.white,
+      textAlign: 'center',
+    },
+  });
+}

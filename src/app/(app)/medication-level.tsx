@@ -19,7 +19,8 @@ import { PhaseBadge } from '@/components/today/phase-badge';
 import { generateSteadyStateCurve } from '@/features/medication-level/calculator';
 import { useMedicationLevelCurve } from '@/features/medication-level/hooks';
 import { useTodayData } from '@/features/today/hooks';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import type { GLP1MedicationId } from '@/types';
 
 const MEDICATION_DISPLAY_NAMES: Record<GLP1MedicationId, string> = {
@@ -58,7 +59,6 @@ const VIEW_CONFIG: Record<ViewRange, {
 export default function MedicationLevelScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
-  const chartWidth = width - spacing.lg * 2 - spacing.md * 2;
 
   const { profile, isLoading: profileLoading, injectionCycle } = useTodayData();
   const {
@@ -75,6 +75,14 @@ export default function MedicationLevelScreen() {
   const isLoading = profileLoading || curveLoading;
 
   const [viewRange, setViewRange] = React.useState<ViewRange>('30D');
+
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows]
+  );
+
+  const chartWidth = width - spacing.lg * 2 - spacing.md * 2;
   const config = VIEW_CONFIG[viewRange];
 
   const today = format(new Date(), 'yyyy-MM-dd');
@@ -240,152 +248,161 @@ export default function MedicationLevelScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  loader: {
-    flex: 1,
-    alignSelf: 'center',
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-    gap: spacing.md,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  // Header
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.xs,
-  },
-  backButton: {
-    width: 60,
-  },
-  backText: {
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    textAlign: 'center',
-    flex: 1,
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    loader: {
+      flex: 1,
+      alignSelf: 'center',
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+      gap: spacing.md,
+    },
 
-  // Empty state
-  emptyState: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.xl,
-    alignItems: 'center',
-    ...shadows.sm,
-  },
-  emptyTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  emptyBody: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
+    // Header
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: spacing.xs,
+    },
+    backButton: {
+      width: 60,
+    },
+    backText: {
+      fontSize: 16,
+      color: colors.primary,
+      fontWeight: '500',
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      textAlign: 'center',
+      flex: 1,
+    },
 
-  // Medication badge
-  medicationBadgeRow: {
-    alignItems: 'flex-start',
-  },
-  medicationBadge: {
-    backgroundColor: colors.primaryLight,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  medicationBadgeText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.primaryDark,
-  },
+    // Empty state
+    emptyState: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.xl,
+      alignItems: 'center',
+      ...shadows.sm,
+    },
+    emptyTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    emptyBody: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
 
-  // Chart card
-  chartCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    ...shadows.sm,
-  },
-  chartCardHeader: {
-    marginBottom: spacing.xs,
-  },
-  chartCardTitle: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    letterSpacing: 0.6,
-  },
-  chartRangeRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginBottom: spacing.sm,
-  },
-  emptyChart: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyChartText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
+    // Medication badge
+    medicationBadgeRow: {
+      alignItems: 'flex-start',
+    },
+    medicationBadge: {
+      backgroundColor: colors.primaryLight,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+    },
+    medicationBadgeText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.primaryDark,
+    },
 
-  // Summary card
-  summaryCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    alignItems: 'center',
-    ...shadows.md,
-  },
-  summaryLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    letterSpacing: 0.6,
-    marginBottom: spacing.xs,
-  },
-  summaryValue: {
-    fontSize: 48,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    lineHeight: 56,
-  },
+    // Chart card
+    chartCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      ...shadows.sm,
+    },
+    chartCardHeader: {
+      marginBottom: spacing.xs,
+    },
+    chartCardTitle: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.6,
+    },
+    chartRangeRow: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      marginBottom: spacing.sm,
+    },
+    emptyChart: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    emptyChartText: {
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
 
-  // Phase card
-  phaseCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    ...shadows.sm,
-  },
-  phaseLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    letterSpacing: 0.6,
-    marginBottom: spacing.sm,
-  },
+    // Summary card
+    summaryCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      alignItems: 'center',
+      ...shadows.md,
+    },
+    summaryLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.6,
+      marginBottom: spacing.xs,
+    },
+    summaryValue: {
+      fontSize: 48,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      lineHeight: 56,
+    },
 
-  // Disclaimer
-  disclaimerText: {
-    fontSize: 12,
-    color: '#9A3412',
-    lineHeight: 18,
-  },
-});
+    // Phase card
+    phaseCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      ...shadows.sm,
+    },
+    phaseLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.6,
+      marginBottom: spacing.sm,
+    },
+
+    // Disclaimer
+    disclaimerText: {
+      fontSize: 12,
+      color: '#9A3412',
+      lineHeight: 18,
+    },
+  });
+}

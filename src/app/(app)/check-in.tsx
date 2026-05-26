@@ -19,7 +19,8 @@ import { useUpsertCheckIn, useTodayCheckIn } from '@/features/check-in/hooks';
 import { useInsertWeightLog, useWeightLogs } from '@/features/weight/hooks';
 import { kgToLbs, lbsToKg, useWeightUnit } from '@/lib/unit-preference';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 const WATER_DROPS = 8; // 8 × 250 ml = 2000 ml max (easy UI)
 const WATER_DROP_ML = 250;
@@ -46,6 +47,12 @@ export default function CheckInScreen() {
   const { mutate: logWeight } = useInsertWeightLog();
   const { logs: weightLogs } = useWeightLogs();
   const { unit: weightUnit } = useWeightUnit();
+
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
 
   const [nausea, setNausea] = React.useState<number>(1);
   const [energy, setEnergy] = React.useState<number>(3);
@@ -261,158 +268,167 @@ export default function CheckInScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  // Header
-  header: {
-    marginBottom: spacing.lg,
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-    marginBottom: spacing.sm,
-  },
-  backButtonText: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  dateLabel: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    loadingContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+    },
 
-  // Cards
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    ...shadows.sm,
-  },
-  sectionTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
+    // Header
+    header: {
+      marginBottom: spacing.lg,
+    },
+    backButton: {
+      alignSelf: 'flex-start',
+      marginBottom: spacing.sm,
+    },
+    backButtonText: {
+      fontSize: 14,
+      color: colors.primary,
+      fontWeight: '500',
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.xs,
+    },
+    dateLabel: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
 
-  // Water drops
-  waterTotal: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: spacing.sm,
-  },
-  dropRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  dropButton: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.gray100,
-  },
-  dropButtonFilled: {
-    backgroundColor: colors.primaryLight,
-  },
-  dropButtonPressed: {
-    opacity: 0.7,
-  },
-  dropEmoji: {
-    fontSize: 20,
-    color: colors.textSecondary,
-  },
+    // Cards
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      ...shadows.sm,
+    },
+    sectionTitle: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
 
-  // Weight
-  weightRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    height: 48,
-    backgroundColor: colors.gray50,
-    gap: spacing.xs,
-  },
-  weightInput: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    height: 48,
-  },
-  weightUnit: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    fontWeight: '500',
-  },
-  weightHint: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: spacing.xs,
-  },
+    // Water drops
+    waterTotal: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      marginBottom: spacing.sm,
+    },
+    dropRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+    },
+    dropButton: {
+      width: 40,
+      height: 40,
+      borderRadius: radius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.gray100,
+    },
+    dropButtonFilled: {
+      backgroundColor: colors.primaryLight,
+    },
+    dropButtonPressed: {
+      opacity: 0.7,
+    },
+    dropEmoji: {
+      fontSize: 20,
+      color: colors.textSecondary,
+    },
 
-  // Notes
-  notesInput: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    fontSize: 14,
-    color: colors.textPrimary,
-    minHeight: 90,
-    backgroundColor: colors.gray50,
-  },
+    // Weight
+    weightRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      height: 48,
+      backgroundColor: colors.gray50,
+      gap: spacing.xs,
+    },
+    weightInput: {
+      flex: 1,
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      height: 48,
+    },
+    weightUnit: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      fontWeight: '500',
+    },
+    weightHint: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: spacing.xs,
+    },
 
-  // Submit
-  submitButton: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.lg,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-    marginBottom: spacing.md,
-    ...shadows.md,
-  },
-  submitButtonPressed: {
-    backgroundColor: colors.primaryDark,
-  },
-  submitButtonDisabled: {
-    opacity: 0.6,
-  },
-  submitButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.white,
-  },
+    // Notes
+    notesInput: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      fontSize: 14,
+      color: colors.textPrimary,
+      minHeight: 90,
+      backgroundColor: colors.gray50,
+    },
 
-  // Disclaimer
-  disclaimerText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 18,
-  },
-});
+    // Submit
+    submitButton: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.lg,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+      marginBottom: spacing.md,
+      ...shadows.md,
+    },
+    submitButtonPressed: {
+      backgroundColor: colors.primaryDark,
+    },
+    submitButtonDisabled: {
+      opacity: 0.6,
+    },
+    submitButtonText: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.white,
+    },
+
+    // Disclaimer
+    disclaimerText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 18,
+    },
+  });
+}

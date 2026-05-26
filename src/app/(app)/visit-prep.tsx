@@ -24,7 +24,8 @@ import {
   useGeneratePdf,
 } from '@/features/visit-prep/hooks';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 // Static fallback questions shown before AI generation runs.
 const STATIC_QUESTIONS = [
@@ -45,6 +46,12 @@ function SectionCard({
   label: string;
   children: React.ReactNode;
 }) {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeSectionCardStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
+
   return (
     <View style={styles.card}>
       <Text style={styles.cardLabel}>{label}</Text>
@@ -54,6 +61,12 @@ function SectionCard({
 }
 
 function DataRow({ name, value }: { name: string; value: string }) {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeDataRowStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
+
   return (
     <View style={styles.dataRow}>
       <Text style={styles.dataRowLabel}>{name}</Text>
@@ -77,6 +90,12 @@ export default function VisitPrepScreen() {
   } = useVisitPrep();
   const { generate, isLoading: isPdfLoading, error: pdfError } = useGeneratePdf();
   const { isPro } = useSubscription();
+
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
 
   // Active question list — AI-generated when available, static fallback otherwise.
   const activeQuestions: readonly string[] =
@@ -324,156 +343,174 @@ export default function VisitPrepScreen() {
 // Styles
 // ---------------------------------------------------------------------------
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  loader: {
-    flex: 1,
-    alignSelf: 'center',
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-    gap: spacing.md,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  // Header
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.xs,
-  },
-  backButton: {
-    width: 60,
-  },
-  backText: {
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    textAlign: 'center',
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    loader: {
+      flex: 1,
+      alignSelf: 'center',
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+      gap: spacing.md,
+    },
 
-  // Disclaimer
-  disclaimerText: {
-    fontSize: 12,
-    color: '#9A3412',
-    lineHeight: 18,
-  },
+    // Header
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: spacing.xs,
+    },
+    backButton: {
+      width: 60,
+    },
+    backText: {
+      fontSize: 16,
+      color: colors.primary,
+      fontWeight: '500',
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      textAlign: 'center',
+    },
 
-  // Data cards
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    gap: spacing.sm,
-    ...shadows.sm,
-  },
-  cardLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    letterSpacing: 0.6,
-    marginBottom: spacing.xs / 2,
-  },
-  dataRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  dataRowLabel: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    flex: 1,
-  },
-  dataRowValue: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    textAlign: 'right',
-    flexShrink: 1,
-    marginLeft: spacing.sm,
-  },
-  emptyText: {
-    fontSize: 13,
-    color: colors.textDisabled,
-    fontStyle: 'italic',
-  },
+    // Disclaimer
+    disclaimerText: {
+      fontSize: 12,
+      color: '#9A3412',
+      lineHeight: 18,
+    },
 
-  // Questions
-  questionRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.xs,
-  },
-  bulletDot: {
-    fontSize: 13,
-    color: colors.primary,
-    lineHeight: 20,
-  },
-  questionText: {
-    fontSize: 13,
-    color: colors.textPrimary,
-    lineHeight: 20,
-    flex: 1,
-  },
-  questionsNote: {
-    fontSize: 11,
-    color: colors.textDisabled,
-    fontStyle: 'italic',
-    marginTop: spacing.xs,
-  },
-  errorText: {
-    fontSize: 12,
-    color: colors.error,
-    lineHeight: 18,
-    marginTop: spacing.xs,
-  },
+    emptyText: {
+      fontSize: 13,
+      color: colors.textDisabled,
+      fontStyle: 'italic',
+    },
 
-  // Generate questions button (outlined, secondary action)
-  generateButton: {
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-    borderRadius: radius.md,
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-    marginTop: spacing.sm,
-    minHeight: 38,
-    justifyContent: 'center',
-  },
-  generateButtonPressed: {
-    backgroundColor: colors.primaryLight,
-  },
-  generateButtonDisabled: {
-    borderColor: colors.border,
-  },
-  generateButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.primary,
-  },
+    // Questions
+    questionRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: spacing.xs,
+    },
+    bulletDot: {
+      fontSize: 13,
+      color: colors.primary,
+      lineHeight: 20,
+    },
+    questionText: {
+      fontSize: 13,
+      color: colors.textPrimary,
+      lineHeight: 20,
+      flex: 1,
+    },
+    questionsNote: {
+      fontSize: 11,
+      color: colors.textDisabled,
+      fontStyle: 'italic',
+      marginTop: spacing.xs,
+    },
+    errorText: {
+      fontSize: 12,
+      color: colors.error,
+      lineHeight: 18,
+      marginTop: spacing.xs,
+    },
 
-  // Export button
-  exportButton: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.lg,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-    ...shadows.md,
-  },
-  exportButtonPressed: {
-    backgroundColor: colors.primaryDark,
-  },
-  exportButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.white,
-  },
-});
+    // Generate questions button (outlined, secondary action)
+    generateButton: {
+      borderWidth: 1.5,
+      borderColor: colors.primary,
+      borderRadius: radius.md,
+      paddingVertical: spacing.sm,
+      alignItems: 'center',
+      marginTop: spacing.sm,
+      minHeight: 38,
+      justifyContent: 'center',
+    },
+    generateButtonPressed: {
+      backgroundColor: colors.primaryLight,
+    },
+    generateButtonDisabled: {
+      borderColor: colors.border,
+    },
+    generateButtonText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.primary,
+    },
+
+    // Export button
+    exportButton: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.lg,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+      ...shadows.md,
+    },
+    exportButtonPressed: {
+      backgroundColor: colors.primaryDark,
+    },
+    exportButtonText: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.white,
+    },
+  });
+}
+
+function makeSectionCardStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      gap: spacing.sm,
+      ...shadows.sm,
+    },
+    cardLabel: {
+      fontSize: 10,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      letterSpacing: 0.6,
+      marginBottom: spacing.xs / 2,
+    },
+  });
+}
+
+function makeDataRowStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    dataRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    dataRowLabel: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      flex: 1,
+    },
+    dataRowValue: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      textAlign: 'right',
+      flexShrink: 1,
+      marginLeft: spacing.sm,
+    },
+  });
+}

@@ -14,7 +14,8 @@ import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { DISCONTINUATION_GUIDES } from '@/features/medication-status/discontinuation-guidance';
 import { useTodayProfile } from '@/features/today/hooks';
 import { useWeightLogs } from '@/features/weight/hooks';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 // Escalation copy — Rule 9: locked text, no condition names.
 const ESCALATION_COPY =
@@ -22,6 +23,12 @@ const ESCALATION_COPY =
 
 function WeightTrendSection() {
   const { logs, isLoading } = useWeightLogs();
+
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeWeightTrendStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
 
   if (isLoading) {
     return (
@@ -97,6 +104,12 @@ export default function DiscontinuationModeScreen() {
   // Full protein floor — no maintenance reduction after discontinuation.
   // Muscle preservation is the highest priority (CLAUDE.md).
   const proteinFloorG = profile?.proteinFloorG ?? 0;
+
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
 
   function handleContactPrescriber() {
     Alert.alert(
@@ -184,217 +197,230 @@ export default function DiscontinuationModeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  // Header
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+    },
 
-  // Disclaimer
-  disclaimerText: {
-    fontSize: 13,
-    color: '#9A3412',
-    lineHeight: 20,
-  },
+    // Header
+    headerTitle: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.md,
+    },
 
-  // Hero card
-  heroCard: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    marginTop: spacing.sm,
-    marginBottom: spacing.md,
-    ...shadows.md,
-  },
-  heroTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.white,
-    marginBottom: spacing.sm,
-  },
-  heroBody: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.9)',
-    lineHeight: 22,
-    marginBottom: spacing.sm,
-  },
-  heroCredit: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.65)',
-    fontStyle: 'italic',
-  },
+    // Disclaimer
+    disclaimerText: {
+      fontSize: 13,
+      color: '#9A3412',
+      lineHeight: 20,
+    },
 
-  // Protein floor card
-  proteinCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
-  },
-  proteinLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    marginBottom: spacing.sm,
-  },
-  proteinRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    marginBottom: spacing.sm,
-  },
-  proteinValue: {
-    fontSize: 48,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    marginRight: spacing.xs,
-  },
-  proteinUnit: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: colors.textSecondary,
-  },
-  proteinNote: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    lineHeight: 20,
-  },
-  proteinLoadingText: {
-    fontSize: 14,
-    color: colors.textDisabled,
-    paddingVertical: spacing.md,
-  },
+    // Hero card
+    heroCard: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      marginTop: spacing.sm,
+      marginBottom: spacing.md,
+      ...shadows.md,
+    },
+    heroTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.white,
+      marginBottom: spacing.sm,
+    },
+    heroBody: {
+      fontSize: 14,
+      color: 'rgba(255,255,255,0.9)',
+      lineHeight: 22,
+      marginBottom: spacing.sm,
+    },
+    heroCredit: {
+      fontSize: 12,
+      color: 'rgba(255,255,255,0.65)',
+      fontStyle: 'italic',
+    },
 
-  // Weight trend card
-  weightCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
-  },
-  weightLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    marginBottom: spacing.sm,
-  },
-  weightRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.xs,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
-  },
-  weightDate: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    width: 52,
-  },
-  weightValue: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    flex: 1,
-  },
-  weightEwma: {
-    fontSize: 12,
-    color: colors.textDisabled,
-  },
-  trendRow: {
-    marginTop: spacing.sm,
-  },
-  trendText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  trendUp: {
-    color: colors.warning,
-  },
-  trendDown: {
-    color: colors.success,
-  },
-  weightNote: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    lineHeight: 20,
-    marginTop: spacing.sm,
-  },
-  weightLoadingText: {
-    fontSize: 14,
-    color: colors.textDisabled,
-    paddingVertical: spacing.md,
-  },
-  weightEmptyText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: spacing.sm,
-    lineHeight: 20,
-  },
+    // Protein floor card
+    proteinCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...shadows.sm,
+    },
+    proteinLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.8,
+      textTransform: 'uppercase',
+      marginBottom: spacing.sm,
+    },
+    proteinRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      marginBottom: spacing.sm,
+    },
+    proteinValue: {
+      fontSize: 48,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      marginRight: spacing.xs,
+    },
+    proteinUnit: {
+      fontSize: 18,
+      fontWeight: '500',
+      color: colors.textSecondary,
+    },
+    proteinNote: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    proteinLoadingText: {
+      fontSize: 14,
+      color: colors.textDisabled,
+      paddingVertical: spacing.md,
+    },
 
-  // Section heading
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
+    // Section heading
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
 
-  // Guidance cards
-  guideCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.success,
-    ...shadows.sm,
-  },
-  guideTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  guideBody: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    lineHeight: 22,
-  },
+    // Guidance cards
+    guideCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.success,
+      ...shadows.sm,
+    },
+    guideTitle: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: spacing.xs,
+    },
+    guideBody: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      lineHeight: 22,
+    },
 
-  // Contact prescriber button
-  prescriberButton: {
-    marginTop: spacing.lg,
-    backgroundColor: colors.primaryLight,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  prescriberButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.primary,
-  },
-});
+    // Contact prescriber button
+    prescriberButton: {
+      marginTop: spacing.lg,
+      backgroundColor: colors.primaryLight,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.primary,
+    },
+    prescriberButtonText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.primary,
+    },
+  });
+}
+
+function makeWeightTrendStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    // Weight trend card
+    weightCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...shadows.sm,
+    },
+    weightLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.8,
+      textTransform: 'uppercase',
+      marginBottom: spacing.sm,
+    },
+    weightRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing.xs,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.border,
+    },
+    weightDate: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      width: 52,
+    },
+    weightValue: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      flex: 1,
+    },
+    weightEwma: {
+      fontSize: 12,
+      color: colors.textDisabled,
+    },
+    trendRow: {
+      marginTop: spacing.sm,
+    },
+    trendText: {
+      fontSize: 13,
+      fontWeight: '600',
+    },
+    trendUp: {
+      color: colors.warning,
+    },
+    trendDown: {
+      color: colors.success,
+    },
+    weightNote: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      lineHeight: 20,
+      marginTop: spacing.sm,
+    },
+    weightLoadingText: {
+      fontSize: 14,
+      color: colors.textDisabled,
+      paddingVertical: spacing.md,
+    },
+    weightEmptyText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: spacing.sm,
+      lineHeight: 20,
+    },
+  });
+}

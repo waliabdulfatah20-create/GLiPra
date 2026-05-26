@@ -28,7 +28,8 @@ import {
   useUpdateInjectionSite,
 } from '@/features/injection-sites/hooks';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import type { GLP1MedicationId } from '@/types';
 
 const MEDICATION_DISPLAY_NAMES: Record<GLP1MedicationId, string> = {
@@ -81,6 +82,12 @@ export default function EditShotScreen() {
   const { mutate: updateShot, isPending: isUpdating } = useUpdateInjectionSite();
   const { mutate: deleteShot, isPending: isDeleting } = useDeleteInjectionSite();
   const isPending = isUpdating || isDeleting;
+
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
 
   // Form state — defaults, filled once the log arrives from cache
   const [date, setDate] = React.useState<Date>(new Date());
@@ -380,140 +387,149 @@ export default function EditShotScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  headerSpacer: {
-    width: 48,
-  },
-  cancel: {
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  title: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  save: {
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  saveDisabled: {
-    color: colors.textDisabled,
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-    gap: spacing.sm,
-  },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    headerSpacer: {
+      width: 48,
+    },
+    cancel: {
+      fontSize: 16,
+      color: colors.primary,
+      fontWeight: '500',
+    },
+    title: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    save: {
+      fontSize: 16,
+      color: colors.primary,
+      fontWeight: '600',
+    },
+    saveDisabled: {
+      color: colors.textDisabled,
+    },
 
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1,
-    color: colors.textSecondary,
-    marginTop: spacing.md,
-    marginBottom: spacing.xs,
-  },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+      gap: spacing.sm,
+    },
 
-  fieldRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  fieldLabelCol: {
-    gap: 2,
-  },
-  fieldLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    fontWeight: '500',
-  },
-  fieldValue: {
-    fontSize: 16,
-    color: colors.textPrimary,
-    fontWeight: '600',
-  },
-  fieldNote: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    fontWeight: '500',
-    fontStyle: 'italic',
-  },
+    sectionLabel: {
+      fontSize: 11,
+      fontWeight: '700',
+      letterSpacing: 1,
+      color: colors.textSecondary,
+      marginTop: spacing.md,
+      marginBottom: spacing.xs,
+    },
 
-  notesInput: {
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    padding: spacing.md,
-    minHeight: 96,
-    fontSize: 15,
-    color: colors.textPrimary,
-    ...shadows.sm,
-  },
+    fieldRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    fieldLabelCol: {
+      gap: 2,
+    },
+    fieldLabel: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      fontWeight: '500',
+    },
+    fieldValue: {
+      fontSize: 16,
+      color: colors.textPrimary,
+      fontWeight: '600',
+    },
+    fieldNote: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      fontWeight: '500',
+      fontStyle: 'italic',
+    },
 
-  deleteBtn: {
-    backgroundColor: colors.errorLight,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-    marginTop: spacing.md,
-  },
-  deleteBtnPressed: {
-    opacity: 0.7,
-  },
-  deleteBtnText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.error,
-  },
+    notesInput: {
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+      padding: spacing.md,
+      minHeight: 96,
+      fontSize: 15,
+      color: colors.textPrimary,
+      ...shadows.sm,
+    },
 
-  notFound: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.xl,
-  },
-  notFoundTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  notFoundBody: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
+    deleteBtn: {
+      backgroundColor: colors.errorLight,
+      borderRadius: radius.md,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+      marginTop: spacing.md,
+    },
+    deleteBtnPressed: {
+      opacity: 0.7,
+    },
+    deleteBtnText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.error,
+    },
 
-  disclaimerText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 18,
-  },
-});
+    notFound: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: spacing.xl,
+    },
+    notFoundTitle: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    notFoundBody: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+
+    disclaimerText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 18,
+    },
+  });
+}

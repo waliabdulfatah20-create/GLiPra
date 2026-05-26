@@ -18,16 +18,24 @@ import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { useInsertWeightLog, useWeightLogs } from '@/features/weight/hooks';
 import { UnitToggle } from '@/components/ui/unit-toggle';
 import { formatWeight, useWeightUnit } from '@/lib/unit-preference';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 export default function WeightScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
-  const chartWidth = width - spacing.lg * 2;
 
   const { logs, isLoading } = useWeightLogs();
   const { mutate: insertLog, isLoading: isSaving, isSuccess } = useInsertWeightLog();
   const { unit: weightUnit, toggle: toggleWeightUnit } = useWeightUnit();
+
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
+
+  const chartWidth = width - spacing.lg * 2;
 
   const latestLog = logs.length > 0 ? logs[logs.length - 1] : null;
   const recentLogs = [...logs].reverse().slice(0, 10);
@@ -146,162 +154,171 @@ export default function WeightScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-    gap: spacing.md,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  // Header
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.sm,
-  },
-  backButton: {
-    width: 60,
-  },
-  backText: {
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    textAlign: 'center',
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+      gap: spacing.md,
+    },
 
-  // Summary card
-  summaryCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    alignItems: 'center',
-    ...shadows.sm,
-  },
-  summaryLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    letterSpacing: 0.6,
-    marginBottom: spacing.xs,
-  },
-  summaryValue: {
-    fontSize: 56,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    lineHeight: 64,
-  },
-  summaryUnit: {
-    fontSize: 22,
-    fontWeight: '400',
-    color: colors.textSecondary,
-  },
-  trendText: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '500',
-    marginTop: spacing.xs,
-  },
-  summaryDate: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: spacing.xs,
-  },
-  noDataText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
+    // Header
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: spacing.sm,
+    },
+    backButton: {
+      width: 60,
+    },
+    backText: {
+      fontSize: 16,
+      color: colors.primary,
+      fontWeight: '500',
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      textAlign: 'center',
+    },
 
-  successText: {
-    fontSize: 13,
-    color: colors.success,
-    textAlign: 'center',
-    fontWeight: '500',
-  },
+    // Summary card
+    summaryCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      alignItems: 'center',
+      ...shadows.sm,
+    },
+    summaryLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.6,
+      marginBottom: spacing.xs,
+    },
+    summaryValue: {
+      fontSize: 56,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      lineHeight: 64,
+    },
+    summaryUnit: {
+      fontSize: 22,
+      fontWeight: '400',
+      color: colors.textSecondary,
+    },
+    trendText: {
+      fontSize: 14,
+      color: colors.primary,
+      fontWeight: '500',
+      marginTop: spacing.xs,
+    },
+    summaryDate: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: spacing.xs,
+    },
+    noDataText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
 
-  // Chart
-  chartCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    ...shadows.sm,
-  },
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    letterSpacing: 0.6,
-    marginBottom: spacing.sm,
-  },
-  chartLegend: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing.sm,
-    justifyContent: 'center',
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  legendDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  legendLine: {
-    width: 16,
-    height: 2,
-    borderRadius: 1,
-  },
-  legendText: {
-    fontSize: 11,
-    color: colors.textSecondary,
-  },
+    successText: {
+      fontSize: 13,
+      color: colors.success,
+      textAlign: 'center',
+      fontWeight: '500',
+    },
 
-  // History list
-  historyCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    ...shadows.sm,
-  },
-  historyRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    gap: spacing.md,
-  },
-  historyDate: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    width: 50,
-  },
-  historyWeight: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    flex: 1,
-  },
-  historyEwma: {
-    fontSize: 12,
-    color: colors.primary,
-  },
+    // Chart
+    chartCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      ...shadows.sm,
+    },
+    sectionLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.6,
+      marginBottom: spacing.sm,
+    },
+    chartLegend: {
+      flexDirection: 'row',
+      gap: spacing.md,
+      marginTop: spacing.sm,
+      justifyContent: 'center',
+    },
+    legendItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    legendDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    },
+    legendLine: {
+      width: 16,
+      height: 2,
+      borderRadius: 1,
+    },
+    legendText: {
+      fontSize: 11,
+      color: colors.textSecondary,
+    },
 
-  disclaimerText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 18,
-  },
-});
+    // History list
+    historyCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      ...shadows.sm,
+    },
+    historyRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      gap: spacing.md,
+    },
+    historyDate: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      width: 50,
+    },
+    historyWeight: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      flex: 1,
+    },
+    historyEwma: {
+      fontSize: 12,
+      color: colors.primary,
+    },
+
+    disclaimerText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 18,
+    },
+  });
+}

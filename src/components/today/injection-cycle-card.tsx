@@ -20,6 +20,14 @@ function getPhaseForDay(dayIndex: number): InjectionPhase {
   return 'recovery_window';
 }
 
+const PHASE_LABELS: Record<InjectionPhase, string> = {
+  injection_day:    '💉',
+  peak_suppression: 'PEAK',
+  adjustment:       'ADJ',
+  recovery_window:  'REC',
+  overdue:          'OD',
+};
+
 export function InjectionCycleCard({ lastInjectionDate, injectionCycle }: InjectionCycleCardProps) {
   const { t } = useTranslation();
   const { colors, spacing, radius, shadows } = useTheme();
@@ -49,7 +57,7 @@ export function InjectionCycleCard({ lastInjectionDate, injectionCycle }: Inject
     const isToday = !injectionCycle.isOverdue && i === effectiveDaySince;
     const cellPhase = getPhaseForDay(i);
     const phaseColor = phaseAccent[cellPhase];
-    return { dayLabel, isPast, isToday, phaseColor };
+    return { dayLabel, isPast, isToday, phaseColor, cellPhase };
   });
 
   const footerText = injectionCycle.isOverdue
@@ -68,7 +76,7 @@ export function InjectionCycleCard({ lastInjectionDate, injectionCycle }: Inject
         </View>
 
         <View style={styles.stripRow}>
-          {cells.map(({ dayLabel, isPast, isToday, phaseColor }) => (
+          {cells.map(({ dayLabel, isPast, isToday, phaseColor, cellPhase }) => (
             <View key={dayLabel} style={styles.cellUnit}>
               <Text style={[styles.todayBadge, isToday && styles.todayBadgeVisible]}>
                 {t('today.cycle_today_badge')}
@@ -81,7 +89,13 @@ export function InjectionCycleCard({ lastInjectionDate, injectionCycle }: Inject
                     : styles.domeFuture,
                   isToday && styles.domeToday,
                 ]}
-              />
+              >
+                {(isPast || isToday) && (
+                  <Text style={styles.domeLabel} numberOfLines={1} adjustsFontSizeToFit>
+                    {PHASE_LABELS[cellPhase]}
+                  </Text>
+                )}
+              </View>
               <Text style={[styles.dayLabel, (isPast || isToday) && styles.dayLabelActive]}>
                 {dayLabel}
               </Text>
@@ -165,6 +179,8 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       borderTopRightRadius: 999,
       borderBottomLeftRadius: 6,
       borderBottomRightRadius: 6,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     domeFuture: {
       backgroundColor: colors.gray100,
@@ -172,6 +188,13 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     domeToday: {
       borderWidth: 2.5,
       borderColor: colors.white,
+    },
+    domeLabel: {
+      fontSize: 9,
+      fontWeight: '800',
+      color: colors.white,
+      letterSpacing: 0.5,
+      textTransform: 'uppercase',
     },
     dayLabel: {
       marginTop: 4,

@@ -38,7 +38,15 @@
   "onboarding": {
     "message": "Welcome to Glipra",
     "language_title": "Choose your language",
-    "language_subtitle": "You can change this later in Settings."
+    "language_subtitle": "You can change this later in Settings.",
+    "appearance_title": "Choose your appearance",
+    "appearance_subtitle": "You can change this later in Settings.",
+    "appearance_light": "Light",
+    "appearance_light_sub": "Always light mode",
+    "appearance_dark": "Dark",
+    "appearance_dark_sub": "Always dark mode",
+    "appearance_system": "System",
+    "appearance_system_sub": "Follows your device setting"
   },
   "tabs": {
     "today": "Today",

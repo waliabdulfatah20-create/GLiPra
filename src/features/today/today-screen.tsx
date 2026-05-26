@@ -39,6 +39,9 @@ import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
 import type { InjectionPhase } from '@/types';
+import { useAuthStore } from '@/features/auth/use-auth-store';
+import { markRedFlagTriggered } from '@/features/check-in/api';
+import { useRedFlagSnooze } from '@/features/safety/hooks';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -95,6 +98,27 @@ export function TodayScreen() {
 
   const { checkIn } = useTodayCheckIn();
   const hasCheckedInToday = checkIn !== null;
+
+  const session = useAuthStore.use.session();
+  const userId = session?.user.id;
+  const today = format(new Date(), 'yyyy-MM-dd');
+
+  const { isSnoozed, isLoading: snoozeLoading, snooze } = useRedFlagSnooze();
+
+  // isTriggered: detection fired AND snooze has loaded AND snooze is not active
+  const isTriggered =
+    !!redFlagDetection?.triggered && !snoozeLoading && !isSnoozed;
+
+  // Write audit flag to DB when triggered (non-blocking, non-fatal)
+  React.useEffect(() => {
+    if (redFlagDetection?.triggered && userId) {
+      markRedFlagTriggered(userId, today).catch(() => {});
+    }
+  }, [redFlagDetection?.triggered, userId, today]);
+
+  const handleDismiss = React.useCallback(async () => {
+    await snooze();
+  }, [snooze]);
 
   // Milestone toast state — shows the first newly unlocked milestone.
   const [toastMilestone, setToastMilestone] = React.useState<Milestone | null>(null);
@@ -158,6 +182,20 @@ export function TodayScreen() {
     : hourOfDay < 17
       ? t('today.greeting_afternoon')
       : t('today.greeting_evening');
+
+  // Escalation override — replaces all content when triggered
+  if (isTriggered && redFlagDetection) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <ScrollView
+          contentContainerStyle={styles.escalationContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <EscalationCard detection={redFlagDetection} onDismiss={handleDismiss} />
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -264,14 +302,6 @@ export function TodayScreen() {
               </Text>
             </View>
           </View>
-        )}
-
-        {/* ── Safety escalation ─────────────────────────────────── */}
-        {redFlagDetection?.triggered && (
-          <EscalationCard
-            detection={redFlagDetection}
-            onDismiss={() => {}}
-          />
         )}
 
         {/* ── Today's Metrics ───────────────────────────────────── */}
@@ -487,6 +517,11 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       // No top/horizontal padding — the gradient hero is full-bleed.
       // Individual content sections apply their own padding.
       paddingBottom: spacing.xxl,
+    },
+    escalationContent: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      padding: spacing.lg,
     },
 
     // ── Gradient hero ────────────────────────────────────────────

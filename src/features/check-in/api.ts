@@ -126,3 +126,27 @@ export async function fetchCheckInHistory(
 
   return Array.from(entriesByDate.values()).sort((a, b) => b.date.localeCompare(a.date));
 }
+
+/**
+ * Mark today's check-in rows as red_flag_triggered = true.
+ * Non-fatal — failure is logged but never rethrows (audit log, not user-facing).
+ */
+export async function markRedFlagTriggered(
+  userId: string,
+  date: string, // 'YYYY-MM-DD'
+): Promise<void> {
+  const localDate = new Date(date + 'T00:00:00');
+  const dayStart = startOfDay(localDate).toISOString();
+  const dayEnd = startOfDay(addDays(localDate, 1)).toISOString();
+
+  const { error } = await supabase
+    .from('daily_checkins')
+    .update({ red_flag_triggered: true })
+    .eq('user_id', userId)
+    .gte('checked_in_at', dayStart)
+    .lt('checked_in_at', dayEnd);
+
+  if (error) {
+    console.warn(`markRedFlagTriggered failed: ${error.message}`);
+  }
+}

@@ -43,7 +43,7 @@ export interface ProteinResult {
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────
 
-const ACTIVITY_MULTIPLIERS: Record<ActivityLevel, number> = {
+export const ACTIVITY_MULTIPLIERS: Record<ActivityLevel, number> = {
   sedentary: 1.2,
   moderate: 1.4,
   active: 1.6,

@@ -85,6 +85,7 @@ export function GlipraTabBar({ state, navigation, insets }: BottomTabBarProps) {
             key={route.key}
             onPress={onPress}
             onLongPress={() => {
+              haptics.tap();
               navigation.emit({ type: 'tabLongPress', target: route.key });
             }}
             testID={config.testID}
@@ -139,6 +140,7 @@ const styles = StyleSheet.create({
   },
   activePill: {
     height: 32,
+    minWidth: 44,
     paddingHorizontal: 14,
     borderRadius: 16,
     alignItems: 'center',

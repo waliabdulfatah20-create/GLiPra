@@ -38,7 +38,9 @@ export default function TabLayout() {
       tabBar={(props) => <GlipraTabBar {...props} />}
       screenOptions={{ headerShown: false }}
     >
-      {/* ── Visible tabs ──────────────────────────────────────── */}
+      {/* ── Visible tabs ─────────────────────────────────────────
+          Note: GlipraTabBar reads labels from its own TAB_CONFIG (not these titles).
+          Titles kept for documentation and potential header fallback only. ── */}
       <Tabs.Screen name="index"            options={{ title: t('tabs.today'),     headerShown: false }} />
       <Tabs.Screen name="progress"         options={{ title: t('tabs.progress'),  headerShown: false }} />
       <Tabs.Screen name="log"              options={{ title: t('tabs.nutrition'), headerShown: false }} />

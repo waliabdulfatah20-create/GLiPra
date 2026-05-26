@@ -30,7 +30,7 @@ export default function LanguageScreen() {
     haptics.medium();
     setItem(LOCAL, selected);
     changeLanguage(selected);
-    router.push('/onboarding/medication');
+    router.push('/onboarding/appearance');
   };
 
   return (

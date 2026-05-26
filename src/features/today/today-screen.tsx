@@ -24,7 +24,11 @@ import { ProteinRing } from '@/components/today/protein-ring';
 import { InjectionCycleCard } from '@/components/today/injection-cycle-card';
 import { StreakCard } from '@/components/today/streak-card';
 import { MilestoneToast } from '@/components/ui/milestone-toast';
-import { Settings as SettingsIcon } from '@/components/ui/icons';
+import {
+  ClipboardCheck,
+  ProgressPath,
+  Settings as SettingsIcon,
+} from '@/components/ui/icons';
 import { useTodayCheckIn } from '@/features/check-in/hooks';
 import type { ContentCard } from '@/features/content-cards/data';
 import { getActiveCards } from '@/features/content-cards/data';
@@ -367,6 +371,18 @@ export function TodayScreen() {
             hasCheckedInToday ? "Edit today's check-in" : 'Start daily check-in'
           }
         >
+          <View
+            style={[
+              styles.actionIconCircle,
+              hasCheckedInToday ? styles.actionIconCircleDone : styles.actionIconCirclePending,
+            ]}
+          >
+            <ClipboardCheck
+              color={hasCheckedInToday ? colors.white : colors.primary}
+              width={20}
+              height={20}
+            />
+          </View>
           <View style={styles.actionTextBlock}>
             <Text style={styles.actionHeadline}>{t('today.checkin_title')}</Text>
             <View style={[styles.actionPill, hasCheckedInToday && styles.actionPillDone]}>
@@ -401,6 +417,9 @@ export function TodayScreen() {
           accessibilityRole="button"
           accessibilityLabel="View your journey milestones"
         >
+          <View style={[styles.actionIconCircle, styles.actionIconCirclePending]}>
+            <ProgressPath color={colors.primary} width={20} height={20} />
+          </View>
           <View style={styles.actionTextBlock}>
             <Text style={styles.actionHeadline}>{t('today.journey_title')}</Text>
             <View style={styles.actionPill}>

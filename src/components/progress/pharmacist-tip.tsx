@@ -14,13 +14,20 @@
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 interface PharmacistTipProps {
   children: React.ReactNode;
 }
 
 export function PharmacistTip({ children }: PharmacistTipProps) {
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius],
+  );
+
   return (
     <View style={styles.container} accessibilityRole="text">
       <View style={styles.badge}>
@@ -31,33 +38,41 @@ export function PharmacistTip({ children }: PharmacistTipProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.sm,
-    backgroundColor: colors.primaryLight,
-    borderRadius: radius.md,
-    padding: spacing.sm + 2,
-    marginTop: spacing.sm,
-  },
-  badge: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.sm,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    marginTop: 1,
-  },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: colors.white,
-    letterSpacing: 0.5,
-  },
-  body: {
-    flex: 1,
-    fontSize: 12,
-    color: colors.primaryDark,
-    lineHeight: 17,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: spacing.sm,
+      backgroundColor: colors.primaryLight,
+      borderRadius: radius.md,
+      padding: spacing.sm + 2,
+      marginTop: spacing.sm,
+    },
+    badge: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.sm,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      marginTop: 1,
+    },
+    badgeText: {
+      fontSize: 10,
+      fontWeight: '800',
+      color: colors.white,
+      letterSpacing: 0.5,
+    },
+    body: {
+      flex: 1,
+      fontSize: 12,
+      color: colors.primaryDark,
+      lineHeight: 17,
+    },
+  });
+}

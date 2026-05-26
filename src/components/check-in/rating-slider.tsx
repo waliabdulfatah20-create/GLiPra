@@ -2,7 +2,8 @@ import * as React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { haptics } from '@/lib/haptics';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 interface RatingSliderProps {
   label: string;
@@ -21,6 +22,12 @@ export function RatingSlider({
   highLabel,
   emojis,
 }: RatingSliderProps) {
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius],
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
@@ -56,48 +63,56 @@ export function RatingSlider({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: spacing.lg,
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: spacing.xs,
-  },
-  emojiButton: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.sm,
-    borderRadius: radius.md,
-    backgroundColor: colors.gray100,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  emojiButtonSelected: {
-    backgroundColor: colors.primaryLight,
-    borderColor: colors.primary,
-  },
-  emojiButtonPressed: {
-    backgroundColor: colors.gray200,
-  },
-  emoji: {
-    fontSize: 26,
-  },
-  scaleLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: spacing.xs,
-  },
-  scaleLabel: {
-    fontSize: 11,
-    color: colors.textSecondary,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      marginBottom: spacing.lg,
+    },
+    label: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: spacing.xs,
+    },
+    emojiButton: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: spacing.sm,
+      borderRadius: radius.md,
+      backgroundColor: colors.gray100,
+      borderWidth: 2,
+      borderColor: 'transparent',
+    },
+    emojiButtonSelected: {
+      backgroundColor: colors.primaryLight,
+      borderColor: colors.primary,
+    },
+    emojiButtonPressed: {
+      backgroundColor: colors.gray200,
+    },
+    emoji: {
+      fontSize: 26,
+    },
+    scaleLabels: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: spacing.xs,
+    },
+    scaleLabel: {
+      fontSize: 11,
+      color: colors.textSecondary,
+    },
+  });
+}

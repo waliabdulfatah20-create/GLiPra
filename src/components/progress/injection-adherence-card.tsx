@@ -14,7 +14,8 @@ import { Circle, Line, Svg } from 'react-native-svg';
 
 import { useInjectionAdherence } from '@/features/progress/hooks';
 import { tipI18nKey } from '@/features/progress/pharmacist-tips';
-import { colors, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 import { CardShell } from './card-shell';
 import { PharmacistTip } from './pharmacist-tip';
@@ -31,6 +32,11 @@ export function InjectionAdherenceCard({
   width,
 }: InjectionAdherenceCardProps) {
   const { t } = useTranslation();
+  const { colors, spacing } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing }),
+    [colors, spacing],
+  );
   const { rate, windowDates, intervalDays, hasData, isLoading } =
     useInjectionAdherence(days);
 
@@ -107,37 +113,44 @@ function intervalLabel(intervalDays: number, t: (k: string) => string): string {
   return t('progress.adherence_card.custom');
 }
 
-const styles = StyleSheet.create({
-  placeholder: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    paddingVertical: spacing.md,
-    textAlign: 'center',
-  },
-  headlineRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  bigValue: {
-    fontSize: 36,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    letterSpacing: -1,
-  },
-  bigCaption: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    flexShrink: 1,
-  },
-  axisRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 2,
-  },
-  axisLabel: {
-    fontSize: 10,
-    color: colors.textSecondary,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+}
+
+function makeStyles({ colors, spacing }: StyleTokens) {
+  return StyleSheet.create({
+    placeholder: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      paddingVertical: spacing.md,
+      textAlign: 'center',
+    },
+    headlineRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+    bigValue: {
+      fontSize: 36,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      letterSpacing: -1,
+    },
+    bigCaption: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      flexShrink: 1,
+    },
+    axisRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 2,
+    },
+    axisLabel: {
+      fontSize: 10,
+      color: colors.textSecondary,
+    },
+  });
+}

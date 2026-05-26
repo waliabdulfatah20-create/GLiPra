@@ -8,7 +8,8 @@ import * as React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 
 import { haptics } from '@/lib/haptics';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 export type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
@@ -25,6 +26,12 @@ const CHIPS: { slot: MealSlot; label: string }[] = [
 ];
 
 export function MealChipRow({ active, onSelect }: Props) {
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius],
+  );
+
   function handlePress(slot: MealSlot) {
     // Tapping the active chip clears the filter
     onSelect(active === slot ? null : slot);
@@ -54,28 +61,36 @@ export function MealChipRow({ active, onSelect }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  chip: {
-    backgroundColor: colors.gray100,
-    borderRadius: radius.full,
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-  },
-  chipActive: {
-    backgroundColor: colors.primary,
-  },
-  chipText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  chipTextActive: {
-    color: colors.white,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    chip: {
+      backgroundColor: colors.gray100,
+      borderRadius: radius.full,
+      paddingHorizontal: 14,
+      paddingVertical: 7,
+    },
+    chipActive: {
+      backgroundColor: colors.primary,
+    },
+    chipText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+    chipTextActive: {
+      color: colors.white,
+    },
+  });
+}

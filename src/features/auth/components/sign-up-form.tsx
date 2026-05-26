@@ -17,7 +17,8 @@ import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui';
 import { getFieldError } from '@/components/ui/form-utils';
-import { colors } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 const schema = z.object({
   email: z
@@ -45,19 +46,25 @@ function getPasswordStrength(password: string): PasswordStrength {
   return 'weak';
 }
 
-const strengthColors: Record<PasswordStrength, string> = {
-  weak: colors.error,
-  medium: colors.warning,
-  strong: colors.success,
-};
-
-const strengthSegments: Record<PasswordStrength, number> = {
-  weak: 1,
-  medium: 2,
-  strong: 3,
-};
-
 function PasswordStrengthBar({ password }: { password: string }) {
+  const { colors } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors }),
+    [colors],
+  );
+
+  const strengthColors: Record<PasswordStrength, string> = {
+    weak: colors.error,
+    medium: colors.warning,
+    strong: colors.success,
+  };
+
+  const strengthSegments: Record<PasswordStrength, number> = {
+    weak: 1,
+    medium: 2,
+    strong: 3,
+  };
+
   if (!password) {
     return <View testID="password-strength-bar" style={styles.strengthBarEmpty} />;
   }
@@ -85,6 +92,11 @@ function PasswordStrengthBar({ password }: { password: string }) {
 export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
   const router = useRouter();
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors }),
+    [colors],
+  );
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [passwordValue, setPasswordValue] = useState('');
   const [appleAvailable, setAppleAvailable] = useState(false);
@@ -217,43 +229,49 @@ export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, gap: 4 },
-  heading: { fontSize: 28, fontWeight: '700', color: colors.textPrimary, marginBottom: 4, marginTop: 12 },
-  subheading: { fontSize: 14, color: colors.textSecondary, marginBottom: 24 },
-  apiErrorBox: { backgroundColor: colors.errorLight, borderRadius: 10, padding: 12, marginBottom: 8 },
-  apiErrorText: { color: colors.error, fontSize: 14 },
-  fieldContainer: { marginBottom: 16 },
-  label: {
-    fontSize: 11, fontWeight: '600', color: colors.textSecondary,
-    letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 6,
-  },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 12,
-    // @ts-expect-error borderCurve
-    borderCurve: 'continuous',
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    fontSize: 15,
-    color: colors.textPrimary,
-    // @ts-expect-error boxShadow string form
-    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-  },
-  inputFocused: {
-    borderColor: colors.borderFocus,
-    // @ts-expect-error boxShadow string form
-    boxShadow: '0 0 0 3px rgba(45,107,228,0.12)',
-  },
-  inputError: { borderColor: colors.error },
-  errorText: { color: colors.error, fontSize: 13, marginTop: 4 },
-  strengthBarEmpty: { height: 4, marginTop: 6 },
-  strengthBarContainer: { flexDirection: 'row', gap: 4, marginTop: 6 },
-  strengthSegment: { flex: 1, height: 4, borderRadius: 2 },
-  appleButton: { width: '100%', height: 50, marginTop: 8 },
-  crossLink: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },
-  crossLinkText: { color: colors.textSecondary, fontSize: 14 },
-  crossLinkAction: { color: colors.primary, fontSize: 14, fontWeight: '500' },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+}
+
+function makeStyles({ colors }: StyleTokens) {
+  return StyleSheet.create({
+    container: { flex: 1, padding: 24, gap: 4 },
+    heading: { fontSize: 28, fontWeight: '700', color: colors.textPrimary, marginBottom: 4, marginTop: 12 },
+    subheading: { fontSize: 14, color: colors.textSecondary, marginBottom: 24 },
+    apiErrorBox: { backgroundColor: colors.errorLight, borderRadius: 10, padding: 12, marginBottom: 8 },
+    apiErrorText: { color: colors.error, fontSize: 14 },
+    fieldContainer: { marginBottom: 16 },
+    label: {
+      fontSize: 11, fontWeight: '600', color: colors.textSecondary,
+      letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 6,
+    },
+    input: {
+      backgroundColor: colors.surface,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderRadius: 12,
+      // @ts-expect-error borderCurve
+      borderCurve: 'continuous',
+      paddingHorizontal: 14,
+      paddingVertical: 13,
+      fontSize: 15,
+      color: colors.textPrimary,
+      // @ts-expect-error boxShadow string form
+      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+    },
+    inputFocused: {
+      borderColor: colors.borderFocus,
+      // @ts-expect-error boxShadow string form
+      boxShadow: '0 0 0 3px rgba(45,107,228,0.12)',
+    },
+    inputError: { borderColor: colors.error },
+    errorText: { color: colors.error, fontSize: 13, marginTop: 4 },
+    strengthBarEmpty: { height: 4, marginTop: 6 },
+    strengthBarContainer: { flexDirection: 'row', gap: 4, marginTop: 6 },
+    strengthSegment: { flex: 1, height: 4, borderRadius: 2 },
+    appleButton: { width: '100%', height: 50, marginTop: 8 },
+    crossLink: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },
+    crossLinkText: { color: colors.textSecondary, fontSize: 14 },
+    crossLinkAction: { color: colors.primary, fontSize: 14, fontWeight: '500' },
+  });
+}

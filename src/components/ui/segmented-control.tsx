@@ -5,7 +5,8 @@ import * as React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { haptics } from '@/lib/haptics';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 interface SegmentedControlProps {
   options: string[];
@@ -14,6 +15,12 @@ interface SegmentedControlProps {
 }
 
 export function SegmentedControl({ options, active, onSelect }: SegmentedControlProps) {
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius],
+  );
+
   return (
     <View style={styles.row}>
       {options.map((opt) => {
@@ -35,30 +42,38 @@ export function SegmentedControl({ options, active, onSelect }: SegmentedControl
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
-  },
-  btn: {
-    paddingVertical: 5,
-    paddingHorizontal: spacing.md,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  btnActive: {
-    backgroundColor: colors.primary,
-  },
-  btnText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  btnTextActive: {
-    color: colors.white,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      borderRadius: radius.sm,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: 'hidden',
+    },
+    btn: {
+      paddingVertical: 5,
+      paddingHorizontal: spacing.md,
+      backgroundColor: colors.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    btnActive: {
+      backgroundColor: colors.primary,
+    },
+    btnText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+    btnTextActive: {
+      color: colors.white,
+    },
+  });
+}

@@ -2,7 +2,8 @@ import * as React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { haptics } from '@/lib/haptics';
-import { colors, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 // ─── SettingsRow ──────────────────────────────────────────────────────────────
 // Replaces the Obytes SettingsItem (which used NativeWind className).
@@ -27,6 +28,8 @@ export function SettingsRow({
   destructive = false,
   isLast = false,
 }: SettingsRowProps) {
+  const { colors, spacing } = useTheme();
+  const styles = React.useMemo(() => makeStyles({ colors, spacing }), [colors, spacing]);
   const isPressable = onPress !== undefined;
 
   return (
@@ -59,40 +62,47 @@ export function SettingsRow({
 // Keep old name exported for backward compatibility.
 export { SettingsRow as SettingsItem };
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: 14,
-    backgroundColor: colors.surface,
-  },
-  rowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  rowPressed: {
-    backgroundColor: colors.gray50,
-  },
-  label: {
-    fontSize: 15,
-    color: colors.textPrimary,
-  },
-  labelDestructive: {
-    color: colors.error,
-  },
-  right: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  value: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  chevron: {
-    fontSize: 22,
-    color: colors.gray300,
-    lineHeight: 26,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+}
+
+function makeStyles({ colors, spacing }: StyleTokens) {
+  return StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.md,
+      paddingVertical: 14,
+      backgroundColor: colors.surface,
+    },
+    rowBorder: {
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    rowPressed: {
+      backgroundColor: colors.gray50,
+    },
+    label: {
+      fontSize: 15,
+      color: colors.textPrimary,
+    },
+    labelDestructive: {
+      color: colors.error,
+    },
+    right: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    value: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    chevron: {
+      fontSize: 22,
+      color: colors.gray300,
+      lineHeight: 26,
+    },
+  });
+}

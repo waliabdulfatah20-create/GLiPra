@@ -2,7 +2,8 @@ import * as React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { haptics } from '@/lib/haptics';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 interface PainLevelSliderProps {
   /** Integer 0–10 */
@@ -24,6 +25,12 @@ const VALUES = Array.from({ length: 11 }, (_, i) => i); // 0..10
  * dots instead of full-width emoji buttons.
  */
 export function PainLevelSlider({ value, onChange }: PainLevelSliderProps) {
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius],
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Pain Level</Text>
@@ -48,43 +55,51 @@ export function PainLevelSlider({ value, onChange }: PainLevelSliderProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-    gap: spacing.sm,
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    minWidth: 84,
-  },
-  dotsRow: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  dot: {
-    width: 9,
-    height: 9,
-    borderRadius: radius.full,
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-  },
-  dotActive: {
-    width: 12,
-    height: 12,
-    backgroundColor: colors.primary,
-  },
-  value: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    minWidth: 24,
-    textAlign: 'right',
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing.sm,
+      gap: spacing.sm,
+    },
+    label: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      minWidth: 84,
+    },
+    dotsRow: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    dot: {
+      width: 9,
+      height: 9,
+      borderRadius: radius.full,
+      backgroundColor: 'transparent',
+      borderWidth: 1.5,
+      borderColor: colors.primary,
+    },
+    dotActive: {
+      width: 12,
+      height: 12,
+      backgroundColor: colors.primary,
+    },
+    value: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      minWidth: 24,
+      textAlign: 'right',
+    },
+  });
+}

@@ -11,7 +11,8 @@ import { useTranslation } from 'react-i18next';
 
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import type { ContentCard } from '@/features/content-cards/data';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 export interface ContentCardSheetProps {
   card: ContentCard | null;
@@ -20,6 +21,11 @@ export interface ContentCardSheetProps {
 
 export function ContentCardSheet({ card, onClose }: ContentCardSheetProps) {
   const { t } = useTranslation();
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius],
+  );
 
   if (!card) return null;
 
@@ -85,83 +91,91 @@ export function ContentCardSheet({ card, onClose }: ContentCardSheetProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-  },
-  sheet: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: radius.xl,
-    borderTopRightRadius: radius.xl,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
-    paddingTop: spacing.sm,
-    maxHeight: '80%',
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: radius.full,
-    backgroundColor: colors.gray300,
-    alignSelf: 'center',
-    marginBottom: spacing.md,
-  },
-  scrollContent: {
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.md,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
 
-  // ── Badge ────────────────────────────────────────────────────────────────
-  badge: {
-    alignSelf: 'flex-start',
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    marginBottom: spacing.sm,
-  },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 0.8,
-  },
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    backdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.4)',
+    },
+    sheet: {
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: radius.xl,
+      borderTopRightRadius: radius.xl,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.xxl,
+      paddingTop: spacing.sm,
+      maxHeight: '80%',
+    },
+    handle: {
+      width: 40,
+      height: 4,
+      borderRadius: radius.full,
+      backgroundColor: colors.gray300,
+      alignSelf: 'center',
+      marginBottom: spacing.md,
+    },
+    scrollContent: {
+      paddingTop: spacing.xs,
+      paddingBottom: spacing.md,
+    },
 
-  // ── Title + body ─────────────────────────────────────────────────────────
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-    lineHeight: 28,
-  },
-  body: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    lineHeight: 24,
-    marginBottom: spacing.md,
-  },
+    // ── Badge ────────────────────────────────────────────────────────────────
+    badge: {
+      alignSelf: 'flex-start',
+      borderRadius: radius.sm,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 2,
+      marginBottom: spacing.sm,
+    },
+    badgeText: {
+      fontSize: 10,
+      fontWeight: '700',
+      letterSpacing: 0.8,
+    },
 
-  // ── Disclaimer ───────────────────────────────────────────────────────────
-  disclaimerText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 18,
-  },
+    // ── Title + body ─────────────────────────────────────────────────────────
+    title: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.md,
+      lineHeight: 28,
+    },
+    body: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      lineHeight: 24,
+      marginBottom: spacing.md,
+    },
 
-  // ── Close button ─────────────────────────────────────────────────────────
-  closeButton: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.md,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: spacing.md,
-  },
-  closeButtonPressed: {
-    backgroundColor: colors.primaryDark,
-  },
-  closeButtonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+    // ── Disclaimer ───────────────────────────────────────────────────────────
+    disclaimerText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 18,
+    },
+
+    // ── Close button ─────────────────────────────────────────────────────────
+    closeButton: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.md,
+      paddingVertical: 14,
+      alignItems: 'center',
+      marginTop: spacing.md,
+    },
+    closeButtonPressed: {
+      backgroundColor: colors.primaryDark,
+    },
+    closeButtonText: {
+      color: colors.white,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
+}

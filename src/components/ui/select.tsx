@@ -11,7 +11,7 @@ import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import colors from '@/components/ui/colors';
-import { colors as themeColors } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
 
 import { CaretDown } from '@/components/ui/icons';
 import { Modal, useModal } from './modal';
@@ -56,44 +56,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const optionStyles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 18,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: themeColors.border,
-  },
-  rowPressed: {
-    backgroundColor: themeColors.primaryLight,
-  },
-  label: {
-    fontSize: 16,
-    color: themeColors.textPrimary,
-  },
-  labelSelected: {
-    fontWeight: '600',
-    color: themeColors.primary,
-  },
-  // Non-selectable section header inside the dropdown list
-  headerRow: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: themeColors.border,
-  },
-  headerLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1,
-    color: themeColors.primary,
-    textTransform: 'uppercase',
-  },
-});
-
 const List = Platform.OS === 'web' ? FlashList : BottomSheetFlatList;
 
 export type OptionType = {
@@ -118,15 +80,27 @@ export function Options({ ref, options, onSelect, value, testID }: OptionsProps 
   // Headers count as shorter rows (~36px); selectable rows are ~70px each.
   const height = options.reduce((sum, o) => sum + (o.disabled ? 36 : 70), 0) + 100;
   const snapPoints = React.useMemo(() => [height], [height]);
-  const isDark = false;
+  const { colors: themeColors } = useTheme();
 
   const renderSelectItem = React.useCallback(
     ({ item }: { item: OptionType }) => {
       if (item.disabled) {
         // Non-selectable section header
         return (
-          <View style={optionStyles.headerRow}>
-            <Text style={optionStyles.headerLabel}>{item.label}</Text>
+          <View style={{
+            paddingHorizontal: 20,
+            paddingTop: 16,
+            paddingBottom: 8,
+            borderBottomWidth: StyleSheet.hairlineWidth,
+            borderBottomColor: themeColors.border,
+          }}>
+            <Text style={{
+              fontSize: 11,
+              fontWeight: '700',
+              letterSpacing: 1,
+              color: themeColors.primary,
+              textTransform: 'uppercase',
+            }}>{item.label}</Text>
           </View>
         );
       }
@@ -140,7 +114,7 @@ export function Options({ ref, options, onSelect, value, testID }: OptionsProps 
         />
       );
     },
-    [onSelect, value, testID],
+    [onSelect, value, testID, themeColors],
   );
 
   return (
@@ -149,7 +123,7 @@ export function Options({ ref, options, onSelect, value, testID }: OptionsProps 
       index={0}
       snapPoints={snapPoints}
       backgroundStyle={{
-        backgroundColor: isDark ? colors.neutral[800] : colors.white,
+        backgroundColor: colors.white,
       }}
     >
       <List
@@ -172,15 +146,27 @@ const Option = React.memo(
     selected?: boolean;
     label: string;
   }) => {
+    const { colors: themeColors } = useTheme();
     return (
       <Pressable
         style={({ pressed }) => [
-          optionStyles.row,
-          pressed && optionStyles.rowPressed,
+          {
+            flexDirection: 'row' as const,
+            alignItems: 'center' as const,
+            justifyContent: 'space-between' as const,
+            paddingHorizontal: 20,
+            paddingVertical: 18,
+            borderBottomWidth: StyleSheet.hairlineWidth,
+            borderBottomColor: themeColors.border,
+          },
+          pressed && { backgroundColor: themeColors.primaryLight },
         ]}
         {...props}
       >
-        <Text style={[optionStyles.label, selected && optionStyles.labelSelected]}>
+        <Text style={[
+          { fontSize: 16, color: themeColors.textPrimary },
+          selected && { fontWeight: '600', color: themeColors.primary },
+        ]}>
           {label}
         </Text>
         {selected && <Check stroke={themeColors.primary} />}

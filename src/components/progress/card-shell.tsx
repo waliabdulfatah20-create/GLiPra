@@ -10,7 +10,8 @@
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 interface CardShellProps {
   label: string;
@@ -19,6 +20,12 @@ interface CardShellProps {
 }
 
 export function CardShell({ label, accentColor, children }: CardShellProps) {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
+
   return (
     <View style={[styles.card, { borderTopColor: accentColor }]}>
       <Text style={styles.label}>{label}</Text>
@@ -27,19 +34,28 @@ export function CardShell({ label, accentColor, children }: CardShellProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    borderTopWidth: 3,
-    ...shadows.sm,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    letterSpacing: 1,
-    marginBottom: spacing.sm,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
+
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      borderTopWidth: 3,
+      ...shadows.sm,
+    },
+    label: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      letterSpacing: 1,
+      marginBottom: spacing.sm,
+    },
+  });
+}

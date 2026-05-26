@@ -7,7 +7,8 @@ import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Circle, Svg } from 'react-native-svg';
 
-import { colors } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 interface Props {
   consumed: number;
@@ -18,6 +19,12 @@ const SIZE = 44;
 const STROKE = 4;
 
 export function NutritionHeaderRing({ consumed, floor }: Props) {
+  const { colors } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors }),
+    [colors],
+  );
+
   const r = (SIZE - STROKE) / 2;
   const circumference = 2 * Math.PI * r;
   const progress = floor > 0 ? Math.min(1, consumed / floor) : 0;
@@ -58,20 +65,26 @@ export function NutritionHeaderRing({ consumed, floor }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    width: SIZE,
-    height: SIZE,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  center: {
-    position: 'absolute',
-    alignItems: 'center',
-  },
-  label: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+}
+
+function makeStyles({ colors }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      width: SIZE,
+      height: SIZE,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    center: {
+      position: 'absolute',
+      alignItems: 'center',
+    },
+    label: {
+      fontSize: 10,
+      fontWeight: '700',
+      color: colors.primary,
+    },
+  });
+}

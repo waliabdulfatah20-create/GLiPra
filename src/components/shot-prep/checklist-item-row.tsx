@@ -2,7 +2,8 @@ import * as React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { ChecklistItem } from '@/features/shot-prep/checklist-data';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 interface ChecklistItemRowProps {
   item: ChecklistItem;
@@ -15,6 +16,12 @@ export function ChecklistItemRow({
   isChecked,
   onToggle,
 }: ChecklistItemRowProps) {
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius],
+  );
+
   return (
     <Pressable
       style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
@@ -61,85 +68,93 @@ export function ChecklistItemRow({
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  rowPressed: {
-    opacity: 0.7,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
 
-  // Checkbox
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: radius.full,
-    borderWidth: 2,
-    borderColor: colors.phaseInjectionDay,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.md,
-    marginTop: 1,
-    flexShrink: 0,
-  },
-  checkboxChecked: {
-    backgroundColor: colors.phaseInjectionDay,
-    borderColor: colors.phaseInjectionDay,
-  },
-  checkmark: {
-    color: colors.white,
-    fontSize: 13,
-    fontWeight: '700',
-    lineHeight: 16,
-  },
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      paddingVertical: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    rowPressed: {
+      opacity: 0.7,
+    },
 
-  // Content area
-  content: {
-    flex: 1,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginBottom: spacing.xs,
-  },
+    // Checkbox
+    checkbox: {
+      width: 24,
+      height: 24,
+      borderRadius: radius.full,
+      borderWidth: 2,
+      borderColor: colors.phaseInjectionDay,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.md,
+      marginTop: 1,
+      flexShrink: 0,
+    },
+    checkboxChecked: {
+      backgroundColor: colors.phaseInjectionDay,
+      borderColor: colors.phaseInjectionDay,
+    },
+    checkmark: {
+      color: colors.white,
+      fontSize: 13,
+      fontWeight: '700',
+      lineHeight: 16,
+    },
 
-  // Pharmacist note pill badge
-  pharmacistBadge: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-  },
-  pharmacistBadgeText: {
-    color: colors.white,
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 0.3,
-  },
+    // Content area
+    content: {
+      flex: 1,
+    },
+    titleRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      gap: spacing.xs,
+      marginBottom: spacing.xs,
+    },
 
-  // Title
-  title: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    flexShrink: 1,
-  },
-  titleChecked: {
-    textDecorationLine: 'line-through',
-    color: colors.textDisabled,
-    fontWeight: '400',
-  },
+    // Pharmacist note pill badge
+    pharmacistBadge: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 2,
+    },
+    pharmacistBadgeText: {
+      color: colors.white,
+      fontSize: 10,
+      fontWeight: '700',
+      letterSpacing: 0.3,
+    },
 
-  // Detail
-  detail: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    lineHeight: 20,
-  },
-});
+    // Title
+    title: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      flexShrink: 1,
+    },
+    titleChecked: {
+      textDecorationLine: 'line-through',
+      color: colors.textDisabled,
+      fontWeight: '400',
+    },
+
+    // Detail
+    detail: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+  });
+}

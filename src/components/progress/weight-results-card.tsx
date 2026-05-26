@@ -14,7 +14,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { CardShell } from './card-shell';
 import type { WeightLogEntry } from '@/features/weight/api';
 import { useWeightUnit, kgToLbs } from '@/lib/unit-preference';
-import { colors, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 interface WeightResultsCardProps {
   /** All weight logs for the current range (or all-time). */
@@ -33,6 +34,11 @@ interface MetricCellProps {
 }
 
 function MetricCell({ label, value, unit, dimmed = false }: MetricCellProps) {
+  const { colors, spacing } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing }),
+    [colors, spacing],
+  );
   return (
     <View style={styles.cell}>
       <View style={styles.cellValueRow}>
@@ -46,6 +52,11 @@ function MetricCell({ label, value, unit, dimmed = false }: MetricCellProps) {
 
 export function WeightResultsCard({ logs, goalWeightKg, heightCm }: WeightResultsCardProps) {
   const { t } = useTranslation();
+  const { colors, spacing } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing }),
+    [colors, spacing],
+  );
   const { unit: weightUnit } = useWeightUnit();
 
   if (logs.length < 2) {
@@ -129,46 +140,53 @@ export function WeightResultsCard({ logs, goalWeightKg, heightCm }: WeightResult
   );
 }
 
-const styles = StyleSheet.create({
-  empty: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    paddingVertical: spacing.md,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  cell: {
-    width: '50%',
-    paddingVertical: spacing.sm,
-    paddingRight: spacing.sm,
-  },
-  cellValueRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 3,
-  },
-  cellValue: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    letterSpacing: -0.5,
-  },
-  cellValueDimmed: {
-    color: colors.textDisabled,
-  },
-  cellUnit: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  cellLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    letterSpacing: 0.4,
-    marginTop: 2,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+}
+
+function makeStyles({ colors, spacing }: StyleTokens) {
+  return StyleSheet.create({
+    empty: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      paddingVertical: spacing.md,
+    },
+    grid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    cell: {
+      width: '50%',
+      paddingVertical: spacing.sm,
+      paddingRight: spacing.sm,
+    },
+    cellValueRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: 3,
+    },
+    cellValue: {
+      fontSize: 22,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      letterSpacing: -0.5,
+    },
+    cellValueDimmed: {
+      color: colors.textDisabled,
+    },
+    cellUnit: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+    cellLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.4,
+      marginTop: 2,
+    },
+  });
+}

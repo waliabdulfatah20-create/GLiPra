@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 interface StepProgressProps {
   current: number; // 1-based
@@ -9,6 +10,8 @@ interface StepProgressProps {
 }
 
 export function StepProgress({ current, total }: StepProgressProps) {
+  const { colors, spacing } = useTheme();
+  const styles = React.useMemo(() => makeStyles({ colors, spacing }), [colors, spacing]);
   const progress = current / total;
 
   return (
@@ -25,32 +28,39 @@ export function StepProgress({ current, total }: StepProgressProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  row: {
-    marginBottom: spacing.xs,
-  },
-  label: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    fontWeight: '500',
-  },
-  track: {
-    height: 4,
-    backgroundColor: colors.gray200,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  fill: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: 2,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+}
+
+function makeStyles({ colors, spacing }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.sm,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    row: {
+      marginBottom: spacing.xs,
+    },
+    label: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      fontWeight: '500',
+    },
+    track: {
+      height: 4,
+      backgroundColor: colors.gray200,
+      borderRadius: 2,
+      overflow: 'hidden',
+    },
+    fill: {
+      height: '100%',
+      backgroundColor: colors.primary,
+      borderRadius: 2,
+    },
+  });
+}

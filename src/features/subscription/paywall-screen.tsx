@@ -21,7 +21,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 // ---------------------------------------------------------------------------
 // RevenueCat availability guard (same pattern as use-subscription)
@@ -79,6 +80,11 @@ export interface PaywallScreenProps {
 // ---------------------------------------------------------------------------
 
 export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
 
   const handlePurchase = useCallback(
@@ -276,6 +282,11 @@ function PurchaseButton({
   onPress,
   style,
 }: PurchaseButtonProps) {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
   const isPrimary = style === 'primary';
 
   return (
@@ -331,193 +342,202 @@ function PurchaseButton({
 // Styles
 // ---------------------------------------------------------------------------
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-    gap: spacing.md,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  // Header
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.xs,
-  },
-  dismissPlaceholder: {
-    width: 32,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    textAlign: 'center',
-    flex: 1,
-  },
-  dismissButton: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.full,
-    backgroundColor: colors.gray100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dismissText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+      gap: spacing.md,
+    },
 
-  // Value card
-  valueCard: {
-    backgroundColor: colors.primaryLight,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.primary + '40',
-    gap: spacing.sm,
-    alignItems: 'center',
-  },
-  featureHighlight: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.primaryDark,
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  pharmacistBadge: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.primary,
-    textAlign: 'center',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
+    // Header
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: spacing.xs,
+    },
+    dismissPlaceholder: {
+      width: 32,
+    },
+    headerTitle: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      textAlign: 'center',
+      flex: 1,
+    },
+    dismissButton: {
+      width: 32,
+      height: 32,
+      borderRadius: radius.full,
+      backgroundColor: colors.gray100,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    dismissText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      fontWeight: '600',
+    },
 
-  // Benefits
-  benefitsCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    gap: spacing.sm,
-    ...shadows.sm,
-  },
-  benefitsTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: spacing.xs / 2,
-  },
-  benefitRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.sm,
-  },
-  benefitCheck: {
-    fontSize: 14,
-    color: colors.success,
-    fontWeight: '700',
-    lineHeight: 20,
-  },
-  benefitText: {
-    fontSize: 14,
-    color: colors.textPrimary,
-    lineHeight: 20,
-    flex: 1,
-  },
+    // Value card
+    valueCard: {
+      backgroundColor: colors.primaryLight,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.primary + '40',
+      gap: spacing.sm,
+      alignItems: 'center',
+    },
+    featureHighlight: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: colors.primaryDark,
+      textAlign: 'center',
+      lineHeight: 24,
+    },
+    pharmacistBadge: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.primary,
+      textAlign: 'center',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
 
-  // Purchase buttons
-  purchaseButton: {
-    borderRadius: radius.lg,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 56,
-    ...shadows.sm,
-  },
-  purchaseButtonPrimary: {
-    backgroundColor: colors.primary,
-  },
-  purchaseButtonSecondary: {
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.primary,
-  },
-  purchaseButtonDisabled: {
-    backgroundColor: colors.gray200,
-    borderColor: colors.gray200,
-    shadowOpacity: 0,
-    elevation: 0,
-  },
-  purchaseButtonPressed: {
-    opacity: 0.85,
-  },
-  purchaseButtonContent: {
-    alignItems: 'center',
-    gap: 2,
-  },
-  purchaseButtonLabel: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  purchaseButtonLabelPrimary: {
-    color: colors.white,
-  },
-  purchaseButtonLabelSecondary: {
-    color: colors.primary,
-  },
-  purchaseButtonLabelDisabled: {
-    color: colors.textDisabled,
-  },
-  purchaseButtonSublabel: {
-    fontSize: 12,
-    color: colors.successLight,
-    fontWeight: '500',
-  },
+    // Benefits
+    benefitsCard: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      gap: spacing.sm,
+      ...shadows.sm,
+    },
+    benefitsTitle: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginBottom: spacing.xs / 2,
+    },
+    benefitRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: spacing.sm,
+    },
+    benefitCheck: {
+      fontSize: 14,
+      color: colors.success,
+      fontWeight: '700',
+      lineHeight: 20,
+    },
+    benefitText: {
+      fontSize: 14,
+      color: colors.textPrimary,
+      lineHeight: 20,
+      flex: 1,
+    },
 
-  // Stub notice
-  stubNotice: {
-    backgroundColor: colors.warningLight,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.warning + '60',
-  },
-  stubNoticeText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    lineHeight: 18,
-    textAlign: 'center',
-  },
+    // Purchase buttons
+    purchaseButton: {
+      borderRadius: radius.lg,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: 56,
+      ...shadows.sm,
+    },
+    purchaseButtonPrimary: {
+      backgroundColor: colors.primary,
+    },
+    purchaseButtonSecondary: {
+      backgroundColor: colors.surface,
+      borderWidth: 2,
+      borderColor: colors.primary,
+    },
+    purchaseButtonDisabled: {
+      backgroundColor: colors.gray200,
+      borderColor: colors.gray200,
+      shadowOpacity: 0,
+      elevation: 0,
+    },
+    purchaseButtonPressed: {
+      opacity: 0.85,
+    },
+    purchaseButtonContent: {
+      alignItems: 'center',
+      gap: 2,
+    },
+    purchaseButtonLabel: {
+      fontSize: 16,
+      fontWeight: '700',
+    },
+    purchaseButtonLabelPrimary: {
+      color: colors.white,
+    },
+    purchaseButtonLabelSecondary: {
+      color: colors.primary,
+    },
+    purchaseButtonLabelDisabled: {
+      color: colors.textDisabled,
+    },
+    purchaseButtonSublabel: {
+      fontSize: 12,
+      color: colors.successLight,
+      fontWeight: '500',
+    },
 
-  // Text links
-  textLink: {
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-  },
-  textLinkPressed: {
-    opacity: 0.6,
-  },
-  textLinkDisabled: {
-    opacity: 0.4,
-  },
-  textLinkLabel: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  textLinkLabelDisabled: {
-    color: colors.textDisabled,
-  },
-  maybeLaterText: {
-    color: colors.textSecondary,
-  },
-});
+    // Stub notice
+    stubNotice: {
+      backgroundColor: colors.warningLight,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.warning + '60',
+    },
+    stubNoticeText: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      lineHeight: 18,
+      textAlign: 'center',
+    },
+
+    // Text links
+    textLink: {
+      alignItems: 'center',
+      paddingVertical: spacing.sm,
+    },
+    textLinkPressed: {
+      opacity: 0.6,
+    },
+    textLinkDisabled: {
+      opacity: 0.4,
+    },
+    textLinkLabel: {
+      fontSize: 14,
+      color: colors.primary,
+      fontWeight: '500',
+    },
+    textLinkLabelDisabled: {
+      color: colors.textDisabled,
+    },
+    maybeLaterText: {
+      color: colors.textSecondary,
+    },
+  });
+}

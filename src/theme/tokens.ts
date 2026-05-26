@@ -60,6 +60,7 @@ export interface GlipraColorTokens {
   escalationText: string;
   disclaimerBg: string;
   disclaimerBorder: string;
+  disclaimerText: string;
 }
 
 export interface GlipraShadowTokens {
@@ -176,6 +177,7 @@ export const lightTokens: GlipraTokens = {
     escalationText: '#991b1b',
     disclaimerBg: '#fff7ed',
     disclaimerBorder: '#fed7aa',
+    disclaimerText: '#9a3412',
   },
 };
 
@@ -256,5 +258,6 @@ export const darkTokens: GlipraTokens = {
     escalationText: '#fca5a5',
     disclaimerBg: 'rgba(251, 191, 36, 0.12)',
     disclaimerBorder: '#fbbf24',
+    disclaimerText: '#fdba74',
   },
 };

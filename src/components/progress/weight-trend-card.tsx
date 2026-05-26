@@ -13,7 +13,8 @@ import { EwmaChart } from '@/components/weight/ewma-chart';
 import { useWeightLogs } from '@/features/weight/hooks';
 import { useInjectionAdherence } from '@/features/progress/hooks';
 import { tipI18nKey } from '@/features/progress/pharmacist-tips';
-import { colors, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 import { CardShell } from './card-shell';
 import { PharmacistTip } from './pharmacist-tip';
@@ -25,6 +26,11 @@ interface WeightTrendCardProps {
 
 export function WeightTrendCard({ days, width }: WeightTrendCardProps) {
   const { t } = useTranslation();
+  const { colors, spacing } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing }),
+    [colors, spacing],
+  );
   const { logs, isLoading } = useWeightLogs(days);
   const { windowDates: injectionDates } = useInjectionAdherence(days);
 
@@ -46,15 +52,22 @@ export function WeightTrendCard({ days, width }: WeightTrendCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  placeholder: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
-  },
-  placeholderText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+}
+
+function makeStyles({ colors, spacing }: StyleTokens) {
+  return StyleSheet.create({
+    placeholder: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: spacing.lg,
+    },
+    placeholderText: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+  });
+}

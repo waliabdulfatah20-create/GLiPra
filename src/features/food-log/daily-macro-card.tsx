@@ -8,12 +8,18 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useTodayProfile } from '@/features/today/hooks';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 import { useDailyMacros } from './hooks';
 
 export function DailyMacroCard() {
   const { t } = useTranslation();
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
   const {
     protein,
     carbs,
@@ -152,141 +158,150 @@ export function DailyMacroCard() {
   );
 }
 
-const styles = StyleSheet.create({
-  wrapper: {
-    marginHorizontal: spacing.md,
-    marginBottom: spacing.md,
-  },
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    marginBottom: spacing.sm,
-    marginLeft: 2,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    ...shadows.sm,
-  },
-  primaryRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.md,
-  },
-  proteinBlock: {
-    flex: 1,
-  },
-  primaryLabelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  primaryMetricLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    letterSpacing: 0.3,
-  },
-  primaryValue: {
-    fontSize: 22,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-  },
-  proteinFloorText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.textSecondary,
-  },
-  progressTrack: {
-    marginTop: 6,
-    height: 5,
-    backgroundColor: colors.gray100,
-    borderRadius: radius.full,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: radius.full,
-  },
-  caloriesBlock: {
-    alignItems: 'flex-end',
-    paddingTop: 2,
-  },
-  caloriesValue: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    letterSpacing: -0.5,
-  },
-  caloriesUnit: {
-    fontSize: 11,
-    color: colors.textSecondary,
-    marginTop: 1,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginVertical: spacing.sm,
-  },
-  secondaryRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-  },
-  secondaryBlock: {
-    alignItems: 'center',
-    minWidth: 52,
-  },
-  secondaryValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  secondaryLabel: {
-    fontSize: 11,
-    color: colors.textSecondary,
-    marginTop: 1,
-  },
-  glpWatchSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.sm,
-  },
-  glpWatchLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.primary,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-  },
-  glpWatchNote: {
-    fontSize: 11,
-    color: colors.textDisabled,
-    fontStyle: 'italic',
-  },
-  microRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
-  },
-  microBlock: {
-    alignItems: 'center',
-    minWidth: 60,
-  },
-  microValue: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  microUnit: {
-    fontSize: 10,
-    color: colors.textSecondary,
-    marginTop: 1,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
+
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    wrapper: {
+      marginHorizontal: spacing.md,
+      marginBottom: spacing.md,
+    },
+    sectionLabel: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+      marginBottom: spacing.sm,
+      marginLeft: 2,
+    },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+      ...shadows.sm,
+    },
+    primaryRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: spacing.md,
+    },
+    proteinBlock: {
+      flex: 1,
+    },
+    primaryLabelRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 4,
+    },
+    primaryMetricLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.3,
+    },
+    primaryValue: {
+      fontSize: 22,
+      fontWeight: '800',
+      letterSpacing: -0.5,
+    },
+    proteinFloorText: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.textSecondary,
+    },
+    progressTrack: {
+      marginTop: 6,
+      height: 5,
+      backgroundColor: colors.gray100,
+      borderRadius: radius.full,
+      overflow: 'hidden',
+    },
+    progressFill: {
+      height: '100%',
+      borderRadius: radius.full,
+    },
+    caloriesBlock: {
+      alignItems: 'flex-end',
+      paddingTop: 2,
+    },
+    caloriesValue: {
+      fontSize: 22,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      letterSpacing: -0.5,
+    },
+    caloriesUnit: {
+      fontSize: 11,
+      color: colors.textSecondary,
+      marginTop: 1,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.border,
+      marginVertical: spacing.sm,
+    },
+    secondaryRow: {
+      flexDirection: 'row',
+      gap: spacing.md,
+    },
+    secondaryBlock: {
+      alignItems: 'center',
+      minWidth: 52,
+    },
+    secondaryValue: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    secondaryLabel: {
+      fontSize: 11,
+      color: colors.textSecondary,
+      marginTop: 1,
+    },
+    glpWatchSection: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: spacing.sm,
+    },
+    glpWatchLabel: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: colors.primary,
+      letterSpacing: 0.8,
+      textTransform: 'uppercase',
+    },
+    glpWatchNote: {
+      fontSize: 11,
+      color: colors.textDisabled,
+      fontStyle: 'italic',
+    },
+    microRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.md,
+    },
+    microBlock: {
+      alignItems: 'center',
+      minWidth: 60,
+    },
+    microValue: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    microUnit: {
+      fontSize: 10,
+      color: colors.textSecondary,
+      marginTop: 1,
+    },
+  });
+}

@@ -10,7 +10,8 @@ import {
 
 import { WeightUnit, kgToLbs, lbsToKg } from '@/lib/unit-preference';
 import { haptics } from '@/lib/haptics';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 export interface WeightEntryFormProps {
   onSubmit: (entry: { weightKg: number; notes?: string }) => void;
@@ -30,6 +31,11 @@ export function WeightEntryForm({
   lastWeightKg,
   weightUnit = 'kg',
 }: WeightEntryFormProps) {
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius],
+  );
   const [weightInput, setWeightInput] = React.useState('');
   const [notes, setNotes] = React.useState('');
 
@@ -110,76 +116,84 @@ export function WeightEntryForm({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    gap: spacing.sm,
-  },
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    letterSpacing: 0.6,
-    marginBottom: spacing.xs,
-  },
-  row: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    alignItems: 'center',
-  },
-  inputWrapper: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    height: 44,
-    backgroundColor: colors.gray50,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: colors.textPrimary,
-    height: 44,
-  },
-  unit: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginLeft: spacing.xs,
-  },
-  button: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    minWidth: 100,
-  },
-  buttonDisabled: {
-    backgroundColor: colors.gray300,
-  },
-  buttonPressed: {
-    backgroundColor: colors.primaryDark,
-  },
-  buttonText: {
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  notesInput: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    fontSize: 14,
-    color: colors.textPrimary,
-    backgroundColor: colors.gray50,
-    minHeight: 40,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      gap: spacing.sm,
+    },
+    sectionLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.6,
+      marginBottom: spacing.xs,
+    },
+    row: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+      alignItems: 'center',
+    },
+    inputWrapper: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      height: 44,
+      backgroundColor: colors.gray50,
+    },
+    input: {
+      flex: 1,
+      fontSize: 16,
+      color: colors.textPrimary,
+      height: 44,
+    },
+    unit: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginLeft: spacing.xs,
+    },
+    button: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      height: 44,
+      justifyContent: 'center',
+      alignItems: 'center',
+      minWidth: 100,
+    },
+    buttonDisabled: {
+      backgroundColor: colors.gray300,
+    },
+    buttonPressed: {
+      backgroundColor: colors.primaryDark,
+    },
+    buttonText: {
+      color: colors.white,
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    notesInput: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      fontSize: 14,
+      color: colors.textPrimary,
+      backgroundColor: colors.gray50,
+      minHeight: 40,
+    },
+  });
+}

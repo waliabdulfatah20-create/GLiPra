@@ -2,7 +2,8 @@ import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Circle, Svg } from 'react-native-svg';
 
-import { colors } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 interface ProteinRingProps {
   proteinConsumedG: number;
@@ -10,17 +11,23 @@ interface ProteinRingProps {
   size?: number;
 }
 
-function arcColor(progress: number): string {
-  if (progress >= 0.9) return colors.proteinGood;
-  if (progress >= 0.6) return colors.proteinMid;
-  return colors.proteinLow;
-}
-
 export function ProteinRing({
   proteinConsumedG,
   proteinFloorG,
   size = 140,
 }: ProteinRingProps) {
+  const { colors } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors }),
+    [colors],
+  );
+
+  function arcColor(progress: number): string {
+    if (progress >= 0.9) return colors.proteinGood;
+    if (progress >= 0.6) return colors.proteinMid;
+    return colors.proteinLow;
+  }
+
   const progress = proteinFloorG > 0 ? Math.min(1, proteinConsumedG / proteinFloorG) : 0;
   const strokeWidth = 10;
   const radius = (size - strokeWidth) / 2;
@@ -66,22 +73,28 @@ export function ProteinRing({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  center: {
-    position: 'absolute',
-    alignItems: 'center',
-  },
-  consumed: {
-    fontSize: 22,
-    fontWeight: '800',
-  },
-  floor: {
-    fontSize: 11,
-    color: colors.textSecondary,
-    marginTop: 1,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+}
+
+function makeStyles({ colors }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    center: {
+      position: 'absolute',
+      alignItems: 'center',
+    },
+    consumed: {
+      fontSize: 22,
+      fontWeight: '800',
+    },
+    floor: {
+      fontSize: 11,
+      color: colors.textSecondary,
+      marginTop: 1,
+    },
+  });
+}

@@ -12,7 +12,8 @@ import {
   View,
 } from 'react-native';
 
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import type { ManualFoodEntry } from '@/features/food-log/types';
 
 export interface ManualEntryFormProps {
@@ -37,6 +38,11 @@ const INITIAL_STATE: FormState = {
 };
 
 export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
   const [form, setForm] = React.useState<FormState>(INITIAL_STATE);
   const [focusedField, setFocusedField] = React.useState<string | null>(null);
 
@@ -181,65 +187,74 @@ export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginHorizontal: spacing.md,
-    marginTop: spacing.md,
-    ...shadows.sm,
-  },
-  fieldGroup: {
-    marginBottom: spacing.md,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
-    letterSpacing: 0.2,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 10,
-    fontSize: 16,
-    color: colors.textPrimary,
-    backgroundColor: colors.gray50,
-  },
-  inputFocused: {
-    borderColor: colors.borderFocus,
-    backgroundColor: colors.white,
-  },
-  numericRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  numericField: {
-    flex: 1,
-  },
-  numericFieldRequired: {
-    flex: 1.2,
-  },
-  submitButton: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.md,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: spacing.xs,
-  },
-  submitButtonEmpty: {
-    backgroundColor: colors.gray200,
-  },
-  submitButtonPressed: {
-    backgroundColor: colors.primaryDark,
-  },
-  submitButtonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
+
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      marginHorizontal: spacing.md,
+      marginTop: spacing.md,
+      ...shadows.sm,
+    },
+    fieldGroup: {
+      marginBottom: spacing.md,
+    },
+    label: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      marginBottom: spacing.xs,
+      letterSpacing: 0.2,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      paddingVertical: 10,
+      fontSize: 16,
+      color: colors.textPrimary,
+      backgroundColor: colors.gray50,
+    },
+    inputFocused: {
+      borderColor: colors.borderFocus,
+      backgroundColor: colors.white,
+    },
+    numericRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    numericField: {
+      flex: 1,
+    },
+    numericFieldRequired: {
+      flex: 1.2,
+    },
+    submitButton: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.md,
+      paddingVertical: 14,
+      alignItems: 'center',
+      marginTop: spacing.xs,
+    },
+    submitButtonEmpty: {
+      backgroundColor: colors.gray200,
+    },
+    submitButtonPressed: {
+      backgroundColor: colors.primaryDark,
+    },
+    submitButtonText: {
+      color: colors.white,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
+}

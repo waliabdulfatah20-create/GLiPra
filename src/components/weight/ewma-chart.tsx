@@ -3,7 +3,8 @@ import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Circle, Line, Polyline, Svg, Text as SvgText } from 'react-native-svg';
 
-import { colors, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 export interface EwmaChartProps {
   logs: Array<{
@@ -24,6 +25,12 @@ const PADDING = { top: 16, right: 8, bottom: 28, left: 40 };
  * Built with react-native-svg primitives — no third-party charting library.
  */
 export function EwmaChart({ logs, width, height, injectionDates }: EwmaChartProps) {
+  const { colors, spacing } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing }),
+    [colors, spacing],
+  );
+
   if (logs.length < 2) {
     return (
       <View style={[styles.empty, { width, height }]}>
@@ -161,16 +168,23 @@ export function EwmaChart({ logs, width, height, injectionDates }: EwmaChartProp
   );
 }
 
-const styles = StyleSheet.create({
-  empty: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface,
-  },
-  emptyText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    paddingHorizontal: spacing.lg,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+}
+
+function makeStyles({ colors, spacing }: StyleTokens) {
+  return StyleSheet.create({
+    empty: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.surface,
+    },
+    emptyText: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      paddingHorizontal: spacing.lg,
+    },
+  });
+}

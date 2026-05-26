@@ -7,7 +7,8 @@ import * as React from 'react';
 import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
 import { format } from 'date-fns';
 
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import type { Milestone } from '@/features/journey-cards/milestones';
 
 // ---------------------------------------------------------------------------
@@ -25,6 +26,11 @@ interface MilestoneCardProps {
 // ---------------------------------------------------------------------------
 
 export function MilestoneCard({ milestone, unlockedAt, isNew = false }: MilestoneCardProps) {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
   const tintBg = `${milestone.accentColor}15`;
   const unlockedDateStr = format(unlockedAt, 'MMM d, yyyy');
 
@@ -69,6 +75,12 @@ interface LockedMilestoneCardProps {
 }
 
 export function LockedMilestoneCard({ title }: LockedMilestoneCardProps) {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
+
   return (
     <View style={styles.lockedCard}>
       <Text style={styles.lockedEmoji}>🔒</Text>
@@ -81,101 +93,110 @@ export function LockedMilestoneCard({ title }: LockedMilestoneCardProps) {
 // Styles
 // ---------------------------------------------------------------------------
 
-const styles = StyleSheet.create({
-  card: {
-    width: 280,
-    minHeight: 180,
-    borderRadius: radius.xl,
-    borderLeftWidth: 4,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-    position: 'relative',
-    ...shadows.md,
-  },
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
 
-  // NEW badge
-  newBadge: {
-    position: 'absolute',
-    top: spacing.sm,
-    right: spacing.sm,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
-  },
-  newBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.white,
-    letterSpacing: 0.5,
-  },
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    card: {
+      width: 280,
+      minHeight: 180,
+      borderRadius: radius.xl,
+      borderLeftWidth: 4,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+      position: 'relative',
+      ...shadows.md,
+    },
 
-  // Content
-  emoji: {
-    fontSize: 48,
-    marginTop: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    textAlign: 'center',
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 18,
-    marginBottom: spacing.md,
-  },
-  unlockedDate: {
-    fontSize: 11,
-    color: colors.textDisabled,
-    textAlign: 'center',
-    marginTop: 'auto',
-    paddingTop: spacing.xs,
-  },
+    // NEW badge
+    newBadge: {
+      position: 'absolute',
+      top: spacing.sm,
+      right: spacing.sm,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 3,
+    },
+    newBadgeText: {
+      fontSize: 10,
+      fontWeight: '700',
+      color: colors.white,
+      letterSpacing: 0.5,
+    },
 
-  // Share button
-  shareBtn: {
-    marginTop: spacing.sm,
-    backgroundColor: colors.primaryLight,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs + 2,
-  },
-  shareBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.primary,
-    textAlign: 'center',
-  },
+    // Content
+    emoji: {
+      fontSize: 48,
+      marginTop: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      textAlign: 'center',
+      marginBottom: spacing.xs,
+    },
+    subtitle: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 18,
+      marginBottom: spacing.md,
+    },
+    unlockedDate: {
+      fontSize: 11,
+      color: colors.textDisabled,
+      textAlign: 'center',
+      marginTop: 'auto',
+      paddingTop: spacing.xs,
+    },
 
-  // Locked card
-  lockedCard: {
-    width: 280,
-    minHeight: 180,
-    borderRadius: radius.xl,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.gray300,
-    backgroundColor: colors.gray100,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    opacity: 0.6,
-    ...shadows.sm,
-  },
-  lockedEmoji: {
-    fontSize: 36,
-    marginBottom: spacing.sm,
-  },
-  lockedTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-});
+    // Share button
+    shareBtn: {
+      marginTop: spacing.sm,
+      backgroundColor: colors.primaryLight,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs + 2,
+    },
+    shareBtnText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.primary,
+      textAlign: 'center',
+    },
+
+    // Locked card
+    lockedCard: {
+      width: 280,
+      minHeight: 180,
+      borderRadius: radius.xl,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.gray300,
+      backgroundColor: colors.gray100,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+      opacity: 0.6,
+      ...shadows.sm,
+    },
+    lockedEmoji: {
+      fontSize: 36,
+      marginBottom: spacing.sm,
+    },
+    lockedTitle: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+  });
+}

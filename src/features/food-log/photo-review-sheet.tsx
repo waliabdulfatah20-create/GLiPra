@@ -21,7 +21,8 @@ import {
   View,
 } from 'react-native';
 
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 import { useConfirmPhotoLog, useUserFoodDefault } from './hooks';
 import type { RecognitionResult } from './photo-recognition';
@@ -108,6 +109,12 @@ function parseEntry(form: FormState): PhotoFoodEntry {
 // ---------------------------------------------------------------------------
 
 export function PhotoReviewSheet({ result, onClose }: PhotoReviewSheetProps) {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
+
   // Track the original AI name separately — used to detect corrections
   const originalAiName = React.useRef<string>('');
   const [form, setForm] = React.useState<FormState | null>(null);
@@ -342,7 +349,18 @@ export function PhotoReviewSheet({ result, onClose }: PhotoReviewSheetProps) {
 // ---------------------------------------------------------------------------
 
 function SectionHeader({ title }: { title: string }) {
-  return <Text style={styles.sectionHeader}>{title}</Text>;
+  const { colors, spacing } = useTheme();
+  return (
+    <Text style={{
+      fontSize: 11,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      letterSpacing: 0.8,
+      textTransform: 'uppercase',
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+    }}>{title}</Text>
+  );
 }
 
 interface FieldRowProps {
@@ -352,10 +370,18 @@ interface FieldRowProps {
 }
 
 function FieldRow({ label, children }: FieldRowProps) {
+  const { colors, spacing } = useTheme();
   return (
-    <View style={styles.fieldRow}>
-      <Text style={styles.fieldLabel}>{label}</Text>
-      <View style={styles.fieldInput}>{children}</View>
+    <View style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      gap: spacing.sm,
+    }}>
+      <Text style={{ fontSize: 14, color: colors.textSecondary, width: 80 }}>{label}</Text>
+      <View style={{ flex: 1 }}>{children}</View>
     </View>
   );
 }
@@ -369,10 +395,26 @@ interface MacroInputProps {
 }
 
 function MacroInput({ label, unit, value, onChangeText, highlight = false }: MacroInputProps) {
+  const { colors, spacing, radius } = useTheme();
   return (
-    <View style={[styles.macroInputBlock, highlight && styles.macroInputHighlight]}>
+    <View style={[
+      {
+        width: '30%',
+        minWidth: 80,
+        backgroundColor: colors.gray50,
+        borderRadius: radius.md,
+        borderWidth: 1,
+        borderColor: colors.border,
+        padding: spacing.sm,
+        alignItems: 'center',
+      },
+      highlight && { backgroundColor: colors.primaryLight, borderColor: colors.primary + '60' },
+    ]}>
       <TextInput
-        style={[styles.macroInput, highlight && styles.macroInputTextHighlight]}
+        style={[
+          { fontSize: 18, fontWeight: '700', color: colors.textPrimary, textAlign: 'center', padding: 0, width: '100%' },
+          highlight && { color: colors.primary },
+        ]}
         value={value}
         onChangeText={onChangeText}
         keyboardType="decimal-pad"
@@ -380,8 +422,11 @@ function MacroInput({ label, unit, value, onChangeText, highlight = false }: Mac
         placeholderTextColor={colors.textDisabled}
         accessibilityLabel={`${label} in ${unit}`}
       />
-      <Text style={[styles.macroUnit, highlight && styles.macroUnitHighlight]}>{unit}</Text>
-      <Text style={styles.macroLabel}>{label}</Text>
+      <Text style={[
+        { fontSize: 10, color: colors.textSecondary, marginTop: 1 },
+        highlight && { color: colors.primary },
+      ]}>{unit}</Text>
+      <Text style={{ fontSize: 11, fontWeight: '600', color: colors.textSecondary, marginTop: 2 }}>{label}</Text>
     </View>
   );
 }
@@ -390,193 +435,138 @@ function MacroInput({ label, unit, value, onChangeText, highlight = false }: Mac
 // Styles
 // ---------------------------------------------------------------------------
 
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-  },
-  keyboardAvoid: {
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: radius.xl,
-    borderTopRightRadius: radius.xl,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    maxHeight: '92%',
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: radius.full,
-    backgroundColor: colors.gray300,
-    alignSelf: 'center',
-    marginBottom: spacing.md,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.xs,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  confidenceBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: radius.full,
-  },
-  confidenceDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-  },
-  confidenceText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  headerSubtitle: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    lineHeight: 18,
-    marginBottom: spacing.md,
-  },
-  scroll: {
-    flexGrow: 0,
-  },
-  sectionHeader: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  fieldRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    gap: spacing.sm,
-  },
-  fieldLabel: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    width: 80,
-  },
-  fieldInput: {
-    flex: 1,
-  },
-  textInput: {
-    fontSize: 15,
-    color: colors.textPrimary,
-    fontWeight: '500',
-    padding: 0,
-  },
-  macroGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginBottom: spacing.xs,
-  },
-  macroInputBlock: {
-    width: '30%',
-    minWidth: 80,
-    backgroundColor: colors.gray50,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.sm,
-    alignItems: 'center',
-  },
-  macroInputHighlight: {
-    backgroundColor: colors.primaryLight,
-    borderColor: colors.primary + '60',
-  },
-  macroInput: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    textAlign: 'center',
-    padding: 0,
-    width: '100%',
-  },
-  macroInputTextHighlight: {
-    color: colors.primary,
-  },
-  macroUnit: {
-    fontSize: 10,
-    color: colors.textSecondary,
-    marginTop: 1,
-  },
-  macroUnitHighlight: {
-    color: colors.primary,
-  },
-  macroLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  glpHeader: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  glpNote: {
-    fontSize: 11,
-    color: colors.textDisabled,
-    fontStyle: 'italic',
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginTop: spacing.lg,
-  },
-  cancelButton: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  cancelText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  confirmButton: {
-    flex: 2,
-    backgroundColor: colors.primary,
-    borderRadius: radius.md,
-    paddingVertical: 14,
-    alignItems: 'center',
-    ...shadows.sm,
-  },
-  confirmButtonPressed: {
-    backgroundColor: colors.primaryDark,
-  },
-  confirmButtonDisabled: {
-    backgroundColor: colors.gray300,
-  },
-  confirmText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  bottomPad: {
-    height: spacing.xl,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
+
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    backdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.4)',
+    },
+    keyboardAvoid: {
+      justifyContent: 'flex-end',
+    },
+    sheet: {
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: radius.xl,
+      borderTopRightRadius: radius.xl,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      maxHeight: '92%',
+    },
+    handle: {
+      width: 40,
+      height: 4,
+      borderRadius: radius.full,
+      backgroundColor: colors.gray300,
+      alignSelf: 'center',
+      marginBottom: spacing.md,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: spacing.xs,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    confidenceBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: radius.full,
+    },
+    confidenceDot: {
+      width: 7,
+      height: 7,
+      borderRadius: 4,
+    },
+    confidenceText: {
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    headerSubtitle: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      lineHeight: 18,
+      marginBottom: spacing.md,
+    },
+    scroll: {
+      flexGrow: 0,
+    },
+    macroGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+      marginBottom: spacing.xs,
+    },
+    textInput: {
+      fontSize: 15,
+      color: colors.textPrimary,
+      fontWeight: '500',
+      padding: 0,
+    },
+    glpHeader: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      justifyContent: 'space-between',
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    glpNote: {
+      fontSize: 11,
+      color: colors.textDisabled,
+      fontStyle: 'italic',
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+      marginTop: spacing.lg,
+    },
+    cancelButton: {
+      flex: 1,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      paddingVertical: 14,
+      alignItems: 'center',
+    },
+    cancelText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+    confirmButton: {
+      flex: 2,
+      backgroundColor: colors.primary,
+      borderRadius: radius.md,
+      paddingVertical: 14,
+      alignItems: 'center',
+      ...shadows.sm,
+    },
+    confirmButtonPressed: {
+      backgroundColor: colors.primaryDark,
+    },
+    confirmButtonDisabled: {
+      backgroundColor: colors.gray300,
+    },
+    confirmText: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.white,
+    },
+    bottomPad: {
+      height: spacing.xl,
+    },
+  });
+}

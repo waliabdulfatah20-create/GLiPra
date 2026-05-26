@@ -12,7 +12,8 @@ import { Line, Polyline, Svg } from 'react-native-svg';
 
 import { useCheckInTrend } from '@/features/progress/hooks';
 import { tipI18nKey } from '@/features/progress/pharmacist-tips';
-import { colors, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 import { CardShell } from './card-shell';
 import { PharmacistTip } from './pharmacist-tip';
@@ -28,6 +29,11 @@ const MAX_SCORE = 5;
 
 export function CheckInSymptomCard({ days, width }: CheckInSymptomCardProps) {
   const { t } = useTranslation();
+  const { colors, spacing } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing }),
+    [colors, spacing],
+  );
   const { days: trend, avgNausea, avgEnergy, hasData, isLoading } =
     useCheckInTrend(days);
 
@@ -127,6 +133,11 @@ function SummaryStat({
   label: string;
   value: number | null;
 }) {
+  const { colors, spacing } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing }),
+    [colors, spacing],
+  );
   return (
     <View style={styles.statItem}>
       <View style={[styles.statDot, { backgroundColor: color }]} />
@@ -138,34 +149,41 @@ function SummaryStat({
   );
 }
 
-const styles = StyleSheet.create({
-  placeholder: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    paddingVertical: spacing.md,
-    textAlign: 'center',
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    gap: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  statDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  statValue: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+}
+
+function makeStyles({ colors, spacing }: StyleTokens) {
+  return StyleSheet.create({
+    placeholder: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      paddingVertical: spacing.md,
+      textAlign: 'center',
+    },
+    summaryRow: {
+      flexDirection: 'row',
+      gap: spacing.lg,
+      marginBottom: spacing.sm,
+    },
+    statItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    statDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+    },
+    statLabel: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+    statValue: {
+      fontSize: 16,
+      fontWeight: '700',
+    },
+  });
+}

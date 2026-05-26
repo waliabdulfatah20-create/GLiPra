@@ -6,7 +6,8 @@
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import type { Milestone } from '@/features/journey-cards/milestones';
 
 // ---------------------------------------------------------------------------
@@ -24,6 +25,12 @@ interface MilestoneToastProps {
 // ---------------------------------------------------------------------------
 
 export function MilestoneToast({ milestone, onDismiss }: MilestoneToastProps) {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
+
   // Auto-dismiss after 3 seconds whenever a milestone is shown.
   React.useEffect(() => {
     if (!milestone) return;
@@ -54,41 +61,50 @@ export function MilestoneToast({ milestone, onDismiss }: MilestoneToastProps) {
 // Styles
 // ---------------------------------------------------------------------------
 
-const styles = StyleSheet.create({
-  toast: {
-    position: 'absolute',
-    top: spacing.md,
-    left: spacing.md,
-    right: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.primary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 2,
-    zIndex: 1000,
-    ...shadows.lg,
-  },
-  emoji: {
-    fontSize: 28,
-    marginRight: spacing.sm,
-  },
-  textCol: {
-    flex: 1,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.primary,
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-    marginBottom: 2,
-  },
-  title: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
+
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    toast: {
+      position: 'absolute',
+      top: spacing.md,
+      left: spacing.md,
+      right: spacing.md,
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.primary,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm + 2,
+      zIndex: 1000,
+      ...shadows.lg,
+    },
+    emoji: {
+      fontSize: 28,
+      marginRight: spacing.sm,
+    },
+    textCol: {
+      flex: 1,
+    },
+    label: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: colors.primary,
+      letterSpacing: 0.5,
+      textTransform: 'uppercase',
+      marginBottom: 2,
+    },
+    title: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+  });
+}

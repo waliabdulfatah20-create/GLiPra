@@ -14,7 +14,8 @@ import { Rect, Svg } from 'react-native-svg';
 
 import { useProteinHistoryPerDay } from '@/features/progress/hooks';
 import { tipI18nKey } from '@/features/progress/pharmacist-tips';
-import { colors, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 import { CardShell } from './card-shell';
 import { PharmacistTip } from './pharmacist-tip';
@@ -29,6 +30,11 @@ const GAP = 2;
 
 export function ProteinHitRateCard({ days, width }: ProteinHitRateCardProps) {
   const { t } = useTranslation();
+  const { colors, spacing } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing }),
+    [colors, spacing],
+  );
   const { history, hitRate, proteinFloorG, isLoading } =
     useProteinHistoryPerDay(days);
 
@@ -88,28 +94,35 @@ export function ProteinHitRateCard({ days, width }: ProteinHitRateCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  placeholder: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    paddingVertical: spacing.md,
-    textAlign: 'center',
-  },
-  headlineRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  bigValue: {
-    fontSize: 36,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    letterSpacing: -1,
-  },
-  bigCaption: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    flexShrink: 1,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+}
+
+function makeStyles({ colors, spacing }: StyleTokens) {
+  return StyleSheet.create({
+    placeholder: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      paddingVertical: spacing.md,
+      textAlign: 'center',
+    },
+    headlineRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+    bigValue: {
+      fontSize: 36,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      letterSpacing: -1,
+    },
+    bigCaption: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      flexShrink: 1,
+    },
+  });
+}

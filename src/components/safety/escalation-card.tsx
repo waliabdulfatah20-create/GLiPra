@@ -8,7 +8,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import type { RedFlagDetection } from '@/features/safety/redFlagDetector';
-import { colors, radius, shadows, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 // ─── Locked attorney-approved copy ───────────────────────────────────────────
 const COPY = {
@@ -28,8 +29,14 @@ interface EscalationCardProps {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function EscalationCard({ detection, onDismiss }: EscalationCardProps) {
+  const { colors, spacing, radius, shadows } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
+  );
+
   return (
-    <View style={[styles.container, shadows.md]}>
+    <View style={styles.container}>
       {/* Top section: Icon + Label */}
       <View style={styles.header}>
         <Text style={styles.headerIcon}>🚨</Text>
@@ -81,76 +88,86 @@ export function EscalationCard({ detection, onDismiss }: EscalationCardProps) {
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.disclaimerBg,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    marginVertical: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.disclaimerBorder,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  headerIcon: {
-    fontSize: 20,
-    marginRight: spacing.sm,
-  },
-  headerLabel: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.warning,
-  },
-  body: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
-  disclaimerWrapper: {
-    marginBottom: spacing.md,
-  },
-  disclaimerText: {
-    fontSize: 13,
-    lineHeight: 18,
-    color: colors.textPrimary,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  button: {
-    flex: 1,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryButton: {
-    backgroundColor: colors.primary,
-    opacity: 0.5, // disabled state
-  },
-  secondaryButton: {
-    backgroundColor: colors.gray200,
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  primaryButtonText: {
-    color: colors.white,
-  },
-  secondaryButtonText: {
-    color: colors.textPrimary,
-  },
-  footerText: {
-    fontSize: 10,
-    color: colors.textDisabled,
-    textAlign: 'center',
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
+}
+
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      backgroundColor: colors.disclaimerBg,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      marginVertical: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.disclaimerBorder,
+      ...shadows.md,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    headerIcon: {
+      fontSize: 20,
+      marginRight: spacing.sm,
+    },
+    headerLabel: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.warning,
+    },
+    body: {
+      fontSize: 14,
+      lineHeight: 20,
+      color: colors.textPrimary,
+      marginBottom: spacing.md,
+    },
+    disclaimerWrapper: {
+      marginBottom: spacing.md,
+    },
+    disclaimerText: {
+      fontSize: 13,
+      lineHeight: 18,
+      color: colors.textPrimary,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+      marginBottom: spacing.md,
+    },
+    button: {
+      flex: 1,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: radius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    primaryButton: {
+      backgroundColor: colors.primary,
+      opacity: 0.5, // disabled state
+    },
+    secondaryButton: {
+      backgroundColor: colors.gray200,
+    },
+    buttonText: {
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    primaryButtonText: {
+      color: colors.white,
+    },
+    secondaryButtonText: {
+      color: colors.textPrimary,
+    },
+    footerText: {
+      fontSize: 10,
+      color: colors.textDisabled,
+      textAlign: 'center',
+    },
+  });
+}

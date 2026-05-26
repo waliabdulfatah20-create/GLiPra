@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import type { ContentCard } from '@/features/content-cards/data';
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 export interface ContentCardViewProps {
   card: ContentCard;
@@ -12,6 +13,11 @@ export interface ContentCardViewProps {
 
 export function ContentCardView({ card }: ContentCardViewProps) {
   const { t } = useTranslation();
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius],
+  );
   const accentColor = card.tier === 1 ? colors.warning : colors.primary;
   const badgeBg = card.tier === 1 ? colors.warningLight : colors.primaryLight;
 
@@ -42,40 +48,48 @@ export function ContentCardView({ card }: ContentCardViewProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    borderLeftWidth: 4,
-  },
-  badge: {
-    alignSelf: 'flex-start',
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    marginBottom: spacing.sm,
-  },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 0.8,
-  },
-  title: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
-    lineHeight: 20,
-  },
-  body: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    lineHeight: 20,
-  },
-  disclaimerText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 18,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    container: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      padding: spacing.md,
+      borderLeftWidth: 4,
+    },
+    badge: {
+      alignSelf: 'flex-start',
+      borderRadius: radius.sm,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 2,
+      marginBottom: spacing.sm,
+    },
+    badgeText: {
+      fontSize: 10,
+      fontWeight: '700',
+      letterSpacing: 0.8,
+    },
+    title: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.sm,
+      lineHeight: 20,
+    },
+    body: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    disclaimerText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 18,
+    },
+  });
+}

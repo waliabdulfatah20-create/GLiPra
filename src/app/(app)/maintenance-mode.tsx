@@ -162,7 +162,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     // Disclaimer
     disclaimerText: {
       fontSize: 13,
-      color: '#9A3412',
+      color: colors.disclaimerText,
       lineHeight: 20,
     },
 

@@ -238,13 +238,9 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       color: colors.warning,
     },
 
-    // Disclaimer text — styled inside the Tier-1 banner container
-    // NOTE: '#9A3412' is a hardcoded color literal (dark orange-red for disclaimer text).
-    // This does not map to a GlipraTokens key. Needs manual attention to add a
-    // disclaimerText token or use colors.escalationText instead.
     disclaimerText: {
       fontSize: 14,
-      color: '#9A3412',
+      color: colors.disclaimerText,
       lineHeight: 20,
     },
 

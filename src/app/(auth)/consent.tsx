@@ -173,7 +173,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     },
     disclaimerBody: {
       fontSize: 14,
-      color: '#7C2D12',
+      color: colors.disclaimerText,
       lineHeight: 21,
     },
     disclaimerBold: {

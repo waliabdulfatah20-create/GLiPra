@@ -63,6 +63,7 @@ export const colors = {
   escalationText: '#991B1B',
   disclaimerBg: '#FFF7ED',
   disclaimerBorder: '#FED7AA',
+  disclaimerText: '#9A3412',
 } as const;
 
 export const spacing = {

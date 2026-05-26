@@ -3,7 +3,8 @@ import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Circle, Line, Polyline, Svg, Text as SvgText } from 'react-native-svg';
 
-import { colors, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 
 interface LevelChartProps {
   curve: Array<{ date: string; dayOffset: number; levelMg: number }>;
@@ -56,6 +57,12 @@ export function LevelChart({
   width,
   height,
 }: LevelChartProps) {
+  const { colors, spacing } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing }),
+    [colors, spacing],
+  );
+
   if (curve.length < 2) {
     return (
       <View style={[styles.empty, { width, height }]}>
@@ -235,24 +242,31 @@ export function LevelChart({
   );
 }
 
-const styles = StyleSheet.create({
-  empty: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  todayLabel: {
-    position: 'absolute',
-    width: 32,
-    alignItems: 'center',
-  },
-  todayLabelText: {
-    fontSize: 9,
-    color: colors.warning,
-    fontWeight: '600',
-    marginTop: spacing.xs,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+}
+
+function makeStyles({ colors, spacing }: StyleTokens) {
+  return StyleSheet.create({
+    empty: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    emptyText: {
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+    todayLabel: {
+      position: 'absolute',
+      width: 32,
+      alignItems: 'center',
+    },
+    todayLabelText: {
+      fontSize: 9,
+      color: colors.warning,
+      fontWeight: '600',
+      marginTop: spacing.xs,
+    },
+  });
+}

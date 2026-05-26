@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/lib/ThemeContext';
+import type { GlipraTokens } from '@/theme/tokens';
 import type { DisclaimerTier } from '@/types';
 
 interface DisclaimerBannerProps {
@@ -17,6 +18,12 @@ export function DisclaimerBanner({
   onAcknowledge,
   acknowledged = false,
 }: DisclaimerBannerProps) {
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(
+    () => makeStyles({ colors, spacing, radius }),
+    [colors, spacing, radius],
+  );
+
   if (tier === 1) {
     return (
       <View style={styles.tier1Container}>
@@ -52,80 +59,90 @@ export function DisclaimerBanner({
   );
 }
 
-const styles = StyleSheet.create({
-  // Tier 1 — full content weight, orange card
-  tier1Container: {
-    backgroundColor: colors.disclaimerBg,
-    borderWidth: 1,
-    borderColor: colors.disclaimerBorder,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginVertical: spacing.sm,
-  },
-  tier1Header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  tier1IconBadge: {
-    width: 22,
-    height: 22,
-    borderRadius: radius.full,
-    backgroundColor: '#F97316',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
-  },
-  tier1IconText: {
-    color: colors.white,
-    fontSize: 13,
-    fontWeight: '700',
-    lineHeight: 16,
-  },
-  tier1Title: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#9A3412',
-    letterSpacing: 0.2,
-  },
-  tier1Body: {
-    // children render here — no extra wrapping
-  },
-  acknowledgeButton: {
-    marginTop: spacing.md,
-    alignSelf: 'flex-start',
-    backgroundColor: '#F97316',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.md,
-  },
-  acknowledgeButtonPressed: {
-    opacity: 0.85,
-  },
-  acknowledgeButtonText: {
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: '600',
-  },
+// ─── Styles ──────────────────────────────────────────────────────────────────
 
-  // Tier 2 — slim footer strip
-  tier2Container: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: colors.gray50,
-    borderTopWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  tier2IconText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.textDisabled,
-    marginRight: spacing.xs,
-    marginTop: 1,
-  },
-  tier2Content: {
-    flex: 1,
-  },
-});
+interface StyleTokens {
+  colors: GlipraTokens['colors'];
+  spacing: GlipraTokens['spacing'];
+  radius: GlipraTokens['radius'];
+}
+
+function makeStyles({ colors, spacing, radius }: StyleTokens) {
+  return StyleSheet.create({
+    // Tier 1 — full content weight, orange card
+    tier1Container: {
+      backgroundColor: colors.disclaimerBg,
+      borderWidth: 1,
+      borderColor: colors.disclaimerBorder,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      marginVertical: spacing.sm,
+    },
+    tier1Header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    tier1IconBadge: {
+      width: 22,
+      height: 22,
+      borderRadius: radius.full,
+      backgroundColor: '#F97316',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.sm,
+    },
+    tier1IconText: {
+      color: colors.white,
+      fontSize: 13,
+      fontWeight: '700',
+      lineHeight: 16,
+    },
+    tier1Title: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.disclaimerText,
+      letterSpacing: 0.2,
+    },
+    tier1Body: {
+      // children render here — no extra wrapping
+    },
+    acknowledgeButton: {
+      marginTop: spacing.md,
+      alignSelf: 'flex-start',
+      backgroundColor: '#F97316',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: radius.md,
+    },
+    acknowledgeButtonPressed: {
+      opacity: 0.85,
+    },
+    acknowledgeButtonText: {
+      color: colors.white,
+      fontSize: 14,
+      fontWeight: '600',
+    },
+
+    // Tier 2 — slim footer strip
+    tier2Container: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      backgroundColor: colors.gray50,
+      borderTopWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+    },
+    tier2IconText: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: colors.textDisabled,
+      marginRight: spacing.xs,
+      marginTop: 1,
+    },
+    tier2Content: {
+      flex: 1,
+    },
+  });
+}

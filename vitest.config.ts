@@ -18,6 +18,7 @@ export default defineConfig({
       'src/features/**/readiness-calculator.test.ts',
       'src/features/safety/**/*.test.ts',
       'src/features/medication-level/**/*.test.ts',
+      'src/features/today/readiness-display.test.ts',
     ],
     environment: 'node',
     passWithNoTests: true,
@@ -29,6 +30,7 @@ export default defineConfig({
         'src/features/**/readiness-calculator.ts',
         'src/features/safety/**/*.ts',
         'src/features/medication-level/**/*.ts',
+        'src/features/today/readiness-display.test.ts',
       ],
       exclude: [
         'src/features/safety/**/*.test.ts',

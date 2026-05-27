@@ -1,5 +1,5 @@
 import type { InjectionPhase } from '@/types';
-import type { ReadinessResult, FactorId, FactorDelta } from './readiness-calculator';
+import type { ReadinessResult, FactorDelta } from './readiness-calculator';
 
 export type DisplayFactor = {
   label: string;
@@ -43,14 +43,14 @@ export function buildReadinessCard(
 
   // 3. Tip selection — factor with most negative delta
   // Tie-break: injection_phase > protein_pace > any other id
-  const negativeFaktors = result.factors.filter((f) => f.delta < 0);
+  const negativeFactors = result.factors.filter((f) => f.delta < 0);
 
   let tipFactor: FactorDelta | null = null;
 
-  if (negativeFaktors.length > 0) {
+  if (negativeFactors.length > 0) {
     // Find the minimum delta value
-    const minDelta = Math.min(...negativeFaktors.map((f) => f.delta));
-    const worstFactors = negativeFaktors.filter((f) => f.delta === minDelta);
+    const minDelta = Math.min(...negativeFactors.map((f) => f.delta));
+    const worstFactors = negativeFactors.filter((f) => f.delta === minDelta);
 
     if (worstFactors.length === 1) {
       tipFactor = worstFactors[0];

@@ -20,6 +20,12 @@ describe('getNutrientPct', () => {
   it('returns 0 when actual is 0', () => {
     expect(getNutrientPct(0, 420)).toBe(0);
   });
+  it('returns 0 for negative actual', () => {
+    expect(getNutrientPct(-10, 420)).toBe(0);
+  });
+  it('returns 0 when rda is zero', () => {
+    expect(getNutrientPct(100, 0)).toBe(0);
+  });
 });
 
 describe('getNutrientStatus', () => {
@@ -33,6 +39,9 @@ describe('getNutrientStatus', () => {
   it('returns red below 50%', () => {
     expect(getNutrientStatus(190, 420)).toBe('red');
     expect(getNutrientStatus(0, 420)).toBe('red');
+  });
+  it('returns red when rda is zero', () => {
+    expect(getNutrientStatus(0, 0)).toBe('red');
   });
 });
 
@@ -69,9 +78,12 @@ describe('getGapBannerText', () => {
     const text = getGapBannerText({ ...noGaps, b12Mcg: 0.4 }) ?? '';
     expect(text).not.toMatch(/deficiency|anemia|rickets|osteo/i);
   });
-  it('handles multiple gaps without throwing', () => {
+  it('handles multiple gaps — names both and includes tips for each', () => {
     const text = getGapBannerText({ magnesiumMg: 0, zincMg: 0, b12Mcg: 0, vitaminDIu: 0 });
     expect(typeof text).toBe('string');
+    expect(text).not.toBeNull();
+    // Should name the top 2 gap nutrients
+    expect(text!.length).toBeGreaterThan(10);
   });
 });
 

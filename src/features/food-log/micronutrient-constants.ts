@@ -14,23 +14,20 @@ export type NutrientStatus = 'green' | 'amber' | 'red';
 
 /** % of RDA achieved, capped at 100, rounded to nearest integer */
 export function getNutrientPct(actual: number, rda: number): number {
-  return Math.min(100, Math.round((actual / rda) * 100));
+  if (rda <= 0 || !isFinite(rda)) return 0;
+  return Math.min(100, Math.round((Math.max(0, actual) / rda) * 100));
 }
 
 /** green >= 80% | amber 50-79% | red < 50% */
 export function getNutrientStatus(actual: number, rda: number): NutrientStatus {
+  if (rda <= 0 || !isFinite(rda)) return 'red';
   const pct = (actual / rda) * 100;
   if (pct >= 80) return 'green';
   if (pct >= 50) return 'amber';
   return 'red';
 }
 
-export interface MicronutrientData {
-  magnesiumMg: number;
-  zincMg: number;
-  b12Mcg: number;
-  vitaminDIu: number;
-}
+export type MicronutrientData = { [K in NutrientKey]: number };
 
 /** Count of nutrients strictly below 50% of their RDA */
 export function getGapCount(data: MicronutrientData): number {
@@ -64,6 +61,6 @@ export function getGapBannerText(data: MicronutrientData): string | null {
   );
   if (gaps.length === 0) return null;
   const named = gaps.slice(0, 2).map((k) => NUTRIENT_LABELS[k]).join(' and ');
-  const tipKey = gaps[0];
-  return `Low ${named} is common on GLP-1s. Try ${NUTRIENT_FOOD_TIPS[tipKey]} today.`;
+  const tips = gaps.slice(0, 2).map((k) => NUTRIENT_FOOD_TIPS[k]).join(', or ');
+  return `Low ${named} today. Try ${tips}.`;
 }

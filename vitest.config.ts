@@ -14,6 +14,7 @@ export default defineConfig({
     include: [
       'src/utils/**/*.test.ts',
       'src/theme/**/*.test.ts',
+      'src/__tests__/**/*.test.ts',
       'src/features/**/calculator.test.ts',
       'src/features/**/readiness-calculator.test.ts',
       'src/features/safety/**/*.test.ts',

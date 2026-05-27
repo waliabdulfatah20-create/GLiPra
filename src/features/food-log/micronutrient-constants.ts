@@ -1,0 +1,69 @@
+// src/features/food-log/micronutrient-constants.ts
+// US RDA targets and pure helper functions for MicronutrientWatchCard.
+// No React, no side effects — safe to Vitest.
+
+export const MICRONUTRIENT_RDAS = {
+  magnesiumMg: 420,
+  zincMg: 11,
+  b12Mcg: 2.4,
+  vitaminDIu: 600,
+} as const;
+
+export type NutrientKey = keyof typeof MICRONUTRIENT_RDAS;
+export type NutrientStatus = 'green' | 'amber' | 'red';
+
+/** % of RDA achieved, capped at 100, rounded to nearest integer */
+export function getNutrientPct(actual: number, rda: number): number {
+  return Math.min(100, Math.round((actual / rda) * 100));
+}
+
+/** green >= 80% | amber 50-79% | red < 50% */
+export function getNutrientStatus(actual: number, rda: number): NutrientStatus {
+  const pct = (actual / rda) * 100;
+  if (pct >= 80) return 'green';
+  if (pct >= 50) return 'amber';
+  return 'red';
+}
+
+export interface MicronutrientData {
+  magnesiumMg: number;
+  zincMg: number;
+  b12Mcg: number;
+  vitaminDIu: number;
+}
+
+/** Count of nutrients strictly below 50% of their RDA */
+export function getGapCount(data: MicronutrientData): number {
+  return (Object.keys(MICRONUTRIENT_RDAS) as NutrientKey[]).filter(
+    (key) => data[key] / MICRONUTRIENT_RDAS[key] < 0.5,
+  ).length;
+}
+
+// Rule 9: no condition names. Rule 10: food strategy only.
+const NUTRIENT_LABELS: Record<NutrientKey, string> = {
+  b12Mcg: 'B12',
+  vitaminDIu: 'Vitamin D',
+  magnesiumMg: 'Magnesium',
+  zincMg: 'Zinc',
+};
+
+const NUTRIENT_FOOD_TIPS: Record<NutrientKey, string> = {
+  b12Mcg: 'eggs, Greek yogurt, or fortified cereals',
+  vitaminDIu: 'fatty fish, egg yolks, or fortified milk',
+  magnesiumMg: 'nuts, seeds, or leafy greens',
+  zincMg: 'beef, pumpkin seeds, or lentils',
+};
+
+/**
+ * Returns a food-strategy tip naming up to 2 gap nutrients.
+ * Returns null when no gaps exist.
+ */
+export function getGapBannerText(data: MicronutrientData): string | null {
+  const gaps = (Object.keys(MICRONUTRIENT_RDAS) as NutrientKey[]).filter(
+    (key) => data[key] / MICRONUTRIENT_RDAS[key] < 0.5,
+  );
+  if (gaps.length === 0) return null;
+  const named = gaps.slice(0, 2).map((k) => NUTRIENT_LABELS[k]).join(' and ');
+  const tipKey = gaps[0];
+  return `Low ${named} is common on GLP-1s. Try ${NUTRIENT_FOOD_TIPS[tipKey]} today.`;
+}

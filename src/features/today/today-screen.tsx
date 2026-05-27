@@ -89,7 +89,7 @@ export function TodayScreen() {
     injectionCycle,
     proteinFloorG,
     proteinConsumedG,
-    readiness,
+    readinessCard,
     hourOfDay,
     streak,
     isStreakLoading,
@@ -130,8 +130,8 @@ export function TodayScreen() {
   // Readiness score count-up animation — ticks 0 → score over 1.2 s when data arrives
   const [displayScore, setDisplayScore] = React.useState(0);
   React.useEffect(() => {
-    if (!readiness?.score) return;
-    const target = readiness.score;
+    if (!readinessCard?.score) return;
+    const target = readinessCard.score;
     const DURATION_MS = 1200;
     const STEPS = 36;
     const stepMs = DURATION_MS / STEPS;
@@ -144,7 +144,7 @@ export function TodayScreen() {
       if (step >= STEPS) clearInterval(timer);
     }, stepMs);
     return () => clearInterval(timer);
-  }, [readiness?.score]);
+  }, [readinessCard?.score]);
 
   // Phase accent colors — useMemo so they re-derive when theme changes
   const phaseAccent = React.useMemo<Record<InjectionPhase, string>>(
@@ -312,16 +312,64 @@ export function TodayScreen() {
         )}
 
         {/* ── Readiness Score ───────────────────────────────────── */}
-        {readiness && (
+        {readinessCard && (
           <View style={styles.readinessCard}>
-            <Text style={styles.readinessLabel}>{t('today.readiness_title')}</Text>
-            <Text style={styles.readinessScore}>{displayScore}</Text>
+            {/* Headline */}
+            <Text style={styles.readinessHeadline}>{readinessCard.headline}</Text>
+
+            {/* Divider */}
             <View style={styles.readinessDivider} />
-            <Text style={styles.readinessGuidance}>{readiness.guidance}</Text>
-            <View style={styles.readinessTrustBadge}>
-              <Text style={styles.readinessTrustText}>
-                {t('today.readiness_trust')}
-              </Text>
+
+            {/* Factor rows */}
+            {readinessCard.factors.map((factor) => (
+              <View key={factor.label} style={styles.readinessFactorRow}>
+                <View
+                  style={[
+                    styles.readinessFactorDot,
+                    {
+                      backgroundColor:
+                        factor.sentiment === 'positive'
+                          ? colors.success
+                          : factor.delta < -10
+                          ? colors.error
+                          : colors.warning,
+                    },
+                  ]}
+                />
+                <Text style={styles.readinessFactorLabel}>{factor.label}</Text>
+                <Text
+                  style={[
+                    styles.readinessFactorDelta,
+                    {
+                      color:
+                        factor.sentiment === 'positive'
+                          ? colors.success
+                          : factor.delta < -10
+                          ? colors.error
+                          : colors.warning,
+                    },
+                  ]}
+                >
+                  {factor.delta > 0 ? `+${factor.delta}` : `${factor.delta}`}
+                </Text>
+              </View>
+            ))}
+
+            {/* Divider */}
+            <View style={styles.readinessDivider} />
+
+            {/* Score row (demoted) */}
+            <View style={styles.readinessScoreRow}>
+              <Text style={styles.readinessScoreLabel}>{t('today.readiness_title')}</Text>
+              <Text style={styles.readinessScore}>{displayScore}</Text>
+              <View style={styles.readinessTrustBadge}>
+                <Text style={styles.readinessTrustText}>{t('today.readiness_trust')}</Text>
+              </View>
+            </View>
+
+            {/* Tip box */}
+            <View style={styles.readinessTipBox}>
+              <Text style={styles.readinessTipText}>{readinessCard.tip}</Text>
             </View>
           </View>
         )}
@@ -602,52 +650,84 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
 
     // ── Readiness card ──────────────────────────────────────────
     readinessCard: {
-      backgroundColor: colors.primary,
+      backgroundColor: colors.surface,
       borderRadius: radius.xl,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.primary,
       padding: spacing.lg,
-      alignItems: 'center',
       marginBottom: spacing.md,
       ...shadows.md,
     },
-    readinessLabel: {
-      fontSize: 11,
+    readinessHeadline: {
+      fontSize: 16,
       fontWeight: '700',
-      color: 'rgba(255,255,255,0.7)',
-      letterSpacing: 1,
-      textTransform: 'uppercase',
+      color: colors.textPrimary,
       marginBottom: spacing.xs,
-    },
-    readinessScore: {
-      fontSize: 80,
-      fontWeight: '800',
-      color: colors.white,
-      lineHeight: 88,
-      letterSpacing: -2,
     },
     readinessDivider: {
       height: 1,
-      backgroundColor: 'rgba(255,255,255,0.2)',
+      backgroundColor: colors.border,
       alignSelf: 'stretch',
       marginVertical: spacing.sm,
     },
-    readinessGuidance: {
-      fontSize: 14,
-      color: 'rgba(255,255,255,0.9)',
-      textAlign: 'center',
-      lineHeight: 20,
-      marginBottom: spacing.sm,
+    readinessFactorRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      paddingVertical: 3,
+    },
+    readinessFactorDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    },
+    readinessFactorLabel: {
+      flex: 1,
+      fontSize: 13,
+      color: colors.textPrimary,
+    },
+    readinessFactorDelta: {
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    readinessScoreRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    readinessScoreLabel: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      letterSpacing: 0.5,
+      textTransform: 'uppercase',
+      fontWeight: '600',
+    },
+    readinessScore: {
+      fontSize: 24,
+      fontWeight: '800',
+      color: colors.textPrimary,
     },
     readinessTrustBadge: {
-      backgroundColor: 'rgba(255,255,255,0.15)',
-      borderRadius: radius.full,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.xs,
+      flex: 1,
+      alignItems: 'flex-end',
     },
     readinessTrustText: {
-      fontSize: 11,
-      color: 'rgba(255,255,255,0.75)',
-      fontWeight: '600',
-      letterSpacing: 0.3,
+      fontSize: 10,
+      color: colors.textSecondary,
+      fontWeight: '500',
+    },
+    readinessTipBox: {
+      marginTop: spacing.sm,
+      backgroundColor: colors.warningLight,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.warning,
+      borderRadius: radius.sm,
+      padding: spacing.sm,
+    },
+    readinessTipText: {
+      fontSize: 13,
+      color: colors.textPrimary,
+      lineHeight: 18,
     },
 
     // ── Metrics row ─────────────────────────────────────────────

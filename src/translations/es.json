@@ -196,7 +196,18 @@
     "photo_comment_subtitle": "Opcional — ayuda a la IA a estimar la porción e ingredientes",
     "photo_comment_placeholder": "ej. tazón grande, queso extra, media porción…",
     "photo_comment_skip": "Omitir",
-    "photo_comment_analyze": "Analizar"
+    "photo_comment_analyze": "Analizar",
+    "micronutrient_watch": "Control de Micronutrientes",
+    "gaps_today_one": "{{count}} brecha hoy",
+    "gaps_today_other": "{{count}} brechas hoy",
+    "all_on_track": "Todos los nutrientes en orden",
+    "no_micro_data": "Escanea o busca alimentos para ver tus niveles",
+    "nutrient_magnesium": "Magnesio",
+    "nutrient_zinc": "Zinc",
+    "nutrient_b12": "Vitamina B12",
+    "nutrient_vitd": "Vitamina D",
+    "pct_of_goal": "{{pct}}% de la meta",
+    "goal_met": "Meta cumplida"
   },
   "checkin": {
     "title": "Check-in diario",

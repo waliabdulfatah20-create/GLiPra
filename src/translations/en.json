@@ -196,7 +196,18 @@
     "photo_comment_subtitle": "Optional — helps AI estimate portion and ingredients",
     "photo_comment_placeholder": "e.g. large bowl, extra cheese, half portion…",
     "photo_comment_skip": "Skip",
-    "photo_comment_analyze": "Analyze"
+    "photo_comment_analyze": "Analyze",
+    "micronutrient_watch": "Micronutrient Watch",
+    "gaps_today_one": "{{count}} gap today",
+    "gaps_today_other": "{{count}} gaps today",
+    "all_on_track": "All nutrients on track",
+    "no_micro_data": "Scan or search foods to see your nutrient levels",
+    "nutrient_magnesium": "Magnesium",
+    "nutrient_zinc": "Zinc",
+    "nutrient_b12": "Vitamin B12",
+    "nutrient_vitd": "Vitamin D",
+    "pct_of_goal": "{{pct}}% of goal",
+    "goal_met": "Goal met"
   },
   "checkin": {
     "title": "Daily Check-in",

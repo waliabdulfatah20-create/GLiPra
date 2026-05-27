@@ -4,6 +4,7 @@
 // Layout (top to bottom):
 //   1. Header — "Nutrition Log" title + compact protein ring
 //   2. DailyMacroCard (when entries exist)
+//   2b. MicronutrientWatchCard — Pro-gated, always rendered
 //   3. MealChipRow — Breakfast / Lunch / Dinner / Snack time-based filter
 //   4. PhotoCaptureButton — always-visible AI hero card (Pro-gated internally)
 //   5. 2-tab toggle — Manual | Barcode (Photo removed; lives in the AI card)
@@ -36,6 +37,7 @@ import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import type { BarcodeProduct } from '@/features/food-log/barcode-lookup';
 import { DailyMacroCard } from '@/features/food-log/daily-macro-card';
+import { MicronutrientWatchCard } from '@/features/food-log/micronutrient-watch-card';
 import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useTodayFoodLogs } from '@/features/food-log/hooks';
 import { PhotoReviewSheet } from '@/features/food-log/photo-review-sheet';
 import type { FoodLogEntry, ManualFoodEntry } from '@/features/food-log/types';
@@ -169,6 +171,9 @@ export default function LogScreen() {
 
             {/* 2. Daily macro summary card — shown when there are entries today */}
             {logs.length > 0 && <DailyMacroCard />}
+
+            {/* 2b. Micronutrient Watch — Pro-gated, always rendered (handles empty state internally) */}
+            <MicronutrientWatchCard />
 
             {/* 3. Meal context chips */}
             <MealChipRow active={selectedMeal} onSelect={setSelectedMeal} />

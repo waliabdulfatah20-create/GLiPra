@@ -7,10 +7,12 @@ module.exports = {
   // Patterns mirror vitest.config.ts `include` globs exactly.
   testPathIgnorePatterns: [
     '/node_modules/',
+    '/src/__tests__/',                         // all Vitest-only tests (src/__tests__/*.test.ts)
     '/src/utils/.*\\.test\\.ts$',              // utils/protein, utils/ewma, …
     '/src/features/.*calculator\\.test\\.ts$', // */calculator + */readiness-calculator
     '/src/features/safety/.*\\.test\\.ts$',    // redFlagDetector, …
     '/src/features/medication-level/.*\\.test\\.ts$',
+    '/src/features/today/readiness-display\\.test\\.ts$', // Vitest-only display logic test
     '/src/theme/.*\\.test\\.ts$',              // theme/tokens, …
   ],
   collectCoverageFrom: [

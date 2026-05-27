@@ -1,7 +1,7 @@
 // DailyMacroCard — shows today's running nutrition totals on the Log screen.
 // Protein gets a progress bar vs the user's protein floor.
-// GLP-1 Watch section (B12, vitamin D, magnesium, zinc) renders only when
-// at least one food log entry today has micronutrient data.
+// Micronutrient data (B12, vitamin D, magnesium, zinc) is now shown in the
+// dedicated MicronutrientWatchCard (Pro-gated) rendered below this card on log.tsx.
 
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -26,11 +26,6 @@ export function DailyMacroCard() {
     fat,
     fiber,
     calories,
-    b12Mcg,
-    vitaminDIu,
-    magnesiumMg,
-    zincMg,
-    hasMicronutrients,
     isLoading: macrosLoading,
   } = useDailyMacros();
 
@@ -117,42 +112,6 @@ export function DailyMacroCard() {
           </>
         )}
 
-        {/* GLP-1 Watch — micronutrients, only shown when data exists */}
-        {hasMicronutrients && (
-          <>
-            <View style={styles.divider} />
-            <View style={styles.glpWatchSection}>
-              <Text style={styles.glpWatchLabel}>{t('log.glp1_watch')}</Text>
-              <Text style={styles.glpWatchNote}>{t('log.estimated')}</Text>
-            </View>
-            <View style={styles.microRow}>
-              {b12Mcg > 0 && (
-                <View style={styles.microBlock}>
-                  <Text style={styles.microValue}>{b12Mcg.toFixed(1)}</Text>
-                  <Text style={styles.microUnit}>mcg B-12</Text>
-                </View>
-              )}
-              {vitaminDIu > 0 && (
-                <View style={styles.microBlock}>
-                  <Text style={styles.microValue}>{Math.round(vitaminDIu)}</Text>
-                  <Text style={styles.microUnit}>IU Vit D</Text>
-                </View>
-              )}
-              {magnesiumMg > 0 && (
-                <View style={styles.microBlock}>
-                  <Text style={styles.microValue}>{Math.round(magnesiumMg)}</Text>
-                  <Text style={styles.microUnit}>mg Mg</Text>
-                </View>
-              )}
-              {zincMg > 0 && (
-                <View style={styles.microBlock}>
-                  <Text style={styles.microValue}>{zincMg.toFixed(1)}</Text>
-                  <Text style={styles.microUnit}>mg Zinc</Text>
-                </View>
-              )}
-            </View>
-          </>
-        )}
       </View>
     </View>
   );
@@ -263,43 +222,6 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     },
     secondaryLabel: {
       fontSize: 11,
-      color: colors.textSecondary,
-      marginTop: 1,
-    },
-    glpWatchSection: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginBottom: spacing.sm,
-    },
-    glpWatchLabel: {
-      fontSize: 11,
-      fontWeight: '700',
-      color: colors.primary,
-      letterSpacing: 0.8,
-      textTransform: 'uppercase',
-    },
-    glpWatchNote: {
-      fontSize: 11,
-      color: colors.textDisabled,
-      fontStyle: 'italic',
-    },
-    microRow: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: spacing.md,
-    },
-    microBlock: {
-      alignItems: 'center',
-      minWidth: 60,
-    },
-    microValue: {
-      fontSize: 15,
-      fontWeight: '700',
-      color: colors.textPrimary,
-    },
-    microUnit: {
-      fontSize: 10,
       color: colors.textSecondary,
       marginTop: 1,
     },

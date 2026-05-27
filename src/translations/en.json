@@ -280,5 +280,36 @@
     "generating": "Generating…",
     "download_pdf": "Download PDF",
     "summary_label": "Your Summary"
+  },
+  "readiness": {
+    "headlines": {
+      "injection_day": "Injection day",
+      "peak_suppression": "Day 1-2 after injection",
+      "adjustment": "Days 3-4 after injection",
+      "recovery_window": "Days 5-7 after injection",
+      "overdue": "Injection overdue"
+    },
+    "factor_labels": {
+      "injection_phase": "GLP-1 phase",
+      "protein_pace": "Protein pace today",
+      "prev_day_protein": "Yesterday's protein",
+      "nausea": "Nausea",
+      "energy": "Energy",
+      "new_dose_week": "New dose week",
+      "streak": "Streak momentum"
+    },
+    "tips": {
+      "injection_phase_injection_day": "Great timing to build your protein habit for the week",
+      "injection_phase_peak_suppression": "Front-load protein before noon while energy allows",
+      "injection_phase_adjustment": "Appetite is adjusting today - steady, consistent protein works best",
+      "injection_phase_recovery_window": "Appetite returning - a good day to hit your full protein target",
+      "injection_phase_overdue": "Take your injection today and restart your protein rhythm",
+      "protein_pace": "You are behind pace - aim for 30g protein in your next meal",
+      "prev_day_protein": "Yesterday was short - today matters most for protecting muscle",
+      "nausea": "Small, frequent portions work better than large meals today",
+      "energy": "Low energy today - shakes or yogurt take less effort than cooking",
+      "new_dose_week": "New dose weeks are hardest - small frequent protein beats big meals",
+      "streak": "Keep your streak alive - one protein-rich meal seals the day"
+    }
   }
 }

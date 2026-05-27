@@ -280,5 +280,36 @@
     "generating": "Generando…",
     "download_pdf": "Descargar PDF",
     "summary_label": "Tu resumen"
+  },
+  "readiness": {
+    "headlines": {
+      "injection_day": "Dia de inyeccion",
+      "peak_suppression": "Dias 1-2 tras la inyeccion",
+      "adjustment": "Dias 3-4 tras la inyeccion",
+      "recovery_window": "Dias 5-7 tras la inyeccion",
+      "overdue": "Inyeccion atrasada"
+    },
+    "factor_labels": {
+      "injection_phase": "Fase GLP-1",
+      "protein_pace": "Ritmo de proteina hoy",
+      "prev_day_protein": "Proteina de ayer",
+      "nausea": "Nauseas",
+      "energy": "Energia",
+      "new_dose_week": "Semana de nueva dosis",
+      "streak": "Racha activa"
+    },
+    "tips": {
+      "injection_phase_injection_day": "Buen momento para establecer el habito de proteinas de la semana",
+      "injection_phase_peak_suppression": "Prioriza la proteina antes del mediodia mientras tengas energia",
+      "injection_phase_adjustment": "El apetito esta ajustandose hoy - la proteina constante funciona mejor",
+      "injection_phase_recovery_window": "El apetito regresa - un buen dia para alcanzar tu meta de proteinas",
+      "injection_phase_overdue": "Ponte la inyeccion hoy y retoma tu rutina de proteinas",
+      "protein_pace": "Vas retrasado - intenta tomar 30g de proteina en tu proxima comida",
+      "prev_day_protein": "Ayer fue poco - hoy es el dia mas importante para proteger el musculo",
+      "nausea": "Porciones pequenas y frecuentes funcionan mejor que comidas grandes hoy",
+      "energy": "Poca energia hoy - batidos o yogur requieren menos esfuerzo que cocinar",
+      "new_dose_week": "Las semanas de nueva dosis son las mas dificiles - proteina frecuente es mejor",
+      "streak": "Manten tu racha - una comida con proteinas sella el dia"
+    }
   }
 }

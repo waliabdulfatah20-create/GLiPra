@@ -11,6 +11,7 @@ import { isMockAIEnabled, MOCK_VISIT_PREP_QUESTIONS } from '@/lib/mockAI';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { useTodayData } from '@/features/today/hooks';
 import { useWeightLogs } from '@/features/weight/hooks';
+import { useProteinHistoryPerDay } from '@/features/progress/hooks';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -105,14 +106,20 @@ export function useVisitPrepData(): VisitPrepData {
   const { profile, injectionCycle, isLoading: isTodayLoading } = useTodayData();
   const { logs, isLoading: isWeightLoading } = useWeightLogs();
   const { checkIns, isLoading: isCheckInsLoading } = useRecentCheckIns();
+  // 28-day protein history (food logging is now live)
+  const { history: proteinHistory, isLoading: isProteinLoading } = useProteinHistoryPerDay(28);
 
   // Most-recent weight log values
   const latestLog = logs.length > 0 ? logs[logs.length - 1] : null;
   const currentWeightKg = latestLog?.weightKg ?? null;
   const ewmaWeightKg = latestLog?.ewmaWeightKg ?? null;
 
-  // Average protein — no food logs feature yet, so stub at 0 until built
-  const avgProteinG = 0;
+  // 28-day average protein — only count days where the user logged food (hasData)
+  const loggedDays = proteinHistory.filter((d) => d.hasData);
+  const avgProteinG =
+    loggedDays.length > 0
+      ? loggedDays.reduce((sum, d) => sum + d.proteinG, 0) / loggedDays.length
+      : 0;
 
   // Injection cycle data from today profile
   const injectionPhase = injectionCycle
@@ -141,7 +148,7 @@ export function useVisitPrepData(): VisitPrepData {
     medicationName,
     avgNausea,
     avgEnergy,
-    isLoading: isTodayLoading || isWeightLoading || isCheckInsLoading,
+    isLoading: isTodayLoading || isWeightLoading || isCheckInsLoading || isProteinLoading,
   };
 }
 
@@ -234,17 +241,6 @@ export function useGeneratePdf(): GeneratePdfResult {
   const generate = async (data: VisitPrepData): Promise<string | null> => {
     setIsLoading(true);
     setError(null);
-
-    // Mock gate — PDF generation requires a real Supabase connection.
-    if (isMockAIEnabled()) {
-      await new Promise<void>((resolve) => setTimeout(resolve, 600));
-      setIsLoading(false);
-      setError(
-        'PDF generation requires a real Supabase connection. ' +
-          'Set EXPO_PUBLIC_USE_MOCK_AI=false and run the local Supabase stack.',
-      );
-      return null;
-    }
 
     try {
       const visitDate = format(new Date(), 'yyyy-MM-dd');

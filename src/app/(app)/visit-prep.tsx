@@ -139,14 +139,13 @@ export default function VisitPrepScreen() {
         return;
       }
     } catch {
-      // expo-sharing/expo-file-system not installed yet — fall through to stub
+      // Sharing unavailable on this device/simulator — fall through to stub
     }
 
     // Stub: show a truncated base64 in an alert for local dev verification.
     Alert.alert(
-      'PDF Ready (dev stub)',
-      `PDF generated successfully.\nBase64 length: ${pdfBase64.length} chars.\n\n` +
-        'Install expo-sharing + expo-file-system for full share support.',
+      'PDF Ready',
+      `PDF generated successfully.\nBase64 length: ${pdfBase64.length} chars.\n\nSharing is not available on this device.`,
     );
   }, [data, generate, pdfError]);
 

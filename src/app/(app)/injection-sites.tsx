@@ -2,7 +2,6 @@ import { format, parseISO } from 'date-fns';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import {
-  ActivityIndicator,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,6 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
+import { SkeletonBox } from '@/components/ui/skeleton-box';
 import { SITE_LABELS, type SiteCode } from '@/features/injection-sites/constants';
 import {
   useInjectionLogs,
@@ -81,7 +81,9 @@ export default function InjectionSitesScreen() {
         {/* Active Rotation card */}
         {isLoading ? (
           <View style={styles.loadingCard}>
-            <ActivityIndicator color={colors.primary} />
+            <SkeletonBox style={{ height: 9, width: '40%', marginBottom: spacing.sm }} />
+            <SkeletonBox style={{ height: 17, width: '60%', marginBottom: spacing.sm }} />
+            <SkeletonBox style={{ height: 34, width: 88, borderRadius: radius.md, alignSelf: 'flex-end' }} />
           </View>
         ) : (
           <View style={styles.rotationCard}>
@@ -230,11 +232,10 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     },
 
     loadingCard: {
-      height: 72,
       backgroundColor: colors.surface,
       borderRadius: radius.lg,
-      alignItems: 'center',
-      justifyContent: 'center',
+      padding: spacing.md,
+      gap: spacing.sm,
       ...shadows.sm,
     },
 

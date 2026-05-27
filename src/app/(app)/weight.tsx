@@ -2,7 +2,6 @@ import { format, parseISO } from 'date-fns';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import {
-  ActivityIndicator,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -15,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { EwmaChart } from '@/components/weight/ewma-chart';
 import { WeightEntryForm } from '@/components/weight/weight-entry-form';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
+import { SkeletonBox } from '@/components/ui/skeleton-box';
 import { useInsertWeightLog, useWeightLogs } from '@/features/weight/hooks';
 import { UnitToggle } from '@/components/ui/unit-toggle';
 import { formatWeight, useWeightUnit } from '@/lib/unit-preference';
@@ -68,7 +68,11 @@ export default function WeightScreen() {
         {/* Latest weight summary card */}
         <View style={styles.summaryCard}>
           {isLoading ? (
-            <ActivityIndicator color={colors.primary} />
+            <>
+              <SkeletonBox style={{ height: 12, width: '30%', marginBottom: spacing.sm }} />
+              <SkeletonBox style={{ height: 56, width: '55%', marginBottom: spacing.xs }} />
+              <SkeletonBox style={{ height: 12, width: '40%' }} />
+            </>
           ) : latestLog ? (
             <>
               <Text style={styles.summaryLabel}>LATEST</Text>

@@ -3,7 +3,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import * as React from 'react';
 import {
-  ActivityIndicator,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -24,6 +23,7 @@ import { ProteinRing } from '@/components/today/protein-ring';
 import { InjectionCycleCard } from '@/components/today/injection-cycle-card';
 import { StreakCard } from '@/components/today/streak-card';
 import { MilestoneToast } from '@/components/ui/milestone-toast';
+import { TodaySkeleton } from '@/components/ui/today-skeleton';
 import {
   ClipboardCheck,
   ProgressPath,
@@ -218,8 +218,11 @@ export function TodayScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.loadingContainer} edges={['top']}>
-        <ActivityIndicator size="large" color={colors.primary} />
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: gradients.hero[0] }]}
+        edges={['top']}
+      >
+        <TodaySkeleton />
       </SafeAreaView>
     );
   }
@@ -525,12 +528,6 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     contentArea: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.lg,
-    },
-    loadingContainer: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: colors.background,
     },
     scroll: {
       // No top/horizontal padding — the gradient hero is full-bleed.

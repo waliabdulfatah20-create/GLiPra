@@ -226,7 +226,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     },
     inputFocused: {
       borderColor: colors.borderFocus,
-      backgroundColor: colors.white,
+      backgroundColor: colors.surface,
     },
     numericRow: {
       flexDirection: 'row',

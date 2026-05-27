@@ -418,7 +418,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       alignItems: 'center',
     },
     modeButtonActive: {
-      backgroundColor: colors.white,
+      backgroundColor: colors.surface,
       ...shadows.sm,
     },
     modeButtonText: {

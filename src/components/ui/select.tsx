@@ -123,7 +123,7 @@ export function Options({ ref, options, onSelect, value, testID }: OptionsProps 
       index={0}
       snapPoints={snapPoints}
       backgroundStyle={{
-        backgroundColor: colors.white,
+        backgroundColor: themeColors.surface,
       }}
     >
       <List

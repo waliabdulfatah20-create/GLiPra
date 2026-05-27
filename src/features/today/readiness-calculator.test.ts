@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { calculateReadinessScore } from './readiness-calculator';
-import type { FactorDelta } from './readiness-calculator';
+import type { FactorDelta, FactorId } from './readiness-calculator';
 
 const base = {
   proteinProgress: 0.5,
@@ -9,11 +9,11 @@ const base = {
 };
 
 // Helper: check whether a specific factor id is present in the factors array
-function hasFactor(factors: FactorDelta[], id: string): boolean {
+function hasFactor(factors: FactorDelta[], id: FactorId): boolean {
   return factors.some((f) => f.id === id);
 }
 
-function getFactor(factors: FactorDelta[], id: string): FactorDelta | undefined {
+function getFactor(factors: FactorDelta[], id: FactorId): FactorDelta | undefined {
   return factors.find((f) => f.id === id);
 }
 
@@ -153,6 +153,12 @@ describe('calculateReadinessScore — nausea and energy modifiers', () => {
     expect(score).toBe(70);
   });
 
+  it('nausea=2 subtracts 5', () => {
+    const result = calculateReadinessScore({ ...base, injectionPhase: 'adjustment', nausea: 2 });
+    expect(result.score).toBe(65);
+    expect(getFactor(result.factors, 'nausea')).toEqual({ id: 'nausea', delta: -5 });
+  });
+
   it('nausea=3 subtracts 10', () => {
     const { score } = calculateReadinessScore({ ...base, injectionPhase: 'adjustment', nausea: 3 });
     expect(score).toBe(60);
@@ -166,6 +172,12 @@ describe('calculateReadinessScore — nausea and energy modifiers', () => {
   it('energy=3 (neutral) adds 0', () => {
     const { score } = calculateReadinessScore({ ...base, injectionPhase: 'adjustment', energy: 3 });
     expect(score).toBe(70);
+  });
+
+  it('energy=4 adds 5', () => {
+    const result = calculateReadinessScore({ ...base, injectionPhase: 'adjustment', energy: 4 });
+    expect(result.score).toBe(75);
+    expect(getFactor(result.factors, 'energy')).toEqual({ id: 'energy', delta: 5 });
   });
 
   it('energy=5 adds 10', () => {

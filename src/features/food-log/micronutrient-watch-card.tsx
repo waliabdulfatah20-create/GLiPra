@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, type TFunction } from 'react-i18next';
 
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { ProGate } from '@/features/subscription/pro-gate';
@@ -125,20 +125,29 @@ interface NutrientTileProps {
   unit: string;
   rda: number;
   styles: ReturnType<typeof makeStyles>;
-  t: (key: string, opts?: object) => string;
+  t: TFunction;
 }
 
 function NutrientTile({ label, value, unit, rda, styles, t }: NutrientTileProps) {
-  const { colors } = useTheme();
   const pct = getNutrientPct(value, rda);
   const status: NutrientStatus = getNutrientStatus(value, rda);
-  const barColor = { green: colors.success, amber: colors.warning, red: colors.error }[status];
-  const display =
-    unit === 'mcg' ? value.toFixed(1) : Math.round(value).toString();
+  const safe = Number.isFinite(value) ? value : 0;
+  const display = unit === 'mcg' ? safe.toFixed(1) : Math.round(safe).toString();
+
+  const dotColorStyle = {
+    green: styles.statusDotGreen,
+    amber: styles.statusDotAmber,
+    red: styles.statusDotRed,
+  }[status];
+  const barColorStyle = {
+    green: styles.barFillGreen,
+    amber: styles.barFillAmber,
+    red: styles.barFillRed,
+  }[status];
 
   return (
     <View style={styles.tile}>
-      <View style={[styles.statusDot, { backgroundColor: barColor }]} />
+      <View style={[styles.statusDot, dotColorStyle]} />
       <Text style={styles.tileName}>{label}</Text>
       <Text style={styles.tileValue}>
         {display}
@@ -151,7 +160,8 @@ function NutrientTile({ label, value, unit, rda, styles, t }: NutrientTileProps)
         <View
           style={[
             styles.barFill,
-            { width: `${pct}%` as `${number}%`, backgroundColor: barColor },
+            barColorStyle,
+            { width: `${pct}%` as `${number}%` },
           ]}
         />
       </View>
@@ -277,6 +287,9 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       height: 6,
       borderRadius: 3,
     },
+    statusDotGreen: { backgroundColor: colors.success },
+    statusDotAmber: { backgroundColor: colors.warning },
+    statusDotRed: { backgroundColor: colors.error },
     tileName: {
       fontSize: 8,
       fontWeight: '600',
@@ -311,6 +324,9 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       height: 3,
       borderRadius: 2,
     },
+    barFillGreen: { backgroundColor: colors.success },
+    barFillAmber: { backgroundColor: colors.warning },
+    barFillRed: { backgroundColor: colors.error },
     gapBanner: {
       borderLeftWidth: 3,
       borderLeftColor: colors.warning,

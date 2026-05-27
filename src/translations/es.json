@@ -207,7 +207,8 @@
     "nutrient_b12": "Vitamina B12",
     "nutrient_vitd": "Vitamina D",
     "pct_of_goal": "{{pct}}% de la meta",
-    "goal_met": "Meta cumplida"
+    "goal_met": "Meta cumplida",
+    "micronutrient_disclaimer": "Los valores nutricionales son estimados basados en promedios de la base de datos de alimentos y pueden no reflejar el contenido exacto de tu comida."
   },
   "checkin": {
     "title": "Check-in diario",

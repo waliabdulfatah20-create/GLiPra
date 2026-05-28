@@ -117,7 +117,7 @@ export default function ShotPrepScreen() {
               onToggle={() => {
                 if (!isLoading) {
                   haptics.tap();
-                  toggleItem(item.id as ChecklistItemId);
+                  toggleItem(item.id);
                 }
               }}
             />
@@ -166,14 +166,14 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     backChevron: {
       fontSize: 28,
       fontWeight: '300',
-      color: '#ffffff',
+      color: colors.white,
       lineHeight: 32,
     },
     headerTitle: {
       flex: 1,
       fontSize: 20,
       fontWeight: '800',
-      color: '#ffffff',
+      color: colors.white,
     },
     rxBadge: {
       backgroundColor: 'rgba(255,255,255,0.25)',
@@ -182,7 +182,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       paddingVertical: 3,
     },
     rxBadgeText: {
-      color: '#ffffff',
+      color: colors.white,
       fontSize: 11,
       fontWeight: '700',
       letterSpacing: 0.5,

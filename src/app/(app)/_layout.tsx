@@ -1,5 +1,6 @@
-import { Redirect, SplashScreen, Tabs } from 'expo-router';
+import { Redirect, SplashScreen, Tabs, router } from 'expo-router';
 import * as React from 'react';
+import { BackHandler } from 'react-native';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -22,6 +23,20 @@ export default function TabLayout() {
       return () => clearTimeout(timer);
     }
   }, [hideSplash, status]);
+
+  // Exit the app cleanly when the hardware back button is pressed at the tab
+  // root. Without this, React Navigation falls back to (auth), which
+  // immediately redirects to (app), producing a blank flicker frame.
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (!router.canGoBack()) {
+        BackHandler.exitApp();
+        return true; // consume the event — do not propagate to React Navigation
+      }
+      return false; // let React Navigation handle back normally (sub-screens, modals)
+    });
+    return () => subscription.remove();
+  }, []);
 
   if (isFirstTime === undefined) {
     return null;

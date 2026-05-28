@@ -42,10 +42,8 @@ export function EwmaChart({ logs, width, height, injectionDates, unit = 'kg' }: 
     );
   }
 
-  // ── Compute value range ───────────────────────────────────────────────────
-  const allValues: number[] = logs.flatMap((l) =>
-    l.ewmaWeightKg != null ? [l.weightKg, l.ewmaWeightKg] : [l.weightKg],
-  );
+  // ── Compute value range — raw weights only (excludes stale DB EWMA) ───────
+  const allValues: number[] = logs.map((l) => l.weightKg);
   const rawMin = Math.min(...allValues);
   const rawMax = Math.max(...allValues);
   const pad = (rawMax - rawMin) * 0.05 || 1; // 5% padding; fallback 1 kg if flat
@@ -70,14 +68,23 @@ export function EwmaChart({ logs, width, height, injectionDates, unit = 'kg' }: 
     return PADDING.top + ((maxVal - val) / (maxVal - minVal)) * plotH;
   }
 
+  // ── Windowed EWMA — seeded from first in-window log, ignores DB ewmaWeightKg ─
+  // The stored ewmaWeightKg is the cumulative all-time trend from the user's very
+  // first log. With EWMA_ALPHA=0.1 it can lag 50–100 lbs behind the current data,
+  // making the line look disconnected. Recomputing from the window start ensures
+  // the line begins at the first visible dot and tracks forward sensibly.
+  const EWMA_ALPHA = 0.1;
+  const windowedEwma: number[] = logs.reduce<number[]>((acc, log, i) => {
+    if (i === 0) return [log.weightKg];
+    const prev = acc[i - 1];
+    return [...acc, Math.round((EWMA_ALPHA * log.weightKg + (1 - EWMA_ALPHA) * prev) * 100) / 100];
+  }, []);
+
   // ── Build EWMA polyline points ────────────────────────────────────────────
-  // Keep the array so we can count actual data points for the ≥3 guard.
-  const ewmaPointsArr = logs
-    .filter((l) => l.ewmaWeightKg != null)
-    .map((l) => {
-      const ts = parseISO(l.loggedAt).getTime();
-      return `${toX(ts)},${toY(l.ewmaWeightKg as number)}`;
-    });
+  const ewmaPointsArr = logs.map((log, i) => {
+    const ts = parseISO(log.loggedAt).getTime();
+    return `${toX(ts)},${toY(windowedEwma[i])}`;
+  });
   const ewmaPoints = ewmaPointsArr.join(' ');
 
   // ── Y-axis label values (3 ticks) ─────────────────────────────────────────

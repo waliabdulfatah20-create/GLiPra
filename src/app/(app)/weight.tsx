@@ -37,7 +37,7 @@ export default function WeightScreen() {
     [colors, spacing, radius, shadows],
   );
 
-  const chartWidth = width - spacing.lg * 2;
+  const chartWidth = width - spacing.lg * 2 - spacing.md * 2;
 
   const latestLog = logs.length > 0 ? logs[logs.length - 1] : null;
   const recentLogs = [...logs].reverse().slice(0, 10);

@@ -1,5 +1,7 @@
+import { formatISO } from 'date-fns';
+
 import { supabase } from '@/lib/supabase';
-import { CHECKLIST_ITEMS } from './checklist-data';
+import { getChecklistStatus } from './checklist-data';
 
 export interface ShotPrepLog {
   completedItems: string[];
@@ -18,7 +20,8 @@ export async function fetchShotPrepLog(
     .eq('injection_date', injectionDate)
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (error) throw new Error(error.message); // real failure — propagate
+  if (!data) return null; // no row yet — valid first-use
 
   return {
     completedItems: (data.completed_items as string[]) ?? [],
@@ -31,8 +34,8 @@ export async function upsertShotPrepLog(
   userId: string,
   injectionDate: string,
   completedItems: string[],
-): Promise<{ error: string | null }> {
-  const fullyCompleted = completedItems.length >= CHECKLIST_ITEMS.length;
+): Promise<void> {
+  const { isDone: fullyCompleted } = getChecklistStatus(completedItems);
 
   const { error } = await supabase.from('shot_prep_logs').upsert(
     {
@@ -40,10 +43,10 @@ export async function upsertShotPrepLog(
       injection_date: injectionDate,
       completed_items: completedItems,
       fully_completed: fullyCompleted,
-      logged_at: new Date().toISOString(),
+      logged_at: formatISO(new Date()),
     },
     { onConflict: 'user_id,injection_date' },
   );
 
-  return { error: error ? error.message : null };
+  if (error) throw new Error(error.message);
 }

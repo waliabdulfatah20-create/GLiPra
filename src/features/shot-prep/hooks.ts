@@ -3,13 +3,17 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { fetchShotPrepLog, upsertShotPrepLog } from './api';
-import { CHECKLIST_ITEMS, type ChecklistItemId } from './checklist-data';
+import { CHECKLIST_ITEMS, getChecklistStatus, type ChecklistItemId } from './checklist-data';
 
 export function useShotDayPrep(injectionDate: string) {
   const session = useAuthStore.use.session();
   const userId = session?.user.id;
   const queryClient = useQueryClient();
-  const queryKey = ['shot-prep-log', userId, injectionDate];
+
+  // Key by userId to avoid cross-user cache collision; sentinel for unauthenticated state.
+  const queryKey = userId
+    ? (['shot-prep-log', userId, injectionDate] as const)
+    : (['shot-prep-log', '__no_user__'] as const);
 
   const { data: log, isLoading } = useQuery({
     queryKey,
@@ -20,17 +24,27 @@ export function useShotDayPrep(injectionDate: string) {
 
   // Optimistic local state — initialized once from DB when data first loads.
   const [localCompleted, setLocalCompleted] = useState<string[]>([]);
-  const initialized = useRef(false);
+
+  // Keyed by injectionDate so we re-initialize when the date changes.
+  const initializedForDate = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!isLoading && !initialized.current) {
+    if (!isLoading && initializedForDate.current !== injectionDate) {
       setLocalCompleted(log?.completedItems ?? []);
-      initialized.current = true;
+      initializedForDate.current = injectionDate;
     }
-  }, [isLoading, log]);
+  }, [isLoading, log, injectionDate]);
 
   const { mutate: doUpsert } = useMutation({
     mutationFn: (items: string[]) => upsertShotPrepLog(userId!, injectionDate, items),
+    onMutate: () => ({
+      previousItems: localCompleted,
+    }),
+    onError: (_err, _items, context) => {
+      if (context?.previousItems !== undefined) {
+        setLocalCompleted(context.previousItems);
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
     },
@@ -38,6 +52,7 @@ export function useShotDayPrep(injectionDate: string) {
 
   const toggleItem = useCallback(
     (id: ChecklistItemId) => {
+      if (!userId) return;
       setLocalCompleted((prev) => {
         const next = prev.includes(id)
           ? prev.filter((x) => x !== id)
@@ -46,12 +61,10 @@ export function useShotDayPrep(injectionDate: string) {
         return next;
       });
     },
-    [doUpsert],
+    [doUpsert, userId],
   );
 
-  const completedCount = localCompleted.length;
-  const totalCount = CHECKLIST_ITEMS.length;
-  const isDone = completedCount >= totalCount;
+  const { completedCount, totalCount, isDone } = getChecklistStatus(localCompleted);
 
   return { completedItems: localCompleted, completedCount, totalCount, isDone, isLoading, toggleItem };
 }

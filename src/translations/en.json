@@ -323,5 +323,27 @@
       "new_dose_week": "New dose weeks are hardest - small frequent protein beats big meals",
       "streak": "Keep your streak alive - one protein-rich meal seals the day"
     }
+  },
+  "shot_prep": {
+    "header_title": "Shot Day Prep",
+    "header_subtitle": "Pharmacist's checklist for your injection day",
+    "progress_done": "All steps complete",
+    "progress_partial": "{{completed}} of {{total}} steps complete",
+    "done_title": "You're all set for your injection",
+    "done_body": "Great prep work. Your body will thank you.",
+    "disclaimer": "This checklist provides general wellness guidance designed by a licensed pharmacist. It does not replace your prescriber's instructions. Contact your provider if you experience severe or worsening side effects.",
+    "pharmacist_note": "Pharmacist note",
+    "items": {
+      "hydrated_title": "Drink 8+ oz of water",
+      "hydrated_detail": "Hydrating before your injection reduces nausea. Do this before coffee.",
+      "breakfast_title": "Eat a light protein-rich breakfast",
+      "breakfast_detail": "Greek yogurt or eggs. An empty stomach worsens GLP-1 side effects.",
+      "rotate_site_title": "Rotate your injection site",
+      "rotate_site_detail": "Today's recommended site is shown in the Injection Sites tab.",
+      "anti_nausea_title": "Have anti-nausea food nearby",
+      "anti_nausea_detail": "Crackers, ginger tea, or peppermint. Keep them accessible for 2-3 hours post-injection.",
+      "protein_plan_title": "Plan your protein meal 2 hours post-injection",
+      "protein_plan_detail": "A protein-forward meal or shake ~2 hours after helps blunt the nausea window."
+    }
   }
 }

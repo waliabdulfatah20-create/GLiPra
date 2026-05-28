@@ -15,6 +15,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useTranslation } from 'react-i18next';
+
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { ChecklistItemRow } from '@/components/shot-prep/checklist-item-row';
 import { useShotDayPrep } from '@/features/shot-prep/hooks';
@@ -25,6 +27,7 @@ import type { GlipraTokens } from '@/theme/tokens';
 
 export default function ShotPrepScreen() {
   const { colors, spacing, radius, shadows, gradients } = useTheme();
+  const { t } = useTranslation();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
     [colors, spacing, radius, shadows],
@@ -58,13 +61,13 @@ export default function ShotPrepScreen() {
           >
             <Text style={styles.backChevron}>&#x2039;</Text>
           </Pressable>
-          <Text style={styles.headerTitle}>Shot Day Prep</Text>
+          <Text style={styles.headerTitle}>{t('shot_prep.header_title')}</Text>
           <View style={styles.rxBadge}>
             <Text style={styles.rxBadgeText}>Rx</Text>
           </View>
         </View>
         <Text style={styles.headerSubtitle}>
-          Pharmacist's checklist for your injection day
+          {t('shot_prep.header_subtitle')}
         </Text>
       </LinearGradient>
 
@@ -78,8 +81,8 @@ export default function ShotPrepScreen() {
           <View style={styles.progressRow}>
             <Text style={styles.progressLabel}>
               {isDone
-                ? 'All steps complete'
-                : `${completedCount} of ${totalCount} steps complete`}
+                ? t('shot_prep.progress_done')
+                : t('shot_prep.progress_partial', { completed: completedCount, total: totalCount })}
             </Text>
             <Text style={styles.progressFraction}>{completedCount}/{totalCount}</Text>
           </View>
@@ -101,8 +104,8 @@ export default function ShotPrepScreen() {
           <View style={styles.doneBanner}>
             <Text style={styles.doneCheck}>&#x2713;</Text>
             <View style={styles.doneTextBlock}>
-              <Text style={styles.doneTitle}>You're all set for your injection</Text>
-              <Text style={styles.doneBody}>Great prep work. Your body will thank you.</Text>
+              <Text style={styles.doneTitle}>{t('shot_prep.done_title')}</Text>
+              <Text style={styles.doneBody}>{t('shot_prep.done_body')}</Text>
             </View>
           </View>
         )}
@@ -112,7 +115,11 @@ export default function ShotPrepScreen() {
           {CHECKLIST_ITEMS.map((item) => (
             <ChecklistItemRow
               key={item.id}
-              item={item}
+              item={{
+                ...item,
+                title: t(`shot_prep.items.${item.id}_title`),
+                detail: t(`shot_prep.items.${item.id}_detail`),
+              }}
               isChecked={completedItems.includes(item.id)}
               onToggle={() => {
                 if (!isLoading) {
@@ -127,9 +134,7 @@ export default function ShotPrepScreen() {
         {/* Rule 8: tier-2 disclaimer for pharmacist-authored educational content */}
         <DisclaimerBanner tier={2}>
           <Text style={styles.disclaimerText}>
-            This checklist provides general wellness guidance designed by a licensed pharmacist.
-            It does not replace your prescriber's instructions. Contact your provider if you
-            experience severe or worsening side effects.
+            {t('shot_prep.disclaimer')}
           </Text>
         </DisclaimerBanner>
       </ScrollView>

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import type { ChecklistItem } from '@/features/shot-prep/checklist-data';
 import { useTheme } from '@/lib/ThemeContext';
@@ -17,6 +18,7 @@ export function ChecklistItemRow({
   onToggle,
 }: ChecklistItemRowProps) {
   const { colors, spacing, radius } = useTheme();
+  const { t } = useTranslation();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
     [colors, spacing, radius],
@@ -46,7 +48,7 @@ export function ChecklistItemRow({
         <View style={styles.titleRow}>
           {item.isPharmacistNote && (
             <View style={styles.pharmacistBadge}>
-              <Text style={styles.pharmacistBadgeText}>Pharmacist note</Text>
+              <Text style={styles.pharmacistBadgeText}>{t('shot_prep.pharmacist_note')}</Text>
             </View>
           )}
           <Text

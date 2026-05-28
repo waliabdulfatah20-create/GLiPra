@@ -1,121 +1,137 @@
+// Route: /(app)/shot-prep
+// Shot Day Prep Checklist — pharmacist-authored injection day checklist.
+// Route registered in _layout.tsx as href:null (do NOT add it again).
+
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { format } from 'date-fns';
 import * as React from 'react';
 import {
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { ChecklistItemRow } from '@/components/shot-prep/checklist-item-row';
-import { CHECKLIST_ITEMS } from '@/features/shot-prep/checklist-data';
 import { useShotDayPrep } from '@/features/shot-prep/hooks';
+import { CHECKLIST_ITEMS, type ChecklistItemId } from '@/features/shot-prep/checklist-data';
+import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
 
-/** Use today's date as the injection date key so the checklist resets daily. */
-function todayDateString(): string {
-  return format(new Date(), 'yyyy-MM-dd');
-}
-
 export default function ShotPrepScreen() {
-  const injectionDate = todayDateString();
-  const { completedItems, completedCount, totalCount, isDone, toggleItem } =
-    useShotDayPrep(injectionDate);
-
-  const { colors, spacing, radius, shadows } = useTheme();
+  const { colors, spacing, radius, shadows, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows]
+    [colors, spacing, radius, shadows],
   );
 
-  const progressFraction = totalCount > 0 ? completedCount / totalCount : 0;
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const { completedItems, completedCount, totalCount, isDone, isLoading, toggleItem } =
+    useShotDayPrep(today);
+
+  const progressPct = totalCount > 0 ? completedCount / totalCount : 0;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
+      edges={['top', 'bottom']}
+    >
+      {/* Gradient header */}
+      <LinearGradient
+        colors={gradients.hero}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.heroGradient}
+      >
+        <View style={styles.headerRow}>
+          <Pressable
+            onPress={() => { haptics.tap(); router.back(); }}
+            hitSlop={8}
+            style={styles.backButton}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Text style={styles.backChevron}>&#x2039;</Text>
+          </Pressable>
+          <Text style={styles.headerTitle}>Shot Day Prep</Text>
+          <View style={styles.rxBadge}>
+            <Text style={styles.rxBadgeText}>Rx</Text>
+          </View>
+        </View>
+        <Text style={styles.headerSubtitle}>
+          Pharmacist's checklist for your injection day
+        </Text>
+      </LinearGradient>
+
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Back button */}
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
-
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerIcon}>💉</Text>
-          <Text style={styles.headerTitle}>Shot Day Prep</Text>
-          <Text style={styles.headerSubtitle}>Your injection day checklist</Text>
-        </View>
-
-        {/* Progress bar */}
-        <View style={styles.progressSection}>
-          <Text style={styles.progressLabel}>
-            {completedCount}/{totalCount} items
-          </Text>
+        {/* Progress strip */}
+        <View style={styles.progressCard}>
+          <View style={styles.progressRow}>
+            <Text style={styles.progressLabel}>
+              {isDone
+                ? 'All steps complete'
+                : `${completedCount} of ${totalCount} steps complete`}
+            </Text>
+            <Text style={styles.progressFraction}>{completedCount}/{totalCount}</Text>
+          </View>
           <View style={styles.progressTrack}>
             <View
               style={[
                 styles.progressFill,
-                { width: `${Math.round(progressFraction * 100)}%` },
+                {
+                  width: `${progressPct * 100}%`,
+                  backgroundColor: isDone ? colors.success : colors.phaseInjectionDay,
+                },
               ]}
             />
           </View>
         </View>
 
-        {/* Rule 8: Tier-2 disclaimer */}
-        <DisclaimerBanner tier={2}>
-          <Text style={styles.disclaimerText}>
-            This checklist is for general preparation guidance only. Always
-            follow your prescriber's specific instructions for your medication.
-          </Text>
-        </DisclaimerBanner>
+        {/* Done banner */}
+        {isDone && (
+          <View style={styles.doneBanner}>
+            <Text style={styles.doneCheck}>&#x2713;</Text>
+            <View style={styles.doneTextBlock}>
+              <Text style={styles.doneTitle}>You're all set for your injection</Text>
+              <Text style={styles.doneBody}>Great prep work. Your body will thank you.</Text>
+            </View>
+          </View>
+        )}
 
-        {/* Checklist items */}
-        <View style={styles.listCard}>
+        {/* Checklist card */}
+        <View style={styles.checklistCard}>
           {CHECKLIST_ITEMS.map((item) => (
             <ChecklistItemRow
               key={item.id}
               item={item}
               isChecked={completedItems.includes(item.id)}
-              onToggle={() => toggleItem(item.id)}
+              onToggle={() => {
+                if (!isLoading) {
+                  haptics.tap();
+                  toggleItem(item.id as ChecklistItemId);
+                }
+              }}
             />
           ))}
         </View>
 
-        {/* Injection site tracker CTA */}
-        <TouchableOpacity
-          style={styles.siteTrackerRow}
-          onPress={() => router.push('/injection-sites')}
-          activeOpacity={0.75}
-          accessibilityRole="button"
-          accessibilityLabel="Open injection site tracker"
-        >
-          <View style={styles.siteTrackerLeft}>
-            <Text style={styles.siteTrackerTitle}>Injection Site Tracker</Text>
-            <Text style={styles.siteTrackerBody}>Log where you injected today</Text>
-          </View>
-          <Text style={styles.siteTrackerChevron}>›</Text>
-        </TouchableOpacity>
-
-        {/* Completion banner */}
-        {isDone && (
-          <View style={styles.completionBanner}>
-            <Text style={styles.completionText}>
-              You're ready for your injection!
-            </Text>
-          </View>
-        )}
+        {/* Rule 8: tier-2 disclaimer for pharmacist-authored educational content */}
+        <DisclaimerBanner tier={2}>
+          <Text style={styles.disclaimerText}>
+            This checklist provides general wellness guidance designed by a licensed pharmacist.
+            It does not replace your prescriber's instructions. Contact your provider if you
+            experience severe or worsening side effects.
+          </Text>
+        </DisclaimerBanner>
       </ScrollView>
     </SafeAreaView>
   );
@@ -130,125 +146,135 @@ interface StyleTokens {
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    scroll: {
-      padding: spacing.lg,
-      paddingBottom: spacing.xxl,
-    },
+    container: { flex: 1 },
+    scroll: { flex: 1, backgroundColor: colors.background },
+    scrollContent: { paddingBottom: spacing.xxl },
 
-    // Back button
-    backButton: {
-      alignSelf: 'flex-start',
-      marginBottom: spacing.md,
+    heroGradient: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.xl,
     },
-    backButtonText: {
-      fontSize: 15,
-      fontWeight: '600',
-      color: colors.primary,
-    },
-
-    // Header
-    header: {
+    headerRow: {
+      flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: spacing.lg,
-    },
-    headerIcon: {
-      fontSize: 40,
       marginBottom: spacing.sm,
     },
+    backButton: {
+      marginRight: spacing.sm,
+    },
+    backChevron: {
+      fontSize: 28,
+      fontWeight: '300',
+      color: '#ffffff',
+      lineHeight: 32,
+    },
     headerTitle: {
-      fontSize: 24,
+      flex: 1,
+      fontSize: 20,
       fontWeight: '800',
-      color: colors.textPrimary,
-      marginBottom: spacing.xs,
+      color: '#ffffff',
+    },
+    rxBadge: {
+      backgroundColor: 'rgba(255,255,255,0.25)',
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 3,
+    },
+    rxBadgeText: {
+      color: '#ffffff',
+      fontSize: 11,
+      fontWeight: '700',
+      letterSpacing: 0.5,
     },
     headerSubtitle: {
       fontSize: 14,
-      color: colors.textSecondary,
+      color: 'rgba(255,255,255,0.85)',
+      lineHeight: 20,
     },
 
-    // Progress
-    progressSection: {
-      marginBottom: spacing.md,
+    progressCard: {
+      marginHorizontal: spacing.lg,
+      marginTop: spacing.lg,
+      marginBottom: spacing.sm,
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      ...shadows.sm,
+    },
+    progressRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
     },
     progressLabel: {
       fontSize: 13,
       fontWeight: '600',
       color: colors.textSecondary,
-      marginBottom: spacing.xs,
+    },
+    progressFraction: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.textPrimary,
     },
     progressTrack: {
-      height: 8,
-      backgroundColor: colors.gray200,
+      height: 4,
       borderRadius: radius.full,
+      backgroundColor: colors.gray100,
       overflow: 'hidden',
     },
     progressFill: {
-      height: '100%',
-      backgroundColor: colors.phaseInjectionDay,
+      height: 4,
       borderRadius: radius.full,
     },
 
-    // Disclaimer text child
-    disclaimerText: {
-      fontSize: 12,
+    doneBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginHorizontal: spacing.lg,
+      marginBottom: spacing.sm,
+      backgroundColor: colors.successLight,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.success,
+      padding: spacing.md,
+      gap: spacing.md,
+    },
+    doneCheck: {
+      fontSize: 24,
+      color: colors.success,
+      fontWeight: '700',
+    },
+    doneTextBlock: {
+      flex: 1,
+    },
+    doneTitle: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.success,
+      marginBottom: 2,
+    },
+    doneBody: {
+      fontSize: 13,
       color: colors.textSecondary,
       lineHeight: 18,
     },
 
-    // Checklist card
-    listCard: {
+    checklistCard: {
+      marginHorizontal: spacing.lg,
+      marginBottom: spacing.md,
       backgroundColor: colors.surface,
       borderRadius: radius.lg,
       paddingHorizontal: spacing.md,
-      marginTop: spacing.md,
+      overflow: 'hidden',
       ...shadows.sm,
     },
 
-    // Injection site tracker row
-    siteTrackerRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.surface,
-      borderRadius: radius.lg,
-      padding: spacing.md,
-      marginTop: spacing.md,
-      ...shadows.sm,
-    },
-    siteTrackerLeft: { flex: 1 },
-    siteTrackerTitle: {
-      fontSize: 15,
-      fontWeight: '700',
-      color: colors.textPrimary,
-      marginBottom: 2,
-    },
-    siteTrackerBody: {
-      fontSize: 13,
+    disclaimerText: {
+      fontSize: 12,
       color: colors.textSecondary,
-    },
-    siteTrackerChevron: {
-      fontSize: 22,
-      color: colors.phaseInjectionDay,
-      fontWeight: '300',
-    },
-
-    // Completion banner
-    completionBanner: {
-      marginTop: spacing.lg,
-      backgroundColor: colors.phaseInjectionDay,
-      borderRadius: radius.lg,
-      padding: spacing.lg,
-      alignItems: 'center',
-      ...shadows.md,
-    },
-    completionText: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: colors.white,
-      textAlign: 'center',
+      lineHeight: 18,
     },
   });
 }

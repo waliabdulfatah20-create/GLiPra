@@ -113,5 +113,9 @@ function ConnectedProviders({ children }: { children: React.ReactNode }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // GestureHandlerRootView sits outside GlipraThemeProvider — cannot use
+    // useTheme(). Hardcode the light-mode background token (#f7f9fc) so
+    // Android never flashes a bare white frame on back-press transitions.
+    backgroundColor: '#f7f9fc',
   },
 });

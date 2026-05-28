@@ -24,7 +24,7 @@ describe('getChecklistStatus', () => {
   it('returns 0 completed when empty', () => {
     const s = getChecklistStatus([]);
     expect(s.completedCount).toBe(0);
-    expect(s.totalCount).toBe(5);
+    expect(s.totalCount).toBe(CHECKLIST_ITEMS.length);
     expect(s.isDone).toBe(false);
   });
   it('counts only valid item IDs — ignores unknown IDs', () => {
@@ -41,8 +41,13 @@ describe('getChecklistStatus', () => {
     const s = getChecklistStatus(CHECKLIST_ITEM_IDS.slice(0, 4));
     expect(s.isDone).toBe(false);
   });
-  it('totalCount is always 5 regardless of input', () => {
-    expect(getChecklistStatus([]).totalCount).toBe(5);
-    expect(getChecklistStatus(['hydrated']).totalCount).toBe(5);
+  it('totalCount is always CHECKLIST_ITEMS.length regardless of input', () => {
+    expect(getChecklistStatus([]).totalCount).toBe(CHECKLIST_ITEMS.length);
+    expect(getChecklistStatus(['hydrated']).totalCount).toBe(CHECKLIST_ITEMS.length);
+  });
+  it('deduplicates repeated IDs — does not overcount', () => {
+    const s = getChecklistStatus(['hydrated', 'hydrated', 'breakfast', 'breakfast']);
+    expect(s.completedCount).toBe(2); // only 2 unique valid IDs
+    expect(s.isDone).toBe(false);
   });
 });

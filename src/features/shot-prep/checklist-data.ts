@@ -8,7 +8,7 @@ export type ChecklistItemId =
   | 'anti_nausea'
   | 'protein_plan';
 
-export const CHECKLIST_ITEM_IDS: ChecklistItemId[] = [
+export const CHECKLIST_ITEM_IDS: readonly ChecklistItemId[] = [
   'hydrated',
   'breakfast',
   'rotate_site',
@@ -23,7 +23,7 @@ export interface ChecklistItem {
   isPharmacistNote?: boolean;
 }
 
-export const CHECKLIST_ITEMS: ChecklistItem[] = [
+export const CHECKLIST_ITEMS: ReadonlyArray<ChecklistItem> = [
   {
     id: 'hydrated',
     title: 'Drink 8+ oz of water',
@@ -66,7 +66,7 @@ export interface ChecklistStatus {
  */
 export function getChecklistStatus(completedItemIds: string[]): ChecklistStatus {
   const validIds = new Set<string>(CHECKLIST_ITEM_IDS);
-  const completedCount = completedItemIds.filter((id) => validIds.has(id)).length;
+  const completedCount = new Set(completedItemIds.filter((id) => validIds.has(id))).size;
   const totalCount = CHECKLIST_ITEMS.length;
-  return { completedCount, totalCount, isDone: completedCount >= totalCount };
+  return { completedCount, totalCount, isDone: completedCount === totalCount };
 }

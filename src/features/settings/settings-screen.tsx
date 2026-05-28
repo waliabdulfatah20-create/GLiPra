@@ -207,8 +207,8 @@ export function SettingsScreen() {
         <SettingsSection title={t('settings.about')}>
           <SettingsRow label={t('settings.app_name')} value={Env.EXPO_PUBLIC_NAME} />
           <SettingsRow label={t('settings.version')} value={Env.EXPO_PUBLIC_VERSION} />
-          <SettingsRow label={t('settings.privacy')} onPress={() => {}} />
-          <SettingsRow label={t('settings.terms')} onPress={() => {}} isLast />
+          <SettingsRow label={t('settings.privacy')} onPress={() => router.push('/legal/privacy-policy')} />
+          <SettingsRow label={t('settings.terms')} onPress={() => router.push('/legal/terms-of-service')} isLast />
         </SettingsSection>
 
         {/* ── Account ───────────────────────────────────────────────── */}

@@ -43,16 +43,17 @@ export function LevelChart({
   const BRAND = colors.primary;
   const AMBER = colors.warning;
 
-  if (curve.length < 2) return null;
-
   const plotW = width - PADDING.left - PADDING.right;
   const plotH = height - PADDING.top - PADDING.bottom;
 
-  const minOffset = curve[0].dayOffset;
-  const maxOffset = curve[curve.length - 1].dayOffset;
-
-  // Fix 2: Memoize coordinate mapping computations
+  // Fix 2: Memoize coordinate mapping computations — MUST be before any early return
+  // (Rules of Hooks: hooks must be called unconditionally on every render)
   const computed = React.useMemo(() => {
+    // Guard inside the memo so curve.length < 2 never causes an out-of-bounds access
+    if (curve.length < 2) return null;
+
+    const minOffset = curve[0].dayOffset;
+    const maxOffset = curve[curve.length - 1].dayOffset;
     const maxLevel = Math.max(...curve.map((p) => p.levelMg));
     const levelRange = maxLevel || 1;
     const offsetRange = maxOffset - minOffset || 1;
@@ -113,13 +114,16 @@ export function LevelChart({
       { value: 0, label: '0' },
     ];
 
-    return { curvePoints, fillPath, baselineY, todayX, todayY, injectionOffsets, xLabels, yTicks, toX, toY };
-  }, [curve, todayOffset, injectionDates, labelIntervalDays, width, height, minOffset, maxOffset, plotW, plotH]);
-
-  const { curvePoints, fillPath, baselineY, todayX, todayY, injectionOffsets, xLabels, yTicks, toX } = computed;
+    return { curvePoints, fillPath, baselineY, todayX, todayY, injectionOffsets, xLabels, yTicks, toX, toY, minOffset, maxOffset };
+  }, [curve, todayOffset, injectionDates, labelIntervalDays, width, height, plotW, plotH]);
 
   // Fix 3: Gate today line/dot rendering when todayOffset is out of curve range
-  const todayInRange = todayOffset >= minOffset && todayOffset <= maxOffset;
+  // computed is null when curve.length < 2 — early return AFTER all hooks
+  const todayInRange = computed != null && todayOffset >= computed.minOffset && todayOffset <= computed.maxOffset;
+
+  if (computed == null) return null;
+
+  const { curvePoints, fillPath, baselineY, todayX, todayY, injectionOffsets, xLabels, yTicks, toX } = computed;
 
   return (
     <View style={{ width, height }}>

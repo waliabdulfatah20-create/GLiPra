@@ -30,7 +30,7 @@ export default function TabLayout() {
     return <Redirect href="/onboarding/language" />;
   }
   if (status === 'signOut') {
-    return <Redirect href="/login" />;
+    return <Redirect href="/(auth)/sign-in" />;
   }
 
   return (

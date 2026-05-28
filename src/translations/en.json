@@ -102,7 +102,7 @@
       "energy": "Energy"
     },
     "tips": {
-      "weight": "Your trend line is smoothed to filter day-to-day noise from hydration and food timing. Look at the slope over weeks, not single days.",
+      "weight": "Your weight line connects every entry you log. Day-to-day swings are normal — hydration and food timing affect the scale. Look at the direction over weeks, not single days.",
       "protein": "Hitting 80% or more of your protein floor protects lean muscle while GLP-1 does its job. Aim for consistency over perfection.",
       "streak": "Every green day fueled your muscle preservation goal. A missed day doesn't undo progress — keep going tomorrow.",
       "injection": "Consistent timing keeps medication levels stable. Shifting your dose day within a 24-hour window is clinically fine.",

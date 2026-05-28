@@ -1,7 +1,7 @@
 import { parseISO } from 'date-fns';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Circle, Line, Svg, Text as SvgText } from 'react-native-svg';
+import { Circle, Line, Polyline, Svg, Text as SvgText } from 'react-native-svg';
 
 import { useTheme } from '@/lib/ThemeContext';
 import { kgToLbs } from '@/lib/unit-preference';
@@ -68,20 +68,13 @@ export function EwmaChart({ logs, width, height, injectionDates, unit = 'kg' }: 
     return PADDING.top + ((maxVal - val) / (maxVal - minVal)) * plotH;
   }
 
-  // ── Linear regression trend line ──────────────────────────────────────────
-  // Least-squares best-fit through actual weight dots. Always visually passes
-  // through the center of the data regardless of point count or data range.
-  const regPoints = logs.map((log, i) => ({ x: timestamps[i], y: log.weightKg }));
-  const n = regPoints.length;
-  const sumX  = regPoints.reduce((s, p) => s + p.x, 0);
-  const sumY  = regPoints.reduce((s, p) => s + p.y, 0);
-  const sumXY = regPoints.reduce((s, p) => s + p.x * p.y, 0);
-  const sumX2 = regPoints.reduce((s, p) => s + p.x * p.x, 0);
-  const denom = n * sumX2 - sumX * sumX;
-  const slope     = denom !== 0 ? (n * sumXY - sumX * sumY) / denom : 0;
-  const intercept = (sumY - slope * sumX) / n;
-  const trendY1   = intercept + slope * minTime;
-  const trendY2   = intercept + slope * maxTime;
+  // ── Raw line connecting all dots in chronological order ───────────────────
+  const rawLinePoints = logs
+    .map((log) => {
+      const ts = parseISO(log.loggedAt).getTime();
+      return `${toX(ts)},${toY(log.weightKg)}`;
+    })
+    .join(' ');
 
   // ── Y-axis label values (3 ticks) ─────────────────────────────────────────
   const yTicks = [minVal, (minVal + maxVal) / 2, maxVal];
@@ -140,18 +133,15 @@ export function EwmaChart({ logs, width, height, injectionDates, unit = 'kg' }: 
           {unit === 'lbs' ? 'lbs' : 'kg'}
         </SvgText>
 
-        {/* Linear regression trend line — drawn when ≥3 data points exist */}
-        {logs.length >= 3 && (
-          <Line
-            x1={toX(minTime)}
-            y1={toY(trendY1)}
-            x2={toX(maxTime)}
-            y2={toY(trendY2)}
-            stroke={colors.primary}
-            strokeWidth={2}
-            strokeLinecap="round"
-          />
-        )}
+        {/* Line connecting all weight dots in chronological order */}
+        <Polyline
+          points={rawLinePoints}
+          fill="none"
+          stroke={colors.primary}
+          strokeWidth={2}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
 
         {/* Dose marker lines — faint dashed verticals at each injection date */}
         {injectionDates?.map((isoDate) => {

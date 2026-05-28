@@ -335,27 +335,5 @@
       "new_dose_week": "Las semanas de nueva dosis son las mas dificiles - proteina frecuente es mejor",
       "streak": "Manten tu racha - una comida con proteinas sella el dia"
     }
-  },
-  "shot_prep": {
-    "header_title": "Preparación para el día de inyección",
-    "header_subtitle": "Lista de verificación del farmacéutico para el día de tu inyección",
-    "progress_done": "Todos los pasos completos",
-    "progress_partial": "{{completed}} de {{total}} pasos completos",
-    "done_title": "Estás listo/a para tu inyección",
-    "done_body": "Excelente preparación. Tu cuerpo te lo agradecerá.",
-    "disclaimer": "Esta lista proporciona orientación general de bienestar diseñada por un farmacéutico con licencia. No reemplaza las instrucciones de tu médico. Contacta a tu proveedor si experimentas efectos secundarios graves o que empeoran.",
-    "pharmacist_note": "Nota del farmacéutico",
-    "items": {
-      "hydrated_title": "Bebe 8+ oz de agua",
-      "hydrated_detail": "Hidratarte antes de la inyección reduce las náuseas. Haz esto antes del café.",
-      "breakfast_title": "Come un desayuno ligero rico en proteínas",
-      "breakfast_detail": "Yogur griego o huevos. Un estómago vacío empeora los efectos secundarios de GLP-1.",
-      "rotate_site_title": "Rota tu sitio de inyección",
-      "rotate_site_detail": "El sitio recomendado para hoy se muestra en la pestaña Sitios de inyección.",
-      "anti_nausea_title": "Ten comida antináuseas cerca",
-      "anti_nausea_detail": "Galletas, té de jengibre o menta. Tenlos accesibles por 2-3 horas después de la inyección.",
-      "protein_plan_title": "Planifica tu comida proteica 2 horas después de la inyección",
-      "protein_plan_detail": "Una comida o batido rico en proteínas ~2 horas después ayuda a reducir el período de náuseas."
-    }
   }
 }

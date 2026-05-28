@@ -48,7 +48,7 @@ export function ChecklistItemRow({
         <View style={styles.titleRow}>
           {item.isPharmacistNote && (
             <View style={styles.pharmacistBadge}>
-              <Text style={styles.pharmacistBadgeText}>{t('shot_prep.pharmacist_note')}</Text>
+              <Text style={styles.pharmacistBadgeText}>{t('shotPrep.pharmacistNote')}</Text>
             </View>
           )}
           <Text

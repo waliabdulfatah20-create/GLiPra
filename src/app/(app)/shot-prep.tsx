@@ -61,13 +61,13 @@ export default function ShotPrepScreen() {
           >
             <Text style={styles.backChevron}>&#x2039;</Text>
           </Pressable>
-          <Text style={styles.headerTitle}>{t('shot_prep.header_title')}</Text>
+          <Text style={styles.headerTitle}>{t('shotPrep.title')}</Text>
           <View style={styles.rxBadge}>
             <Text style={styles.rxBadgeText}>Rx</Text>
           </View>
         </View>
         <Text style={styles.headerSubtitle}>
-          {t('shot_prep.header_subtitle')}
+          {t('shotPrep.subtitle')}
         </Text>
       </LinearGradient>
 
@@ -81,8 +81,8 @@ export default function ShotPrepScreen() {
           <View style={styles.progressRow}>
             <Text style={styles.progressLabel}>
               {isDone
-                ? t('shot_prep.progress_done')
-                : t('shot_prep.progress_partial', { completed: completedCount, total: totalCount })}
+                ? t('shotPrep.progressAllDone')
+                : t('shotPrep.progressInProgress', { completed: completedCount, total: totalCount })}
             </Text>
             <Text style={styles.progressFraction}>{completedCount}/{totalCount}</Text>
           </View>
@@ -104,8 +104,8 @@ export default function ShotPrepScreen() {
           <View style={styles.doneBanner}>
             <Text style={styles.doneCheck}>&#x2713;</Text>
             <View style={styles.doneTextBlock}>
-              <Text style={styles.doneTitle}>{t('shot_prep.done_title')}</Text>
-              <Text style={styles.doneBody}>{t('shot_prep.done_body')}</Text>
+              <Text style={styles.doneTitle}>{t('shotPrep.doneBannerTitle')}</Text>
+              <Text style={styles.doneBody}>{t('shotPrep.doneBannerBody')}</Text>
             </View>
           </View>
         )}
@@ -115,11 +115,7 @@ export default function ShotPrepScreen() {
           {CHECKLIST_ITEMS.map((item) => (
             <ChecklistItemRow
               key={item.id}
-              item={{
-                ...item,
-                title: t(`shot_prep.items.${item.id}_title`),
-                detail: t(`shot_prep.items.${item.id}_detail`),
-              }}
+              item={item}
               isChecked={completedItems.includes(item.id)}
               onToggle={() => {
                 if (!isLoading) {
@@ -134,7 +130,7 @@ export default function ShotPrepScreen() {
         {/* Rule 8: tier-2 disclaimer for pharmacist-authored educational content */}
         <DisclaimerBanner tier={2}>
           <Text style={styles.disclaimerText}>
-            {t('shot_prep.disclaimer')}
+            {t('shotPrep.disclaimer')}
           </Text>
         </DisclaimerBanner>
       </ScrollView>

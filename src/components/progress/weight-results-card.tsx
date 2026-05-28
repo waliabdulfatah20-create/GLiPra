@@ -31,9 +31,10 @@ interface MetricCellProps {
   value: string;
   unit?: string;
   dimmed?: boolean;
+  valueColor?: string;
 }
 
-function MetricCell({ label, value, unit, dimmed = false }: MetricCellProps) {
+function MetricCell({ label, value, unit, dimmed = false, valueColor }: MetricCellProps) {
   const { colors, spacing } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing }),
@@ -42,7 +43,7 @@ function MetricCell({ label, value, unit, dimmed = false }: MetricCellProps) {
   return (
     <View style={styles.cell}>
       <View style={styles.cellValueRow}>
-        <Text style={[styles.cellValue, dimmed && styles.cellValueDimmed]}>{value}</Text>
+        <Text style={[styles.cellValue, dimmed && styles.cellValueDimmed, valueColor ? { color: valueColor } : null]}>{value}</Text>
         {unit ? <Text style={styles.cellUnit}>{unit}</Text> : null}
       </View>
       <Text style={styles.cellLabel}>{label}</Text>
@@ -76,7 +77,10 @@ export function WeightResultsCard({ logs, goalWeightKg, heightCm }: WeightResult
     weightUnit === 'lbs'
       ? kgToLbs(Math.abs(totalLostKg)).toFixed(1)
       : Math.abs(totalLostKg).toFixed(1);
-  const totalLostSign = totalLostKg >= 0 ? '-' : '+';
+  const isGain = totalLostKg < 0;
+  const totalLostLabel = isGain ? t('progress.results_card.total_gained') : t('progress.results_card.total_lost');
+  const totalLostColor = isGain ? colors.textSecondary : colors.success;
+  const totalLostPrefix = isGain ? '+' : '-';
   const totalLostUnit = weightUnit === 'lbs' ? 'lbs' : 'kg';
 
   // ── Weekly average change ──────────────────────────────────────────────────
@@ -116,9 +120,10 @@ export function WeightResultsCard({ logs, goalWeightKg, heightCm }: WeightResult
     <CardShell label={t('progress.results_card.label')} accentColor={colors.success}>
       <View style={styles.grid}>
         <MetricCell
-          label={t('progress.results_card.total_lost')}
-          value={`${totalLostSign}${totalLostDisplay}`}
+          label={totalLostLabel}
+          value={`${totalLostPrefix}${totalLostDisplay}`}
           unit={totalLostUnit}
+          valueColor={totalLostColor}
         />
         <MetricCell
           label={t('progress.results_card.weekly_avg')}

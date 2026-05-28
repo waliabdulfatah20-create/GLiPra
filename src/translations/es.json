@@ -65,6 +65,7 @@
     "results_card": {
       "label": "RESULTADOS DE PESO",
       "total_lost": "Total perdido",
+      "total_gained": "Total ganado",
       "weekly_avg": "Promedio semanal",
       "bmi": "IMC",
       "to_goal": "A la meta",

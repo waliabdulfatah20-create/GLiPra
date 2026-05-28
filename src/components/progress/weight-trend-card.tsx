@@ -14,6 +14,7 @@ import { useWeightLogs } from '@/features/weight/hooks';
 import { useInjectionAdherence } from '@/features/progress/hooks';
 import { tipI18nKey } from '@/features/progress/pharmacist-tips';
 import { useTheme } from '@/lib/ThemeContext';
+import { useWeightUnit } from '@/lib/unit-preference';
 import type { GlipraTokens } from '@/theme/tokens';
 
 import { CardShell } from './card-shell';
@@ -33,6 +34,7 @@ export function WeightTrendCard({ days, width }: WeightTrendCardProps) {
   );
   const { logs, isLoading } = useWeightLogs(days);
   const { windowDates: injectionDates } = useInjectionAdherence(days);
+  const { unit: weightUnit } = useWeightUnit();
 
   return (
     <CardShell label={t('progress.weight_card.label')} accentColor={colors.primary}>
@@ -44,8 +46,22 @@ export function WeightTrendCard({ days, width }: WeightTrendCardProps) {
         <View style={[styles.placeholder, { width, height: 160 }]}>
           <Text style={styles.placeholderText}>{t('progress.weight_card.empty')}</Text>
         </View>
+      ) : logs.length < 3 ? (
+        <View style={styles.sparseState}>
+          <Text style={styles.sparseIcon}>⚖️</Text>
+          <Text style={styles.sparseTitle}>Keep logging to see your trend</Text>
+          <Text style={styles.sparseBody}>
+            Log your weight a few more times and your smoothed trend line will appear here.
+          </Text>
+        </View>
       ) : (
-        <EwmaChart logs={logs} width={width} height={160} injectionDates={injectionDates} />
+        <EwmaChart
+          logs={logs}
+          width={width}
+          height={160}
+          unit={weightUnit}
+          injectionDates={injectionDates}
+        />
       )}
       <PharmacistTip>{t(tipI18nKey('weight'))}</PharmacistTip>
     </CardShell>
@@ -68,6 +84,28 @@ function makeStyles({ colors, spacing }: StyleTokens) {
       fontSize: 13,
       color: colors.textSecondary,
       textAlign: 'center',
+    },
+    sparseState: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: spacing.xl,
+      gap: spacing.sm,
+    },
+    sparseIcon: {
+      fontSize: 28,
+    },
+    sparseTitle: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      textAlign: 'center',
+    },
+    sparseBody: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 18,
+      paddingHorizontal: spacing.lg,
     },
   });
 }

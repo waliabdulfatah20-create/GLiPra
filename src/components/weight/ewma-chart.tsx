@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Circle, Line, Polyline, Svg, Text as SvgText } from 'react-native-svg';
 
 import { useTheme } from '@/lib/ThemeContext';
+import { kgToLbs } from '@/lib/unit-preference';
 import type { GlipraTokens } from '@/theme/tokens';
 
 export interface EwmaChartProps {
@@ -16,6 +17,8 @@ export interface EwmaChartProps {
   height: number;
   /** ISO date strings for each injection. Rendered as faint dashed vertical lines. */
   injectionDates?: string[];
+  /** Display unit for y-axis labels. Defaults to 'kg'. */
+  unit?: 'kg' | 'lbs';
 }
 
 const PADDING = { top: 16, right: 8, bottom: 28, left: 40 };
@@ -24,7 +27,7 @@ const PADDING = { top: 16, right: 8, bottom: 28, left: 40 };
  * Simple SVG line chart showing raw weight dots and the EWMA trend line.
  * Built with react-native-svg primitives — no third-party charting library.
  */
-export function EwmaChart({ logs, width, height, injectionDates }: EwmaChartProps) {
+export function EwmaChart({ logs, width, height, injectionDates, unit = 'kg' }: EwmaChartProps) {
   const { colors, spacing } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing }),
@@ -68,16 +71,21 @@ export function EwmaChart({ logs, width, height, injectionDates }: EwmaChartProp
   }
 
   // ── Build EWMA polyline points ────────────────────────────────────────────
-  const ewmaPoints = logs
+  // Keep the array so we can count actual data points for the ≥3 guard.
+  const ewmaPointsArr = logs
     .filter((l) => l.ewmaWeightKg != null)
     .map((l) => {
       const ts = parseISO(l.loggedAt).getTime();
       return `${toX(ts)},${toY(l.ewmaWeightKg as number)}`;
-    })
-    .join(' ');
+    });
+  const ewmaPoints = ewmaPointsArr.join(' ');
 
   // ── Y-axis label values (3 ticks) ─────────────────────────────────────────
   const yTicks = [minVal, (minVal + maxVal) / 2, maxVal];
+
+  // ── Y-axis tick formatter — respects unit preference ─────────────────────
+  const formatTick = (kg: number): string =>
+    unit === 'lbs' ? `${Math.round(kgToLbs(kg))}` : kg.toFixed(1);
 
   return (
     <View style={{ width, height }}>
@@ -112,14 +120,27 @@ export function EwmaChart({ logs, width, height, injectionDates }: EwmaChartProp
                 fontSize={9}
                 fill={colors.textSecondary}
               >
-                {tick.toFixed(1)}
+                {formatTick(tick)}
               </SvgText>
             </React.Fragment>
           );
         })}
 
-        {/* EWMA trend line */}
-        {ewmaPoints.length > 0 && (
+        {/* Y-axis unit label */}
+        <SvgText
+          x={PADDING.left - 6}
+          y={PADDING.top - 4}
+          textAnchor="end"
+          fontSize={8}
+          fill={colors.textSecondary}
+        >
+          {unit === 'lbs' ? 'lbs' : 'kg'}
+        </SvgText>
+
+        {/* EWMA trend line — only drawn when ≥3 data points exist.
+            With fewer points EWMA_ALPHA=0.1 barely moves from its seed value,
+            making the trend line diverge wildly from the raw dots. */}
+        {ewmaPointsArr.length >= 3 && (
           <Polyline
             points={ewmaPoints}
             fill="none"

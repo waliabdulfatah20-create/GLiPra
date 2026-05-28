@@ -65,6 +65,7 @@
     "results_card": {
       "label": "WEIGHT RESULTS",
       "total_lost": "Total Lost",
+      "total_gained": "Total Gained",
       "weekly_avg": "Weekly Avg",
       "bmi": "BMI",
       "to_goal": "To Goal",

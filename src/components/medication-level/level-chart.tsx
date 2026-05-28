@@ -29,10 +29,6 @@ export interface LevelChartProps {
 
 const PADDING = { top: 16, right: 12, bottom: 28, left: 40 };
 
-// Brand primitives — hardcoded because SVG fill/stroke must be plain strings.
-const BRAND = '#6d28d9';  // colors.primary
-const AMBER = '#d97706';  // colors.today
-
 export function LevelChart({
   curve,
   todayOffset,
@@ -43,76 +39,97 @@ export function LevelChart({
 }: LevelChartProps) {
   const { colors } = useTheme();
 
+  // Fix 1: Derive BRAND and AMBER from theme colors (dark mode support)
+  const BRAND = colors.primary;
+  const AMBER = colors.warning;
+
   if (curve.length < 2) return null;
 
   const plotW = width - PADDING.left - PADDING.right;
   const plotH = height - PADDING.top - PADDING.bottom;
 
-  const maxLevel = Math.max(...curve.map((p) => p.levelMg));
-  const levelRange = maxLevel || 1;
-
   const minOffset = curve[0].dayOffset;
   const maxOffset = curve[curve.length - 1].dayOffset;
-  const offsetRange = maxOffset - minOffset || 1;
 
-  function toX(offset: number): number {
-    return PADDING.left + ((offset - minOffset) / offsetRange) * plotW;
-  }
-  function toY(level: number): number {
-    return PADDING.top + ((maxLevel - level) / levelRange) * plotH;
-  }
+  // Fix 2: Memoize coordinate mapping computations
+  const computed = React.useMemo(() => {
+    const maxLevel = Math.max(...curve.map((p) => p.levelMg));
+    const levelRange = maxLevel || 1;
+    const offsetRange = maxOffset - minOffset || 1;
 
-  const baselineY = toY(0);
+    function toX(offset: number): number {
+      return PADDING.left + ((offset - minOffset) / offsetRange) * plotW;
+    }
+    function toY(level: number): number {
+      return PADDING.top + ((maxLevel - level) / levelRange) * plotH;
+    }
 
-  const curvePoints = curve
-    .map((p) => `${toX(p.dayOffset).toFixed(1)},${toY(p.levelMg).toFixed(1)}`)
-    .join(' ');
+    const baselineY = toY(0);
 
-  const firstX = toX(curve[0].dayOffset).toFixed(1);
-  const lastX = toX(curve[curve.length - 1].dayOffset).toFixed(1);
-  const fillPath =
-    `M ${firstX},${baselineY.toFixed(1)} ` +
-    curve.map((p) => `L ${toX(p.dayOffset).toFixed(1)},${toY(p.levelMg).toFixed(1)}`).join(' ') +
-    ` L ${lastX},${baselineY.toFixed(1)} Z`;
+    const curvePoints = curve
+      .map((p) => `${toX(p.dayOffset).toFixed(1)},${toY(p.levelMg).toFixed(1)}`)
+      .join(' ');
 
-  const todayX = toX(todayOffset);
-  const todayPoint = curve.find((p) => p.dayOffset === todayOffset);
-  const todayY = todayPoint != null ? toY(todayPoint.levelMg) : null;
+    const firstX = toX(curve[0].dayOffset).toFixed(1);
+    const lastX = toX(curve[curve.length - 1].dayOffset).toFixed(1);
+    const fillPath =
+      `M ${firstX},${baselineY.toFixed(1)} ` +
+      curve.map((p) => `L ${toX(p.dayOffset).toFixed(1)},${toY(p.levelMg).toFixed(1)}`).join(' ') +
+      ` L ${lastX},${baselineY.toFixed(1)} Z`;
 
-  // Build date to offset lookup for injection dot placement
-  const dateToOffset: Record<string, number> = {};
-  for (const p of curve) { dateToOffset[p.date] = p.dayOffset; }
-  const injectionOffsets = injectionDates
-    .map((d) => dateToOffset[d])
-    .filter((o): o is number => o !== undefined && o >= minOffset && o <= maxOffset);
+    const todayX = toX(todayOffset);
+    const todayPoint = curve.find((p) => p.dayOffset === todayOffset);
+    const todayY = todayPoint != null ? toY(todayPoint.levelMg) : null;
 
-  // X-axis labels every labelIntervalDays, always include today
-  const seenSlots = new Set<number>();
-  const xLabels: Array<{ offset: number; label: string; isToday: boolean }> = [];
-  for (const p of curve) {
-    const isToday = p.dayOffset === todayOffset;
-    const slot = Math.round((p.dayOffset - minOffset) / labelIntervalDays);
-    if ((p.dayOffset - minOffset) % labelIntervalDays === 0 || isToday) {
-      if (!seenSlots.has(slot)) {
-        seenSlots.add(slot);
-        xLabels.push({
-          offset: p.dayOffset,
-          label: isToday ? 'Today' : format(parseISO(p.date), 'MMM d'),
-          isToday,
-        });
+    // Build date to offset lookup for injection dot placement
+    const dateToOffset: Record<string, number> = {};
+    for (const p of curve) { dateToOffset[p.date] = p.dayOffset; }
+    const injectionOffsets = injectionDates
+      .map((d) => dateToOffset[d])
+      .filter((o): o is number => o !== undefined && o >= minOffset && o <= maxOffset);
+
+    // X-axis labels every labelIntervalDays, always include today
+    // Fix 4: "Today" always wins slot collision
+    const seenSlots = new Set<number>();
+    const xLabels: Array<{ offset: number; label: string; isToday: boolean }> = [];
+    for (const p of curve) {
+      const isToday = p.dayOffset === todayOffset;
+      const slot = Math.round((p.dayOffset - minOffset) / labelIntervalDays);
+      if (isToday || (p.dayOffset - minOffset) % labelIntervalDays === 0) {
+        if (isToday || !seenSlots.has(slot)) {
+          seenSlots.add(slot);
+          xLabels.push({
+            offset: p.dayOffset,
+            label: isToday ? 'Today' : format(parseISO(p.date), 'MMM d'),
+            isToday,
+          });
+        }
       }
     }
-  }
 
-  const yTicks = [
-    { value: maxLevel, label: maxLevel.toFixed(1) },
-    { value: maxLevel / 2, label: (maxLevel / 2).toFixed(1) },
-    { value: 0, label: '0' },
-  ];
+    const yTicks = [
+      { value: maxLevel, label: maxLevel.toFixed(1) },
+      { value: maxLevel / 2, label: (maxLevel / 2).toFixed(1) },
+      { value: 0, label: '0' },
+    ];
+
+    return { curvePoints, fillPath, baselineY, todayX, todayY, injectionOffsets, xLabels, yTicks, toX, toY };
+  }, [curve, todayOffset, injectionDates, labelIntervalDays, width, height, minOffset, maxOffset, plotW, plotH]);
+
+  const { curvePoints, fillPath, baselineY, todayX, todayY, injectionOffsets, xLabels, yTicks, toX } = computed;
+
+  // Fix 3: Gate today line/dot rendering when todayOffset is out of curve range
+  const todayInRange = todayOffset >= minOffset && todayOffset <= maxOffset;
 
   return (
     <View style={{ width, height }}>
-      <Svg width={width} height={height}>
+      {/* Fix 5: Add accessibilityLabel to Svg */}
+      <Svg
+        width={width}
+        height={height}
+        accessible={true}
+        accessibilityLabel="Medication level chart"
+      >
         <Defs>
           <SvgLinearGradient id="pkGrad" x1="0" y1="0" x2="0" y2="1">
             <Stop offset="0%" stopColor={BRAND} stopOpacity="0.22" />
@@ -130,7 +147,7 @@ export function LevelChart({
 
         {/* Y-axis ticks + labels */}
         {yTicks.map(({ value, label }) => {
-          const y = toY(value);
+          const y = computed.toY(value);
           return (
             <React.Fragment key={value}>
               <Line
@@ -165,18 +182,20 @@ export function LevelChart({
           strokeLinejoin="round"
         />
 
-        {/* Today dashed vertical line */}
-        <Line
-          x1={todayX} y1={PADDING.top}
-          x2={todayX} y2={baselineY}
-          stroke={AMBER}
-          strokeWidth={1}
-          strokeDasharray="3,3"
-          opacity={0.8}
-        />
+        {/* Today dashed vertical line — only when today is in chart range */}
+        {todayInRange && (
+          <Line
+            x1={todayX} y1={PADDING.top}
+            x2={todayX} y2={baselineY}
+            stroke={AMBER}
+            strokeWidth={1}
+            strokeDasharray="3,3"
+            opacity={0.8}
+          />
+        )}
 
-        {/* Today dot on the curve */}
-        {todayY !== null && (
+        {/* Today dot on the curve — only when today is in chart range */}
+        {todayInRange && todayY !== null && (
           <Circle cx={todayX} cy={todayY} r={4} fill={AMBER} />
         )}
 

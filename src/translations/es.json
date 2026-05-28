@@ -155,6 +155,18 @@
     "cycle_overdue_label": "ATRASADA",
     "settings_button_label": "Abrir configuración"
   },
+  "shotPrep": {
+    "title": "Preparación del Día de Inyección",
+    "subtitle": "Lista del farmacéutico para tu día de inyección",
+    "progressInProgress": "{{completed}} de {{total}} pasos completados",
+    "progressAllDone": "Todos los pasos completados",
+    "doneBannerTitle": "Estás listo para tu inyección",
+    "doneBannerBody": "Excelente preparación. Tu cuerpo te lo agradecerá.",
+    "siteTrackerTitle": "Rastreador de Sitio de Inyección",
+    "siteTrackerBody": "Registra dónde te inyectaste hoy para mantener tu rotación programada.",
+    "disclaimer": "Esta lista de verificación proporciona orientación general de bienestar diseñada por un farmacéutico certificado. No reemplaza las instrucciones de tu médico. Comunícate con tu proveedor si experimentas efectos secundarios graves o que empeoran.",
+    "pharmacistNote": "Nota del farmacéutico"
+  },
   "content_card": {
     "tip": "CONSEJO",
     "warning": "ADVERTENCIA",

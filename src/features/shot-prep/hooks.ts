@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { fetchShotPrepLog, upsertShotPrepLog } from './api';
-import { CHECKLIST_ITEMS, getChecklistStatus, type ChecklistItemId } from './checklist-data';
+import { getChecklistStatus, type ChecklistItemId } from './checklist-data';
 
 export function useShotDayPrep(injectionDate: string) {
   const session = useAuthStore.use.session();
@@ -27,25 +27,27 @@ export function useShotDayPrep(injectionDate: string) {
 
   // Keyed by injectionDate so we re-initialize when the date changes.
   const initializedForDate = useRef<string | null>(null);
+  const committedItems = useRef<string[]>([]);
 
   useEffect(() => {
     if (!isLoading && initializedForDate.current !== injectionDate) {
-      setLocalCompleted(log?.completedItems ?? []);
+      const items = log?.completedItems ?? [];
+      setLocalCompleted(items);
+      committedItems.current = items;
       initializedForDate.current = injectionDate;
     }
   }, [isLoading, log, injectionDate]);
 
   const { mutate: doUpsert } = useMutation({
     mutationFn: (items: string[]) => upsertShotPrepLog(userId!, injectionDate, items),
-    onMutate: () => ({
-      previousItems: localCompleted,
-    }),
+    onMutate: () => ({ previousItems: committedItems.current }),
     onError: (_err, _items, context) => {
       if (context?.previousItems !== undefined) {
         setLocalCompleted(context.previousItems);
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, items) => {
+      committedItems.current = items;
       queryClient.invalidateQueries({ queryKey });
     },
   });

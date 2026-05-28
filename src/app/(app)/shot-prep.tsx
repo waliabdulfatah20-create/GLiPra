@@ -12,12 +12,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { ChecklistItemRow } from '@/components/shot-prep/checklist-item-row';
-import { SHOT_DAY_CHECKLIST } from '@/features/shot-prep/checklist-data';
+import { CHECKLIST_ITEMS } from '@/features/shot-prep/checklist-data';
 import { useShotPrepChecklist } from '@/features/shot-prep/hooks';
 import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
 
-const TOTAL = SHOT_DAY_CHECKLIST.length;
+const TOTAL = CHECKLIST_ITEMS.length;
 
 /** Use today's date as the injection date key so the checklist resets daily. */
 function todayDateString(): string {
@@ -85,7 +85,7 @@ export default function ShotPrepScreen() {
 
         {/* Checklist items */}
         <View style={styles.listCard}>
-          {SHOT_DAY_CHECKLIST.map((item) => (
+          {CHECKLIST_ITEMS.map((item) => (
             <ChecklistItemRow
               key={item.id}
               item={item}

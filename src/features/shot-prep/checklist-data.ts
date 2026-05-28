@@ -1,80 +1,72 @@
+// Pharmacist-authored shot day prep checklist.
+// Content locked — do not rewrite without pharmacist review (CLAUDE.md liability rules).
+
+export type ChecklistItemId =
+  | 'hydrated'
+  | 'breakfast'
+  | 'rotate_site'
+  | 'anti_nausea'
+  | 'protein_plan';
+
+export const CHECKLIST_ITEM_IDS: ChecklistItemId[] = [
+  'hydrated',
+  'breakfast',
+  'rotate_site',
+  'anti_nausea',
+  'protein_plan',
+];
+
 export interface ChecklistItem {
-  id: string;
+  id: ChecklistItemId;
   title: string;
   detail: string;
-  /** true for items authored as a direct pharmacist note */
-  isPharmacistNote: boolean;
+  isPharmacistNote?: boolean;
 }
 
-export const SHOT_DAY_CHECKLIST: ChecklistItem[] = [
+export const CHECKLIST_ITEMS: ChecklistItem[] = [
   {
-    id: 'site-rotation',
-    title: 'Site rotation',
-    detail:
-      'Choose an abdomen site different from last week. Glipra will recommend the next site in your rotation.',
-    isPharmacistNote: false,
-  },
-  {
-    id: 'temperature-check',
-    title: 'Temperature check',
-    detail:
-      'If refrigerated: remove pen/vial 30 minutes before injection to reach room temperature.',
-    isPharmacistNote: false,
-  },
-  {
-    id: 'hydration',
-    title: 'Hydration',
-    detail:
-      'Drink at least 250 ml of water before your injection. Stay well hydrated today.',
-    isPharmacistNote: false,
-  },
-  {
-    id: 'meal-timing',
-    title: 'Meal timing',
-    detail:
-      'You can inject with or without food. If nausea is a concern, try injecting before bed.',
-    isPharmacistNote: false,
-  },
-  {
-    id: 'dose-confirmation',
-    title: 'Dose confirmation',
-    detail:
-      'Confirm your dose setting matches your prescriber’s instructions before dialing.',
-    isPharmacistNote: false,
-  },
-  {
-    id: 'injection-technique',
-    title: 'Injection technique',
-    detail:
-      'Inject at 90° angle. Hold pen in place for 10 seconds after pressing the button.',
-    isPharmacistNote: false,
-  },
-  {
-    id: 'site-care',
-    title: 'Site care',
-    detail:
-      'Do not rub the injection site after administering. This can affect absorption.',
-    isPharmacistNote: false,
-  },
-  {
-    id: 'storage',
-    title: 'Storage',
-    detail:
-      'Return unused medication to the refrigerator. Do not freeze. Keep away from light.',
-    isPharmacistNote: false,
-  },
-  {
-    id: 'log-injection',
-    title: 'Log your injection',
-    detail:
-      'Tap the Sites tab and use Add Shot to record today\'s injection site, dose, and any notes.',
-    isPharmacistNote: false,
-  },
-  {
-    id: 'post-injection-watch',
-    title: 'Post-injection watch',
-    detail:
-      'Most people feel fine. Mild injection site reactions are normal and resolve quickly.',
+    id: 'hydrated',
+    title: 'Drink 8+ oz of water',
+    detail: 'Hydrating before your injection reduces nausea. Do this before coffee.',
     isPharmacistNote: true,
   },
+  {
+    id: 'breakfast',
+    title: 'Eat a light protein-rich breakfast',
+    detail: 'Greek yogurt or eggs. An empty stomach worsens GLP-1 side effects.',
+    isPharmacistNote: true,
+  },
+  {
+    id: 'rotate_site',
+    title: 'Rotate your injection site',
+    detail: "Today's recommended site is shown in the Injection Sites tab.",
+  },
+  {
+    id: 'anti_nausea',
+    title: 'Have anti-nausea food nearby',
+    detail: 'Crackers, ginger tea, or peppermint. Keep them accessible for 2-3 hours post-injection.',
+    isPharmacistNote: true,
+  },
+  {
+    id: 'protein_plan',
+    title: 'Plan your protein meal 2 hours post-injection',
+    detail: 'A protein-forward meal or shake ~2 hours after helps blunt the nausea window.',
+  },
 ];
+
+export interface ChecklistStatus {
+  completedCount: number;
+  totalCount: number;
+  isDone: boolean;
+}
+
+/**
+ * Derives completion status from an array of completed item IDs.
+ * Unknown IDs are silently ignored (defensive against stale DB data).
+ */
+export function getChecklistStatus(completedItemIds: string[]): ChecklistStatus {
+  const validIds = new Set<string>(CHECKLIST_ITEM_IDS);
+  const completedCount = completedItemIds.filter((id) => validIds.has(id)).length;
+  const totalCount = CHECKLIST_ITEMS.length;
+  return { completedCount, totalCount, isDone: completedCount >= totalCount };
+}

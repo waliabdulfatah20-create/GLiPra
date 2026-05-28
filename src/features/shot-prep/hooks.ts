@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as React from 'react';
 
-import { SHOT_DAY_CHECKLIST } from '@/features/shot-prep/checklist-data';
+import { CHECKLIST_ITEMS } from '@/features/shot-prep/checklist-data';
 
-const TOTAL_ITEMS = SHOT_DAY_CHECKLIST.length;
+const TOTAL_ITEMS = CHECKLIST_ITEMS.length;
 
 function storageKey(injectionDate: string): string {
   return `SHOT_PREP_${injectionDate}`;

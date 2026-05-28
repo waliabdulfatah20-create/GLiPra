@@ -40,7 +40,10 @@ export function useShotDayPrep(injectionDate: string) {
 
   const { mutate: doUpsert } = useMutation({
     mutationFn: (items: string[]) => upsertShotPrepLog(userId!, injectionDate, items),
-    onMutate: () => ({ previousItems: committedItems.current }),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey });
+      return { previousItems: committedItems.current };
+    },
     onError: (_err, _items, context) => {
       if (context?.previousItems !== undefined) {
         setLocalCompleted(context.previousItems);
@@ -48,7 +51,10 @@ export function useShotDayPrep(injectionDate: string) {
     },
     onSuccess: (_data, items) => {
       committedItems.current = items;
-      queryClient.invalidateQueries({ queryKey });
+      queryClient.setQueryData(queryKey, {
+        completedItems: items,
+        fullyCompleted: getChecklistStatus(items).isDone,
+      });
     },
   });
 

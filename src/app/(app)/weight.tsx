@@ -2,6 +2,7 @@ import { format, parseISO } from 'date-fns';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import {
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -15,7 +16,7 @@ import { EwmaChart } from '@/components/weight/ewma-chart';
 import { WeightEntryForm } from '@/components/weight/weight-entry-form';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { SkeletonBox } from '@/components/ui/skeleton-box';
-import { useInsertWeightLog, useWeightLogs } from '@/features/weight/hooks';
+import { useInsertWeightLog, useDeleteWeightLog, useWeightLogs } from '@/features/weight/hooks';
 import { UnitToggle } from '@/components/ui/unit-toggle';
 import { formatWeight, useWeightUnit } from '@/lib/unit-preference';
 import { useTheme } from '@/lib/ThemeContext';
@@ -27,6 +28,7 @@ export default function WeightScreen() {
 
   const { logs, isLoading } = useWeightLogs();
   const { mutate: insertLog, isLoading: isSaving, isSuccess } = useInsertWeightLog();
+  const { mutate: deleteLog } = useDeleteWeightLog();
   const { unit: weightUnit, toggle: toggleWeightUnit } = useWeightUnit();
 
   const { colors, spacing, radius, shadows } = useTheme();
@@ -39,6 +41,24 @@ export default function WeightScreen() {
 
   const latestLog = logs.length > 0 ? logs[logs.length - 1] : null;
   const recentLogs = [...logs].reverse().slice(0, 10);
+
+  const handleDelete = React.useCallback(
+    (id: string, displayWeight: string) => {
+      Alert.alert(
+        'Delete entry?',
+        `Remove ${displayWeight} from your log? This cannot be undone.`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: () => deleteLog(id),
+          },
+        ],
+      );
+    },
+    [deleteLog],
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -128,21 +148,31 @@ export default function WeightScreen() {
         {recentLogs.length > 0 && (
           <View style={styles.historyCard}>
             <Text style={styles.sectionLabel}>RECENT ENTRIES</Text>
-            {recentLogs.map((log) => (
-              <View key={log.id} style={styles.historyRow}>
-                <Text style={styles.historyDate}>
-                  {format(parseISO(log.loggedAt), 'MMM d')}
-                </Text>
-                <Text style={styles.historyWeight}>
-                  {formatWeight(log.weightKg, weightUnit)}
-                </Text>
-                {log.ewmaWeightKg != null && (
-                  <Text style={styles.historyEwma}>
-                    Trend: {formatWeight(log.ewmaWeightKg, weightUnit)}
+            {recentLogs.map((log) => {
+              const displayWeight = formatWeight(log.weightKg, weightUnit);
+              return (
+                <View key={log.id} style={styles.historyRow}>
+                  <Text style={styles.historyDate}>
+                    {format(parseISO(log.loggedAt), 'MMM d')}
                   </Text>
-                )}
-              </View>
-            ))}
+                  <Text style={styles.historyWeight}>{displayWeight}</Text>
+                  {log.ewmaWeightKg != null && (
+                    <Text style={styles.historyEwma}>
+                      Trend: {formatWeight(log.ewmaWeightKg, weightUnit)}
+                    </Text>
+                  )}
+                  <Pressable
+                    onPress={() => handleDelete(log.id, displayWeight)}
+                    style={styles.deleteButton}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Delete ${displayWeight} entry`}
+                    hitSlop={8}
+                  >
+                    <Text style={styles.deleteButtonText}>✕</Text>
+                  </Pressable>
+                </View>
+              );
+            })}
           </View>
         )}
 
@@ -317,6 +347,16 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     historyEwma: {
       fontSize: 12,
       color: colors.primary,
+    },
+    deleteButton: {
+      marginLeft: 'auto',
+      paddingHorizontal: spacing.xs,
+      paddingVertical: 2,
+    },
+    deleteButtonText: {
+      fontSize: 14,
+      color: colors.textDisabled,
+      fontWeight: '600',
     },
 
     disclaimerText: {

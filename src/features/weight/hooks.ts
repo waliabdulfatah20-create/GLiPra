@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/features/auth/use-auth-store';
-import { fetchWeightLogs, fetchWeightLogCount, insertWeightLog } from '@/features/weight/api';
+import { fetchWeightLogs, fetchWeightLogCount, insertWeightLog, deleteWeightLog } from '@/features/weight/api';
 import type { WeightLogEntry } from '@/features/weight/api';
 import { analytics, EVENTS } from '@/lib/analytics';
 import { applyEwma } from '@/utils/ewma';
@@ -96,5 +96,59 @@ export function useInsertWeightLog(): {
     mutate: mutation.mutate,
     isLoading: mutation.isPending,
     isSuccess: mutation.isSuccess,
+  };
+}
+
+/**
+ * Mutation to delete a weight log entry by id.
+ * Optimistically removes the row from all cached windows immediately,
+ * then invalidates to refetch the corrected EWMA chain.
+ */
+export function useDeleteWeightLog(): {
+  mutate: (id: string) => void;
+  isLoading: boolean;
+} {
+  const session = useAuthStore.use.session();
+  const userId = session?.user.id;
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (id: string) => {
+      if (!userId) throw new Error('Not authenticated');
+      await deleteWeightLog(id);
+    },
+    onMutate: async (id: string) => {
+      // Cancel in-flight refetches so they don't overwrite the optimistic state
+      await queryClient.cancelQueries({ queryKey: [WEIGHT_LOGS_KEY, userId] });
+
+      // Optimistically remove the row from every cached window
+      const allKeys = queryClient
+        .getQueryCache()
+        .findAll({ queryKey: [WEIGHT_LOGS_KEY, userId] });
+      const snapshots: Array<{ queryKey: unknown[]; previous: WeightLogEntry[] | undefined }> = [];
+      for (const query of allKeys) {
+        const previous = queryClient.getQueryData<WeightLogEntry[]>(query.queryKey as string[]);
+        snapshots.push({ queryKey: query.queryKey as string[], previous });
+        queryClient.setQueryData<WeightLogEntry[]>(
+          query.queryKey as string[],
+          (old) => (old ?? []).filter((l) => l.id !== id),
+        );
+      }
+      return { snapshots };
+    },
+    onError: (_err, _id, context) => {
+      // Roll back all windows on failure
+      for (const { queryKey, previous } of context?.snapshots ?? []) {
+        queryClient.setQueryData(queryKey, previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [WEIGHT_LOGS_KEY, userId] });
+    },
+  });
+
+  return {
+    mutate: mutation.mutate,
+    isLoading: mutation.isPending,
   };
 }

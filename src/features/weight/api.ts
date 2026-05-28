@@ -36,6 +36,21 @@ export async function insertWeightLog(
 }
 
 /**
+ * Delete a single weight log by its primary key.
+ * RLS ensures users can only delete their own rows.
+ */
+export async function deleteWeightLog(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('weight_logs')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    throw new Error(`Failed to delete weight log: ${error.message}`);
+  }
+}
+
+/**
  * Count total weight logs for a user (all-time).
  * Used to check the weight_logged_10x milestone.
  */

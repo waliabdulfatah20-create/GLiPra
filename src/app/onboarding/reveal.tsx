@@ -10,6 +10,7 @@ import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { setItem } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
+import { analytics, EVENTS } from '@/lib/analytics';
 import { haptics } from '@/lib/haptics';
 import { notifications } from '@/lib/notifications';
 import { useTheme } from '@/lib/ThemeContext';
@@ -109,6 +110,8 @@ export default function RevealScreen() {
       // Await the AsyncStorage write BEFORE navigating so (app)/_layout
       // reads isFirstTime=false on its first render and does not redirect back.
       await setItem('IS_FIRST_TIME', false);
+
+      analytics.capture(EVENTS.ONBOARDING_COMPLETED);
 
       // Request notification permission at the ideal moment — user has just
       // completed onboarding and understands the app's value proposition.

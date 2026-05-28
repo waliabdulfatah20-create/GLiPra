@@ -31,6 +31,9 @@ export const EVENTS = {
   // Weight
   WEIGHT_LOGGED: 'weight_logged',
 
+  // Injection logging
+  INJECTION_LOGGED: 'injection_logged',
+
   // AI Coach
   COACH_MESSAGE_SENT: 'coach_message_sent',
   COACH_MESSAGE_BLOCKED: 'coach_message_blocked', // keyword blocklist triggered

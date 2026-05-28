@@ -21,6 +21,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { analytics, EVENTS } from '@/lib/analytics';
 import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
 
@@ -87,16 +88,21 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
   );
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
 
+  // Fire paywall_viewed once per mount — includes the feature that triggered it.
+  React.useEffect(() => {
+    analytics.capture(EVENTS.PAYWALL_VIEWED, { feature: featureName });
+  }, [featureName]);
+
   const handlePurchase = useCallback(
     async (productId: string) => {
       const Purchases = getPurchasesModule();
       if (!Purchases) return;
 
       setPurchasingId(productId);
+      analytics.capture(EVENTS.PURCHASE_STARTED, { product_id: productId });
       try {
         await Purchases.purchaseProduct(productId);
-        // On success the parent should re-check subscription state.
-        // Dismiss the paywall — useSubscription will refresh automatically.
+        analytics.capture(EVENTS.PURCHASE_COMPLETED, { product_id: productId });
         onDismiss();
       } catch (e) {
         // PurchasesError with code PURCHASE_CANCELLED (2) is a user action —

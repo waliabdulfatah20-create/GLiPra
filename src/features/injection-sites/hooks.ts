@@ -14,6 +14,7 @@ import {
 } from './api';
 import { computeNextSite } from './calculator';
 import type { InjectionLog } from './types';
+import { analytics, EVENTS } from '@/lib/analytics';
 import { unlockMilestone } from '@/features/journey-cards/api';
 
 const QUERY_KEY = 'injection-logs';
@@ -85,6 +86,7 @@ export function useLogInjectionSite(lastInjectionDate?: string) {
     mutationFn: (input: InjectionLogInput) =>
       insertInjectionLog(userId!, input),
     onSuccess: (_data, input) => {
+      analytics.capture(EVENTS.INJECTION_LOGGED);
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY, userId] });
       // Refresh the curve and phase banner caches so both update immediately
       queryClient.invalidateQueries({ queryKey: ['injection-logs-curve', userId] });

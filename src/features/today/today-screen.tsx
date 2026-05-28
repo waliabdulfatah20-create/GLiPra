@@ -42,6 +42,7 @@ import type { InjectionPhase } from '@/types';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { markRedFlagTriggered } from '@/features/check-in/api';
 import { useRedFlagSnooze } from '@/features/safety/hooks';
+import { analytics, EVENTS } from '@/lib/analytics';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -112,6 +113,10 @@ export function TodayScreen() {
   // Write audit flag to DB when triggered (non-blocking, non-fatal)
   React.useEffect(() => {
     if (redFlagDetection?.triggered && userId) {
+      // Rule 2: no flag type codes — only aggregate count
+      analytics.capture(EVENTS.RED_FLAG_DETECTED, {
+        flag_count: redFlagDetection.patterns?.length ?? 1,
+      });
       markRedFlagTriggered(userId, today).catch(() => {});
     }
   }, [redFlagDetection?.triggered, userId, today]);

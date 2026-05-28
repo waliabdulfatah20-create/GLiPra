@@ -85,9 +85,14 @@ export function LevelChart({
     // Build date to offset lookup for injection dot placement
     const dateToOffset: Record<string, number> = {};
     for (const p of curve) { dateToOffset[p.date] = p.dayOffset; }
-    const injectionOffsets = injectionDates
-      .map((d) => dateToOffset[d])
-      .filter((o): o is number => o !== undefined && o >= minOffset && o <= maxOffset);
+    const injectionDotData = injectionDates
+      .map((d) => {
+        const offset = dateToOffset[d];
+        if (offset === undefined || offset < minOffset || offset > maxOffset) return null;
+        const point = curve.find((p) => p.dayOffset === offset);
+        return { offset, levelMg: point?.levelMg ?? 0 };
+      })
+      .filter((item): item is { offset: number; levelMg: number } => item !== null);
 
     // X-axis labels every labelIntervalDays, always include today
     // Fix 4: "Today" always wins slot collision
@@ -114,7 +119,7 @@ export function LevelChart({
       { value: 0, label: '0' },
     ];
 
-    return { curvePoints, fillPath, baselineY, todayX, todayY, injectionOffsets, xLabels, yTicks, toX, toY, minOffset, maxOffset };
+    return { curvePoints, fillPath, baselineY, todayX, todayY, injectionDotData, xLabels, yTicks, toX, toY, minOffset, maxOffset };
   }, [curve, todayOffset, injectionDates, labelIntervalDays, width, height, plotW, plotH]);
 
   // Fix 3: Gate today line/dot rendering when todayOffset is out of curve range
@@ -123,7 +128,7 @@ export function LevelChart({
 
   if (computed == null) return null;
 
-  const { curvePoints, fillPath, baselineY, todayX, todayY, injectionOffsets, xLabels, yTicks, toX } = computed;
+  const { curvePoints, fillPath, baselineY, todayX, todayY, injectionDotData, xLabels, yTicks, toX, toY } = computed;
 
   return (
     <View style={{ width, height }}>
@@ -203,12 +208,12 @@ export function LevelChart({
           <Circle cx={todayX} cy={todayY} r={4} fill={AMBER} />
         )}
 
-        {/* Injection event dots on the baseline */}
-        {injectionOffsets.map((offset) => (
+        {/* Injection event dots on the concentration curve */}
+        {injectionDotData.map(({ offset, levelMg }) => (
           <Circle
             key={offset}
             cx={toX(offset)}
-            cy={baselineY}
+            cy={toY(levelMg)}
             r={4}
             fill={BRAND}
           />

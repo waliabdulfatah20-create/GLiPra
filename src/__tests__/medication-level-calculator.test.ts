@@ -150,3 +150,44 @@ describe('constants', () => {
     expect(HALF_LIVES['dulaglutide_trulicity']).toBe(4.5);
   });
 });
+
+describe('generateSteadyStateCurve — actualInjectionDates', () => {
+  const TODAY = '2026-05-28';
+
+  it('no phantom peaks before first injection', () => {
+    const actual = ['2026-05-23', '2026-05-16', '2026-05-09'];
+    const curve = generateSteadyStateCurve(
+      1.0, 'semaglutide_ozempic', '2026-05-23', 7, TODAY, 14, 26, actual,
+    );
+    // May 8 is one day before first shot — must be 0
+    const before = curve.find((p) => p.date === '2026-05-08');
+    expect(before?.levelMg).toBe(0);
+  });
+
+  it('single injection: today level equals doseMg', () => {
+    const curve = generateSteadyStateCurve(
+      2.0, 'semaglutide_ozempic', TODAY, 7, TODAY, 7, 7, [TODAY],
+    );
+    const today = curve.find((p) => p.dayOffset === 0);
+    expect(today?.levelMg).toBeCloseTo(2.0, 5);
+  });
+
+  it('accumulates level across multiple actual injections', () => {
+    const actual = ['2026-05-23', '2026-05-16', '2026-05-09'];
+    const curve = generateSteadyStateCurve(
+      1.0, 'semaglutide_ozempic', '2026-05-23', 7, TODAY, 14, 28, actual,
+    );
+    const today = curve.find((p) => p.dayOffset === 0);
+    expect(today?.levelMg).toBeGreaterThan(0);
+    expect(today?.levelMg).toBeLessThan(3);
+  });
+
+  it('empty actualInjectionDates produces all-zero levels', () => {
+    const curve = generateSteadyStateCurve(
+      1.0, 'semaglutide_ozempic', TODAY, 7, TODAY, 7, 7, [],
+    );
+    for (const p of curve) {
+      expect(p.levelMg).toBe(0);
+    }
+  });
+});

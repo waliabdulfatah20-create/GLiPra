@@ -87,10 +87,6 @@ export default function MedicationLevelScreen() {
 
   const today = format(new Date(), 'yyyy-MM-dd');
 
-  // Compute current estimated level from the curve
-  const todayPoint = curve?.find((p) => p.date === today);
-  const currentLevelMg = todayPoint?.levelMg ?? null;
-
   // Recompute the visible curve whenever the view range changes.
   // lastInjectionDate comes from real injection logs (via useMedicationLevelCurve),
   // not from the profiles table, so it always reflects the actual last shot.
@@ -118,10 +114,14 @@ export default function MedicationLevelScreen() {
       today,
       config.projectDays,
       effectivePastDays,
+      injectionDates,   // actual logged dates; no phantom history
     );
   }, [lastInjectionDate, medicationId, profile?.medicationId, doseMg, injectionIntervalDays, injectionDates, today, config]);
 
   const displayTodayOffset = displayCurve?.find((p) => p.date === today)?.dayOffset ?? 0;
+  // Derive current level from displayCurve (which falls back to doseMg ?? 1.0),
+  // so the card always renders when the chart renders.
+  const currentLevelMg = displayCurve?.find((p) => p.date === today)?.levelMg ?? null;
 
   if (isLoading) {
     return (

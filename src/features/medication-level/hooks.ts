@@ -141,6 +141,9 @@ export function useMedicationLevelCurve(): MedicationLevelCurveResult {
     lastInjectionDate,
     injectionIntervalDays,
     today,
+    14,              // projectDays default
+    undefined,       // pastDays — use calculator default
+    injectionDates,  // actual logged dates; no phantom history
   );
 
   const todayIndex = curve.findIndex((p) => p.date === today);

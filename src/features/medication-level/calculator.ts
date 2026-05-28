@@ -71,6 +71,9 @@ export function generateLevelCurve(
  * @param today - ISO date string representing today
  * @param projectDays - number of days to project into the future (default 14)
  * @param pastDays - how far back to start the chart window (default: 4 × injectionIntervalDays)
+ * @param actualInjectionDates - optional YYYY-MM-DD strings of real logged shots.
+ *   When provided, only those dates contribute to the curve — no synthetic pre-history.
+ *   When omitted, falls back to extrapolating past cycles for steady-state modelling.
  * @returns array of { date, dayOffset, levelMg }
  */
 export function generateSteadyStateCurve(
@@ -81,6 +84,7 @@ export function generateSteadyStateCurve(
   today: string,
   projectDays = 14,
   pastDays?: number,
+  actualInjectionDates?: string[],
 ): Array<{ date: string; dayOffset: number; levelMg: number }> {
   const todayDate = parseISO(today);
   const lastInjectionParsed = parseISO(lastInjectionDate);
@@ -90,14 +94,21 @@ export function generateSteadyStateCurve(
   const NUM_PAST_CYCLES = 4;
   const resolvedPastDays = pastDays ?? (NUM_PAST_CYCLES * injectionIntervalDays);
 
-  const numHistoricDoses =
-    Math.max(NUM_PAST_CYCLES, Math.ceil(resolvedPastDays / injectionIntervalDays)) + 1;
-
-  // Build injection date list going back far enough to cover the display window
-  const injectionDates: Date[] = [];
-  for (let i = numHistoricDoses - 1; i >= 0; i--) {
-    injectionDates.push(addDays(lastInjectionParsed, -i * injectionIntervalDays));
-  }
+  // When actual logged dates are provided, use only those (no phantom history).
+  // Otherwise fall back to synthetic extrapolation for backward compatibility.
+  const injectionDates: Date[] = actualInjectionDates
+    ? [...actualInjectionDates]
+        .map((d) => parseISO(d))
+        .sort((a, b) => a.getTime() - b.getTime())
+    : (() => {
+        const numHistoricDoses =
+          Math.max(NUM_PAST_CYCLES, Math.ceil(resolvedPastDays / injectionIntervalDays)) + 1;
+        const dates: Date[] = [];
+        for (let i = numHistoricDoses - 1; i >= 0; i--) {
+          dates.push(addDays(lastInjectionParsed, -i * injectionIntervalDays));
+        }
+        return dates;
+      })();
 
   // dayOffset 0 = today. Compute start day relative to today.
   const startDate = addDays(todayDate, -resolvedPastDays);

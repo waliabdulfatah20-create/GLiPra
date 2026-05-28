@@ -155,6 +155,18 @@
     "cycle_overdue_label": "OVERDUE",
     "settings_button_label": "Open settings"
   },
+  "shotPrep": {
+    "title": "Shot Day Prep",
+    "subtitle": "Pharmacist's checklist for your injection day",
+    "progressInProgress": "{{completed}} of {{total}} steps complete",
+    "progressAllDone": "All steps complete",
+    "doneBannerTitle": "You're all set for your injection",
+    "doneBannerBody": "Great prep work. Your body will thank you.",
+    "siteTrackerTitle": "Injection Site Tracker",
+    "siteTrackerBody": "Log where you injected today to stay on your rotation schedule.",
+    "disclaimer": "This checklist provides general wellness guidance designed by a licensed pharmacist. It does not replace your prescriber's instructions. Contact your provider if you experience severe or worsening side effects.",
+    "pharmacistNote": "Pharmacist note"
+  },
   "content_card": {
     "tip": "TIP",
     "warning": "WARNING",

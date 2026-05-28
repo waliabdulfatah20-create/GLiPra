@@ -1,4 +1,4 @@
-import { Redirect, SplashScreen, Tabs, router } from 'expo-router';
+import { Redirect, SplashScreen, Tabs, usePathname } from 'expo-router';
 import * as React from 'react';
 import { BackHandler } from 'react-native';
 import { useCallback, useEffect } from 'react';
@@ -12,6 +12,7 @@ export default function TabLayout() {
   const { t } = useTranslation();
   const status = useAuth.use.status();
   const [isFirstTime] = useIsFirstTime();
+  const pathname = usePathname();
   const hideSplash = useCallback(async () => {
     await SplashScreen.hideAsync();
   }, []);
@@ -24,19 +25,24 @@ export default function TabLayout() {
     }
   }, [hideSplash, status]);
 
-  // Exit the app cleanly when the hardware back button is pressed at the tab
-  // root. Without this, React Navigation falls back to (auth), which
-  // immediately redirects to (app), producing a blank flicker frame.
+  // Exit the app cleanly when hardware back is pressed at any tab root.
+  // router.canGoBack() is not reliable here — Expo Router's history includes
+  // the auth/onboarding flow the user just completed, so it always returns true
+  // even when on Today/Progress/etc., causing React Navigation to navigate back
+  // to (auth) and flash a white screen.
+  // usePathname() gives us the actual current route so we can distinguish
+  // tab roots (exit) from sub-screens like /shot-prep or /add-shot (let RN handle).
   useEffect(() => {
+    const TAB_ROOTS = new Set(['/', '/progress', '/log', '/injection-sites', '/coach']);
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (!router.canGoBack()) {
+      if (TAB_ROOTS.has(pathname)) {
         BackHandler.exitApp();
-        return true; // consume the event — do not propagate to React Navigation
+        return true; // consumed — do not propagate to React Navigation
       }
-      return false; // let React Navigation handle back normally (sub-screens, modals)
+      return false; // sub-screen: let React Navigation pop the history entry
     });
     return () => subscription.remove();
-  }, []);
+  }, [pathname]);
 
   if (isFirstTime === undefined) {
     return null;

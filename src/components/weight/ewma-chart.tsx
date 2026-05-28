@@ -1,4 +1,4 @@
-import { parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Circle, Line, Polyline, Svg, Text as SvgText } from 'react-native-svg';
@@ -21,7 +21,7 @@ export interface EwmaChartProps {
   unit?: 'kg' | 'lbs';
 }
 
-const PADDING = { top: 16, right: 8, bottom: 28, left: 40 };
+const PADDING = { top: 16, right: 8, bottom: 36, left: 40 };
 
 /**
  * Simple SVG line chart showing raw weight dots and the EWMA trend line.
@@ -76,6 +76,19 @@ export function EwmaChart({ logs, width, height, injectionDates, unit = 'kg' }: 
     })
     .join(' ');
 
+  // ── X-axis date labels — one per dot, skipped if too close to previous ────
+  const MIN_LABEL_GAP_PX = 30;
+  const xLabels: Array<{ x: number; label: string }> = [];
+  let lastLabelX = -Infinity;
+  logs.forEach((log) => {
+    const ts = parseISO(log.loggedAt).getTime();
+    const x = toX(ts);
+    if (x - lastLabelX >= MIN_LABEL_GAP_PX) {
+      xLabels.push({ x, label: format(parseISO(log.loggedAt), 'MMM d') });
+      lastLabelX = x;
+    }
+  });
+
   // ── Y-axis label values (3 ticks) ─────────────────────────────────────────
   const yTicks = [minVal, (minVal + maxVal) / 2, maxVal];
 
@@ -95,6 +108,20 @@ export function EwmaChart({ logs, width, height, injectionDates, unit = 'kg' }: 
           stroke={colors.border}
           strokeWidth={1}
         />
+
+        {/* X-axis date labels */}
+        {xLabels.map(({ x, label }, i) => (
+          <SvgText
+            key={i}
+            x={x}
+            y={PADDING.top + plotH + 14}
+            textAnchor="middle"
+            fontSize={9}
+            fill={colors.textSecondary}
+          >
+            {label}
+          </SvgText>
+        ))}
 
         {/* Y-axis ticks and labels */}
         {yTicks.map((tick, i) => {

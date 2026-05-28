@@ -13,11 +13,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { ChecklistItemRow } from '@/components/shot-prep/checklist-item-row';
 import { CHECKLIST_ITEMS } from '@/features/shot-prep/checklist-data';
-import { useShotPrepChecklist } from '@/features/shot-prep/hooks';
+import { useShotDayPrep } from '@/features/shot-prep/hooks';
 import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
-
-const TOTAL = CHECKLIST_ITEMS.length;
 
 /** Use today's date as the injection date key so the checklist resets daily. */
 function todayDateString(): string {
@@ -26,8 +24,8 @@ function todayDateString(): string {
 
 export default function ShotPrepScreen() {
   const injectionDate = todayDateString();
-  const { checkedIds, toggleItem, allChecked, completedCount } =
-    useShotPrepChecklist(injectionDate);
+  const { completedItems, completedCount, totalCount, isDone, toggleItem } =
+    useShotDayPrep(injectionDate);
 
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
@@ -35,7 +33,7 @@ export default function ShotPrepScreen() {
     [colors, spacing, radius, shadows]
   );
 
-  const progressFraction = TOTAL > 0 ? completedCount / TOTAL : 0;
+  const progressFraction = totalCount > 0 ? completedCount / totalCount : 0;
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -63,7 +61,7 @@ export default function ShotPrepScreen() {
         {/* Progress bar */}
         <View style={styles.progressSection}>
           <Text style={styles.progressLabel}>
-            {completedCount}/{TOTAL} items
+            {completedCount}/{totalCount} items
           </Text>
           <View style={styles.progressTrack}>
             <View
@@ -89,7 +87,7 @@ export default function ShotPrepScreen() {
             <ChecklistItemRow
               key={item.id}
               item={item}
-              isChecked={checkedIds.has(item.id)}
+              isChecked={completedItems.includes(item.id)}
               onToggle={() => toggleItem(item.id)}
             />
           ))}
@@ -111,7 +109,7 @@ export default function ShotPrepScreen() {
         </TouchableOpacity>
 
         {/* Completion banner */}
-        {allChecked && (
+        {isDone && (
           <View style={styles.completionBanner}>
             <Text style={styles.completionText}>
               You're ready for your injection!

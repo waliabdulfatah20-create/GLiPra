@@ -1,66 +1,57 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { CHECKLIST_ITEMS } from '@/features/shot-prep/checklist-data';
+import { useAuthStore } from '@/features/auth/use-auth-store';
+import { fetchShotPrepLog, upsertShotPrepLog } from './api';
+import { CHECKLIST_ITEMS, type ChecklistItemId } from './checklist-data';
 
-const TOTAL_ITEMS = CHECKLIST_ITEMS.length;
+export function useShotDayPrep(injectionDate: string) {
+  const session = useAuthStore.use.session();
+  const userId = session?.user.id;
+  const queryClient = useQueryClient();
+  const queryKey = ['shot-prep-log', userId, injectionDate];
 
-function storageKey(injectionDate: string): string {
-  return `SHOT_PREP_${injectionDate}`;
-}
+  const { data: log, isLoading } = useQuery({
+    queryKey,
+    queryFn: () => fetchShotPrepLog(userId!, injectionDate),
+    enabled: !!userId,
+    staleTime: 60 * 1000,
+  });
 
-export function useShotPrepChecklist(injectionDate: string): {
-  checkedIds: Set<string>;
-  toggleItem: (id: string) => void;
-  allChecked: boolean;
-  completedCount: number;
-} {
-  const [checkedIds, setCheckedIds] = React.useState<Set<string>>(new Set());
+  // Optimistic local state — initialized once from DB when data first loads.
+  const [localCompleted, setLocalCompleted] = useState<string[]>([]);
+  const initialized = useRef(false);
 
-  // Load persisted state on mount / when injection date changes
-  React.useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const raw = await AsyncStorage.getItem(storageKey(injectionDate));
-        if (!cancelled && raw) {
-          const parsed: string[] = JSON.parse(raw);
-          setCheckedIds(new Set(parsed));
-        }
-      } catch {
-        // Non-fatal: start with empty set
-      }
+  useEffect(() => {
+    if (!isLoading && !initialized.current) {
+      setLocalCompleted(log?.completedItems ?? []);
+      initialized.current = true;
     }
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [injectionDate]);
+  }, [isLoading, log]);
 
-  const toggleItem = React.useCallback(
-    (id: string) => {
-      setCheckedIds((prev) => {
-        const next = new Set(prev);
-        if (next.has(id)) {
-          next.delete(id);
-        } else {
-          next.add(id);
-        }
-        // Persist asynchronously — fire and forget
-        void AsyncStorage.setItem(
-          storageKey(injectionDate),
-          JSON.stringify(Array.from(next)),
-        ).catch(() => {
-          // Non-fatal persistence failure — UI state is still correct
-        });
+  const { mutate: doUpsert } = useMutation({
+    mutationFn: (items: string[]) => upsertShotPrepLog(userId!, injectionDate, items),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+    },
+  });
+
+  const toggleItem = useCallback(
+    (id: ChecklistItemId) => {
+      setLocalCompleted((prev) => {
+        const next = prev.includes(id)
+          ? prev.filter((x) => x !== id)
+          : [...prev, id];
+        doUpsert(next);
         return next;
       });
     },
-    [injectionDate],
+    [doUpsert],
   );
 
-  const completedCount = checkedIds.size;
-  const allChecked = completedCount >= TOTAL_ITEMS;
+  const completedCount = localCompleted.length;
+  const totalCount = CHECKLIST_ITEMS.length;
+  const isDone = completedCount >= totalCount;
 
-  return { checkedIds, toggleItem, allChecked, completedCount };
+  return { completedItems: localCompleted, completedCount, totalCount, isDone, isLoading, toggleItem };
 }

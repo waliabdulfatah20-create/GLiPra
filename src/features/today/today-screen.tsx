@@ -28,6 +28,7 @@ import {
   ClipboardCheck,
   ProgressPath,
   Settings as SettingsIcon,
+  TrendingUp,
 } from '@/components/ui/icons';
 import { useTodayCheckIn } from '@/features/check-in/hooks';
 import type { ContentCard } from '@/features/content-cards/data';
@@ -494,6 +495,26 @@ export function TodayScreen() {
               <Text style={[styles.actionPillText, hasCheckedInToday && styles.actionPillTextDone]}>
                 {hasCheckedInToday ? t('today.checkin_logged') : t('today.checkin_action')}
               </Text>
+            </View>
+          </View>
+          <Text style={styles.rowChevron}>›</Text>
+        </TouchableOpacity>
+
+        {/* Track Weight */}
+        <TouchableOpacity
+          style={[styles.actionCard, { borderTopColor: colors.primary }]}
+          onPress={() => { haptics.tap(); router.push('/weight'); }}
+          activeOpacity={0.75}
+          accessibilityRole="button"
+          accessibilityLabel="Track your weight"
+        >
+          <View style={[styles.actionIconCircle, styles.actionIconCirclePending]}>
+            <TrendingUp color={colors.primary} width={20} height={20} />
+          </View>
+          <View style={styles.actionTextBlock}>
+            <Text style={styles.actionHeadline}>{t('today.weight_title')}</Text>
+            <View style={styles.actionPill}>
+              <Text style={styles.actionPillText}>{t('today.weight_subtitle')}</Text>
             </View>
           </View>
           <Text style={styles.rowChevron}>›</Text>

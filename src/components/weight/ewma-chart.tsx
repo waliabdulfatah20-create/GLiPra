@@ -1,7 +1,7 @@
 import { parseISO } from 'date-fns';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Circle, Line, Polyline, Svg, Text as SvgText } from 'react-native-svg';
+import { Circle, Line, Svg, Text as SvgText } from 'react-native-svg';
 
 import { useTheme } from '@/lib/ThemeContext';
 import { kgToLbs } from '@/lib/unit-preference';
@@ -68,24 +68,20 @@ export function EwmaChart({ logs, width, height, injectionDates, unit = 'kg' }: 
     return PADDING.top + ((maxVal - val) / (maxVal - minVal)) * plotH;
   }
 
-  // ── Windowed EWMA — seeded from first in-window log, ignores DB ewmaWeightKg ─
-  // The stored ewmaWeightKg is the cumulative all-time trend from the user's very
-  // first log. With EWMA_ALPHA=0.1 it can lag 50–100 lbs behind the current data,
-  // making the line look disconnected. Recomputing from the window start ensures
-  // the line begins at the first visible dot and tracks forward sensibly.
-  const EWMA_ALPHA = 0.1;
-  const windowedEwma: number[] = logs.reduce<number[]>((acc, log, i) => {
-    if (i === 0) return [log.weightKg];
-    const prev = acc[i - 1];
-    return [...acc, Math.round((EWMA_ALPHA * log.weightKg + (1 - EWMA_ALPHA) * prev) * 100) / 100];
-  }, []);
-
-  // ── Build EWMA polyline points ────────────────────────────────────────────
-  const ewmaPointsArr = logs.map((log, i) => {
-    const ts = parseISO(log.loggedAt).getTime();
-    return `${toX(ts)},${toY(windowedEwma[i])}`;
-  });
-  const ewmaPoints = ewmaPointsArr.join(' ');
+  // ── Linear regression trend line ──────────────────────────────────────────
+  // Least-squares best-fit through actual weight dots. Always visually passes
+  // through the center of the data regardless of point count or data range.
+  const regPoints = logs.map((log, i) => ({ x: timestamps[i], y: log.weightKg }));
+  const n = regPoints.length;
+  const sumX  = regPoints.reduce((s, p) => s + p.x, 0);
+  const sumY  = regPoints.reduce((s, p) => s + p.y, 0);
+  const sumXY = regPoints.reduce((s, p) => s + p.x * p.y, 0);
+  const sumX2 = regPoints.reduce((s, p) => s + p.x * p.x, 0);
+  const denom = n * sumX2 - sumX * sumX;
+  const slope     = denom !== 0 ? (n * sumXY - sumX * sumY) / denom : 0;
+  const intercept = (sumY - slope * sumX) / n;
+  const trendY1   = intercept + slope * minTime;
+  const trendY2   = intercept + slope * maxTime;
 
   // ── Y-axis label values (3 ticks) ─────────────────────────────────────────
   const yTicks = [minVal, (minVal + maxVal) / 2, maxVal];
@@ -144,16 +140,15 @@ export function EwmaChart({ logs, width, height, injectionDates, unit = 'kg' }: 
           {unit === 'lbs' ? 'lbs' : 'kg'}
         </SvgText>
 
-        {/* EWMA trend line — only drawn when ≥3 data points exist.
-            With fewer points EWMA_ALPHA=0.1 barely moves from its seed value,
-            making the trend line diverge wildly from the raw dots. */}
-        {ewmaPointsArr.length >= 3 && (
-          <Polyline
-            points={ewmaPoints}
-            fill="none"
+        {/* Linear regression trend line — drawn when ≥3 data points exist */}
+        {logs.length >= 3 && (
+          <Line
+            x1={toX(minTime)}
+            y1={toY(trendY1)}
+            x2={toX(maxTime)}
+            y2={toY(trendY2)}
             stroke={colors.primary}
             strokeWidth={2}
-            strokeLinejoin="round"
             strokeLinecap="round"
           />
         )}

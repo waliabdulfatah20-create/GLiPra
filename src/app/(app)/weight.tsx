@@ -139,7 +139,7 @@ export default function WeightScreen() {
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendLine, { backgroundColor: colors.primary }]} />
-              <Text style={styles.legendText}>EWMA trend</Text>
+              <Text style={styles.legendText}>Trend line</Text>
             </View>
           </View>
         </View>

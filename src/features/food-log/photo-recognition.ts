@@ -28,6 +28,7 @@ import { supabase } from '@/lib/supabase';
 // ---------------------------------------------------------------------------
 
 export interface RecognitionResult {
+  transcript?: string;
   name: string;
   servingDescription: string;
   proteinG: number;

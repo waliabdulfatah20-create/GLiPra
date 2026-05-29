@@ -60,17 +60,26 @@ describe('mockAI', () => {
   describe('MOCK_VOICE_PARSE', () => {
     it('has expected shape with transcript', () => {
       expect(MOCK_VOICE_PARSE.transcript).toContain('eggs');
-      expect(MOCK_VOICE_PARSE.foods).toHaveLength(2);
-      expect(MOCK_VOICE_PARSE.total_protein_g).toBeGreaterThan(0);
-      expect(MOCK_VOICE_PARSE.total_calories).toBeGreaterThan(0);
+      expect(MOCK_VOICE_PARSE.name).toBeTruthy();
+      expect(MOCK_VOICE_PARSE.proteinG).toBeGreaterThan(0);
+      expect(MOCK_VOICE_PARSE.caloriesKcal).toBeGreaterThan(0);
+      expect(MOCK_VOICE_PARSE.confidence).toBe('medium');
     });
 
-    it('has valid food items with required fields', () => {
-      const food = MOCK_VOICE_PARSE.foods[0];
-      expect(food).toHaveProperty('name');
-      expect(food).toHaveProperty('protein_g');
-      expect(food).toHaveProperty('calories');
-      expect(food).toHaveProperty('serving_description');
+    it('has all required fields', () => {
+      expect(MOCK_VOICE_PARSE).toHaveProperty('transcript');
+      expect(MOCK_VOICE_PARSE).toHaveProperty('name');
+      expect(MOCK_VOICE_PARSE).toHaveProperty('servingDescription');
+      expect(MOCK_VOICE_PARSE).toHaveProperty('proteinG');
+      expect(MOCK_VOICE_PARSE).toHaveProperty('carbsG');
+      expect(MOCK_VOICE_PARSE).toHaveProperty('fatG');
+      expect(MOCK_VOICE_PARSE).toHaveProperty('fiberG');
+      expect(MOCK_VOICE_PARSE).toHaveProperty('caloriesKcal');
+      expect(MOCK_VOICE_PARSE).toHaveProperty('b12Mcg');
+      expect(MOCK_VOICE_PARSE).toHaveProperty('vitaminDIu');
+      expect(MOCK_VOICE_PARSE).toHaveProperty('magnesiumMg');
+      expect(MOCK_VOICE_PARSE).toHaveProperty('zincMg');
+      expect(MOCK_VOICE_PARSE).toHaveProperty('confidence');
     });
   });
 });

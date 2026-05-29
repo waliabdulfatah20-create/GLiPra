@@ -8,6 +8,7 @@
 //   }
 //   // real supabase.functions.invoke() call here
 
+import type { RecognitionResult } from '@/features/food-log/photo-recognition';
 import Env from 'env';
 
 /**
@@ -55,15 +56,21 @@ export const MOCK_MEAL_TEXT_PARSE = {
   total_calories: 360,
 } as const;
 
-export const MOCK_VOICE_PARSE = {
-  transcript: 'I had two eggs and a protein shake for breakfast',
-  foods: [
-    { name: 'Scrambled eggs', protein_g: 12, calories: 140, serving_description: '2 large eggs' },
-    { name: 'Protein shake', protein_g: 25, calories: 130, serving_description: '1 scoop' },
-  ],
-  total_protein_g: 37,
-  total_calories: 270,
-} as const;
+export const MOCK_VOICE_PARSE: RecognitionResult = {
+  transcript: 'I had two scrambled eggs and a protein shake for breakfast',
+  name: 'Two scrambled eggs + protein shake',
+  servingDescription: '1 serving',
+  proteinG: 38,
+  carbsG: 6,
+  fatG: 13,
+  fiberG: 0,
+  caloriesKcal: 295,
+  b12Mcg: 1.2,
+  vitaminDIu: null,
+  magnesiumMg: null,
+  zincMg: 1.5,
+  confidence: 'medium',
+};
 
 // Mock visit prep questions — returned when EXPO_PUBLIC_USE_MOCK_AI=true.
 // Represents realistic AI-generated questions based on sample GLP-1 metrics.

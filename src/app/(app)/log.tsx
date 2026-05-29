@@ -34,12 +34,15 @@ import type { MealSlot } from '@/components/log/meal-chip-row';
 import { NutritionHeaderRing } from '@/components/log/nutrition-header-ring';
 import { PhotoCaptureButton } from '@/components/log/photo-capture-button';
 import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
+import { VoiceCaptureButton } from '@/components/log/voice-capture-button';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import type { BarcodeProduct } from '@/features/food-log/barcode-lookup';
 import { DailyMacroCard } from '@/features/food-log/daily-macro-card';
 import { MicronutrientWatchCard } from '@/features/food-log/micronutrient-watch-card';
 import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useTodayFoodLogs } from '@/features/food-log/hooks';
 import { AIReviewSheet } from '@/features/food-log/ai-review-sheet';
+import { transcribeVoice } from '@/features/food-log/voice-recognition';
+import type { RecognitionResult } from '@/features/food-log/photo-recognition';
 import type { FoodLogEntry, ManualFoodEntry } from '@/features/food-log/types';
 import { useTodayData } from '@/features/today/hooks';
 import { useTheme } from '@/lib/ThemeContext';
@@ -131,6 +134,23 @@ export default function LogScreen() {
     setPendingCapture(null);
   }
 
+  const [isVoiceLoading, setIsVoiceLoading] = React.useState(false);
+  const [voiceResult, setVoiceResult] = React.useState<RecognitionResult | null>(null);
+
+  const handleAudioCaptured = React.useCallback(
+    async (base64: string, mimeType: string) => {
+      setIsVoiceLoading(true);
+      const result = await transcribeVoice({ audioBase64: base64, mimeType });
+      setIsVoiceLoading(false);
+      setVoiceResult(result);
+    },
+    [],
+  );
+
+  function handleVoiceReviewClose() {
+    setVoiceResult(null);
+  }
+
   // ---------------------------------------------------------------------------
   // Derived values
   // ---------------------------------------------------------------------------
@@ -178,13 +198,19 @@ export default function LogScreen() {
             {/* 3. Meal context chips */}
             <MealChipRow active={selectedMeal} onSelect={setSelectedMeal} />
 
-            {/* 4. AI Photo hero card — always visible */}
-            <PhotoCaptureButton
-              onImageSelected={(base64, mimeType) =>
-                setPendingCapture({ base64, mimeType })
-              }
-              isLoading={recognizing}
-            />
+            {/* 4. AI logging row — Photo + Voice */}
+            <View style={styles.aiRow}>
+              <PhotoCaptureButton
+                onImageSelected={(base64, mimeType) =>
+                  setPendingCapture({ base64, mimeType })
+                }
+                isLoading={recognizing}
+              />
+              <VoiceCaptureButton
+                onAudioCaptured={handleAudioCaptured}
+                isLoading={isVoiceLoading}
+              />
+            </View>
 
             {/* 5. 2-tab toggle — Manual | Barcode */}
             <View style={styles.modeToggleRow}>
@@ -290,6 +316,13 @@ export default function LogScreen() {
       <AIReviewSheet
         result={pendingResult}
         onClose={handlePhotoReviewClose}
+      />
+
+      {/* Voice review sheet — slides up after voice transcription */}
+      <AIReviewSheet
+        result={voiceResult}
+        transcript={voiceResult?.transcript}
+        onClose={handleVoiceReviewClose}
       />
     </SafeAreaView>
   );
@@ -405,6 +438,12 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       color: colors.primary,
       fontWeight: '600',
       marginTop: spacing.xs,
+    },
+    aiRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+      marginHorizontal: spacing.md,
+      marginBottom: spacing.sm,
     },
     modeToggleRow: {
       flexDirection: 'row',

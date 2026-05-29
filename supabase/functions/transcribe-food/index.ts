@@ -22,7 +22,7 @@ import { corsHeaders } from '../_shared/cors.ts';
 
 const InputSchema = z.object({
   audioBase64: z.string().min(10),
-  mimeType: z.string().default('audio/m4a'),
+  mimeType: z.enum(['audio/m4a', 'audio/mp4', 'audio/mpeg', 'audio/wav', 'audio/webm']).default('audio/m4a'),
 });
 
 const OutputSchema = z.object({
@@ -77,33 +77,28 @@ const EXTRACTION_MODEL = 'gpt-4o-mini';
 // Helpers
 // ---------------------------------------------------------------------------
 
-function buildExtractionPrompt(transcript: string): string {
-  return (
-    'You are a nutrition analysis assistant for a GLP-1 medication companion app. ' +
-    'The user described their meal by voice. Transcript: "' +
-    transcript +
-    '". ' +
-    'Analyze the described food and return a single JSON object representing the ' +
-    'complete meal as one consolidated entry. Use this exact shape: ' +
-    '{ ' +
-    '"name": string (concise meal name, e.g. "Scrambled eggs + protein shake"), ' +
-    '"servingDescription": string (e.g. "1 serving as described"), ' +
-    '"proteinG": number, ' +
-    '"carbsG": number | null, ' +
-    '"fatG": number | null, ' +
-    '"fiberG": number | null, ' +
-    '"caloriesKcal": number | null, ' +
-    '"b12Mcg": number | null, ' +
-    '"vitaminDIu": number | null, ' +
-    '"magnesiumMg": number | null, ' +
-    '"zincMg": number | null, ' +
-    '"confidence": "high" | "medium" | "low" ' +
-    '}. ' +
-    'For GLP-1 patients, micronutrient estimates are especially important — provide ' +
-    'best estimates for B12, vitamin D, magnesium, zinc, or null if unknown. ' +
-    'Do not include any user-identifying information.'
-  );
-}
+const EXTRACTION_SYSTEM_PROMPT =
+  'You are a nutrition analysis assistant for a GLP-1 medication companion app. ' +
+  'The user will provide a voice transcript describing their meal. ' +
+  'Analyze the described food and return a single JSON object representing the ' +
+  'complete meal as one consolidated entry. Use this exact shape: ' +
+  '{ ' +
+  '"name": string (concise meal name, e.g. "Scrambled eggs + protein shake"), ' +
+  '"servingDescription": string (e.g. "1 serving as described"), ' +
+  '"proteinG": number, ' +
+  '"carbsG": number | null, ' +
+  '"fatG": number | null, ' +
+  '"fiberG": number | null, ' +
+  '"caloriesKcal": number | null, ' +
+  '"b12Mcg": number | null, ' +
+  '"vitaminDIu": number | null, ' +
+  '"magnesiumMg": number | null, ' +
+  '"zincMg": number | null, ' +
+  '"confidence": "high" | "medium" | "low" ' +
+  '}. ' +
+  'For GLP-1 patients, micronutrient estimates are especially important -- provide ' +
+  'best estimates for B12, vitamin D, magnesium, zinc, or null if unknown. ' +
+  'Do not include any user-identifying information.';
 
 // ---------------------------------------------------------------------------
 // Handler
@@ -139,7 +134,9 @@ serve(async (req: Request) => {
       .eq('function_name', FUNCTION_NAME)
       .gte('created_at', oneDayAgo);
 
-    if (!countError && (count ?? 0) >= DAILY_LIMIT) {
+    if (countError) {
+      console.error('Failed to query ai_invocations for rate limit:', countError.message);
+    } else if ((count ?? 0) >= DAILY_LIMIT) {
       return new Response(JSON.stringify({ error: 'Daily limit reached' }), {
         status: 429,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -178,9 +175,30 @@ serve(async (req: Request) => {
       response_format: 'text',
     });
 
-    const transcript = (transcriptionResponse as unknown as string).trim();
+    if (typeof transcriptionResponse !== 'string') {
+      console.error('Whisper response was not a string:', typeof transcriptionResponse);
+      return new Response(JSON.stringify(FALLBACK_RESULT), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const transcript = transcriptionResponse.trim();
 
     if (!transcript) {
+      const serviceSupabaseEmpty = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+      );
+      const { error: emptyLogError } = await serviceSupabaseEmpty.from('ai_invocations').insert({
+        user_id: user.id,
+        function_name: FUNCTION_NAME,
+        model: WHISPER_MODEL,
+        tokens_used: null,
+        created_at: new Date().toISOString(),
+      });
+      if (emptyLogError) console.error('Failed to log empty-transcript invocation:', emptyLogError.message);
+
       return new Response(JSON.stringify({ ...FALLBACK_RESULT, transcript: '' }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -192,8 +210,8 @@ serve(async (req: Request) => {
       model: EXTRACTION_MODEL,
       response_format: { type: 'json_object' },
       messages: [
-        { role: 'system', content: buildExtractionPrompt(transcript) },
-        { role: 'user', content: 'Extract the nutritional information from my meal description.' },
+        { role: 'system', content: EXTRACTION_SYSTEM_PROMPT },
+        { role: 'user', content: transcript },
       ],
     });
 

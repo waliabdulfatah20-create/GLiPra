@@ -13,7 +13,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     heading: '3. Medical and Clinical Disclaimer',
-    body: 'GLIPRA IS NOT A MEDICAL DEVICE, CLINICAL SERVICE, OR SUBSTITUTE FOR PROFESSIONAL MEDICAL ADVICE.\n\nAll content — including pharmacist-authored tips, nutrition guidance, injection-cycle tracking, medication level estimates, readiness scores, and AI-generated responses — is educational in nature and does not constitute medical advice, diagnosis, or treatment.\n\nGlipra is designed by a licensed pharmacist but is not your pharmacist and does not establish a pharmacist-patient relationship. Medication level estimates are mathematical approximations. Actual serum levels vary by individual metabolism, body composition, timing, and other factors.\n\nAlways consult your prescribing physician, pharmacist, or other qualified healthcare provider before making any changes to your medication, diet, or treatment plan.\n\nIN A MEDICAL EMERGENCY, CALL 911 IMMEDIATELY.',
+    body: 'GLIPRA IS NOT A MEDICAL DEVICE, CLINICAL SERVICE, OR SUBSTITUTE FOR PROFESSIONAL MEDICAL ADVICE.\n\nAll content (including pharmacist-authored tips, nutrition guidance, injection-cycle tracking, medication level estimates, readiness scores, and AI-generated responses) is educational in nature and does not constitute medical advice, diagnosis, or treatment.\n\nGlipra is designed by a licensed pharmacist but is not your pharmacist and does not establish a pharmacist-patient relationship. Medication level estimates are mathematical approximations. Actual serum levels vary by individual metabolism, body composition, timing, and other factors.\n\nAlways consult your prescribing physician, pharmacist, or other qualified healthcare provider before making any changes to your medication, diet, or treatment plan.\n\nIN A MEDICAL EMERGENCY, CALL 911 IMMEDIATELY.',
   },
   {
     heading: '4. Account Registration',
@@ -56,7 +56,7 @@ const SECTIONS: LegalSection[] = [
     body: 'These Terms are governed by the laws of the State of Texas, without regard to conflict-of-law principles.',
   },
   {
-    heading: '14. Dispute Resolution — Mandatory Arbitration',
+    heading: '14. Dispute Resolution: Mandatory Arbitration',
     body: 'READ THIS SECTION CAREFULLY. IT AFFECTS YOUR LEGAL RIGHTS.\n\nBefore filing any formal claim, contact us at legal@glipra.com to try to resolve the dispute informally within 30 days.\n\nIf informal resolution fails, any dispute arising out of or relating to these Terms shall be resolved by binding individual arbitration administered by the American Arbitration Association (AAA) under its Consumer Arbitration Rules. Arbitration will be conducted remotely in English by a single arbitrator.\n\nCLASS ACTION WAIVER: YOU AND LEONAVA EACH WAIVE THE RIGHT TO A JURY TRIAL AND THE RIGHT TO PARTICIPATE IN A CLASS ACTION OR CLASS ARBITRATION. All claims must be brought on an individual basis.\n\nEXCEPTIONS: Small claims court actions and emergency injunctive relief are not subject to arbitration.\n\nOPT-OUT: You may opt out of this arbitration agreement by sending written notice to legal@glipra.com with the subject line "Arbitration Opt-Out" within 30 days of first accepting these Terms.',
   },
   {

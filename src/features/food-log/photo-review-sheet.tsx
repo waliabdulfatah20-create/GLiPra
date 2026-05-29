@@ -163,7 +163,7 @@ export function PhotoReviewSheet({ result, onClose }: PhotoReviewSheetProps) {
       ? 'High confidence'
       : result?.confidence === 'medium'
         ? 'Medium confidence'
-        : 'Low confidence — please verify';
+        : 'Low confidence - please verify';
 
   const hasMicroData =
     form &&
@@ -277,7 +277,7 @@ export function PhotoReviewSheet({ result, onClose }: PhotoReviewSheetProps) {
               <>
                 <View style={styles.glpHeader}>
                   <SectionHeader title="GLP-1 WATCH" />
-                  <Text style={styles.glpNote}>AI estimates — verify for precision</Text>
+                  <Text style={styles.glpNote}>AI estimates - verify for precision</Text>
                 </View>
                 <View style={styles.macroGrid}>
                   <MacroInput
@@ -418,7 +418,7 @@ function MacroInput({ label, unit, value, onChangeText, highlight = false }: Mac
         value={value}
         onChangeText={onChangeText}
         keyboardType="decimal-pad"
-        placeholder="—"
+        placeholder="-"
         placeholderTextColor={colors.textDisabled}
         accessibilityLabel={`${label} in ${unit}`}
       />

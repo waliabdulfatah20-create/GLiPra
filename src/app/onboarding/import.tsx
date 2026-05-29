@@ -44,7 +44,7 @@ export default function ImportScreen() {
   const handleConnect = (option: ImportOption) => {
     Alert.alert(
       'Coming Soon',
-      `${option.name} integration is coming soon — we're working on it!`,
+      `${option.name} integration is coming soon - we're working on it!`,
       [{ text: 'OK' }],
     );
   };

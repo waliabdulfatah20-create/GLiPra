@@ -51,8 +51,8 @@ export function StreakCard({ currentStreak, longestStreak }: StreakCardProps) {
         accessibilityRole="button"
         accessibilityLabel={
           hasStreak
-            ? `${currentStreak} day streak — view nutrition log`
-            : 'Start your streak — open nutrition log'
+            ? `${currentStreak} day streak - view nutrition log`
+            : 'Start your streak - open nutrition log'
         }
       >
         <View style={styles.row}>

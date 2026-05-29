@@ -134,7 +134,7 @@ export default function MedicationLevelScreen() {
   const hasData = !!lastInjectionDate;
   const medId = medicationId ?? ((profile?.medicationId ?? 'semaglutide_ozempic') as GLP1MedicationId);
   const medName = MEDICATION_DISPLAY_NAMES[medId] ?? 'GLP-1 Medication';
-  const doseLabel = doseMg ? `${doseMg}mg` : '—';
+  const doseLabel = doseMg ? `${doseMg}mg` : '-';
   const freqLabel = formatFrequency(injectionIntervalDays);
 
   return (

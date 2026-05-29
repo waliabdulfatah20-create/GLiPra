@@ -39,10 +39,10 @@ const GOAL_LABELS: Record<string, string> = {
 };
 
 const WHAT_HAPPENS_NEXT = [
-  'Log your meals daily — 30 seconds with voice or barcode',
+  'Log your meals daily: 30 seconds with voice or barcode',
   'Track protein toward your daily floor',
   'Get injection-cycle-aware guidance every day',
-  'Red-flag safety monitoring — always free',
+  'Red-flag safety monitoring, always free',
 ];
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -158,7 +158,7 @@ export default function RevealScreen() {
           <SummaryCard
             label="Your protein floor"
             value={
-              formData.proteinFloorG !== undefined ? `${formData.proteinFloorG}g/day` : '—'
+              formData.proteinFloorG !== undefined ? `${formData.proteinFloorG}g/day` : '-'
             }
             accent
           />

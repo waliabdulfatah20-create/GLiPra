@@ -134,7 +134,7 @@ export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
           <Text style={styles.label}>Fiber (g)</Text>
           <TextInput
             style={inputStyle('fiberG')}
-            placeholder="—"
+            placeholder="-"
             placeholderTextColor={colors.textDisabled}
             value={form.fiberG}
             onChangeText={(v) => handleChange('fiberG', v)}
@@ -150,7 +150,7 @@ export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
           <Text style={styles.label}>Cal (kcal)</Text>
           <TextInput
             style={inputStyle('caloriesKcal')}
-            placeholder="—"
+            placeholder="-"
             placeholderTextColor={colors.textDisabled}
             value={form.caloriesKcal}
             onChangeText={(v) => handleChange('caloriesKcal', v)}

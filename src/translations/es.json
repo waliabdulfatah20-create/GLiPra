@@ -104,7 +104,7 @@
     "tips": {
       "weight": "Tu línea de peso conecta cada entrada que registras. Los cambios diarios son normales: la hidratación y el momento de las comidas afectan la báscula. Observa la dirección en semanas, no en días sueltos.",
       "protein": "Cumplir el 80% o más de tu mínimo de proteína protege la masa muscular mientras GLP-1 hace su trabajo. Apunta a la consistencia, no a la perfección.",
-      "streak": "Cada día verde alimentó tu meta de preservación muscular. Un día perdido no borra el progreso — sigue mañana.",
+      "streak": "Cada día verde alimentó tu meta de preservación muscular. Un día perdido no borra el progreso - sigue mañana.",
       "injection": "La constancia en el horario mantiene los niveles del medicamento estables. Mover tu día de dosis dentro de 24 horas es clínicamente aceptable.",
       "symptoms": "Los síntomas suelen estabilizarse a medida que tu cuerpo se adapta. Síntomas que persisten más de dos semanas o que empeoran rápidamente merecen una conversación con tu médico."
     }
@@ -208,7 +208,7 @@
     "source_ai": "IA",
     "disclaimer": "Los valores nutricionales son estimaciones basadas en la información que tú o la base de datos de códigos de barras proporcionan. Los valores de fotos de IA son estimaciones, así que siempre verifica con tu médico prescriptor o un dietista registrado.",
     "photo_comment_title": "Agrega contexto para mayor precisión",
-    "photo_comment_subtitle": "Opcional — ayuda a la IA a estimar la porción e ingredientes",
+    "photo_comment_subtitle": "Opcional: ayuda a la IA a estimar la porción e ingredientes",
     "photo_comment_placeholder": "ej. tazón grande, queso extra, media porción…",
     "photo_comment_skip": "Omitir",
     "photo_comment_analyze": "Analizar",
@@ -310,32 +310,32 @@
   },
   "readiness": {
     "headlines": {
-      "injection_day": "Dia de inyeccion",
-      "peak_suppression": "Dias 1-2 tras la inyeccion",
-      "adjustment": "Dias 3-4 tras la inyeccion",
-      "recovery_window": "Dias 5-7 tras la inyeccion",
-      "overdue": "Inyeccion atrasada"
+      "injection_day": "Día de inyección",
+      "peak_suppression": "Días 1-2 tras la inyección",
+      "adjustment": "Días 3-4 tras la inyección",
+      "recovery_window": "Días 5-7 tras la inyección",
+      "overdue": "Inyección atrasada"
     },
     "factor_labels": {
       "injection_phase": "Fase GLP-1",
-      "protein_pace": "Ritmo de proteina hoy",
-      "prev_day_protein": "Proteina de ayer",
-      "nausea": "Nauseas",
-      "energy": "Energia",
+      "protein_pace": "Ritmo de proteína hoy",
+      "prev_day_protein": "Proteína de ayer",
+      "nausea": "Náuseas",
+      "energy": "Energía",
       "new_dose_week": "Semana de nueva dosis",
       "streak": "Racha activa"
     },
     "tips": {
-      "injection_phase_injection_day": "Buen momento para establecer el habito de proteinas de la semana",
-      "injection_phase_peak_suppression": "Prioriza la proteina antes del mediodia mientras tengas energia",
-      "injection_phase_adjustment": "El apetito esta ajustandose hoy - la proteina constante funciona mejor",
-      "injection_phase_recovery_window": "El apetito regresa - un buen dia para alcanzar tu meta de proteinas",
-      "injection_phase_overdue": "Ponte la inyeccion hoy y retoma tu rutina de proteinas",
-      "protein_pace": "Vas retrasado - intenta tomar 30g de proteina en tu proxima comida",
-      "prev_day_protein": "Ayer fue poco - hoy es el dia mas importante para proteger el musculo",
-      "nausea": "Porciones pequenas y frecuentes funcionan mejor que comidas grandes hoy",
-      "energy": "Poca energia hoy - batidos o yogur requieren menos esfuerzo que cocinar",
-      "new_dose_week": "Las semanas de nueva dosis son las mas dificiles - proteina frecuente es mejor",
+      "injection_phase_injection_day": "Buen momento para establecer el hábito de proteínas de la semana",
+      "injection_phase_peak_suppression": "Prioriza la proteína antes del mediodía mientras tengas energía",
+      "injection_phase_adjustment": "El apetito está ajustándose hoy - la proteína constante funciona mejor",
+      "injection_phase_recovery_window": "El apetito regresa - un buen día para alcanzar tu meta de proteínas",
+      "injection_phase_overdue": "Ponte la inyección hoy y retoma tu rutina de proteínas",
+      "protein_pace": "Vas retrasado - intenta tomar 30g de proteína en tu próxima comida",
+      "prev_day_protein": "Ayer fue poco - hoy es el día más importante para proteger el músculo",
+      "nausea": "Porciones pequeñas y frecuentes funcionan mejor que comidas grandes hoy",
+      "energy": "Poca energía hoy - batidos o yogur requieren menos esfuerzo que cocinar",
+      "new_dose_week": "Las semanas de nueva dosis son las más difíciles - proteína frecuente es mejor",
       "streak": "Manten tu racha - una comida con proteinas sella el dia"
     }
   }

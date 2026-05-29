@@ -66,7 +66,7 @@ export default function HealthImportScreen() {
         imported > 0
           ? `Imported ${imported} weight reading${imported === 1 ? '' : 's'}${skipped > 0 ? ` (${skipped} already existed)` : ''}.`
           : skipped > 0
-            ? 'All readings already exist in Glipra — nothing new to import.'
+            ? 'All readings already exist in Glipra - nothing new to import.'
             : 'No weight readings found in the last 90 days.',
       );
     } catch {
@@ -196,7 +196,7 @@ export default function HealthImportScreen() {
             <Text style={styles.stepsUnavailable}>Steps unavailable</Text>
           )}
           <Text style={styles.stepsNote}>
-            Step count is used for activity-level context — not displayed on the main screen.
+            Step count is used for activity-level context, not displayed on the main screen.
           </Text>
         </View>
 

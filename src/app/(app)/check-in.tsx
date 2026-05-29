@@ -189,7 +189,7 @@ export default function CheckInScreen() {
         {/* Morning weight (optional) */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>
-            Morning weight (optional — {weightUnit})
+            Morning weight (optional, {weightUnit})
           </Text>
           <View style={styles.weightRow}>
             <TextInput

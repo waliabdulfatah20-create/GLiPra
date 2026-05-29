@@ -143,7 +143,7 @@ function SummaryStat({
       <View style={[styles.statDot, { backgroundColor: color }]} />
       <Text style={styles.statLabel}>{label}</Text>
       <Text style={[styles.statValue, { color }]}>
-        {value == null ? '—' : value.toFixed(1)}
+        {value == null ? '-' : value.toFixed(1)}
       </Text>
     </View>
   );

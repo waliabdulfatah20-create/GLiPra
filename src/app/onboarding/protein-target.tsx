@@ -135,7 +135,7 @@ export default function ProteinTargetScreen() {
 
             {/* Hero number */}
             <Text style={styles.proteinNumber}>
-              {result !== null ? `${result.proteinFloorG}g` : '—'}
+              {result !== null ? `${result.proteinFloorG}g` : '-'}
             </Text>
             <Text style={styles.proteinLabel}>daily protein floor</Text>
 

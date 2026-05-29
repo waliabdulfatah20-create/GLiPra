@@ -145,7 +145,7 @@ export default function DiscontinuationModeScreen() {
           </Text>
           <Text style={styles.heroBody}>
             Let's protect what you've built. Muscle mass, healthy habits, and a
-            sustainable weight are yours to keep — with the right support.
+            sustainable weight are yours to keep, with the right support.
           </Text>
           <Text style={styles.heroCredit}>Designed by a licensed pharmacist</Text>
         </View>
@@ -158,11 +158,11 @@ export default function DiscontinuationModeScreen() {
           ) : (
             <>
               <View style={styles.proteinRow}>
-                <Text style={styles.proteinValue}>{proteinFloorG || '—'}</Text>
+                <Text style={styles.proteinValue}>{proteinFloorG || '-'}</Text>
                 <Text style={styles.proteinUnit}>{proteinFloorG ? 'g / day' : ''}</Text>
               </View>
               <Text style={styles.proteinNote}>
-                After discontinuing, your full protein floor applies — no reduction.
+                After discontinuing, your full protein floor applies with no reduction.
                 Protecting lean muscle mass is the highest nutritional priority in
                 the weeks and months following your last dose.
               </Text>

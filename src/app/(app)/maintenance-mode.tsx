@@ -73,7 +73,7 @@ export default function MaintenanceModeScreen() {
         <View style={styles.heroCard}>
           <Text style={styles.heroTitle}>You've reached your maintenance phase</Text>
           <Text style={styles.heroBody}>
-            You've done the hard work. Now the goal is protecting what you've built —
+            You've done the hard work. Now the goal is protecting what you've built:
             lean mass, healthy habits, and a sustainable weight.
           </Text>
           <Text style={styles.heroCredit}>Designed by a licensed pharmacist</Text>

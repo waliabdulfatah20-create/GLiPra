@@ -9,7 +9,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     heading: '2. Information We Collect',
-    body: 'We collect information you provide directly:\n\n• Account information — name, email address, password\n• Health profile — height, starting weight, activity level, health goals\n• Medication data — GLP-1 medication type, dosage strength, injection schedule\n• Injection logs — date, time, injection site, dose administered\n• Weight logs — date and weight measurement\n• Symptom logs — reported symptoms and severity\n• Meal data — food items, meal photos, nutritional estimates\n• Notes — free-text notes you add to logs\n\nWe also collect automatically:\n\n• Device information (model, OS version, app version)\n• Usage data (screens viewed, features used, crash logs)\n• Anonymous analytics identifiers — not your name or email\n• Push notification tokens\n\nWe do not collect your payment card details (handled by Apple or Google) or your precise GPS location.',
+    body: 'We collect information you provide directly:\n\n• Account information: name, email address, password\n• Health profile: height, starting weight, activity level, health goals\n• Medication data: GLP-1 medication type, dosage strength, injection schedule\n• Injection logs: date, time, injection site, dose administered\n• Weight logs: date and weight measurement\n• Symptom logs: reported symptoms and severity\n• Meal data: food items, meal photos, nutritional estimates\n• Notes: free-text notes you add to logs\n\nWe also collect automatically:\n\n• Device information (model, OS version, app version)\n• Usage data (screens viewed, features used, crash logs)\n• Anonymous analytics identifiers: not your name or email\n• Push notification tokens\n\nWe do not collect your payment card details (handled by Apple or Google) or your precise GPS location.',
   },
   {
     heading: '3. How We Use Your Information',
@@ -17,7 +17,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     heading: '4. How We Share Your Information',
-    body: 'We do not sell your personal information. We do not share your information for third-party advertising.\n\nWe share data only with service providers (subprocessors) who help us operate the Service under written data processing agreements, including:\n\n• Supabase — database, authentication, storage (US)\n• OpenAI — AI meal analysis and guidance, anonymized prompts only (US)\n• RevenueCat — subscription management (US)\n• PostHog — product analytics, no health data (US)\n• Sentry — crash reporting, no health data (US)\n• Resend — transactional email (US)\n• Apple / Google — app distribution and payments\n\nWe may also disclose information when required by law, in connection with a business transfer, or with your explicit consent.',
+    body: 'We do not sell your personal information. We do not share your information for third-party advertising.\n\nWe share data only with service providers (subprocessors) who help us operate the Service under written data processing agreements, including:\n\n• Supabase: database, authentication, storage (US)\n• OpenAI: AI meal analysis and guidance, anonymized prompts only (US)\n• RevenueCat: subscription management (US)\n• PostHog: product analytics, no health data (US)\n• Sentry: crash reporting, no health data (US)\n• Resend: transactional email (US)\n• Apple / Google: app distribution and payments\n\nWe may also disclose information when required by law, in connection with a business transfer, or with your explicit consent.',
   },
   {
     heading: '5. Data Retention',
@@ -25,18 +25,18 @@ const SECTIONS: LegalSection[] = [
   },
   {
     heading: '6. Data Security',
-    body: 'We implement industry-standard security measures including:\n\n• TLS 1.2+ encryption for all data in transit\n• Encryption at rest in our database\n• Row-level security — your data is inaccessible to other users at the database level\n• Access controls restricting employee access to production data\n\nNo system is completely secure. We will notify you of any breach as required by applicable law.',
+    body: 'We implement industry-standard security measures including:\n\n• TLS 1.2+ encryption for all data in transit\n• Encryption at rest in our database\n• Row-level security: your data is inaccessible to other users at the database level\n• Access controls restricting employee access to production data\n\nNo system is completely secure. We will notify you of any breach as required by applicable law.',
   },
   {
-    heading: '7. Washington Residents — My Health My Data Act',
-    body: 'If you are a Washington state resident, the Washington My Health My Data Act (WMHMD Act) applies to your weight measurements, medication data, injection records, and symptom reports.\n\nWe use this data solely to provide the Service to you. We do not sell consumer health data.\n\nYour rights under the WMHMD Act:\n• Access — confirm whether we collect your health data and obtain a copy\n• Deletion — request deletion of your health data\n• Withdraw consent — withdraw previously granted consent\n• List of sharing — obtain a list of third parties with whom we shared your health data\n\nTo exercise these rights, email legal@glipra.com with subject "Washington Health Data Rights Request." We will respond within 45 days and may verify your identity before processing.',
+    heading: '7. Washington Residents: My Health My Data Act',
+    body: 'If you are a Washington state resident, the Washington My Health My Data Act (WMHMD Act) applies to your weight measurements, medication data, injection records, and symptom reports.\n\nWe use this data solely to provide the Service to you. We do not sell consumer health data.\n\nYour rights under the WMHMD Act:\n• Access: confirm whether we collect your health data and obtain a copy\n• Deletion: request deletion of your health data\n• Withdraw consent: withdraw previously granted consent\n• List of sharing: obtain a list of third parties with whom we shared your health data\n\nTo exercise these rights, email legal@glipra.com with subject "Washington Health Data Rights Request." We will respond within 45 days and may verify your identity before processing.',
   },
   {
-    heading: '8. California Residents — CCPA / CPRA',
-    body: 'California residents have the following rights:\n\n• Know what personal information we collect, use, and disclose\n• Delete personal information we hold about you\n• Correct inaccurate personal information\n• Opt out of sale or sharing — we do not sell or share personal information for targeted advertising\n• Limit use of sensitive personal information — we use health data only to provide the Service\n• Non-discrimination for exercising your rights\n\nWe have not sold personal information in the past 12 months. To submit a request, email legal@glipra.com. We will respond within 45 days.',
+    heading: '8. California Residents: CCPA / CPRA',
+    body: 'California residents have the following rights:\n\n• Know what personal information we collect, use, and disclose\n• Delete personal information we hold about you\n• Correct inaccurate personal information\n• Opt out of sale or sharing: we do not sell or share personal information for targeted advertising\n• Limit use of sensitive personal information: we use health data only to provide the Service\n• Non-discrimination for exercising your rights\n\nWe have not sold personal information in the past 12 months. To submit a request, email legal@glipra.com. We will respond within 45 days.',
   },
   {
-    heading: '9. Texas Residents — TDPSA',
+    heading: '9. Texas Residents: TDPSA',
     body: 'Texas residents have the right to access, correct, delete, and obtain a portable copy of their personal data, and to opt out of the sale of personal data and targeted advertising. We do not sell personal data or use it for targeted advertising.\n\nTo exercise these rights, email legal@glipra.com. We will respond within 45 days. If we deny your request you may appeal by emailing legal@glipra.com with "TDPSA Appeal" in the subject line.',
   },
   {

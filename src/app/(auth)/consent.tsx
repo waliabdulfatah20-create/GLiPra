@@ -79,7 +79,7 @@ export default function ConsentScreen() {
             anonymized, non-identifiable data to improve app guidance. You may export or
             delete all your data at any time from Settings.{'\n\n'}
             We may share aggregated, de-identified usage statistics for research purposes.
-            Any AI features use anonymized context only — your name, email, and identifying
+            Any AI features use anonymized context only. Your name, email, and identifying
             details are never included in AI prompts.
           </Text>
         </View>

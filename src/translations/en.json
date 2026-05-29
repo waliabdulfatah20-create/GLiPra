@@ -102,9 +102,9 @@
       "energy": "Energy"
     },
     "tips": {
-      "weight": "Your weight line connects every entry you log. Day-to-day swings are normal — hydration and food timing affect the scale. Look at the direction over weeks, not single days.",
+      "weight": "Your weight line connects every entry you log. Day-to-day swings are normal - hydration and food timing affect the scale. Look at the direction over weeks, not single days.",
       "protein": "Hitting 80% or more of your protein floor protects lean muscle while GLP-1 does its job. Aim for consistency over perfection.",
-      "streak": "Every green day fueled your muscle preservation goal. A missed day doesn't undo progress — keep going tomorrow.",
+      "streak": "Every green day fueled your muscle preservation goal. A missed day doesn't undo progress - keep going tomorrow.",
       "injection": "Consistent timing keeps medication levels stable. Shifting your dose day within a 24-hour window is clinically fine.",
       "symptoms": "Symptoms usually settle as your body adjusts. Symptoms persisting beyond two weeks or sharply worsening deserve a prescriber conversation."
     }
@@ -208,7 +208,7 @@
     "source_ai": "AI",
     "disclaimer": "Nutrition values are estimated from the information you or the barcode database provide. AI photo values are estimates, so always verify with your prescriber or a registered dietitian.",
     "photo_comment_title": "Add context for better accuracy",
-    "photo_comment_subtitle": "Optional — helps AI estimate portion and ingredients",
+    "photo_comment_subtitle": "Optional: helps AI estimate portion and ingredients",
     "photo_comment_placeholder": "e.g. large bowl, extra cheese, half portion…",
     "photo_comment_skip": "Skip",
     "photo_comment_analyze": "Analyze",

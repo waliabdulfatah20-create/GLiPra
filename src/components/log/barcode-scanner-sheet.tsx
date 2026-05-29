@@ -241,8 +241,8 @@ export function BarcodeScannerSheet({
   // Dynamic note: show "Per serving (Xg)" when OFF provided a non-100g serving_quantity
   const servingLabel =
     product?.servingWeightG != null && product.servingWeightG !== 100
-      ? `Per serving (${product.servingWeightG}g) — edit to match the label`
-      : 'Per 100g — edit to match the label';
+      ? `Per serving (${product.servingWeightG}g) - edit to match the label`
+      : 'Per 100g - edit to match the label';
 
   // GLP-1 Watch section only shows when the API returned at least one micro value
   const hasMicroData =
@@ -303,7 +303,7 @@ export function BarcodeScannerSheet({
                   onPress={() => void getPermission()}
                   accessibilityRole="button"
                 >
-                  <Text style={styles.cancelButtonText}>I've enabled it — check again</Text>
+                  <Text style={styles.cancelButtonText}>I've enabled it - check again</Text>
                 </Pressable>
               </View>
             )}
@@ -387,7 +387,7 @@ export function BarcodeScannerSheet({
             {showProteinWarning && (
               <View style={styles.proteinWarning}>
                 <Text style={styles.proteinWarningText}>
-                  ⚠ Protein data may be missing — verify against the label
+                  ⚠ Protein data may be missing - verify against the label
                 </Text>
               </View>
             )}
@@ -525,7 +525,7 @@ function EditableField({ label, unit, value, onChangeText, micro, styles }: Edit
         onChangeText={onChangeText}
         keyboardType="decimal-pad"
         returnKeyType="done"
-        placeholder="—"
+        placeholder="-"
         placeholderTextColor={micro ? AMBER : '#9ca3af'}
         accessibilityLabel={`${label} (${unit})`}
       />

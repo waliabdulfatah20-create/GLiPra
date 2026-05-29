@@ -87,7 +87,7 @@ export default function SafetyScreen() {
         >
           <Text style={styles.heading}>Safety check</Text>
           <Text style={styles.subheading}>
-            These questions affect your protein target calculation. Answer honestly — your safety
+            These questions affect your protein target calculation. Answer honestly: your safety
             depends on it.
           </Text>
         </LinearGradient>

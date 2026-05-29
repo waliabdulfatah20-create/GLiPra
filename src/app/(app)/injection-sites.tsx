@@ -37,7 +37,7 @@ const INJECTION_TIPS = [
   },
   {
     title: 'Check before you inject',
-    body: 'Avoid areas that feel firm, lumpy, or tender — these sites need more rest time.',
+    body: 'Avoid areas that feel firm, lumpy, or tender - these sites need more rest time.',
   },
 ];
 
@@ -94,7 +94,7 @@ export default function InjectionSitesScreen() {
               </Text>
               {allResting && (
                 <Text style={styles.restingWarning}>
-                  ⚠ All sites used within 7 days — rotate with care
+                  ⚠ All sites used within 7 days - rotate with care
                 </Text>
               )}
             </View>

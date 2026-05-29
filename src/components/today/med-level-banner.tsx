@@ -18,11 +18,11 @@ const MED_BLUE = '#60a5fa';
 const MED_BLUE_BG = 'rgba(37,99,235,0.12)';
 
 const PHASE_HEADLINE: Record<InjectionPhase, string> = {
-  injection_day:     'Injection day — dose administered',
-  peak_suppression:  'Peak suppression — appetite well-controlled',
-  adjustment:        'Adjustment phase — monitor for GI symptoms',
-  recovery_window:   'Recovery window — appetite may return',
-  overdue:           'Injection overdue — contact prescriber',
+  injection_day:     'Injection day: dose administered',
+  peak_suppression:  'Peak suppression: appetite well-controlled',
+  adjustment:        'Adjustment phase: monitor for GI symptoms',
+  recovery_window:   'Recovery window: appetite may return',
+  overdue:           'Injection overdue: contact prescriber',
 };
 
 const PHASE_PILL: Record<InjectionPhase, string> = {

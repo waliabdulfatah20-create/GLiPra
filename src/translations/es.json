@@ -223,7 +223,15 @@
     "nutrient_vitd": "Vitamina D",
     "pct_of_goal": "{{pct}}% de la meta",
     "goal_met": "Meta cumplida",
-    "micronutrient_disclaimer": "Los valores nutricionales son estimados basados en promedios de la base de datos de alimentos y pueden no reflejar el contenido exacto de tu comida."
+    "micronutrient_disclaimer": "Los valores nutricionales son estimados basados en promedios de la base de datos de alimentos y pueden no reflejar el contenido exacto de tu comida.",
+    "voice_button_label": "Voz",
+    "voice_button_subtitle": "Describe tu comida",
+    "voice_recording": "Escuchando...",
+    "voice_stop": "Toca para detener",
+    "voice_processing": "Analizando...",
+    "voice_transcript_label": "Dijiste",
+    "voice_permission_denied_title": "Se requiere acceso al micrófono",
+    "voice_permission_denied_body": "Activa el acceso al micrófono en Configuración para usar el registro por voz."
   },
   "checkin": {
     "title": "Check-in diario",

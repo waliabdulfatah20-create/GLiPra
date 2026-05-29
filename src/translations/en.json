@@ -223,7 +223,15 @@
     "nutrient_vitd": "Vitamin D",
     "pct_of_goal": "{{pct}}% of goal",
     "goal_met": "Goal met",
-    "micronutrient_disclaimer": "Nutrient estimates are based on food database averages and may not reflect the exact content of your meal."
+    "micronutrient_disclaimer": "Nutrient estimates are based on food database averages and may not reflect the exact content of your meal.",
+    "voice_button_label": "Voice",
+    "voice_button_subtitle": "Speak your meal",
+    "voice_recording": "Listening...",
+    "voice_stop": "Tap to stop",
+    "voice_processing": "Analyzing...",
+    "voice_transcript_label": "You said",
+    "voice_permission_denied_title": "Microphone Access Required",
+    "voice_permission_denied_body": "Enable microphone access in Settings to use voice logging."
   },
   "checkin": {
     "title": "Daily Check-in",

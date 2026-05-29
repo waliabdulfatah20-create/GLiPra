@@ -22,7 +22,7 @@
     "preview": {
       "channel": "preview",
       "autoIncrement": true,
-      "distribution": "store",
+      "distribution": "internal",
       "ios": {
         "image": "latest"
       },
@@ -32,7 +32,13 @@
       },
       "environment": "preview",
       "env": {
-        "EXPO_PUBLIC_APP_ENV": "preview"
+        "EXPO_PUBLIC_APP_ENV": "preview",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://cuxndkreewlcmijxlgyg.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_hUeF9JhXxhurIrBEcDyW0A_4bjhBQZw",
+        "EXPO_PUBLIC_USE_MOCK_AI": "true",
+        "EXPO_PUBLIC_REVENUECAT_ANDROID_KEY": "goog_PXIgbDoDUnkzNbEVuSvFOffgeVR",
+        "EXPO_PUBLIC_POSTHOG_API_KEY": "phc_vXjVSqcemdjbo7LXotqxxq4NirGyd8MFHpLkyP6LLPfH",
+        "EXPO_PUBLIC_SENTRY_DSN": "https://cff50645d998e3e2e0128ee5a7ebb009@o4511420663726080.ingest.us.sentry.io/4511420687450112"
       }
     },
     "development": {

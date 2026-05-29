@@ -257,7 +257,7 @@ serve(async (req: Request) => {
     const message = error instanceof Error ? error.message : 'Internal server error';
     console.error('transcribe-food unhandled error:', message);
     return new Response(JSON.stringify({ error: message }), {
-      status: 400,
+      status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }

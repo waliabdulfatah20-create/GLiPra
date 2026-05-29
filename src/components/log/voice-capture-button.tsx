@@ -61,6 +61,15 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
     return () => clearInterval(interval);
   }, [isRecording]);
 
+  // Release audio session if component unmounts while recording is active
+  React.useEffect(() => {
+    return () => {
+      if (recording) {
+        recording.stopAndUnloadAsync().catch(() => {});
+      }
+    };
+  }, [recording]);
+
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
@@ -81,8 +90,12 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
       const result = await RevenueCatUI.presentPaywallIfNeeded({
         requiredEntitlementIdentifier: 'glipra_pro',
       });
-      if (result === PAYWALL_RESULT.NOT_PRESENTED || result === PAYWALL_RESULT.ERROR) return;
-      // User just subscribed — fall through to start recording
+      // Only PURCHASED and RESTORED are valid fall-throughs — all other outcomes exit.
+      if (
+        result === PAYWALL_RESULT.NOT_PRESENTED ||
+        result === PAYWALL_RESULT.CANCELLED ||
+        result === PAYWALL_RESULT.ERROR
+      ) return;
     }
 
     // Mic permission

@@ -39,7 +39,7 @@ import type { BarcodeProduct } from '@/features/food-log/barcode-lookup';
 import { DailyMacroCard } from '@/features/food-log/daily-macro-card';
 import { MicronutrientWatchCard } from '@/features/food-log/micronutrient-watch-card';
 import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useTodayFoodLogs } from '@/features/food-log/hooks';
-import { PhotoReviewSheet } from '@/features/food-log/photo-review-sheet';
+import { AIReviewSheet } from '@/features/food-log/ai-review-sheet';
 import type { FoodLogEntry, ManualFoodEntry } from '@/features/food-log/types';
 import { useTodayData } from '@/features/today/hooks';
 import { useTheme } from '@/lib/ThemeContext';
@@ -287,7 +287,7 @@ export default function LogScreen() {
       />
 
       {/* Photo review sheet — slides up after AI recognition */}
-      <PhotoReviewSheet
+      <AIReviewSheet
         result={pendingResult}
         onClose={handlePhotoReviewClose}
       />

@@ -1,4 +1,4 @@
-// PhotoReviewSheet — slides up after AI food recognition.
+// AIReviewSheet — slides up after AI food recognition (photo or voice).
 // Displays all identified nutrients as editable fields so users can correct
 // the AI output before confirming.
 //
@@ -20,6 +20,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
@@ -32,9 +33,11 @@ import type { PhotoFoodEntry } from './types';
 // Props
 // ---------------------------------------------------------------------------
 
-export interface PhotoReviewSheetProps {
+export interface AIReviewSheetProps {
   result: RecognitionResult | null;
   onClose: () => void;
+  /** Populated on voice entries — the Whisper transcript spoken by the user. */
+  transcript?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -108,7 +111,8 @@ function parseEntry(form: FormState): PhotoFoodEntry {
 // Component
 // ---------------------------------------------------------------------------
 
-export function PhotoReviewSheet({ result, onClose }: PhotoReviewSheetProps) {
+export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProps) {
+  const { t } = useTranslation();
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
@@ -211,6 +215,14 @@ export function PhotoReviewSheet({ result, onClose }: PhotoReviewSheetProps) {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
+            {/* Transcript block — visible on voice entries only */}
+            {transcript ? (
+              <View style={styles.transcriptBlock}>
+                <Text style={styles.transcriptLabel}>{t('log.voice_transcript_label')}</Text>
+                <Text style={styles.transcriptText}>"{transcript}"</Text>
+              </View>
+            ) : null}
+
             {/* Food name + serving */}
             <SectionHeader title="FOOD" />
             <FieldRow label="Food name" unit="">
@@ -567,6 +579,30 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     },
     bottomPad: {
       height: spacing.xl,
+    },
+    // ── Voice transcript block ──────────────────────────────────────────────
+    transcriptBlock: {
+      backgroundColor: colors.background,
+      borderRadius: radius.sm,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.primary,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      marginBottom: spacing.md,
+    },
+    transcriptLabel: {
+      fontSize: 10,
+      fontWeight: '700',
+      letterSpacing: 0.8,
+      textTransform: 'uppercase',
+      color: colors.textSecondary,
+      marginBottom: 4,
+    },
+    transcriptText: {
+      fontSize: 14,
+      color: colors.textPrimary,
+      fontStyle: 'italic',
+      lineHeight: 20,
     },
   });
 }

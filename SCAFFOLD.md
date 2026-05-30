@@ -2,8 +2,9 @@
 
 **This file documents the scaffold inside `dosepath/` and overrides the Obytes template defaults.**
 
-For the full product spec, architecture, and the 10 non-negotiable rules, see the project-root file:
-`../CLAUDE.md`
+For the full product spec, architecture, and the 10 non-negotiable rules, see the
+authoritative product file in this same directory: `CLAUDE.md` (auto-loaded by Claude Code).
+Build history lives in `PROGRESS.md`; architecture decisions in `ARCHITECTURE.md`.
 
 ---
 
@@ -64,6 +65,6 @@ pnpm expo install <pkg>    # Add an Expo-compatible package
 ## Reading Priority
 
 When a question arises:
-1. **Project-root `../CLAUDE.md`** — authoritative for product/clinical/legal rules
+1. **`CLAUDE.md`** (same directory) — authoritative for product/clinical/legal rules
 2. **This file** — authoritative for scaffold state and Obytes overrides
 3. **Obytes template README** — descriptive only; treat as default that may be overridden

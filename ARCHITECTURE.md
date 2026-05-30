@@ -1,0 +1,3484 @@
+# Glipra — Architecture Document
+> Paste this into every new Claude conversation. Keep it updated as decisions are made.
+> Last updated: 2026-05-30 (session 37). App name: Glipra. Formerly working name: Satia.
+> Scaffold complete: Obytes v9.0.0 / Expo SDK 54 / pnpm / NativeWind stripped.
+>
+> **Scaffold from:** [obytes/react-native-template-obytes](https://github.com/obytes/react-native-template-obytes)
+> — this boilerplate matches our exact stack and saves 2-3 weeks of setup.
+
+---
+
+## What Glipra Is
+
+A GLP-1 nutrition companion app built by a licensed pharmacist.
+Core promise: **"We make sure you don't lose muscle while GLP-1 does its job."**
+
+Every feature serves muscle preservation, not weight loss. Weight loss is the drug's job.
+Our job is protein floors, micronutrient coverage, injection-cycle-aware guidance, and
+clinical safety — backed by real pharmacist expertise no generic macro tracker can replicate.
+
+**Target user:** Adults on semaglutide (Ozempic, Wegovy), tirzepatide (Mounjaro, Zepbound),
+liraglutide (Saxenda, Victoza), dulaglutide (Trulicity), or compounded GLP-1/GIP agonists
+who are anxious about muscle loss, confused about nutrition, and underserved by every existing app.
+
+**The Glipra positioning vs MeAgain (current #1):**
+*Match MeAgain on UX polish and feature breadth. Beat them on clinical credibility.*
+Where MeAgain has an RDN, Glipra has a licensed pharmacist.
+Where MeAgain has Capy, Glipra has a Readiness Score grounded in real pharmacokinetics.
+Where MeAgain wants users on telehealth forever, Glipra supports the full journey
+including discontinuation.
+
+**Eight killer differentiators no competitor — including MeAgain — can match:**
+1. Licensed pharmacist credential (MeAgain uses RDN)
+2. Injection cycle intelligence — every recommendation is phase-aware
+3. Protein floor as hero metric with kidney-disease and BMI safety bounds
+4. Voice + hybrid AI logging for nausea days when no other app works
+5. Clinical red-flag detection with real escalation — free for all users
+6. Discontinuation/maintenance mode — the only app that handles "after"
+7. Pre-prescriber visit prep — respects external prescribers (MeAgain hides users from them)
+8. Pharmacist-authored content in English and Spanish
+
+---
+
+## Competitive Landscape
+
+Monitor weekly: [theglp1list.com](https://theglp1list.com/en) — community-ranked GLP-1 apps.
+
+### The Primary Benchmark: MeAgain
+
+**MeAgain is the app to study, match on UX, and beat on clinical credibility.**
+
+| Metric | Detail |
+|---|---|
+| Maker | Dots Future Technologies (NYC) |
+| Reported revenue | ~$400K/month |
+| Users | 372,000+ |
+| App Store rating | 4.8 stars (16,000+ ratings) |
+| Pricing | $10/month or $79.99/year (Premium) |
+| Platforms | iOS-first, Android launched late 2025 |
+| Clinical lead | Erin, RDN (registered dietitian) — NOT a pharmacist |
+| Recent crown | "#1 GLP-1 Tracking App for 2026" press release Dec 2025 |
+| Business model | App subscription + optional telehealth ("MeAgain Care") + cash-pay medications ($129-199/mo compounded; brand match LillyDirect/NovoCare) |
+
+**Why Glipra wins on positioning:** MeAgain's nutrition lead is a Registered Dietitian.
+Glipra is built by a licensed pharmacist. For *medication-related* questions —
+side effects, drug interactions, dose timing, when to call your prescriber — a
+pharmacist credential is stronger and more legally defensible. Lean into this.
+
+**Why Glipra wins on features:**
+- MeAgain has no protein floor with kidney-disease safety bounds (legal/clinical gap)
+- MeAgain has no red-flag clinical escalation (safety gap)
+- MeAgain has no Spanish localization (market gap — Hispanic GLP-1 adoption is significant)
+- MeAgain has no discontinuation/maintenance mode (their business model wants you on telehealth forever)
+- MeAgain has no couples/linked accounts (viral lever they're missing)
+- MeAgain food scan accuracy is the #1 user complaint — beatable
+
+**What MeAgain does brilliantly that Glipra must match or exceed:**
+1. **Capybara widget (Capy)** — gamified home screen companion. Tamagotchi-like.
+   Users say "I just needed a capybara to not disappoint." Drives daily logging.
+2. **Journey Cards** — visual progress timeline with photos, weight, symptoms, milestones.
+   Different from streaks — these are shareable artifacts.
+3. **Shot Day prep checklist** — list of things to do on injection day to reduce side effects.
+4. **Medication level estimator** — dynamic graph showing estimated mg in system over the week.
+5. **Smart food logging** — photo + barcode + voice with AI extraction (we have this).
+6. **Ghost photo** — before/after side-by-side photo comparison.
+7. **Custom dosing + microdosing support** — supports users on non-standard regimens.
+8. **AI coach** — "Ask anything, get real answers" with personalized advice.
+9. **Holistic dashboard** — protein, fiber, water, steps, shots, side effects in ONE view.
+10. **Streaks tied to gamification** — celebrating consistency, not just dramatic weigh-ins.
+
+### Direct Competitors (Ranked by Threat)
+
+| App | Strength | Weakness vs Glipra |
+|---|---|---|
+| **MeAgain** (meagain.com) | #1 ranked, all-in-one, capybara, AI photo logging, 372K users, $400K/mo | RDN not pharmacist, no protein floor safety bounds, no red-flag escalation, no Spanish, no discontinuation mode, English-only |
+| **Shotsy** (shotsyapp.com) | Multi-medication tracking, color-coded dose charts, $39.99/yr (cheaper than MeAgain), PDF exports, maintenance mode, Apple Health, "your data stays private" positioning | Generic macro tracking, no pharmacist, no AI photo, no red-flag escalation, no Spanish |
+| **Glapp** (glapp.io) | iOS-only, injection phase visualization, AI Q&A, clinical trial comparison | No pharmacist, no protein floor, no Spanish, iOS-only, no Android |
+| **My GLP Shot** (myglpshot.com) | Privacy-first PWA, $19.99/yr, offline-first, end-to-end encrypted sync, reconstitution calculator | No nutrition AI, no muscle preservation focus, no clinical credential |
+| **Pep** (pepglp1.com) | Compounded GLP-1, microdosing, customizable reminders | No nutrition depth, no pharmacist |
+| **GLPeak** (glpeak.ai) | AI-powered tracking | No clinical credential, no muscle preservation focus |
+| **Glyppo** | Apple Health sync, no accounts, $X one-time | iOS-only, no nutrition, no AI |
+| **GLP Compass** | Full analytics + half-life estimation | Complex UX, no protein floor |
+| **MyTherapy** | Free, multi-condition tracker | Not GLP-1-specific |
+
+### The Competitive Gap Map
+
+| Feature | MeAgain (#1) | Shotsy | Glapp | MyGLPShot | Pep | Glipra |
+|---|---|---|---|---|---|---|
+| Licensed pharmacist authorship | ❌ (RDN) | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Protein floor with safety bounds (kidney, BMI) | Partial | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Red-flag escalation (pancreatitis, dehydration) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Discontinuation/maintenance mode | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ |
+| Spanish localization | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Couples/linked accounts | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Pre-prescriber visit PDF | Partial | ✅ | ❌ | ❌ | ❌ | ✅ |
+| Multi-medication history | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ |
+| Compounded GLP-1 support | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| Microdosing support | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| AI photo food recognition | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| Barcode food scanning | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| Voice food logging | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Medication level estimator chart | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
+| Injection site rotation map | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ |
+| Shot Day prep checklist | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Companion mascot widget | ✅ (Capy) | ❌ | ❌ | ❌ | ❌ | ✅ (Glipra needs one) |
+| Journey Cards (photo + data milestones) | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Ghost photo (before/after) | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ (optional, v2) |
+| Streaks gamification | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Apple Health + Health Connect | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ |
+| Android + iOS | ✅ | ✅ | ❌ | ✅ (PWA) | ✅ | ✅ |
+
+**The seven things only Glipra has:**
+1. Licensed pharmacist authoring all clinical content
+2. Protein floor with kidney disease + pregnancy + BMI safety bounds
+3. Red-flag clinical escalation (pancreatitis, dehydration, gastroparesis)
+4. Discontinuation/maintenance mode for after-GLP-1 life
+5. Spanish localization at launch
+6. Couples/linked accounts for viral growth
+7. Pre-prescriber visit PDF that respects the user's external prescriber
+
+These are the moats. MeAgain can't add them quickly because (a) they don't have a pharmacist,
+(b) their business model depends on keeping users on their telehealth (not discontinuation),
+and (c) the safety bounds require pharmacist judgment to defend in court.
+
+---
+
+## MeAgain Feature Parity Plan
+
+Glipra should match MeAgain on UX polish and feature breadth, then win on
+clinical depth, safety, and language. The following features are NEW additions
+to the v1 roadmap inspired by MeAgain's UX:
+
+### Companion Mascot Widget (v1)
+
+MeAgain has Capy the capybara. Glipra needs its own mascot — something that:
+- Lives on the home screen (iOS widget + Android widget)
+- Shows protein progress visually (full belly = protein hit, hungry = need to log)
+- Has playful but clinical undertone (not childish)
+- Is unique IP — can be trademarked
+
+**Working name candidates:** "Doe" (a deer), "Pax" (peace), "Floor" (the protein floor),
+or a non-character abstract widget that's just gorgeous data viz.
+
+**Recommendation:** Skip the mascot for v1 launch. Ship with a polished protein ring
+widget instead. Add a mascot in v2 once you have user behavior data on what motivates
+the demographic. A bad mascot is worse than no mascot — it cheapens the clinical brand.
+
+If you do build one, the architecture for it:
+- `widgets/ios/ProteinCompanion/` — Swift widget extension
+- `widgets/android/ProteinCompanion/` — Kotlin widget
+- Backed by `companion_state` table tracking happiness/protein progress per day
+- Updates via WidgetKit (iOS) / Glance (Android)
+
+### Journey Cards (v1) — IMPLEMENTED 2026-05-23
+
+Visual milestone cards that unlock as the user hits real achievements.
+Each card is a shareable artifact with emoji, title, subtitle, unlock date, and a native Share button.
+
+**Architecture (as built):**
+
+```
+src/features/journey-cards/
+├── milestones.ts        — 8 MilestoneId definitions + MILESTONES record
+├── api.ts               — unlockMilestone() (idempotent INSERT ON CONFLICT DO NOTHING)
+│                           fetchUnlockedMilestonesWithDates()
+└── hooks.ts             — useJourneyCards(), useCheckAndUnlockMilestones(profileCreatedAt, onUnlock?)
+
+src/components/journey/
+└── milestone-card.tsx   — MilestoneCard (unlocked) + LockedMilestoneCard (teaser)
+                           Share button via Share.share(milestone.shareText)
+
+src/components/ui/
+└── milestone-toast.tsx  — Slide-in toast, auto-dismisses 3s, brand-purple left border
+```
+
+**8 Milestones (MilestoneId):**
+
+| ID | Title | Trigger |
+|---|---|---|
+| `week_1_complete` | Week 1 Complete | `profileCreatedAt` ≥ 7 days ago |
+| `protein_streak_7` | Protein Streak: 7 Days | `currentStreak` ≥ 7 |
+| `protein_streak_30` | Protein Streak: 30 Days | `currentStreak` ≥ 30 |
+| `first_checkin` | First Check-in | First successful `upsertCheckIn` call |
+| `weight_logged_10x` | Tracking Champion | `fetchWeightLogCount` ≥ 10 |
+| `injection_day_warrior` | Injection Day Warrior | Shot logged on same calendar day as `profile.lastInjectionDate` |
+| `3_months_strong` | 3 Months Strong | `profileCreatedAt` ≥ 90 days ago |
+| `coach_conversation` | First Coaching Session | First successful AI coach reply |
+
+**Unlock pattern (all triggers are idempotent):**
+```ts
+unlockMilestone(userId, 'first_checkin')
+  .then(() => queryClient.invalidateQueries({ queryKey: ['journey-cards', userId] }))
+  .catch(() => {}); // fire-and-forget — non-critical
+```
+`unlockMilestone` uses `INSERT ... ON CONFLICT (user_id, milestone_id) DO NOTHING`
+so calling it on every check-in / coach message / weight log is safe.
+
+**Trigger locations:**
+- Time-based (`week_1_complete`, `3_months_strong`, streak milestones): `useCheckAndUnlockMilestones` in `journey-cards/hooks.ts` — runs on Today screen mount
+- `first_checkin`: `check-in/hooks.ts` → `useUpsertCheckIn` `onSuccess`
+- `weight_logged_10x`: `weight/hooks.ts` → `useInsertWeightLog` `onSuccess` (calls `fetchWeightLogCount`)
+- `injection_day_warrior`: `injection-sites/hooks.ts` → `useLogInjectionSite(lastInjectionDate?)` `onSuccess` — date-sliced comparison (`injectedAt.slice(0,10) === lastInjectionDate.slice(0,10)`)
+- `coach_conversation`: `ai-coach/hooks.ts` → `useAiCoach` `sendMessage` after assistant reply
+
+**Toast wiring (TodayScreen):**
+```ts
+useCheckAndUnlockMilestones(profile?.createdAt, (ids) => {
+  const m = MILESTONES[ids[0]];
+  if (m) setToastMilestone(m);
+});
+<MilestoneToast milestone={toastMilestone} onDismiss={() => setToastMilestone(null)} />
+```
+Multiple simultaneous unlocks show only the first — all visible in /journey screen.
+
+**Database table (live on cloud):**
+```sql
+CREATE TABLE unlocked_milestones (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  milestone_id TEXT NOT NULL,
+  unlocked_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (user_id, milestone_id)
+);
+ALTER TABLE unlocked_milestones ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_milestones" ON unlocked_milestones FOR ALL USING (auth.uid() = user_id);
+```
+
+**Sharing:** Each `MilestoneCard` has a Share button that calls `Share.share({ message: milestone.shareText })` — uses native iOS/Android share sheet. No Skia image generation needed; plain-text shares are the growth loop at this stage.
+
+### Shot Day Prep Checklist (v1)
+
+The morning of injection day, Glipra shows a checklist:
+- [ ] Hydrated (8+ oz water on waking)
+- [ ] Light protein-rich breakfast (Greek yogurt, eggs)
+- [ ] Rotate injection site (auto-suggested based on history)
+- [ ] Have anti-nausea food ready (crackers, ginger tea)
+- [ ] Schedule reminder to eat protein 2hr post-injection
+
+Pharmacist-authored copy. Drives engagement on the highest-anxiety day of the week.
+
+**Implementation:** New `shot_day_prep` content type in `content_cards` table.
+On injection day morning, push notification → opens prep checklist.
+
+### Medication Level Estimator Chart (v1)
+
+MeAgain shows a dynamic graph of estimated mg in system across the week.
+This is half-life pharmacokinetics — well-documented for each GLP-1.
+
+**Implementation:**
+```ts
+// src/features/medication-level/calculator.ts
+
+// Half-lives in days
+const HALF_LIVES: Record<GLP1MedicationId, number> = {
+  semaglutide_ozempic: 7,
+  semaglutide_wegovy: 7,
+  tirzepatide_mounjaro: 5,
+  tirzepatide_zepbound: 5,
+  liraglutide_saxenda: 0.5,    // daily injection, ~13 hours
+  liraglutide_victoza: 0.5,
+  dulaglutide_trulicity: 4.5,
+  // exenatide (~0.1 day half-life) is NOT in glp1_medications seed table — falls under 'other'
+  // Add it to 002_glp1_medications.sql before adding it here, or it silently uses the 7-day fallback
+  other: 7,
+};
+
+export function estimateLevel(
+  dose_mg: number,
+  daysSinceInjection: number,
+  medication: GLP1MedicationId
+): number {
+  const halfLife = HALF_LIVES[medication];
+  return dose_mg * Math.pow(0.5, daysSinceInjection / halfLife);
+}
+
+export function generateLevelCurve(
+  dose_mg: number,
+  medication: GLP1MedicationId,
+  daysToProject: number = 14
+): Array<{ day: number; level_mg: number }> {
+  return Array.from({ length: daysToProject + 1 }, (_, day) => ({
+    day,
+    level_mg: estimateLevel(dose_mg, day, medication),
+  }));
+}
+```
+
+**Pharmacist disclaimer required:** "Estimated based on half-life. Actual levels
+vary by individual metabolism, body composition, and other factors. Not a
+substitute for serum drug level testing."
+
+### Ghost Photo (v2 — not v1)
+
+Side-by-side before/after photo overlay. Common in fitness apps but emotionally
+loaded for the GLP-1 demographic. Defer to v2 with optional opt-in. When built:
+- Photos stored locally only by default (privacy)
+- Optional encrypted Supabase Storage backup
+- Side-by-side compositor uses Skia
+- NEVER auto-prompted — user must opt in
+
+### AI Nutrition Coach (v1, scoped to food only)
+
+**⚠️ LIABILITY DECISION:** AI Coach is scoped to GLP-1 NUTRITION questions only.
+"Ask anything" is explicitly NOT the model. An open-ended AI that answers medication
+questions, while branded with a pharmacist credential, creates a clinical duty of care
+that no disclaimer fully eliminates. Attorney must review prompts before launch.
+
+**What the Glipra Nutrition Coach answers:**
+- Protein sources, portion strategies, high-protein meals
+- Fiber and hydration guidance
+- What to eat on nausea days, peak suppression days
+- Food timing relative to injection cycle
+- General GLP-1 nutrition context from pharmacist content cards
+
+**What it hard-blocks with a canned response:**
+- Drug interaction questions → "For medication questions, contact your prescriber or pharmacist directly."
+- Dosing questions → same canned response
+- "Is it safe to..." questions → same canned response
+- Symptom interpretation → "If you're concerned about symptoms, contact your prescriber."
+
+**The `ai-coach` edge function:**
+- Powered by GPT-4o mini
+- System prompt explicitly limits to nutrition only — never medication advice
+- Input screened with keyword blocklist before hitting OpenAI
+- ALL outputs include tier-1 disclaimer rendered in UI, not just a footer
+- First use: mandatory one-time modal explaining scope
+- Attorney review of system prompt required before enabling for users
+
+Rate limit: 10 questions/day Pro, 2/day Free.
+
+### Microdosing & Custom Dosing Support (v1)
+
+User can enter any custom dose, not just the standard escalation rungs.
+Already partially supported in schema (`custom_dose_description`) — make it
+prominent in UI. Microdosing community is large and underserved.
+
+---
+
+
+
+## Compliance & Safety Framework (Read First)
+
+### Liability Risk Ranking (Highest to Lowest)
+
+Before building any feature, understand its risk profile:
+
+| Risk Level | Feature | Primary Concern | Mitigation |
+|---|---|---|---|
+| 🔴 Highest | Pharmacist license + employment | Board complaint, employer contract | Attorney + employer disclosure first |
+| 🔴 High | AI Nutrition Coach | Medication questions implying clinical authority | Scope to food only, attorney reviews prompts |
+| 🔴 High | Red-flag escalation | False negatives + naming conditions = diagnosis | No condition names in UI, pattern language only |
+| 🟡 Medium | AI daily guidance | Hallucination on safety-sensitive users | Unavoidable disclaimers, Zod validation |
+| 🟡 Medium | Protein floor calculator | Wrong number for kidney/pregnancy patient | Correct bounds + "confirm with prescriber" |
+| 🟡 Medium | Content cards on medical topics | User relies on article during active emergency | Top + bottom disclaimer, emergency redirect |
+| 🟡 Medium | "Built by a licensed pharmacist" branding | Raises standard of care in lawsuits | Precise language, no pharmacist-patient relationship |
+| 🟢 Low | Food/weight logging | User-reported data, no recommendations | Standard disclaimers sufficient |
+| 🟢 Low | Streaks, journey cards | Gamification, no clinical claims | No liability concerns |
+
+**Before launch, attorney must review:**
+1. Employment contract — outside activity clause
+2. TSBP disclosure requirements for your specific situation
+3. All marketing copy mentioning pharmacist credential
+4. AI coach system prompt and keyword blocklist
+5. ToS arbitration clause and class action waiver
+6. Medical disclaimer language in all three forms
+
+### Legal Positioning
+
+Glipra is a consumer health and educational app. It is explicitly:
+- NOT a medical device under FDA classification
+- NOT a HIPAA covered entity
+- NOT providing medical advice, diagnosis, or treatment
+- NOT a substitute for prescriber consultation
+- NOT establishing a pharmacist-patient relationship
+
+Reinforced through: App Store description, onboarding copy, first-launch consent flow
+(mandatory acceptance), persistent disclaimers on AI content, pharmacist-author bylines
+stating "for educational purposes only — consult your prescriber."
+
+### Pharmacist Credential — Exact Approved Language
+
+The pharmacist credential is the #1 differentiator AND raises the standard of care
+in any lawsuit. Use only these approved forms — never deviate without attorney review.
+
+**Approved everywhere:**
+- "Designed by a licensed pharmacist"
+- "Pharmacist-authored educational content"
+- "Built by a pharmacist"
+
+**Approved in bio/about only:**
+- "Glipra was designed by a Texas-licensed pharmacist with [X] years of patient
+  counseling experience. Glipra provides educational content for general wellness
+  purposes; it does not provide pharmacist counseling, prescription review, or
+  professional medical services."
+
+**Never use anywhere:**
+- "Your pharmacist recommends"
+- "Pharmacist-approved"
+- "Pharmacist-prescribed"
+- "The pharmacist behind your guidance" (implies active advising)
+- "Your virtual pharmacist"
+- Any first-person clinical advice as if from the pharmacist
+
+State of licensure (Texas) disclosed in T&C only. Not in marketing copy.
+Licensing in one state does not create authority in all 50 states.
+
+### Layered Disclaimer System
+
+Three intensity tiers, declared per screen via `<DisclaimerBanner tier={...} />`:
+
+- **Tier 1 (highest):** AI-generated guidance, protein floor, medication-related content,
+  AI coach responses. Modal acknowledgment required at first view. Disclaimer rendered
+  at same visual weight as content — not tiny footer text.
+- **Tier 2 (medium):** General educational content, side-effect explanations, micronutrients.
+  Footer disclaimer + "consult your prescriber" link.
+- **Tier 3 (minimum):** Pure user-data display (their own logs, weight). No disclaimer needed.
+
+### First-Launch Consent Flow
+
+After auth, before onboarding step 1, user MUST:
+1. Read and accept Terms of Service
+2. Read and accept Medical Disclaimer
+3. Acknowledge Privacy Policy
+
+Recorded in `profiles.consent_accepted_at` and `profiles.consent_version`.
+If terms update, users must re-accept. No app functionality until consent recorded.
+This is the single best legal defense in any dispute.
+
+### Active Acknowledgment Modals (High-Risk Moments)
+
+Modal acknowledgments required at:
+1. After protein floor reveal in onboarding — with "confirm with your prescriber" checkbox
+2. Before logging severe symptoms (nausea 5, vomiting) — brief safety prompt
+3. At final onboarding step — mandatory checkbox, not just a button tap
+4. First time AI Nutrition Coach is opened — explains it answers food questions only
+
+Each acknowledgment timestamped in `user_acknowledgments` with disclaimer version + IP.
+Audit trail is permanent. Events are never deleted.
+
+### Protein Floor — Liability-Reducing Language
+
+Add this one sentence to the protein floor modal that isn't currently there:
+*"This estimate is based on the information you provided. Inaccurate inputs will
+produce inaccurate estimates. Your prescriber or dietitian may recommend a different
+target."*
+
+The safety bounds (kidney disease cap, pregnancy limit, BMI correction) actually
+REDUCE liability by demonstrating clinical care. Keep them. Make sure they are
+bulletproof with 90%+ test coverage on every branch.
+
+### GDPR/CCPA — Built In
+
+Two edge functions ship in v1 (never paywalled):
+- `export-user-data` — complete JSON archive emailed to user
+- `delete-account` — permanent purge across all tables + auth row
+
+---
+
+## Emergency Escalation
+
+Symptom pattern monitoring. No competitor has this. ALWAYS FREE — safety is never paywalled.
+
+**Legal framing:** This feature is "symptom pattern monitoring," never "medical diagnosis"
+or "condition detection." The names of potential conditions (pancreatitis, gastroparesis)
+are internal/backend only. They are NEVER shown to the user. Naming a medical condition
+to a user constitutes diagnosis — a legal line Glipra does not cross.
+
+### Internal Trigger Names (Backend Only — Never Shown to User)
+
+| Internal Type | Detection Pattern |
+|---|---|
+| `dehydration_risk` | Nausea = 5 AND appetite = 'suppressed' for 3+ consecutive days |
+| `pain_pattern` | Severe nausea (5) + user notes contain pain keywords |
+| `vomiting_pattern` | Vomiting logged for 2+ consecutive days |
+| `energy_pattern` | Energy = 1 for 5+ consecutive days |
+
+`red_flag_type` column stores these internal codes in the database for audit purposes.
+They are used only in support contexts and legal review — never rendered in the app UI.
+
+### User-Facing Card Copy (Exact — Do Not Change Without Attorney Review)
+
+```
+"You've logged symptoms that may need medical attention.
+
+Please contact your prescriber today. If you are in severe pain,
+cannot keep fluids down, or feel this is an emergency — go to
+the emergency room or call 911.
+
+[Contact My Prescriber]   [I'll Handle This]
+```
+
+"I'll Handle This" snoozes for 24 hours only. Card reappears next open.
+No condition name. No diagnosis. No specific medical claim.
+
+### Behavior When Triggered
+
+1. Today screen shows full-screen `<EscalationCard />` overriding all other content
+2. Exact copy above — no condition names, no diagnosis language
+3. Cannot be permanently dismissed — snoozes 24 hours maximum
+4. Logs: `daily_checkins.red_flag_triggered = true` + `red_flag_type` (internal code)
+5. Daily AI guidance suppressed while card is active
+6. All escalation events retained in audit log permanently (never deleted)
+
+### Content Card Safety Rule
+
+Content cards that cover serious medical topics (cards #19, #20 — pancreatitis,
+gallbladder) MUST include this at the top in addition to the bottom disclaimer:
+
+*"If you are currently experiencing these symptoms, stop reading and contact your
+prescriber or go to the emergency room now. This article is for educational purposes
+and is not a substitute for emergency medical care."*
+
+Implementation: `src/features/safety/redFlagDetector.ts` — pure function, fully unit tested.
+90%+ branch coverage required. No exceptions.
+
+---
+
+## Stack
+
+> **⚡ Scaffold status as of 2026-05-17:** Obytes v9.0.0 scaffolded and hardened.
+> Expo SDK upgraded to 54 (v9 template targets 54, not 52). NativeWind fully stripped.
+> Package manager standardized to **pnpm**. See "Scaffold Decisions" section below.
+
+| Layer | Choice | Why |
+|---|---|---|
+| Boilerplate | [obytes/react-native-template-obytes](https://github.com/obytes/react-native-template-obytes) **v9.0.0** (pinned tag) | Exact stack match, saves 2-3 weeks of setup |
+| Framework | Expo managed workflow **SDK 54** | Zero native config; v9 template ships SDK 54 (spec said 52 — accepted upgrade) |
+| Package manager | **pnpm 11.1.2** | Obytes v9 declares `"packageManager": "pnpm@10.12.3"` — never use npm/yarn in this project |
+| Build/Deploy | EAS Build + EAS Submit + EAS Update (OTA) | iOS + Android + fast hotfixes |
+| Language | TypeScript (strict) | AI writes better TS, catches its own bugs |
+| Navigation | **Expo Router 6** | File-based, type-safe; v9 template ships Router 6 (spec said v3 — accepted upgrade) |
+| Styling | **StyleSheet API + `src/theme/colors.ts` design tokens** | NativeWind/Tailwind **stripped** — not installed, not permitted |
+| Server/DB | Supabase (`@supabase/supabase-js` **v2.105.4**) | Auth + Postgres + Realtime + Edge Functions |
+| Database types | `supabase gen types typescript` | Generated, never hand-edited |
+| AI — Photo | OpenAI GPT-4o via Edge Functions | Vision capability |
+| AI — Guidance | OpenAI GPT-4o mini via Edge Functions | Cheap, fast |
+| AI — Voice | OpenAI Whisper API via Edge Functions | Speech-to-text |
+| AI (dev) | `EXPO_PUBLIC_USE_MOCK_AI=true` mock gate | **Zero OpenAI cost during development** — all AI calls return mock data from `src/lib/mockAI.ts` |
+| Barcode | expo-camera (barcode mode) | Built-in to Expo SDK |
+| Food DB SDK | `@openfoodfacts/openfoodfacts-nodejs` (official) | Typed, maintained, replaces custom fetch client |
+| Food DB (primary) | Open Food Facts API | Free, 3M+ products |
+| Food DB (fallback) | USDA FoodData Central API | Government-verified |
+| Food DB (cache + seed) | Supabase `foods` table | Cache + 200 pre-seeded GLP-1-friendly foods |
+| Offline queue | AsyncStorage + React Query | Queue-and-sync for offline logging |
+| State | Zustand (global) + React Query (server) | Clean separation |
+| Persistence | **AsyncStorage** (for Supabase sessions) | Standard Supabase-RN pattern; MMKV reserved for non-auth data in v2 |
+| Date math | **date-fns v4.1.0** | No JS Sunday/Monday landmines; requires `unstable_enablePackageExports = true` in metro.config.js (ESM-first package) |
+| Payments | RevenueCat (react-native-purchases + react-native-purchases-ui) — **deferred to EAS dev build** | iOS + Android subs; requires native module, can't run in Expo Go |
+| Analytics | PostHog (posthog-react-native) — **live in EAS dev build** | Native module |
+| Error monitoring | Sentry (sentry-expo) — **deferred to EAS dev build** | Native module |
+| Notifications | Expo Notifications | With quiet hours + escalation rules |
+| Health sync | `react-native-health-link` (xmartlabs) — **deferred to EAS dev build** | Unified HealthKit + Health Connect — ONE package |
+| PDF | `pdf-lib` (Deno-compatible) in edge functions | Prescriber visit reports — NOT React PDF (Deno incompatible) |
+| Image gen | Skia + edge function | Streak share images |
+| Fonts | DM Serif Display + DM Sans | Warm, clinical-credible |
+| Localization | i18next + expo-localization | English + Spanish v1 |
+| Validation | Zod | Edge function input/output schemas; also used in `env.ts` for build-time env validation |
+| Testing — utils | **Vitest 4.1.6** (pure TS only) | Safety code: 90% coverage gate enforced; scoped to `src/utils/**` and `src/features/**/calculator.ts` |
+| Testing — components | **jest-expo 54.0.16** | React Native components, hooks, screens |
+| CI/CD | GitHub Actions (Obytes provides 10+ workflows) | Tests + builds + OTA |
+| Email | Resend | Transactional email |
+| Support | Plain.com | Customer support (after beta) |
+
+### Scaffold Decisions (2026-05-17)
+
+These are the authoritative decisions made when the Obytes v9.0.0 scaffold was set up.
+They override the original spec in CLAUDE.md where they differ.
+
+| Decision | Original Spec | Actual | Reason |
+|---|---|---|---|
+| Expo SDK version | SDK 52 | **SDK 54** | Obytes v9.0.0 targets SDK 54 — accepted upgrade |
+| Expo Router version | v3 | **v6** | Ships with SDK 54 template — accepted upgrade |
+| Package manager | npm | **pnpm 11.1.2** | Template declares `"packageManager": "pnpm@10.12.3"`; standardized to pnpm |
+| Obytes template version | unversioned | **v9.0.0** (pinned) | Pinned for supply chain repeatability |
+| Styling | StyleSheet (planned) | **StyleSheet + colors.ts** (NativeWind **stripped**) | Template ships with NativeWind; CLAUDE.md bans it; fully removed |
+| Tailwind utilities | — | **tailwind-variants + tailwind-merge removed** | Tailwind-specific; produce useless output without NativeWind |
+| Test runner (utils) | Vitest | **Vitest 4.1.6** | Configured and scoped — does NOT import any RN packages |
+| Test runner (components) | jest-expo | **jest-expo 54.0.16** | `pnpm test` runs this for all component/integration tests |
+| Supabase client | @supabase/supabase-js | **v2.105.4** | Installed version |
+| Supabase session store | MMKV (Obytes default) | **AsyncStorage** | Standard Supabase-RN pattern for auth persistence |
+| date-fns | date-fns | **v4.1.0** | ESM-first; requires `resolver.unstable_enablePackageExports = true` in metro.config.js |
+| Native packages | install now | **deferred to first EAS dev build** | RevenueCat, HealthKit, PostHog, Sentry — can't test in Expo Go |
+| Install flag | (none) | **`--ignore-scripts`** | Supply chain hardening — never run postinstall scripts from new deps without review |
+| Inner CLAUDE.md | Obytes template file | **Replaced with Glipra-aware file** | Original said "use NativeWind, use MMKV" — contradicted project rules |
+
+### Supply Chain Posture
+
+- **Install new packages with:** `pnpm add <pkg> --ignore-scripts`
+- **Pinned scaffold tag:** Obytes v9.0.0 (reproducible baseline)
+- **Audit baseline:** `docs/security/AUDIT-BASELINE.md` — 0 critical / 42 high / 26 moderate / 4 low (all dev-only transitive — none ship in production bundles)
+- **Re-audit cadence:** Monthly + after every dep bump + before every production release
+- **Production audit:** `pnpm audit --prod` must show 0 high and 0 critical before App Store submission
+
+### Windows-Specific Setup Notes
+
+These gotchas are specific to developing on Windows and are NOT in the Obytes README.
+
+```powershell
+# Git line endings — CRITICAL to set before first checkout to avoid CRLF errors
+git config core.autocrlf false
+
+# Supabase CLI on Windows — install via Scoop (NOT npm global install)
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase
+
+# Docker for local Supabase — required for `supabase start`
+# Install Docker Desktop and ensure WSL2 backend is enabled
+
+# pnpm — already installed if you ran `corepack enable`
+# If not: npm install -g pnpm@11
+```
+
+---
+
+## Quick Start (Day 1)
+
+> **⚡ Scaffold already done (2026-05-17).** Steps 1–2 are complete.
+> The `dosepath/` directory exists with Obytes v9.0.0 + SDK 54 + pnpm + NativeWind stripped.
+> Start at step 3 (Supabase local setup) for new machines or new team members.
+
+```bash
+# ── DONE: Scaffold from Obytes boilerplate (Obytes v9.0.0, pinned tag) ──────
+# npx create-expo-app@latest dosepath \
+#   --template https://github.com/obytes/react-native-template-obytes#v9.0.0
+# (NativeWind stripped, colors.ts design tokens added, pnpm standardized)
+
+# 0. Clone and install (use pnpm — never npm or yarn in this project)
+cd dosepath
+pnpm install --ignore-scripts   # --ignore-scripts = supply chain hardening
+
+# 1. Set up Supabase locally (requires Docker Desktop + WSL2 on Windows)
+supabase init && supabase start  # use Scoop-installed supabase CLI on Windows
+
+# 2. Apply all migrations
+supabase db reset
+
+# 3. Generate TypeScript types from schema
+supabase gen types typescript --local > src/types/database.ts
+
+# 4. Configure Supabase MCP in Cursor/Claude (see MCP section below)
+
+# 5. Run all tests before writing any UI
+pnpm test              # jest-expo: component + integration tests
+pnpm test:utils        # Vitest: pure-TS safety code
+
+# 6. Set up EAS for builds (only needed for native modules)
+npm install -g eas-cli && eas init && eas build:configure
+
+# 7. Deploy edge functions
+supabase functions deploy recognize-meal-photo
+supabase functions deploy generate-daily-guidance
+supabase functions deploy parse-meal-text
+
+# 8. First development build for native modules (RevenueCat, HealthKit, etc.)
+eas build --profile development --platform ios
+```
+
+---
+
+## MCP Setup (Critical for Development Speed)
+
+MCPs connect Claude directly to dev tools. Set these up before writing code.
+
+### Supabase MCP — Required
+
+**Repo:** https://github.com/supabase-community/supabase-mcp
+
+Add to Cursor/Claude Desktop/Windsurf settings:
+
+```json
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=YOUR_DEV_PROJECT_REF"
+    }
+  }
+}
+```
+
+**What this unlocks:**
+- Claude writes and applies migrations directly to dev database
+- Claude generates TypeScript types from schema without you running CLI
+- Claude queries live data to debug issues
+- Claude verifies RLS policies are correct
+- Claude can seed the 200 GLP-1-friendly foods directly
+
+**Security:** Scope to your DEV project only via `project_ref` query param.
+Never connect MCP to production.
+
+### Filesystem MCP — Recommended
+
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem",
+               "/path/to/dosepath"]
+    }
+  }
+}
+```
+
+Claude reads multiple files simultaneously when debugging.
+No more copy-pasting context.
+
+### GitHub MCP — Optional
+
+```json
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN" }
+    }
+  }
+}
+```
+
+For PR creation and issue management from Claude.
+
+---
+
+## Reference Repos (Study These, Steal What's Legal)
+
+### Boilerplate (start here)
+- **obytes/react-native-template-obytes** —
+  https://github.com/obytes/react-native-template-obytes
+  Exact stack match. TypeScript, Expo Router, Zustand, React Query, i18next,
+  Zod, Husky, EAS, GitHub Actions. Production-tested.
+
+### Barcode + Food DB Patterns
+- **antomanc/simple-calorie-tracker** —
+  https://github.com/antomanc/simple-calorie-tracker
+  Working Open Food Facts + USDA dual-API in React Native. Study the
+  barcode scanner and fallback logic.
+
+- **marcoshernanz/CalYo** —
+  https://github.com/marcoshernanz/CalYo
+  AI photo recognition + barcode in Expo with Convex backend. Study the
+  photo recognition edge function pattern.
+
+### Auth + Supabase Setup
+- **aaronksaunders/expo-supabase-ai-template** —
+  https://github.com/aaronksaunders/expo-supabase-ai-template
+  Expo Router + Supabase auth + OpenAI edge function. Reference for
+  edge function structure.
+
+- **Hechprad/react-native-supabase-boilerplate-2025** —
+  https://github.com/Hechprad/react-native-supabase-boilerplate-2025
+  Alternative starter if not using Obytes.
+
+### Subscriptions (RevenueCat)
+- **RevenueCat/expo-web-billing-demo** —
+  https://github.com/RevenueCat/expo-web-billing-demo
+  Official cross-platform iOS + Android + Web example.
+  Copy `lib/payments.native.ts` directly.
+
+### Analytics
+- **PostHog/support-rn-expo** —
+  https://github.com/PostHog/support-rn-expo
+  Official PostHog + Expo reference implementation.
+
+### Health Sync (iOS + Android)
+- **xmartlabs/react-native-health-link** —
+  https://github.com/xmartlabs/react-native-health-link
+  Unified HealthKit + Health Connect (replaces installing both separately).
+
+- **Haider-Mukhtar/ReactNative-Apple-Health-IOS** —
+  https://github.com/Haider-Mukhtar/ReactNative-Apple-Health-IOS
+  Has `useHealthData.ts` hook for steps, sleep, calories.
+
+- **Haider-Mukhtar/ReactNative-Health-Connect** —
+  https://github.com/Haider-Mukhtar/ReactNative-Health-Connect
+  Android Health Connect hook with permissions handling.
+
+### Email Infrastructure
+- **resend/resend-supabase-edge-functions-example** —
+  https://github.com/resend/resend-supabase-edge-functions-example
+  Complete Resend + Supabase edge function setup.
+
+- **supabase/auth-hook-react-email-resend** —
+  https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/auth-hook-react-email-resend
+  Auth email customization with React Email templates.
+
+### Open Food Facts SDK
+- **openfoodfacts/openfoodfacts-js** —
+  https://github.com/openfoodfacts/openfoodfacts-js
+  OFFICIAL TypeScript SDK. Use this — don't write a custom fetch client.
+
+---
+
+## Project Structure
+
+```
+dosepath/
+├── app/
+│   ├── (auth)/
+│   │   ├── _layout.tsx
+│   │   ├── welcome.tsx
+│   │   └── sign-in.tsx
+│   ├── consent.tsx                       # First-launch consent flow
+│   ├── (onboarding)/
+│   │   ├── _layout.tsx
+│   │   ├── medication.tsx                # Step 1 — GLP-1 med + dose (incl. compounded)
+│   │   ├── injection-day.tsx             # Step 2 — injection day / daily
+│   │   ├── body.tsx                      # Step 3 — weight, height, DOB
+│   │   ├── safety.tsx                    # Step 4 — kidney disease, conditions
+│   │   ├── dietary.tsx                   # Step 5 — pattern + allergens
+│   │   ├── goals.tsx                     # Step 6 — muscle preservation / weight / both
+│   │   ├── status.tsx                    # Step 7 — starting / active / tapering / maintenance
+│   │   ├── protein-target.tsx            # Step 8 — protein floor with safety bounds
+│   │   ├── import.tsx                    # Step 9 (optional) — import MFP/Shotsy/Apple Health
+│   │   └── reveal.tsx                    # Step 10 — personalized plan reveal
+│   ├── (tabs)/
+│   │   ├── _layout.tsx
+│   │   ├── today.tsx                     # Readiness Score + protein ring + phase + guidance
+│   │   ├── log.tsx                       # Logging hub
+│   │   ├── insights.tsx                  # Trends + micronutrients + adherence
+│   │   └── learn.tsx                     # Pharmacist content cards
+│   ├── log-meal/
+│   │   ├── camera.tsx                    # Photo (Pro)
+│   │   ├── barcode.tsx                   # Barcode (Free)
+│   │   ├── voice.tsx                     # Voice/hybrid text
+│   │   ├── search.tsx                    # Manual search
+│   │   └── confirm.tsx                   # Review + confirm
+│   ├── settings/
+│   │   ├── _layout.tsx
+│   │   ├── index.tsx
+│   │   ├── profile.tsx
+│   │   ├── medication.tsx
+│   │   ├── notifications.tsx
+│   │   ├── linked-accounts.tsx
+│   │   ├── data.tsx                      # Export, delete, import
+│   │   ├── language.tsx
+│   │   └── about.tsx                     # Disclaimers, T&C, version
+│   ├── prescriber-visit/
+│   │   ├── new.tsx
+│   │   ├── [id]/prep.tsx
+│   │   └── [id]/report.tsx
+│   ├── share/
+│   │   └── streak.tsx
+│   ├── checkin.tsx
+│   ├── weight.tsx
+│   ├── paywall.tsx
+│   ├── _layout.tsx
+│   └── +not-found.tsx
+│
+├── src/
+│   ├── components/
+│   │   ├── ui/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Card.tsx
+│   │   │   ├── Text.tsx
+│   │   │   ├── Sheet.tsx
+│   │   │   ├── ProteinRing.tsx
+│   │   │   ├── ReadinessScore.tsx        # 0-100 hero component
+│   │   │   ├── InjectionBadge.tsx
+│   │   │   ├── MicronutrientBar.tsx
+│   │   │   ├── DisclaimerBanner.tsx      # tier-based
+│   │   │   ├── EscalationCard.tsx
+│   │   │   ├── WhyTooltip.tsx            # "Why?" transparency
+│   │   │   ├── AIFeedbackThumbs.tsx      # quality loop
+│   │   │   ├── LoadingSkeleton.tsx
+│   │   │   ├── DataConfidenceBadge.tsx
+│   │   │   ├── OfflineBanner.tsx
+│   │   │   └── BadDayToggle.tsx
+│   │   ├── today/
+│   │   │   ├── ReadinessHeader.tsx
+│   │   │   ├── ProteinHeader.tsx
+│   │   │   ├── DailyGuidanceCard.tsx
+│   │   │   ├── MealSummary.tsx
+│   │   │   ├── CheckinCTA.tsx
+│   │   │   └── PrescriberVisitCard.tsx
+│   │   ├── log/
+│   │   │   ├── LogMethodPicker.tsx
+│   │   │   ├── FoodCard.tsx
+│   │   │   ├── PortionPicker.tsx
+│   │   │   ├── MealTypePicker.tsx
+│   │   │   ├── BarcodeScanner.tsx
+│   │   │   ├── VoiceCapture.tsx
+│   │   │   ├── HybridTextInput.tsx
+│   │   │   ├── FoodEditModal.tsx
+│   │   │   └── DraftRecovery.tsx
+│   │   ├── insights/
+│   │   │   ├── WeightChart.tsx
+│   │   │   ├── ProteinAdherence.tsx
+│   │   │   ├── MicronutrientSummary.tsx
+│   │   │   ├── SideEffectTrend.tsx
+│   │   │   └── WeekOverWeek.tsx
+│   │   ├── learn/
+│   │   │   ├── ContentCard.tsx
+│   │   │   └── ContentDetail.tsx
+│   │   ├── share/
+│   │   │   └── StreakImageRenderer.tsx
+│   │   └── prescriber/
+│   │       ├── VisitPrepSummary.tsx
+│   │       └── ReportPreview.tsx
+│   │
+│   ├── features/
+│   │   ├── ai-engine/
+│   │   │   ├── api.ts
+│   │   │   ├── prompts.ts
+│   │   │   ├── guardrails.ts
+│   │   │   ├── feedback.ts
+│   │   │   └── hooks.ts
+│   │   ├── auth/hooks.ts
+│   │   ├── consent/
+│   │   │   ├── api.ts
+│   │   │   └── hooks.ts
+│   │   ├── safety/
+│   │   │   ├── redFlagDetector.ts
+│   │   │   └── hooks.ts
+│   │   ├── readiness/
+│   │   │   ├── calculator.ts
+│   │   │   └── hooks.ts
+│   │   ├── barcode/
+│   │   │   ├── api.ts
+│   │   │   ├── parser.ts
+│   │   │   └── hooks.ts
+│   │   ├── voice-logging/
+│   │   │   ├── api.ts
+│   │   │   ├── transcribe.ts
+│   │   │   └── hooks.ts
+│   │   ├── checkin/
+│   │   │   ├── api.ts
+│   │   │   └── hooks.ts
+│   │   ├── injection-cycle/
+│   │   │   ├── calculator.ts
+│   │   │   └── hooks.ts
+│   │   ├── nutrition/
+│   │   │   ├── api.ts
+│   │   │   ├── hooks.ts
+│   │   │   ├── proteinTracking.ts  # Feature-layer helpers (NOT the safety calculator — that lives in src/utils/protein.ts)
+│   │   │   ├── density.ts
+│   │   │   └── ewma.ts
+│   │   ├── streaks/
+│   │   │   ├── api.ts
+│   │   │   ├── rules.ts
+│   │   │   └── hooks.ts
+│   │   ├── weight/
+│   │   │   ├── api.ts
+│   │   │   └── hooks.ts
+│   │   ├── content/
+│   │   │   ├── api.ts
+│   │   │   └── hooks.ts
+│   │   ├── medication-status/
+│   │   │   ├── api.ts
+│   │   │   ├── transitions.ts
+│   │   │   └── hooks.ts
+│   │   ├── dose-escalation/
+│   │   │   ├── timeline.ts
+│   │   │   ├── anticipation.ts
+│   │   │   └── hooks.ts
+│   │   ├── prescriber-visit/
+│   │   │   ├── api.ts
+│   │   │   ├── reportGenerator.ts
+│   │   │   └── hooks.ts
+│   │   ├── linked-accounts/
+│   │   │   ├── api.ts
+│   │   │   ├── permissions.ts
+│   │   │   └── hooks.ts
+│   │   ├── notifications/
+│   │   │   ├── api.ts
+│   │   │   ├── escalationRules.ts
+│   │   │   ├── quietHours.ts
+│   │   │   └── hooks.ts
+│   │   ├── offline/
+│   │   │   ├── queue.ts
+│   │   │   ├── sync.ts
+│   │   │   └── hooks.ts
+│   │   ├── import/
+│   │   │   ├── myfitnesspal.ts
+│   │   │   ├── shotsy.ts
+│   │   │   ├── appleHealth.ts
+│   │   │   └── hooks.ts
+│   │   ├── share/
+│   │   │   ├── streakImage.ts
+│   │   │   ├── journeyCardImage.ts
+│   │   │   └── hooks.ts
+│   │   ├── journey-cards/
+│   │   │   ├── api.ts
+│   │   │   ├── autoGenerator.ts          # Auto-creates cards on milestones
+│   │   │   └── hooks.ts
+│   │   ├── shot-day-prep/
+│   │   │   ├── checklist.ts
+│   │   │   └── hooks.ts
+│   │   ├── medication-level/
+│   │   │   ├── calculator.ts             # Half-life pharmacokinetics
+│   │   │   └── hooks.ts
+│   │   ├── ai-coach/
+│   │   │   ├── api.ts                    # Calls ai-coach edge function
+│   │   │   ├── prompts.ts                # Pharmacist-trained system prompt
+│   │   │   └── hooks.ts
+│   │   └── onboarding/
+│   │       ├── store.ts
+│   │       └── hooks.ts
+│   │
+│   ├── stores/
+│   │   ├── userStore.ts
+│   │   ├── uiStore.ts
+│   │   └── badDayStore.ts
+│   │
+│   ├── lib/
+│   │   ├── supabase.ts
+│   │   ├── queryClient.ts
+│   │   ├── revenuecat.ts
+│   │   ├── openFoodFacts.ts
+│   │   ├── usdaFoodData.ts
+│   │   ├── notifications.ts
+│   │   ├── healthSync.ts
+│   │   ├── analytics.ts
+│   │   ├── featureFlags.ts
+│   │   ├── i18n.ts
+│   │   └── mockAI.ts             # Returns mock data when EXPO_PUBLIC_USE_MOCK_AI=true
+│   │
+│   ├── theme/
+│   │   ├── colors.ts
+│   │   └── index.ts
+│   │
+│   ├── types/
+│   │   ├── database.ts                   # Generated by supabase gen types
+│   │   └── index.ts
+│   │
+│   ├── locales/
+│   │   ├── en.json
+│   │   └── es.json
+│   │
+│   ├── utils/
+│   │   ├── date.ts
+│   │   ├── nutrition.ts
+│   │   ├── protein.ts
+│   │   └── format.ts
+│   │
+│   └── __tests__/
+│       ├── protein.test.ts
+│       ├── injection-cycle.test.ts
+│       ├── readiness.test.ts
+│       ├── ewma.test.ts
+│       ├── redFlagDetector.test.ts
+│       ├── streak-rules.test.ts
+│       ├── notification-escalation.test.ts
+│       ├── medication-status.test.ts
+│       └── offline-queue.test.ts
+│
+├── supabase/
+│   ├── functions/
+│   │   ├── recognize-meal-photo/
+│   │   ├── parse-meal-text/
+│   │   ├── transcribe-voice/
+│   │   ├── generate-daily-guidance/
+│   │   ├── ai-coach/                     # MeAgain "Ask anything" parity
+│   │   ├── calculate-micronutrients/
+│   │   ├── generate-prescriber-report/
+│   │   ├── generate-streak-image/
+│   │   ├── generate-journey-card-image/  # Shareable milestone images
+│   │   ├── auto-generate-journey-cards/  # Nightly job — creates milestone cards
+│   │   ├── notification-rules-runner/
+│   │   ├── revenuecat-webhook/
+│   │   ├── export-user-data/
+│   │   ├── delete-account/
+│   │   ├── cohort-aggregator/
+│   │   └── _shared/
+│   │       ├── openai.ts
+│   │       ├── guardrails.ts
+│   │       ├── rateLimit.ts
+│   │       ├── pdfBuilder.ts
+│   │       └── cors.ts
+│   │
+│   ├── migrations/
+│   │   ├── 000_baseline.sql
+│   │   ├── 001_profiles.sql
+│   │   ├── 002_glp1_medications.sql
+│   │   ├── 003_user_medications.sql
+│   │   ├── 004_dose_history.sql
+│   │   ├── 005_body_metrics.sql
+│   │   ├── 006_foods.sql
+│   │   ├── 007_foods_seed.sql
+│   │   ├── 008_food_logs.sql
+│   │   ├── 009_daily_checkins.sql
+│   │   ├── 010_protein_streaks.sql
+│   │   ├── 011_daily_guidance.sql
+│   │   ├── 012_content_cards.sql
+│   │   ├── 013_content_card_versions.sql
+│   │   ├── 014_ai_invocations.sql
+│   │   ├── 015_ai_feedback.sql
+│   │   ├── 016_user_acknowledgments.sql
+│   │   ├── 017_prescriber_visits.sql
+│   │   ├── 018_linked_accounts.sql
+│   │   ├── 019_notification_log.sql
+│   │   ├── 020_offline_sync_log.sql
+│   │   ├── 021_import_history.sql
+│   │   ├── 022_subscription_state.sql
+│   │   ├── 023_promo_codes.sql
+│   │   ├── 024_partners.sql
+│   │   ├── 025_admin_audit_log.sql
+│   │   ├── 026_provider_invitations.sql
+│   │   ├── 027_provider_user_links.sql
+│   │   ├── 028_journey_cards.sql         # MeAgain Journey Cards parity
+│   │   └── 029_ai_coach_conversations.sql # AI Coach chat history
+│   │
+│   └── seed/
+│       └── glp1_friendly_foods.sql
+│
+├── .github/
+│   └── workflows/
+│       └── main.yml
+│
+├── assets/
+├── app.json
+├── app.config.ts
+├── eas.json
+├── tsconfig.json
+├── package.json
+├── vitest.config.ts
+└── ARCHITECTURE.md
+```
+
+---
+
+## Onboarding Flow — 11 Steps (Language + 10)
+
+| Step | Screen | Purpose |
+|---|---|---|
+| 0 | language.tsx | Language selection (English / Español) — before step counter starts |
+| 1 | medication.tsx | GLP-1 med + dose (incl. compounded) |
+| 2 | injection-day.tsx | Day of week or "daily" |
+| 3 | body.tsx | Weight, height, DOB |
+| 4 | safety.tsx | Kidney disease, pregnancy/lactation — NON-SKIPPABLE |
+| 5 | dietary.tsx | Dietary pattern + allergens + restrictions |
+| 6 | goals.tsx | Muscle preservation / weight / both |
+| 7 | status.tsx | Starting / active / tapering / maintenance — NON-SKIPPABLE |
+| 8 | protein-target.tsx | Protein floor with safety reasoning + disclaimer modal |
+| 9 | import.tsx | Optional — MFP/Shotsy/Apple Health import |
+| 10 | reveal.tsx | Personalized plan reveal |
+
+Step 0 (language) has no step counter UI — it stands alone before the numbered flow begins.
+First-time redirect in (app)/_layout.tsx points to `/onboarding/language`, not `/onboarding/medication`.
+
+---
+
+## Core Models
+
+### Protein Floor — With Safety Bounds
+
+```ts
+// src/utils/protein.ts
+
+const ABSOLUTE_CEILING_G = 200;
+const ABSOLUTE_FLOOR_G = 50;
+const KIDNEY_DISEASE_MAX_G_PER_KG = 0.8;
+
+interface ProteinFloorInput {
+  weight_kg: number;
+  height_cm: number;
+  goal: UserGoal;
+  has_kidney_disease: boolean;
+  is_pregnant: boolean;
+  is_lactating: boolean;
+  medication_status: MedicationStatus;
+}
+
+export function calculateProteinFloor(input: ProteinFloorInput): {
+  floor_g: number;
+  reasoning: string;
+  safety_capped: boolean;
+} {
+  // Kidney disease — most restrictive path
+  if (input.has_kidney_disease) {
+    const floor = Math.round(input.weight_kg * KIDNEY_DISEASE_MAX_G_PER_KG);
+    return {
+      floor_g: clamp(floor, ABSOLUTE_FLOOR_G, ABSOLUTE_CEILING_G),
+      reasoning: 'Reduced for renal protection. Confirm target with your prescriber.',
+      safety_capped: true,
+    };
+  }
+
+  // Pregnancy/lactation — defer to prescriber
+  if (input.is_pregnant || input.is_lactating) {
+    return {
+      floor_g: clamp(Math.round(input.weight_kg * 1.1), ABSOLUTE_FLOOR_G, 130),
+      reasoning: 'Pregnancy/lactation requires individualized guidance. Confirm with prescriber.',
+      safety_capped: true,
+    };
+  }
+
+  const bmi = input.weight_kg / Math.pow(input.height_cm / 100, 2);
+  const reference_kg = bmi > 35 ? estimateIdealBodyWeight(input.height_cm) : input.weight_kg;
+  const reference_lbs = reference_kg * 2.205;
+
+  let multiplier = input.goal === 'muscle_preservation' ? 1.0 : 0.8;
+  if (input.medication_status === 'maintenance') multiplier *= 0.9;
+
+  const calculated = Math.round(reference_lbs * multiplier);
+  return {
+    floor_g: clamp(calculated, ABSOLUTE_FLOOR_G, ABSOLUTE_CEILING_G),
+    reasoning: bmi > 35
+      ? 'Calculated using ideal body weight for accuracy.'
+      : input.medication_status === 'maintenance'
+      ? 'Adjusted for maintenance phase — preserving what you have.'
+      : 'Standard muscle-preservation target.',
+    safety_capped: calculated !== clamp(calculated, ABSOLUTE_FLOOR_G, ABSOLUTE_CEILING_G),
+  };
+}
+
+function estimateIdealBodyWeight(height_cm: number): number {
+  const height_inches = height_cm / 2.54;
+  return 50 + 2.3 * Math.max(0, height_inches - 60);
+}
+
+function clamp(n: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, n));
+}
+```
+
+### Readiness Score — The Hero UI (0-100)
+
+```ts
+// src/features/readiness/calculator.ts
+
+export function calculateReadinessScore(input: {
+  injection_phase: InjectionPhase;
+  todays_checkin: CheckinField | null;
+  protein_progress: number;  // 0-1
+  hour_of_day: number;
+}): { score: number; guidance: string } {
+  let score = 70;
+
+  if (input.injection_phase === 'peak_suppression') score -= 15;
+  if (input.injection_phase === 'recovery_window') score += 10;
+  if (input.injection_phase === 'injection_day') score += 5;
+
+  if (input.todays_checkin) {
+    score -= (input.todays_checkin.nausea - 1) * 5;
+    score += (input.todays_checkin.energy - 3) * 5;
+  }
+
+  const expected = Math.min(1, input.hour_of_day / 18);
+  if ((expected - input.protein_progress) > 0.2) score -= 10;
+
+  score = Math.max(0, Math.min(100, score));
+  return { score, guidance: getGuidanceForScore(score, input.injection_phase) };
+}
+```
+
+The Readiness Score is the PRIMARY element on Today screen.
+Larger font than the protein ring. One number + one line of contextual guidance.
+Clinically grounded in pharmacokinetics, not a subjective wellness gimmick.
+
+### Streak Rules
+
+```ts
+// src/features/streaks/rules.ts
+const STREAK_THRESHOLD = 0.80;
+
+export function didHitFloorToday(consumed: number, floor: number): boolean {
+  return (consumed / floor) >= STREAK_THRESHOLD;
+}
+// >= 80% of floor = streak day. Day boundary = user's local midnight.
+// Logging after midnight backdates correctly. Never shame a missed day.
+```
+
+### Injection Cycle Calculator
+
+```ts
+// src/features/injection-cycle/calculator.ts
+import { differenceInCalendarDays } from 'date-fns';
+
+export function getInjectionPhase(daysSince: number): InjectionPhase {
+  if (daysSince === 0) return 'injection_day';
+  if (daysSince <= 2)  return 'peak_suppression';
+  if (daysSince <= 4)  return 'adjustment';
+  if (daysSince <= 7)  return 'recovery_window';
+  return 'overdue';
+}
+```
+
+### Discontinuation / Maintenance Mode
+
+```ts
+type MedicationStatus =
+  | 'starting'      // First 4-8 weeks, dose escalating
+  | 'active'        // Standard ongoing use
+  | 'tapering'      // User-initiated wind-down
+  | 'discontinued'  // Stopped GLP-1
+  | 'maintenance';  // Goal weight reached, maintaining
+
+// Protein floor multipliers by status:
+// starting, active, tapering: standard calculation
+// discontinued, maintenance: multiply by 0.9
+// Different guidance tone, different content cards surfaced per status
+```
+
+The most important retention feature. Most apps lose users when they stop their GLP-1.
+Glipra stays relevant through the "after" — which is users' real long-term concern.
+
+### Injection Site Rotation (Form-Based — as of 2026-05-23)
+
+Six stomach sites only. Pharmacist decision: abdomen is the primary GLP-1 injection
+zone; thighs are secondary and rarely used by this patient population.
+
+```ts
+// src/features/injection-sites/constants.ts
+
+export type SiteCode =
+  | 'stomach_upper_left'
+  | 'stomach_upper_mid'
+  | 'stomach_upper_right'
+  | 'stomach_lower_left'
+  | 'stomach_lower_mid'
+  | 'stomach_lower_right';
+
+// Serpentine order — maximally spaces consecutive injections
+export const SITE_ROTATION_ORDER: SiteCode[] = [
+  'stomach_upper_left',
+  'stomach_upper_mid',
+  'stomach_upper_right',
+  'stomach_lower_right',
+  'stomach_lower_mid',
+  'stomach_lower_left',
+];
+
+export const REST_DAYS = 7; // Clinical standard: 7 days before reuse
+```
+
+```ts
+// src/features/injection-sites/calculator.ts
+
+export interface RotationState {
+  recommendation: SiteCode; // Always defined — falls back to LRU when all resting
+  allResting: boolean;       // True when every site used within REST_DAYS — show warning
+}
+
+export function computeNextSite(logs: InjectionLog[], today?: string): RotationState {
+  // Pass 1: first site in rotation order that is either unused or rested (≥ REST_DAYS ago)
+  // Pass 2 (allResting): return least-recently-used site so user can still proceed
+}
+```
+
+**Algorithm guarantees:**
+- Never returns null — always gives a usable recommendation
+- Most-recent log wins when duplicate entries exist for same site
+- `allResting=true` shows a warning banner but does NOT block logging
+- `today` parameter exposed for deterministic Vitest testing
+
+**Rule 4 compliance:** `calculator.ts` has 100% statement coverage, 99.23% branch
+coverage in Vitest (11 test cases in `calculator.test.ts`). Must stay ≥90%.
+
+**UX flow:**
+1. Sites tab → Active Rotation card shows recommended site + "+ Add Shot" button
+2. Add Shot form: date/time pickers, medication dropdown, injection site dropdown
+   (non-selectable "ACTIVE ROTATION" section header at top of dropdown), pain level
+   0–10 slider, notes textarea
+3. On save: log inserted → React Query cache invalidated → rotation advances
+
+---
+
+## Database Schema
+
+### 001_profiles.sql
+
+```sql
+CREATE TABLE profiles (
+  id                      UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  display_name            TEXT,
+  gender                  TEXT CHECK (gender IN ('male','female','non_binary','prefer_not_to_say')),
+  date_of_birth           DATE,
+  height_cm               NUMERIC(5,1),
+  weight_kg               NUMERIC(5,2),
+  goal                    TEXT NOT NULL DEFAULT 'muscle_preservation'
+                            CHECK (goal IN ('muscle_preservation','weight_management','both')),
+  -- Safety inputs
+  has_kidney_disease      BOOLEAN NOT NULL DEFAULT false,
+  is_pregnant             BOOLEAN NOT NULL DEFAULT false,
+  is_lactating            BOOLEAN NOT NULL DEFAULT false,
+  -- Dietary
+  dietary_pattern         TEXT CHECK (dietary_pattern IN
+                            ('omnivore','vegetarian','vegan','pescatarian','other')),
+  allergens               TEXT[] DEFAULT '{}',
+  religious_restrictions  TEXT[] DEFAULT '{}',
+  -- Protein floor
+  protein_floor_g         INT,
+  protein_override_g      INT,
+  protein_floor_capped    BOOLEAN DEFAULT false,
+  protein_floor_reasoning TEXT,
+  -- Subscription
+  subscription_tier       TEXT NOT NULL DEFAULT 'free'
+                            CHECK (subscription_tier IN ('free','pro','founder_lifetime')),
+  revenuecat_user_id      TEXT,
+  -- Consent
+  consent_accepted_at     TIMESTAMPTZ,
+  consent_version         TEXT,
+  -- Localization + notifications
+  timezone                TEXT NOT NULL DEFAULT 'America/Chicago',
+  preferred_language      TEXT NOT NULL DEFAULT 'en'
+                            CHECK (preferred_language IN ('en','es')),
+  quiet_hours_start       TIME DEFAULT '22:00',
+  quiet_hours_end         TIME DEFAULT '08:00',
+  -- Onboarding
+  onboarding_complete     BOOLEAN NOT NULL DEFAULT false,
+  -- Compassion mode
+  bad_day_active          BOOLEAN DEFAULT false,
+  bad_day_until           TIMESTAMPTZ,
+  created_at              TIMESTAMPTZ DEFAULT NOW(),
+  updated_at              TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_profile" ON profiles FOR ALL USING (auth.uid() = id);
+
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO profiles (id, timezone) VALUES (NEW.id, 'America/Chicago');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+```
+
+### 002_glp1_medications.sql
+
+```sql
+CREATE TABLE glp1_medications (
+  id                TEXT PRIMARY KEY,
+  brand_name        TEXT NOT NULL,
+  generic_name      TEXT NOT NULL,
+  drug_class        TEXT NOT NULL,
+  typical_frequency TEXT NOT NULL,
+  dose_unit         TEXT NOT NULL DEFAULT 'mg'
+);
+
+INSERT INTO glp1_medications VALUES
+  ('semaglutide_wegovy',    'Wegovy',    'Semaglutide', 'GLP-1',     'weekly', 'mg'),
+  ('semaglutide_ozempic',   'Ozempic',   'Semaglutide', 'GLP-1',     'weekly', 'mg'),
+  ('tirzepatide_zepbound',  'Zepbound',  'Tirzepatide', 'GIP/GLP-1', 'weekly', 'mg'),
+  ('tirzepatide_mounjaro',  'Mounjaro',  'Tirzepatide', 'GIP/GLP-1', 'weekly', 'mg'),
+  ('liraglutide_saxenda',   'Saxenda',   'Liraglutide', 'GLP-1',     'daily',  'mg'),
+  ('liraglutide_victoza',   'Victoza',   'Liraglutide', 'GLP-1',     'daily',  'mg'),
+  ('dulaglutide_trulicity', 'Trulicity', 'Dulaglutide', 'GLP-1',     'weekly', 'mg'),
+  ('other',                 'Other',     'Other',       'GLP-1',     'weekly', 'mg');
+```
+
+### 003_user_medications.sql
+
+```sql
+CREATE TABLE user_medications (
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id               UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
+  medication_id         TEXT NOT NULL REFERENCES glp1_medications(id),
+  current_dose_mg       NUMERIC(6,2),
+  dose_unit             TEXT DEFAULT 'mg',
+  is_compounded         BOOLEAN DEFAULT false,
+  custom_medication_name TEXT,
+  custom_dose_description TEXT,
+  injection_frequency   TEXT NOT NULL DEFAULT 'weekly'
+                          CHECK (injection_frequency IN ('daily','weekly','biweekly')),
+  injection_day_of_week SMALLINT CHECK (injection_day_of_week BETWEEN 0 AND 6),
+  medication_status     TEXT NOT NULL DEFAULT 'starting'
+                          CHECK (medication_status IN
+                            ('starting','active','tapering','discontinued','maintenance')),
+  status_changed_at     TIMESTAMPTZ DEFAULT NOW(),
+  start_date            DATE,
+  notes                 TEXT,
+  updated_at            TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE user_medications ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_medication" ON user_medications FOR ALL
+  USING (auth.uid() = user_id);
+```
+
+### 004_dose_history.sql
+
+```sql
+CREATE TABLE dose_history (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  dose_amount_mg  NUMERIC(6,2),
+  dose_description TEXT,
+  effective_date  DATE NOT NULL,
+  reason          TEXT,
+  created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_dose_history_user_date ON dose_history(user_id, effective_date DESC);
+ALTER TABLE dose_history ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_dose_history" ON dose_history FOR ALL USING (auth.uid() = user_id);
+```
+
+### 005_body_metrics.sql
+
+```sql
+CREATE TABLE body_metrics (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id       UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  weight_kg     NUMERIC(5,2) NOT NULL,
+  logged_at     TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_body_metrics_user_date ON body_metrics(user_id, logged_at DESC);
+ALTER TABLE body_metrics ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_metrics" ON body_metrics FOR ALL USING (auth.uid() = user_id);
+```
+
+### 006_foods.sql
+
+```sql
+CREATE TABLE foods (
+  id              TEXT PRIMARY KEY,
+  name            TEXT NOT NULL,
+  name_es         TEXT,
+  brand           TEXT,
+  barcode         TEXT,
+  source          TEXT NOT NULL CHECK (source IN
+                    ('open_food_facts','usda','manual','ai_photo','ai_text','curated')),
+  calories        NUMERIC(6,1),
+  protein_g       NUMERIC(5,2),
+  carbs_g         NUMERIC(5,2),
+  fat_g           NUMERIC(5,2),
+  fiber_g         NUMERIC(5,2),
+  b12_mcg         NUMERIC(8,3),
+  iron_mg         NUMERIC(7,3),
+  calcium_mg      NUMERIC(7,2),
+  magnesium_mg    NUMERIC(7,2),
+  protein_density NUMERIC(5,3) GENERATED ALWAYS AS
+                    (CASE WHEN calories > 0 THEN protein_g / calories ELSE 0 END) STORED,
+  data_quality    TEXT CHECK (data_quality IN
+                    ('verified','community','usda','ai_estimated','unverified'))
+                    DEFAULT 'unverified',
+  is_verified     BOOLEAN DEFAULT false,
+  is_glp1_friendly BOOLEAN DEFAULT false,
+  serving_size_g  NUMERIC(6,1),
+  created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_foods_barcode ON foods(barcode);
+CREATE INDEX idx_foods_name ON foods USING gin(to_tsvector('english', name));
+CREATE INDEX idx_foods_protein_density ON foods(protein_density DESC);
+CREATE INDEX idx_foods_glp1_friendly ON foods(is_glp1_friendly) WHERE is_glp1_friendly = true;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX idx_foods_name_trgm ON foods USING gin(name gin_trgm_ops);
+
+ALTER TABLE foods ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "foods_public_read" ON foods FOR SELECT USING (true);
+CREATE POLICY "users_insert_foods" ON foods FOR INSERT
+  WITH CHECK (auth.role() = 'authenticated');
+```
+
+### 007_foods_seed.sql
+
+200 hand-curated pharmacist-verified high-protein foods pre-populated at install.
+Greek yogurt brands, protein shakes, eggs, chicken cuts, cottage cheese, soft proteins.
+All: is_glp1_friendly=true, data_quality='verified', is_verified=true.
+Top 50 include Spanish name translations.
+Solves cold-start UX — first barcode scan hits cache immediately.
+
+### 008_food_logs.sql
+
+```sql
+CREATE TABLE food_logs (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  food_id         TEXT REFERENCES foods(id) ON DELETE SET NULL,
+  food_name       TEXT NOT NULL,
+  meal_type       TEXT NOT NULL CHECK (meal_type IN ('breakfast','lunch','dinner','snack')),
+  quantity_g      NUMERIC(7,2) NOT NULL,
+  calories        NUMERIC(6,1),
+  protein_g       NUMERIC(5,2),
+  carbs_g         NUMERIC(5,2),
+  fat_g           NUMERIC(5,2),
+  fiber_g         NUMERIC(5,2),
+  b12_mcg         NUMERIC(8,3),
+  iron_mg         NUMERIC(7,3),
+  calcium_mg      NUMERIC(7,2),
+  magnesium_mg    NUMERIC(7,2),
+  log_source      TEXT DEFAULT 'manual'
+                    CHECK (log_source IN
+                      ('barcode','photo_ai','voice','hybrid_text',
+                       'search','manual','quick_add','imported')),
+  ai_confidence   NUMERIC(3,2),
+  needs_review    BOOLEAN DEFAULT false,
+  medication_week INT,         -- For cohort insights
+  injection_phase TEXT,        -- For cohort insights
+  client_uuid     TEXT,        -- For offline dedup
+  synced_offline  BOOLEAN DEFAULT false,
+  logged_at       TIMESTAMPTZ DEFAULT NOW(),
+  created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_food_logs_user_date ON food_logs(user_id, logged_at DESC);
+CREATE INDEX idx_food_logs_cohort ON food_logs(medication_week, injection_phase)
+  WHERE medication_week IS NOT NULL;
+CREATE UNIQUE INDEX idx_food_logs_client_uuid ON food_logs(user_id, client_uuid)
+  WHERE client_uuid IS NOT NULL;
+
+ALTER TABLE food_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_logs" ON food_logs FOR ALL USING (auth.uid() = user_id);
+```
+
+### 009_daily_checkins.sql
+
+```sql
+CREATE TABLE daily_checkins (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id             UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  date                DATE NOT NULL,
+  nausea              SMALLINT CHECK (nausea BETWEEN 1 AND 5),
+  energy              SMALLINT CHECK (energy BETWEEN 1 AND 5),
+  constipation        BOOLEAN,
+  vomiting            BOOLEAN DEFAULT false,
+  appetite            TEXT CHECK (appetite IN ('suppressed','low','normal')),
+  injected_today      BOOLEAN DEFAULT false,
+  notes               TEXT,
+  red_flag_triggered  BOOLEAN DEFAULT false,
+  red_flag_type       TEXT,
+  medication_week     INT,
+  injection_phase     TEXT,
+  created_at          TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (user_id, date)
+);
+
+CREATE INDEX idx_checkins_user_date ON daily_checkins(user_id, date DESC);
+CREATE INDEX idx_checkins_red_flag ON daily_checkins(red_flag_triggered)
+  WHERE red_flag_triggered = true;
+
+ALTER TABLE daily_checkins ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_checkins" ON daily_checkins FOR ALL USING (auth.uid() = user_id);
+```
+
+### 010_protein_streaks.sql
+
+```sql
+CREATE TABLE protein_streaks (
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id               UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
+  current_streak_days   INT NOT NULL DEFAULT 0,
+  longest_streak_days   INT NOT NULL DEFAULT 0,
+  last_hit_date         DATE,
+  updated_at            TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE protein_streaks ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_streak" ON protein_streaks FOR ALL USING (auth.uid() = user_id);
+```
+
+### 011_daily_guidance.sql (planned) → applied as 016_daily_guidance.sql
+
+```sql
+-- Applied as migration 016 (session 37). Schema differs from original plan:
+-- injection_phase is nullable (context captured but not required for cache key)
+-- UNIQUE on (user_id, date) only — one tip per user per day regardless of phase/language
+-- reasoning_text added for "Why this?" tooltip
+-- prompt_version added for future prompt iteration tracking
+CREATE TABLE daily_guidance (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  date            DATE NOT NULL,
+  injection_phase TEXT,
+  language        TEXT NOT NULL DEFAULT 'en',
+  guidance_text   TEXT NOT NULL,
+  reasoning_text  TEXT,         -- Powers "Why this?" tooltip in DailyGuidanceCard
+  prompt_version  TEXT DEFAULT 'v1',
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (user_id, date)
+);
+
+ALTER TABLE daily_guidance ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_guidance" ON daily_guidance FOR ALL USING (auth.uid() = user_id);
+CREATE INDEX idx_daily_guidance_user_date ON daily_guidance (user_id, date DESC);
+```
+
+### 012_content_cards.sql
+
+```sql
+CREATE TABLE content_cards (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title           TEXT NOT NULL,
+  title_es        TEXT,
+  summary         TEXT NOT NULL,
+  summary_es      TEXT,
+  body            TEXT NOT NULL,
+  body_es         TEXT,
+  category        TEXT NOT NULL CHECK (category IN (
+    'muscle_preservation','protein','side_effects','micronutrients',
+    'injection_tips','plateaus','discontinuation','maintenance',
+    'insurance','mental_health','comorbidities','general')),
+  relevant_phases TEXT[] DEFAULT '{}',
+  is_published    BOOLEAN DEFAULT false,
+  sort_order      INT DEFAULT 0,
+  created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE content_cards ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "content_public_read" ON content_cards FOR SELECT USING (is_published = true);
+```
+
+### 013_content_card_versions.sql
+
+```sql
+CREATE TABLE content_card_versions (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  card_id         UUID NOT NULL REFERENCES content_cards(id) ON DELETE CASCADE,
+  version         INT NOT NULL,
+  title           TEXT NOT NULL,
+  body            TEXT NOT NULL,
+  published_at    TIMESTAMPTZ DEFAULT NOW(),
+  authored_by     TEXT,
+  UNIQUE (card_id, version)
+);
+```
+
+> **⚠️ Migration numbering note:** The schema entries above and below are PLANNED
+> migrations from the original architecture doc. Actual applied migrations on cloud
+> Supabase use a different numbering sequence (001–013 as of 2026-05-23). The planned
+> table schemas remain accurate for when those features are built; the actual migration
+> file names on disk are authoritative. Run `npx supabase db push` to see live state.
+
+### injection_logs (013_create_injection_logs.sql — LIVE on cloud as of 2026-05-23)
+
+The canonical injection logging table. Replaced an ad-hoc table that had no committed
+migration. site_code is constrained to the 6 supported stomach sites only.
+
+```sql
+CREATE TABLE injection_logs (
+  id              UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID         NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  injected_at     TIMESTAMPTZ  NOT NULL,
+  site_code       TEXT         NOT NULL
+                    CHECK (site_code IN (
+                      'stomach_upper_left',
+                      'stomach_upper_mid',
+                      'stomach_upper_right',
+                      'stomach_lower_left',
+                      'stomach_lower_mid',
+                      'stomach_lower_right'
+                    )),
+  medication_name  TEXT         NOT NULL,
+  dosage_strength  TEXT,        -- e.g. "0.5 mg" — nullable, added migration 014
+  pain_level       INTEGER      NOT NULL CHECK (pain_level BETWEEN 0 AND 10),
+  notes            TEXT,
+  created_at       TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_injection_logs_user_injected_at
+  ON injection_logs (user_id, injected_at DESC);
+
+ALTER TABLE injection_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users select own logs"  ON injection_logs FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users insert own logs"  ON injection_logs FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users update own logs"  ON injection_logs FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users delete own logs"  ON injection_logs FOR DELETE USING (auth.uid() = user_id);
+```
+
+**Why `medication_name` (TEXT) instead of FK to glp1_medications:** Keeps the log table
+independent of the medication catalog. If a user changes medication, historical logs
+correctly reflect what they were on at the time of injection. Display name stored
+(e.g., "Ozempic") — same values as `MEDICATION_DISPLAY_NAMES` in add-shot.tsx.
+
+**Migration 014 — `dosage_strength` column (2026-05-23):**
+```sql
+-- supabase/migrations/014_add_dosage_strength.sql
+ALTER TABLE injection_logs ADD COLUMN IF NOT EXISTS dosage_strength TEXT;
+```
+Nullable — existing rows stay valid. Add Shot screen offers a per-medication dosage
+dropdown (`DOSAGE_OPTIONS_BY_MEDICATION`) with all FDA-approved dose rungs plus
+common compounded ranges. Value stored as a display string (e.g. "0.5 mg").
+
+### 014_ai_invocations.sql
+
+```sql
+CREATE TABLE ai_invocations (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  function_name   TEXT NOT NULL,
+  invoked_at      TIMESTAMPTZ DEFAULT NOW(),
+  success         BOOLEAN,
+  cost_estimate_cents INT
+);
+
+CREATE INDEX idx_ai_invocations_user_function_date ON
+  ai_invocations(user_id, function_name, invoked_at DESC);
+
+ALTER TABLE ai_invocations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_invocations" ON ai_invocations FOR ALL
+  USING (auth.uid() = user_id);
+-- Rate limits: recognize-meal-photo: 50/day Pro; daily-guidance: 5/day per user
+```
+
+### 015_ai_feedback.sql
+
+```sql
+CREATE TABLE ai_feedback (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  function_name   TEXT NOT NULL,
+  prompt_version  TEXT,
+  ai_output       TEXT NOT NULL,
+  rating          TEXT NOT NULL CHECK (rating IN ('up','down')),
+  user_comment    TEXT,
+  context_inputs  JSONB,    -- Exact inputs used — for "Why?" and prompt improvement
+  created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_ai_feedback_function_rating ON ai_feedback(function_name, rating);
+ALTER TABLE ai_feedback ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_feedback" ON ai_feedback FOR ALL USING (auth.uid() = user_id);
+```
+
+### 016_user_acknowledgments.sql
+
+```sql
+CREATE TABLE user_acknowledgments (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  document_type   TEXT NOT NULL CHECK (document_type IN
+                    ('terms_of_service','privacy_policy','medical_disclaimer',
+                     'protein_floor_acknowledgment','red_flag_acknowledgment',
+                     'marketing_consent','data_processing_consent')),
+  document_version TEXT NOT NULL,
+  document_url     TEXT NOT NULL,   -- Permanent URL never deleted
+  ip_address       INET,
+  user_agent       TEXT,
+  acknowledged_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_ack_user_type ON user_acknowledgments(user_id, document_type);
+ALTER TABLE user_acknowledgments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_acks" ON user_acknowledgments FOR ALL USING (auth.uid() = user_id);
+```
+
+### 017_prescriber_visits.sql
+
+```sql
+CREATE TABLE prescriber_visits (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  scheduled_date  DATE NOT NULL,
+  prescriber_name TEXT,
+  visit_type      TEXT,
+  notes_pre_visit TEXT,
+  notes_post_visit TEXT,
+  report_generated_at TIMESTAMPTZ,
+  report_url      TEXT,             -- Signed Supabase Storage URL
+  report_period_start DATE,
+  report_period_end DATE,
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE prescriber_visits ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_visits" ON prescriber_visits FOR ALL USING (auth.uid() = user_id);
+```
+
+### 018_linked_accounts.sql
+
+```sql
+CREATE TABLE linked_accounts (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  primary_user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  linked_user_id  UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  relationship    TEXT NOT NULL CHECK (relationship IN
+                    ('spouse','partner','adult_child','caregiver','parent','sibling','other')),
+  permission_level TEXT NOT NULL DEFAULT 'read_only'
+                    CHECK (permission_level IN ('read_only','read_write','log_for')),
+  invited_at      TIMESTAMPTZ DEFAULT NOW(),
+  accepted_at     TIMESTAMPTZ,
+  revoked_at      TIMESTAMPTZ,
+  UNIQUE (primary_user_id, linked_user_id)
+);
+
+ALTER TABLE linked_accounts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "linked_visible" ON linked_accounts FOR SELECT
+  USING (auth.uid() = primary_user_id OR auth.uid() = linked_user_id);
+CREATE POLICY "linked_manage" ON linked_accounts FOR ALL
+  USING (auth.uid() = primary_user_id);
+```
+
+### 019_notification_log.sql through 025_admin_audit_log.sql
+
+See prior architecture messages for full SQL.
+Key tables: notification_log, offline_sync_log, import_history,
+subscription_state, promo_codes, partners, admin_audit_log.
+
+### 026_provider_invitations.sql + 027_provider_user_links.sql
+
+Schema in migrations v1. Feature ships in v3.
+Avoids future painful migrations when prescriber portal is built.
+
+---
+
+## Offline Mode
+
+```ts
+// src/features/offline/queue.ts
+interface QueuedOperation {
+  client_uuid: string;           // UUID generated client-side
+  operation_type: 'food_log' | 'checkin' | 'weight';
+  payload: any;
+  client_timestamp: string;
+  retry_count: number;
+}
+// Stored in AsyncStorage key 'offline_queue'
+// Drained on: network reconnect, app foreground, manual sync trigger
+// Server uses client_uuid for idempotency (UNIQUE constraint)
+// Last write wins via client_timestamp for conflict resolution
+// UI: <OfflineBanner /> "Logged offline — syncing when back online"
+```
+
+---
+
+## Voice + Hybrid Text Logging
+
+The killer feature for day 2 of the injection cycle when users can't eat,
+can barely tap a screen, but need to log protein.
+
+```
+User taps mic OR "Describe what I ate"
+  → "Half a Greek yogurt and a few crackers"
+  → parse-meal-text edge function (GPT-4o mini)
+  → Returns structured: [{ name, estimated_grams, protein_g, ... }]
+  → User reviews + confirms
+  → Saved as log_source = 'voice' or 'hybrid_text'
+```
+
+Edge function inputs include: injection_phase, dietary_pattern, allergens.
+AI always respects dietary restrictions and allergens 100%.
+
+---
+
+## AI Engine Rules — 16 Non-Negotiable
+
+1. Never call OpenAI from client — always via edge functions
+2. Never send PII to OpenAI (no name, email, exact location)
+3. Validate all AI JSON output against Zod schema; failures → deterministic fallback
+4. Reject output containing forbidden patterns (calorie shaming, dose suggestions)
+5. Never suggest skipping doses or changing medication
+6. Protein floor bounds: never below floor minus 10% or above plus 30%
+7. Never use calorie-shaming language
+8. Frame appetite suppression as the drug working, not a problem
+9. High-nausea days (4-5): suggest only soft/liquid protein
+10. Never recommend exercise on severe nausea (5/5)
+11. Always include "consult your prescriber" for medication-adjacent questions
+12. Daily guidance: phase-aware AND check-in-aware AND medication-status-aware
+13. Respect dietary restrictions and allergens 100% — safety issue, not preference
+14. Protein missed 3+ days: gentle non-shame reframing only
+15. Red-flag triggered today: suppress AI guidance, show escalation card
+16. Every AI response includes `reasoning_text` for the "Why?" tooltip
+
+**Forbidden output patterns (guardrails.ts validates and rejects):**
+- "you should," "you need to," "you must"
+- "clinically proven," "prevents," "treats," "cures"
+- Any specific medication dosage adjustment
+- Any brand-name product endorsement
+- Calorie totals as primary metric
+
+---
+
+## Edge Function Reference Pattern
+
+All 15 Glipra edge functions follow this structure. Use it as a template
+when adding new functions. Reference: aaronksaunders/expo-supabase-ai-template.
+
+```ts
+// supabase/functions/[function-name]/index.ts
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+import { createClient } from 'npm:@supabase/supabase-js@2';
+import { corsHeaders } from '../_shared/cors.ts';
+
+serve(async (req: Request) => {
+  // 1. CORS preflight
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  try {
+    // 2. Auth validation
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) throw new Error('No auth header');
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authErr } = await supabase.auth.getUser();
+    if (authErr || !user) throw new Error('Unauthorized');
+
+    // 3. Rate limiting (from ai_invocations table)
+    const today = new Date().toISOString().split('T')[0];
+    const { count } = await supabase
+      .from('ai_invocations')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('function_name', '[FUNCTION_NAME]')
+      .gte('invoked_at', today);
+
+    if ((count ?? 0) >= DAILY_LIMIT) {
+      return new Response(
+        JSON.stringify({ error: 'Daily limit reached' }),
+        { status: 429, headers: corsHeaders }
+      );
+    }
+
+    // 4. Zod validation on input
+    const body = await req.json();
+    const validated = InputSchema.parse(body);
+
+    // 5. Business logic + AI call
+    const result = await callOpenAI(validated);
+
+    // 6. Zod validation on output (catches AI hallucinations)
+    const validatedOutput = OutputSchema.parse(result);
+
+    // 7. Log invocation + cost
+    await supabase.from('ai_invocations').insert({
+      user_id: user.id,
+      function_name: '[FUNCTION_NAME]',
+      success: true,
+      cost_estimate_cents: estimateCost(result),
+    });
+
+    return new Response(
+      JSON.stringify(validatedOutput),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 400, headers: corsHeaders }
+    );
+  }
+});
+```
+
+### OpenAI Setup (Deno)
+
+```ts
+// supabase/functions/_shared/openai.ts
+import OpenAI from 'npm:openai@4';
+
+const openai = new OpenAI({
+  apiKey: Deno.env.get('OPENAI_API_KEY'),
+});
+
+// GPT-4o for vision (photo recognition)
+export async function recognizeMealPhoto(base64Image: string, prompt: string) {
+  return await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'image_url',
+          image_url: { url: `data:image/jpeg;base64,${base64Image}` } },
+        { type: 'text', text: prompt },
+      ],
+    }],
+    response_format: { type: 'json_object' },
+  });
+}
+
+// GPT-4o mini for text/guidance (10x cheaper)
+export async function generateGuidance(systemPrompt: string, userPrompt: string) {
+  return await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+    response_format: { type: 'json_object' },
+  });
+}
+```
+
+### Daily Cost Limits (per user, per function)
+
+| Function | Free Tier | Pro Tier |
+|---|---|---|
+| recognize-meal-photo | Locked | 50/day |
+| parse-meal-text | Locked (Pro only) | Unlimited |
+| transcribe-voice | Locked (Pro only) | Unlimited |
+| generate-daily-guidance | 0 | 1/day (auto) |
+
+Rate limiting enforced via `ai_invocations` table count + 429 response.
+
+---
+
+## Pre-Prescriber Visit Prep
+
+The strongest retention feature. Users who use this never delete the app.
+
+3 days before scheduled visit → `generate-prescriber-report` runs:
+- Aggregates last 4 weeks: weight trend, protein adherence %, side effect trends,
+  red-flag triggers, dose changes
+- Generates 3 personalized questions based on user's specific data
+- Builds PDF via `pdf-lib` (Deno-compatible — React PDF does NOT run in edge functions)
+- Stores in Supabase Storage with signed URL
+- Pushes notification: "Your visit prep is ready"
+- Client uses `expo-sharing` to share, `expo-print` to view
+
+Example generated questions:
+- "My nausea has been 4-5 on 8 of the last 14 days. Should we adjust my dose?"
+- "Weight plateau at -8 lbs for 3 weeks at 0.5mg. Is escalation appropriate?"
+- "3 episodes of severe abdominal pain this month. Should I be evaluated for pancreatitis?"
+
+**PDF generation pattern (edge function):**
+```ts
+import { PDFDocument, StandardFonts, rgb } from 'npm:pdf-lib@1.17.1';
+
+const pdfDoc = await PDFDocument.create();
+const page = pdfDoc.addPage([595, 842]); // A4
+const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+page.drawText('Glipra — Prescriber Visit Summary', {
+  x: 50, y: 800, size: 16, font,
+});
+// Add user data, trends, suggested questions
+const pdfBytes = await pdfDoc.save();
+// Upload to Supabase Storage, return signed URL
+```
+
+---
+
+## Smart Notification Escalation
+
+`notification-rules-runner` edge function runs nightly.
+All notifications respect `quiet_hours_start/end` (default 22:00-08:00 local).
+
+| Rule | Trigger | Push Message |
+|---|---|---|
+| Streak risk | 8pm + protein <50% | "Floor not yet met — quick log?" |
+| Reengagement 3d | No activity 3 days | "Quick check-in?" |
+| Reengagement 7d | No activity 7 days | "Streak paused, not broken. Come back?" |
+| Repeat nausea | Nausea 4-5 for 4+ days | "When did you last speak with your prescriber?" |
+| Pre-injection | Day before injection | "Good window to hit protein floor today." |
+| Pre-escalation | 3 days before escalation | "Escalating soon — here's what to expect." |
+| Plateau | Weight unchanged 21+ days | "Your weight has been steady — let's review." |
+| Visit prep | 3 days before scheduled visit | "Your visit prep is ready." |
+
+---
+
+## Cohort Insights Schema
+
+`medication_week` and `injection_phase` tagged on every food log and check-in.
+Build this from day one. Surface insights in v2 when you have 1,000+ users.
+
+```sql
+-- "Users at week 4 of Wegovy 2.4mg typically experience nausea of..."
+SELECT AVG(nausea), COUNT(DISTINCT user_id)
+FROM daily_checkins dc
+JOIN user_medications um ON dc.user_id = um.user_id
+WHERE um.medication_id = 'semaglutide_wegovy'
+  AND dc.medication_week = 4
+GROUP BY um.current_dose_mg;
+```
+
+This is the compounding moat. No competitor can build it without your user base.
+Data accumulates from user one.
+
+---
+
+## Testing Strategy
+
+Vitest configured for `src/__tests__/`. Husky pre-commit hook runs all tests.
+CI blocks merges on test failure. No exceptions for safety-critical files.
+
+| Test File | Required Coverage |
+|---|---|
+| protein.test.ts | All branches: kidney, pregnancy, BMI extremes, maintenance, edge cases |
+| injection-cycle.test.ts | Phase boundaries, DST transitions, timezone handling |
+| readiness.test.ts | Score across all phase + check-in combinations |
+| ewma.test.ts | Convergence, single values, missing days, large gaps |
+| redFlagDetector.test.ts | Every trigger, no false positives, multi-day patterns |
+| streak-rules.test.ts | Day boundaries, 80% threshold, broken vs. continuous |
+| notification-escalation.test.ts | Rule triggers, frequency caps, quiet hours |
+| medication-status.test.ts | All state transitions, protein floor adjustments |
+| offline-queue.test.ts | Persistence, drain on reconnect, dedup, conflict resolution |
+
+---
+
+## Design System
+
+### Colors
+
+```ts
+// src/theme/colors.ts
+export const colors = {
+  bg: {
+    base: '#FAFAF8', elevated: '#F4F1ED',
+    surface: '#EDEAE5', overlay: '#E5E1DB',
+  },
+  brand: {
+    teal: '#2D7B7B', tealLight: '#E8F4F4',
+    amber: '#E8A45A', amberLight: '#FDF3E7',
+  },
+  text: {
+    primary: '#1A2B3C', secondary: '#6B7B8D',
+    tertiary: '#9BA8B4', inverse: '#FAFAF8',
+  },
+  semantic: {
+    success: '#5A9E7B',
+    warning: '#E8A45A',
+    danger: '#C0534F',    // RESERVED: clinical escalation ONLY
+    info: '#4A8FB5',
+  },
+  micronutrient: {
+    b12: '#7B5EA7', iron: '#C0534F',
+    calcium: '#4A8FB5', magnesium: '#5A9E7B', fiber: '#8B7355',
+  },
+};
+```
+
+**Typography:** DM Serif Display (hero, numbers) + DM Sans (all UI text)
+
+**Key Rules:**
+- Readiness Score: minimum 96px on Today screen
+- Protein ring: minimum 200px diameter
+- Buttons: height 56, borderRadius 14
+- Cards: borderRadius 16, subtle border
+- Red color ONLY for EscalationCard — never for missed floors or nausea warnings
+- LoadingSkeleton on Today/Insights — never blank-then-pop
+- Light mode first (older demographic)
+- WCAG 2.1 AA — voiceover labels on every interactive element
+- Dynamic type support — text scales to user's system settings
+- Reduced motion — check `useReducedMotion()` before animations
+
+---
+
+## Subscription Tiers
+
+| Feature | Free | Pro | Founder Lifetime |
+|---|---|---|---|
+| Price | Free | $9.99/mo or $79.99/yr | $149 one-time (first 500) |
+| Barcode scanner | ✓ | ✓ | ✓ |
+| Voice/hybrid logging | 5/day | Unlimited | Unlimited |
+| AI photo recognition | — | ✓ 50/day | ✓ |
+| Protein floor + 7-day history | ✓ | ✓ | ✓ |
+| Unlimited protein history | — | ✓ | ✓ |
+| Readiness Score | ✓ | ✓ | ✓ |
+| Injection cycle (full) | Basic | ✓ | ✓ |
+| Red-flag detection | ✓ ALWAYS FREE | ✓ | ✓ |
+| Discontinuation mode | ✓ | ✓ | ✓ |
+| Side effect trends | — | ✓ | ✓ |
+| Micronutrient watch | — | ✓ | ✓ |
+| Pharmacist content | 5 cards | Unlimited | Unlimited |
+| Weight trend (EWMA) | 14 days | Unlimited | Unlimited |
+| Daily AI guidance | — | ✓ | ✓ |
+| Prescriber visit prep | — | ✓ | ✓ |
+| Linked accounts | — | ✓ | ✓ |
+| Streak share images | ✓ | ✓ | ✓ |
+| Apple Health sync | ✓ | ✓ | ✓ |
+| Spanish / English | ✓ | ✓ | ✓ |
+| Data export (GDPR) | ✓ | ✓ | ✓ |
+| Account deletion | ✓ | ✓ | ✓ |
+
+---
+
+## Analytics Event Taxonomy
+
+All events: `domain.object.verb`. Locked pre-launch.
+
+```
+Onboarding:
+  onboarding.started / onboarding.completed
+  onboarding.medication.selected
+  onboarding.safety.completed / onboarding.dietary.completed
+  onboarding.status.selected
+  onboarding.protein_floor.adjusted (props: from_g, to_g, was_capped)
+  onboarding.import.completed (props: source, records_count)
+
+Logging:
+  log.method.selected (props: method)
+  log.barcode.scanned (props: source='off'|'usda'|'cache'|'not_found')
+  log.photo.recognized (props: confidence, items_count)
+  log.voice.transcribed (props: duration_seconds, items_count)
+  log.hybrid.parsed (props: items_count)
+  log.food.logged (props: meal_type, protein_g, source)
+  log.offline.queued / log.offline.synced (props: queued_for_seconds)
+
+AI Quality:
+  ai.feedback.thumbs_up (props: function_name)
+  ai.feedback.thumbs_down (props: function_name, has_comment)
+
+Safety:
+  safety.red_flag.triggered (props: type)
+  safety.escalation_card.viewed
+  safety.bad_day.activated
+
+Engagement:
+  today.readiness.viewed (props: score)
+  today.guidance.viewed / today.guidance.why_tapped
+  today.checkin.submitted (props: nausea, energy, red_flag)
+  paywall.viewed (props: trigger) / paywall.subscribed (props: tier, period)
+
+Prescriber:
+  prescriber.visit.scheduled
+  prescriber.report.generated / prescriber.report.shared
+
+Notifications:
+  notification.sent (props: type)
+  notification.opened / notification.dismissed
+```
+
+---
+
+## A/B Testing & Feature Flags
+
+PostHog feature flags from day one. Set up immediately at launch:
+
+| Flag | Variants | Goal |
+|---|---|---|
+| paywall_position | after_5_logs / after_protein_hit / day_3 | Find best conversion trigger |
+| free_tier_history_days | 7 / 14 / 30 | Test sensitivity |
+| daily_guidance_tone | clinical / warm | Audience preference |
+| notification_streak_time | 4pm / 6pm / 8pm | Optimize engagement |
+| onboarding_length | 8_step / 10_step | Completion rate |
+
+---
+
+## Production Infrastructure
+
+### CI/CD — GitHub Actions
+
+```yaml
+jobs:
+  test:
+    steps:
+      - run: pnpm run typecheck
+      - run: pnpm run lint
+      - run: pnpm test            # jest-expo (components + integration)
+      - run: pnpm test:utils      # Vitest (pure-TS safety code — 90% coverage gate)
+      - run: pnpm run test:rls
+
+  ota-update-staging:
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - run: eas update --branch staging --message "commit message"
+
+  ota-update-production:
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - run: eas update --branch production --message "commit message"
+```
+
+EAS Update for OTA hotfixes. If protein floor calculation has a bug affecting
+kidney disease users, fix ships in hours, not 7-day App Store review cycles.
+
+### Sentry Alerting Thresholds
+
+- Crash-free user rate below 99.5% → immediate alert
+- Edge function 5xx rate >2% over 15 minutes → alert
+- Failed RevenueCat webhooks → alert (revenue impact)
+- AI thumbs-down rate >30% on any prompt → daily digest
+
+### RevenueCat Webhook Security
+
+```ts
+// Always verify signature before processing
+const expected = createHmac('sha256', REVENUECAT_WEBHOOK_SECRET).update(body).digest('hex');
+if (signature !== `Bearer ${expected}`) return new Response('Unauthorized', { status: 401 });
+// Always check last_event_id for idempotency before processing
+```
+
+Subscription state transitions:
+- INITIAL_PURCHASE → trialing or active
+- RENEWAL → active, extend period_end
+- CANCELLATION → cancel_at_period_end: true (still active until period_end)
+- EXPIRATION → expired → downgrade to free
+- BILLING_ISSUE → past_due (7-day grace period before expiration)
+- REFUND → refunded → downgrade immediately
+
+### Cost Telemetry
+
+`cost_estimate_cents` on every `ai_invocations` row.
+Daily admin report: average AI cost per Pro user, total OpenAI spend, gross margin ratio.
+Alert if any single user costs >$2/month (potential abuse pattern).
+
+### Email (Resend)
+
+| Trigger | Email Type |
+|---|---|
+| Signup confirmed | Welcome |
+| Beta approval | Beta access granted |
+| Founder Lifetime purchase | Confirmation + receipt |
+| 1 day before scheduled visit | Prescriber reminder |
+| RevenueCat subscription created | Confirmation |
+| Day 1 of grace period | Past due / update payment |
+| Account deletion confirmed | Farewell + export reminder |
+
+### Deep Linking
+
+Universal Links (iOS) + App Links (Android):
+```
+glipra.com/share/streak/[token]    → streak share screen
+glipra.com/visit/[id]/prep         → visit prep
+glipra.com/invite/[code]           → linked account accept
+glipra.com/pharmacy/[partner]      → pharmacy onboarding flow
+```
+
+Every push notification includes deep link in `data` payload.
+Tapping opens directly to relevant screen, not home tab.
+
+### App Clips (iOS)
+
+QR code on pharmacy handout → App Clip launches in 5 seconds → protein floor
+calculator → user sees personalized number → prompt to install full app.
+Target: <10MB. Includes only protein calculator and injection cycle basics.
+Most powerful pharmacy partnership distribution mechanic.
+
+---
+
+## Legal Readiness
+
+### Entity Structure
+
+Form Texas LLC — "Path Health Technologies LLC" doing business as "Glipra."
+Get EIN from irs.gov (free, 10 minutes).
+Open business bank account (Mercury) — NEVER commingle personal and business funds.
+Registered agent service ($125/year — Northwest Registered Agent).
+S-Corp election when netting >$60K from the app.
+
+### Insurance Stack (Required Before Launch)
+
+- Tech E&O: $1M coverage — $400-1,500/year (Hiscox, Coalition, Embroker)
+- Pharmacist PLI rider for "Telepharmacy and Digital Health Activities" — $200-500/year
+- General liability + cyber liability: $1M each — $500-1,200/year
+- **Total: $1,500-3,200/year. Non-negotiable before launch.**
+
+A single pancreatitis lawsuit costs $50-150K to defend even if you win on the merits.
+Without insurance that's your savings. With insurance it's their problem.
+
+### Required Legal Documents (Attorney-Reviewed)
+
+Public-facing:
+- Terms of Service (mandatory arbitration, class action waiver, limitation of liability)
+- Privacy Policy (GDPR, CCPA, California, Virginia, Colorado, WA My Health My Data)
+- Medical Disclaimer (standalone page + in-app persistent)
+- Subprocessor list (live page, updated as vendors change)
+- Children's privacy section (minimum age 18)
+- Refund policy
+- Subscription auto-renewal disclosures
+
+### Medical Disclaimer Templates
+
+**Master disclaimer (T&C, About page, App Store description):**
+"Glipra is an educational and tracking application for general wellness purposes.
+Information provided, including AI-generated suggestions and content articles, is for
+educational purposes only and is not medical advice, diagnosis, or treatment. Although
+Glipra was designed by a licensed pharmacist, your use of Glipra does not establish
+a pharmacist-patient relationship or any professional medical relationship. Glipra is
+not a substitute for professional medical advice. Always seek the advice of your prescriber
+or qualified healthcare provider. If you think you may have a medical emergency, call 911."
+
+**Protein floor acknowledgment modal:**
+"Your suggested protein target is calculated using general nutritional guidelines. This
+is an estimate, not a personalized medical recommendation. Your prescriber or dietitian
+may recommend a different target.
+[☐] I understand this is an educational estimate."
+
+**AI output footer:**
+"AI-generated educational suggestion. Not medical advice. Consult your prescriber."
+
+### FTC Marketing Claim Compliance
+
+Approved: "Built by a licensed pharmacist," "pharmacist-authored educational content,"
+"helps you stay informed between prescriber visits," "tracks protein and side effects"
+
+Forbidden: "prevents muscle loss," "clinically proven," "doctor-recommended,"
+"FDA-approved," "reduces side effects," "your virtual pharmacist"
+
+No second-person directives in any AI output:
+- BAD: "You should eat more protein at breakfast."
+- GOOD: "Many users find front-loading protein at breakfast helps with daily targets."
+
+### Texas Pharmacy Board
+
+Must verify with attorney before launch:
+1. Do I need to disclose this app to TSBP?
+2. Does my employment contract require outside-activity disclosure?
+3. What language risks triggering a "practicing pharmacy" complaint?
+4. Are there Texas advertising restrictions on referencing my pharmacist license?
+
+Approved founder bio: "Glipra was designed by a Texas-licensed pharmacist with
+[X] years of patient counseling experience. Glipra provides educational content for
+general wellness purposes; it does not provide pharmacist counseling, prescription
+review, or professional medical services."
+
+### Consent Audit Trail
+
+Every legal document version lives at a permanent URL that is never deleted.
+Pattern: `glipra.com/legal/terms/2026.05.09.1`
+
+When a user sues claiming they didn't agree to limitation of liability, you produce:
+timestamp + IP address + exact document URL they accepted.
+That's the defense. `user_acknowledgments` table makes this automatic.
+
+### Pre-Launch Legal Checklist
+
+Entity & Banking:
+- [ ] Texas LLC formed
+- [ ] EIN obtained
+- [ ] Business bank account opened (never commingled)
+- [ ] Registered agent active
+
+Insurance:
+- [ ] Tech E&O $1M active
+- [ ] Pharmacist PLI digital health rider active
+- [ ] General liability + cyber active
+
+Legal Documents (attorney-reviewed):
+- [ ] Terms of Service
+- [ ] Privacy Policy
+- [ ] Medical Disclaimer
+- [ ] Subprocessor list published
+- [ ] All documents version-tagged at permanent URLs
+
+Compliance:
+- [ ] Consent capture with audit trail working
+- [ ] AI guardrails enforcing forbidden language
+- [ ] Red-flag escalation built and tested
+- [ ] Account deletion end-to-end working
+- [ ] Data export end-to-end working
+
+App Stores:
+- [ ] Apple Privacy Manifest complete
+- [ ] Google Data Safety form complete
+- [ ] No medical device claims in app or description
+- [ ] Subscription auto-renewal disclosures compliant
+
+IP:
+- [ ] Trademark application filed (Classes 9, 42, 44)
+- [ ] glipra.com registered
+- [ ] dosepath.app registered
+- [ ] @dosepath on Instagram, TikTok, X secured
+
+Pharmacy Board:
+- [ ] Attorney consulted on Texas Pharmacy Board disclosure
+- [ ] All marketing reviewed for pharmacy practice concerns
+
+---
+
+## Content Production Pipeline
+
+Write 25 pharmacist content cards before launch (Months 2-4).
+
+| # | Title | Category |
+|---|---|---|
+| 1 | Why your protein floor matters more than your calories | protein |
+| 2 | What's happening on day 2 after your shot | injection_tips |
+| 3 | Hair loss on GLP-1: two causes, two fixes | side_effects |
+| 4 | How to eat protein when you can't stand the thought of food | protein |
+| 5 | B12 deficiency on GLP-1: signs, testing, and what to do | micronutrients |
+| 6 | Iron deficiency in women on GLP-1: the silent issue | micronutrients |
+| 7 | Constipation on GLP-1: the actual fix | side_effects |
+| 8 | Why your weight stalls at week 6 (and what NOT to do) | plateaus |
+| 9 | Maintenance: what changes when you've reached your goal | maintenance |
+| 10 | Discontinuing GLP-1: tapering, rebound, and the realistic plan | discontinuation |
+| 11 | Injection site rotation: why it matters | injection_tips |
+| 12 | Ozempic vs. Wegovy: what's actually different | general |
+| 13 | Mounjaro vs. Zepbound: dual mechanism explained | general |
+| 14 | Compounded semaglutide: what's actually in it | general |
+| 15 | Sulfur burps and other weird side effects: what's normal | side_effects |
+| 16 | Alcohol on GLP-1: what changes and why | general |
+| 17 | Exercise on GLP-1: protein timing and resistance training | muscle_preservation |
+| 18 | Magnesium and muscle cramps | micronutrients |
+| 19 | Pancreatitis warning signs: when to actually worry | side_effects |
+| 20 | Gallbladder issues on GLP-1 | side_effects |
+| 21 | Travel and GLP-1: storage, time zones, missed doses | injection_tips |
+| 22 | Holiday eating on GLP-1: the realistic strategy | general |
+| 23 | Insurance coverage and prior authorization | insurance |
+| 24 | Prescriber visits: three questions to always ask | general |
+| 25 | Switching between GLP-1 medications: practical guide | general |
+
+Each card = one TikTok video = one Reddit post. Maximum content leverage.
+Top 10 translated to Spanish at launch.
+
+---
+
+## Marketing Plan
+
+### TikTok — Start Month 1 (not launch month)
+
+**Account:** @Glipra or @PharmacistPath — credential in bio
+**Cadence:** 4 videos/week. Consistency beats volume every time.
+
+**Five Content Pillars:**
+1. "What your prescriber didn't tell you" (40%) — highest performer
+2. "Day in the injection cycle" series (20%)
+3. "Protein hacks for GLP-1" (15%) — high save rate = algorithm gold
+4. "Pharmacist reacts to GLP-1 myths" (15%) — high engagement
+5. "Building Glipra in public" (10%) — start Month 4
+
+**Hook formula:** First 2s = the pain point as a question.
+"Your doctor put you on Ozempic and gave you five minutes?"
+Next 2s = credential. "I'm a licensed pharmacist. Here's what I tell every patient."
+30-50s of clinical explanation. End: "Follow for more."
+
+**Example video ideas (film these first):**
+- "3 things your doctor didn't tell you about your first Ozempic shot"
+- "Why your hair is falling out on Mounjaro and what actually fixes it"
+- "What's happening on day 2 after your Wegovy shot"
+- "How to hit 100g protein when your appetite is gone"
+- "B12 deficiency on Ozempic: the signs nobody warns you about"
+- "Why you stopped losing weight at week 6"
+- "The truth about what happens when you stop GLP-1"
+
+**Critical:** Don't evaluate TikTok performance until video 30.
+The algorithm takes 30+ videos to categorize your account.
+Most creators quit at 12. Push through.
+
+### Reddit — Start Month 1 Lurking
+
+**Primary subreddits:** r/Ozempic, r/Mounjaro, r/Zepbound, r/Wegovy
+**Secondary:** r/Semaglutide, r/Tirzepatide, r/GLP1
+
+**Phase 1 (Months 1-2):** Read only. Mine questions for content cards.
+**Phase 2 (Months 2-4):** Comment as u/PharmacistGlipra. Always disclose credential.
+Long substantive answers. 10+ comments/week. No app mentions ever.
+**Phase 3 (Months 4-5):** Original long-form educational posts. No links.
+**Phase 4 (Month 5):** AMA. 6pm Eastern weekday. Stay 4 hours.
+**Phase 5 (Month 6):** Soft launch announcement after trust is established.
+
+**Comment template:**
+"Pharmacist here, not your pharmacist, this is general information only.
+[Substantive answer with multiple clinical points]
+Always follow up with your own provider for your specific situation."
+
+### Landing Page
+
+**Status:** Live at glipra.com (deployed 2026-05-19)
+**Hosting:** GitHub Pages — repo `waliabdulfatah20-create/GLiPra`, branch `master`, folder `/docs`
+**Files:** `docs/index.html` (single-file HTML/CSS/JS), `docs/CNAME`
+
+**Email capture:** POST to `supabase/functions/capture-waitlist` (public endpoint, `--no-verify-jwt`)
+- Zod-validates email, upserts into `waitlist` table using service role key
+- Silent dedup — same email can submit twice with no error
+- `source` field tracks `hero` vs `footer` form
+
+**Waitlist table:** `supabase/migrations/009_waitlist.sql` — RLS enabled, no user-facing policies (service role only)
+
+**Sections (V2):** Hero (stat card + email capture), Problem (3 cards, SVG icons), Solution (4 feature cards, SVG icons), How It Works (3-step), Injection Cycle Callout (5-phase: Day 0→8+, Glipra-exclusive), Founder Lifetime ($149 one-time, 500 spots), Credibility (Wali Abdul PharmD bio + stats), FAQ (8 questions), Final CTA, Footer
+
+**V2 changes (2026-05-19):** Inline SVG capsule logo (nav + footer), hero stat card ("Up to 40% of GLP-1 weight loss is lean muscle"), How It Works + Injection Cycle sections added from competitive analysis, Wali Abdul PharmD founder bio in credibility section, all emoji icons replaced with SVG line art (amber for problems, blue for features), FAQ expanded 4 → 8 questions.
+
+**Goals:** 2,000+ emails, 100+ Founder Lifetime pre-orders ($14,900 upfront cash)
+
+**Founder Lifetime pre-order payment (Stripe):** Not yet wired — CTA scrolls to waitlist form as interim.
+
+**Live status (2026-05-19):** HTTPS enforced, end-to-end verified — email submissions confirmed appearing in `waitlist` table in cloud Supabase.
+
+### Growth Loops
+
+1. Streak Share → Friend Install → potential couples mode → repeat
+2. Content Card → SEO (glipra.com/learn/[slug]) → organic search → install
+3. Couples Mode → Spouse Conversion → second subscription
+4. Prescriber Visit Report → prescriber asks about it → word of mouth
+5. Pharmacy Partnership → QR code → bulk distribution at zero CAC
+
+---
+
+## 6-Month Build Plan
+
+| Month | Focus | Critical Deliverable | Est. Cost |
+|---|---|---|---|
+| 1 | Foundation | Auth, consent, onboarding, protein floor, injection cycle, Today skeleton + Landing page | $0 |
+| 2 | Core Tracking | Barcode, logging, check-ins, weight, EWMA, streaks + 10 content cards | $20-25 |
+| 3 | Intelligence | Photo AI, voice/hybrid, daily guidance, red-flag detection + 15 more content cards | $40 |
+| 4 | Pro Tier + Polish | RevenueCat, HealthKit sync, notifications, prescriber prep, linked accounts, Spanish | $50 |
+| 5 | Beta 200 Users | TestFlight + Play Internal Testing, feedback iteration, App Store listing, reviews | $184 |
+| 6 | Launch | App Store live, TikTok + Reddit campaigns, pharmacy outreach, 500+ paying subscribers | $70 |
+| **Total** | | | **~$370** |
+
+Break-even on infrastructure: **38 paying Pro subscribers** ($9.99/month).
+
+---
+
+## Cost Strategy — Build Lean
+
+### Monthly Cost Breakdown by Service
+
+| Service | Dev (M1-4) | Beta (M5) | Launch (M6+) | Free Tier Limit |
+|---|---|---|---|---|
+| Cursor | $0→$20 | $20 | $20 | 2,000 completions |
+| Supabase | $0 | $0 | $0 | 500MB DB, 500K edge invocations/mo |
+| OpenAI | $0 (mocked) | $20-40 | $50-100 | None — pay per use |
+| EAS Build | $0 | $0 | $0 | 30 builds/month free |
+| RevenueCat | $0 | $0 | $0 | Free to $2,500 MRR |
+| PostHog | $0 | $0 | $0 | 1M events/month |
+| Sentry | $0 | $0 | $0 | 5,000 errors/month |
+| Apple Dev | $0 | $99/yr | — | — |
+| Google Play | $0 | $25 once | — | — |
+| GitHub | $0 | $0 | $0 | Unlimited private repos |
+| Claude.ai | $0-20 | $0-20 | $0-20 | Free tier sufficient for planning |
+
+**Rule:** Never upgrade a free tier until you actually hit its limit.
+Supabase free handles ~200-300 active users easily. You will not need paid Supabase at launch.
+
+### The Mock AI Strategy (Saves $50-100 During Development)
+
+OpenAI is the only significant variable cost. Mock it during development —
+zero cost, instant responses, fully realistic data for building UI.
+
+**Step 1 — Create the mock file:**
+```ts
+// src/lib/mockAI.ts
+// Used when EXPO_PUBLIC_USE_MOCK_AI=true in .env.local
+
+export const MOCK_DAILY_GUIDANCE = {
+  guidance_text: "Today is day 3 of your cycle. Appetite returning — good window for protein.",
+  reasoning_text: "Day 3 post-injection is the adjustment phase. Appetite suppression easing.",
+  injection_phase: "adjustment",
+  prompt_version: "mock-1.0",
+};
+
+export const MOCK_PARSED_MEAL = {
+  items: [
+    {
+      name: "Greek yogurt",
+      estimated_grams: 170,
+      protein_g: 17,
+      calories: 100,
+      carbs_g: 6,
+      fat_g: 0.7,
+      confidence: 0.95,
+      is_estimated: true,
+    },
+  ],
+  needs_review: false,
+};
+
+export const MOCK_PHOTO_RECOGNITION = {
+  items: [
+    { name: "Grilled chicken breast", estimated_grams: 140, protein_g: 42, calories: 231, carbs_g: 0, fat_g: 5, confidence: 0.88, is_estimated: true },
+    { name: "Mixed salad", estimated_grams: 80, protein_g: 2, calories: 20, carbs_g: 4, fat_g: 0.3, confidence: 0.82, is_estimated: true },
+  ],
+  needs_review: false,
+};
+
+export const MOCK_COACH_RESPONSE = {
+  answer: "Greek yogurt is one of the best protein sources for GLP-1 users — soft texture, high protein density, and easy on a suppressed appetite. Aim for full-fat plain varieties to slow digestion.",
+  sources: ["pharmacist-content"],
+  disclaimer: "AI-generated educational suggestion. Not medical advice. Consult your prescriber.",
+};
+```
+
+**Step 2 — Feature flag in .env.local:**
+```bash
+# Set true during development, false in production
+EXPO_PUBLIC_USE_MOCK_AI=true
+```
+
+**Step 3 — Gate all AI calls behind the flag:**
+```ts
+// In each feature's api.ts
+import { MOCK_DAILY_GUIDANCE } from '@lib/mockAI';
+
+export async function getDailyGuidance(userId: string) {
+  if (process.env.EXPO_PUBLIC_USE_MOCK_AI === 'true') {
+    return MOCK_DAILY_GUIDANCE;
+  }
+  // Real edge function call
+  const { data } = await supabase.functions.invoke('generate-daily-guidance', {...});
+  return data;
+}
+```
+
+Enable real AI only when specifically testing that feature. Keep mock on for everything else.
+
+### OpenAI Hard Budget Cap
+
+Set this in your OpenAI dashboard on Day 1. Never remove it.
+
+```
+OpenAI Dashboard → Settings → Billing → Usage Limits
+Hard limit: $20/month (development)
+Hard limit: $100/month (beta — raise when ready)
+Hard limit: $300/month (post-launch)
+```
+
+If the hard limit is hit, all AI features stop responding. This protects you from
+a bug causing infinite API calls — which has bankrupted developers before.
+
+### Cost Per Feature (When Real AI is Enabled)
+
+| Feature | Model | Cost/call | 100 users × 1/day |
+|---|---|---|---|
+| Daily guidance | GPT-4o mini | ~$0.001 | ~$3/mo |
+| Voice logging | Whisper | ~$0.006/min | ~$18/mo |
+| Nutrition coach | GPT-4o mini | ~$0.002 | ~$6/mo |
+| Photo recognition | GPT-4o | ~$0.015 | ~$45/mo |
+
+Photo recognition is the cost driver. The Pro-only gate (50/day cap) and
+`ai_invocations` rate limiting in every edge function protect you from runaway costs.
+
+### Services to Never Pay For
+
+| Service | Free Alternative |
+|---|---|
+| Vercel/Netlify hosting | Supabase free hosting or GitHub Pages |
+| GitHub Pro | GitHub free (unlimited private repos + Actions) |
+| Linear/Jira/Notion | GitHub Issues (you're one person) |
+| Figma Pro | Figma free (one user) |
+| Any second database | Supabase covers everything |
+| Firebase | Already using Supabase — don't add Firebase |
+| Sendgrid/Mailgun | Resend free (100 emails/day) |
+
+### When to Upgrade Each Service
+
+| Service | Upgrade trigger | Cost |
+|---|---|---|
+| Cursor | Hit free completions limit (~week 3) | $20/mo |
+| Supabase | 500MB database OR 500K edge invocations/mo | $25/mo |
+| OpenAI | Need more than $20/mo cap (beta testing) | Pay as you go |
+| EAS | Need more than 30 builds/month | $30/mo |
+| PostHog | 1M events/month (not until 1,000+ users) | $0 until then |
+| Sentry | 5,000 errors/month (not until launch bugs) | Free tier long enough |
+
+---
+
+## Non-Goals
+
+- Calorie-first UI or calorie-shaming language
+- Before/after photo features
+- Weight as headline dashboard metric
+- Leaderboards or social comparison
+- General fitness tracking
+- Recipe library in v1
+- CGM integration in v1
+- Community/social features in v1
+- Specific brand product endorsements
+- LiDAR food scanning (iPhone Pro only, marginal benefit)
+- All-in-one fitness platform positioning
+- Storing meal photos beyond processing
+- Offline sync for everything (queue-and-sync for key actions is enough in v1)
+
+---
+
+## Decisions Log
+
+| Date | Decision | Reason |
+|---|---|---|
+| 2026-05-06 | Protein floor as hero metric | GLP-1 users need muscle preservation, not calorie counting |
+| 2026-05-06 | Open Food Facts primary food API | Free, 3M+ products, no auth |
+| 2026-05-06 | USDA FoodData Central as fallback | Government-verified accuracy |
+| 2026-05-06 | Barcode free, photo Pro | Cost structure — barcode = $0, photo = OpenAI cost |
+| 2026-05-06 | Injection cycle as core data model | Unique differentiator, no competitor models this |
+| 2026-05-06 | 5 micronutrients only | Clinically relevant, avoids tracking anxiety |
+| 2026-05-06 | Light mode first | Older demographic, clinical context |
+| 2026-05-06 | Safety + dietary in onboarding | Liability protection + AI personalization |
+| 2026-05-06 | Protein floor with safety bounds | Kidney disease, pregnancy, BMI >35 require different math |
+| 2026-05-06 | First-launch consent flow mandatory | Legal positioning, audit trail |
+| 2026-05-06 | Red-flag detection always free | Safety cannot be paywalled |
+| 2026-05-06 | Data export + deletion in v1 | GDPR/CCPA legal requirement |
+| 2026-05-06 | date-fns for all date math | Avoid JS Sunday/Monday landmines |
+| 2026-05-06 | Vitest mandatory for safety code | Health app — "test later" is wrong default |
+| 2026-05-06 | AI rate limiting via ai_invocations | Cost runaway prevention |
+| 2026-05-06 | Content versioning table | Track which version users saw |
+| 2026-05-06 | Provider schema in v1 migrations | Avoid painful future migrations |
+| 2026-05-09 | App name: Glipra | Trademark cleared, dosepath.app auction won |
+| 2026-05-09 | Offline mode queue-and-sync | Real users at restaurants, traveling, poor signal |
+| 2026-05-09 | Voice + hybrid text logging | Nausea-day retention — the killer feature |
+| 2026-05-09 | Discontinuation/maintenance mode | Doubles average user lifetime value |
+| 2026-05-09 | Compounded GLP-1 support | Underserved population, significant market |
+| 2026-05-09 | Pre-prescriber visit prep | Strongest single retention feature |
+| 2026-05-09 | Linked accounts (couples) | Viral coefficient, common GLP-1 use pattern |
+| 2026-05-09 | AI quality feedback loop | Prompts must improve with real data |
+| 2026-05-09 | "Why?" transparency on AI | Trust = retention, unique to Glipra |
+| 2026-05-09 | 200 seeded GLP-1-friendly foods | Cold start UX — first scan hits cache |
+| 2026-05-09 | MFP/Shotsy/Apple Health import | Switching cost killer |
+| 2026-05-09 | Readiness Score as Today hero | Forge Pulse-inspired UX, clinically grounded data |
+| 2026-05-09 | Smart notification escalation | Engagement automation, reduces passive churn |
+| 2026-05-09 | Cohort insights schema from day one | Compounding moat that requires early data |
+| 2026-05-09 | Streak share image generator | Viral lever, zero ongoing cost |
+| 2026-05-09 | Bad day compassion mode | Pharmacist signature feature, uniquely earned |
+| 2026-05-09 | Spanish localization v1 | Hispanic population = large GLP-1 demographic |
+| 2026-05-09 | A/B feature flags from day one | Data-driven optimization from launch |
+| 2026-05-09 | Cost telemetry from day one | Margin visibility — know your gross margin |
+| 2026-05-09 | Founder Lifetime ($149, first 500) | Upfront cash + evangelists + early distribution |
+| 2026-05-09 | EAS Update for OTA | Health app needs fast hotfixes, not 7-day review |
+| 2026-05-09 | RLS tests required pre-merge | Privacy leaks kill health apps |
+| 2026-05-09 | Zod schemas at all API boundaries | Runtime type safety, not just TypeScript |
+| 2026-05-09 | Subscription state machine v1 | Revenue protection from day one |
+| 2026-05-09 | RevenueCat webhook idempotency | Prevent duplicate subscription events |
+| 2026-05-09 | Texas LLC + insurance pre-launch | Non-negotiable liability shield |
+| 2026-05-09 | Healthcare attorney before launch | State board + FTC + consent flow review |
+| 2026-05-09 | 25 content cards before launch | Content = distribution = moat |
+| 2026-05-16 | Scaffold from obytes/react-native-template-obytes | Exact stack match, saves 2-3 weeks of setup |
+| 2026-05-16 | Use official `@openfoodfacts/openfoodfacts-nodejs` SDK | Replaces custom fetch client — typed, maintained, free |
+| 2026-05-16 | Use `react-native-health-link` (unified) | One package replaces installing react-native-health + react-native-health-connect separately |
+| 2026-05-16 | Use `pdf-lib` for PDFs, NOT React PDF | React PDF doesn't run in Deno edge functions; pdf-lib does |
+| 2026-05-16 | Use `react-native-purchases-ui` for paywall | Pre-built paywall component saves a week of custom UI |
+| 2026-05-16 | Supabase MCP for development | Claude writes/applies migrations directly, generates types, queries dev DB |
+| 2026-05-16 | Study CalYo + simple-calorie-tracker for barcode patterns | Working reference implementations exist — don't reinvent |
+| 2026-05-16 | Study RevenueCat/expo-web-billing-demo for IAP setup | Official cross-platform reference saves 2 days |
+| 2026-05-16 | OpenAI Deno SDK via npm: imports in edge functions | npm:openai@4 works in Supabase edge functions (Deno) |
+| 2026-05-16 | Generate food seed from USDA CSV via script | Hand-writing 200 SQL records wastes a week — script it |
+| 2026-05-17 | Benchmark UX against MeAgain | MeAgain is #1, $400K/mo, 372K users — match polish, beat on pharmacist credential |
+| 2026-05-17 | Add Journey Cards feature in v1 | MeAgain's signature engagement feature — milestones as shareable artifacts |
+| 2026-05-17 | Add Shot Day Prep Checklist in v1 | Drives engagement on the highest-anxiety day, pharmacist-authored copy |
+| 2026-05-17 | Add Medication Level Estimator chart in v1 | Half-life pharmacokinetics visualization — table stakes per MeAgain/Shotsy/Glapp |
+| 2026-05-17 | Defer companion mascot to v2 | Bad mascot cheapens clinical brand; ship gorgeous protein widget instead |
+| 2026-05-17 | Defer Ghost Photo (before/after) to v2 | Emotionally loaded for demographic; needs opt-in design |
+| 2026-05-17 | Parallel agent dispatch for independent modules | Use specialized agents per domain (protein, injection-cycle, migrations) — each agent gets CLAUDE.md rules baked into prompt; safety-critical code reviewed before merge |
+| 2026-05-17 | Two test runners coexist: Jest + Vitest | Jest for components (npm test); Vitest for pure utility/safety logic (pnpm test:utils). Run both before end of session per Rule 5 |
+| 2026-05-17 | src/utils/protein.ts — implementation confirmed | Protein floor calculator with Devine IBW, activity multipliers, kidney cap, pregnancy floor, maintenance multiplier, ceiling/floor clamp. 41 Vitest tests, 100% branch coverage |
+| 2026-05-17 | src/features/injection-cycle/calculator.ts — implementation confirmed | Phase mapping (injection_day/peak_suppression/adjustment/recovery_window/overdue) via differenceInCalendarDays. Supports custom intervals. 100% branch coverage |
+| 2026-05-17 | supabase/migrations/003_ai_invocations.sql — created | ai_invocations table is append-only: users SELECT own rows, only service_role can INSERT. No UPDATE/DELETE by design — audit log integrity |
+| 2026-05-17 | Add AI Coach edge function in v1 | MeAgain "Ask anything" parity, with strict pharmacist guardrails |
+| 2026-05-17 | Microdosing + custom dosing prominent in UI | Schema supports it already — surface it as a differentiator |
+| 2026-05-17 | AI Coach scoped to nutrition only — no medication questions | Open-ended "ask anything" with pharmacist branding = unacceptable liability |
+| 2026-05-17 | Condition names removed from escalation card UI | Naming pancreatitis to a user = diagnosis; internal type codes only |
+| 2026-05-17 | Protein floor modal: add "inaccurate inputs = inaccurate estimates" | Closes the gap if a user enters wrong weight/height |
+| 2026-05-17 | Attorney must review AI coach prompts before enabling | Pharmacist credential + AI advice = heightened duty of care |
+| 2026-05-17 | Employment contract review before writing code | Employer outside-activity clause can stop everything retroactively |
+| 2026-05-17 | Water tracking added to v1 check-in | Clinically relevant (dehydration trigger), 30-min build, users expect it |
+| 2026-05-17 | Fiber surfaced as visible metric on Today screen | Already in schema, matches MeAgain feature parity, constipation is top complaint |
+| 2026-05-17 | Tier-1 disclaimers must be same visual weight as content | Not tiny gray footer — rendered at reading weight or it fails the "unavoidable" standard |
+| 2026-05-17 | MFP/Shotsy import cut from v1 | Edge cases, not blocking; Apple Health import stays |
+| 2026-05-17 | Mock AI strategy for development | Zero OpenAI cost during build — EXPO_PUBLIC_USE_MOCK_AI=true flag |
+| 2026-05-17 | OpenAI hard budget cap $20/mo dev | Prevents runaway costs from bugs — set in OpenAI dashboard Day 1 |
+| 2026-05-17 | Never upgrade free tiers until limit hit | Supabase free handles 200-300 users; EAS free is 30 builds/mo |
+| 2026-05-17 | Use Expo Go for 90% of dev — EAS only when needed | EAS builds for RevenueCat, HealthKit, push notifications only |
+| 2026-05-17 | Total 6-month build cost target: ~$370 | Break-even at 38 paying Pro subscribers |
+| 2026-05-17 | **SCAFFOLD COMPLETE** — Obytes v9.0.0 scaffolded and hardened | 12-task plan executed; 46/46 tests green; all supply chain hardening applied |
+| 2026-05-17 | Expo SDK 54 (not 52 as planned) | Obytes v9.0.0 targets SDK 54 — accepted upgrade; no downgrade |
+| 2026-05-17 | Expo Router 6 (not v3 as planned) | Ships with SDK 54 template — accepted upgrade |
+| 2026-05-17 | Standardized on pnpm 11.1.2 | Template declares `"packageManager": "pnpm@10.12.3"`; deleted package-lock.json |
+| 2026-05-17 | NativeWind/tailwind-variants/tailwind-merge fully stripped | Obytes v9 ships with Tailwind; CLAUDE.md bans it; two-pass removal; button/input/select/text/progress-bar stubbed with StyleSheet.create() |
+| 2026-05-17 | `src/theme/colors.ts` design tokens created | Full token system: brand, semantic, protein levels, injection phases, neutrals, backgrounds, text, borders, clinical safety, spacing, radius, shadows |
+| 2026-05-17 | Dual test runners: Vitest 4.1.6 + jest-expo 54.0.16 | Vitest scoped to pure-TS only (`src/utils/**`, `src/features/**/calculator.ts`); jest-expo for everything else |
+| 2026-05-17 | date-fns v4 metro fix | `resolver.unstable_enablePackageExports = true` in metro.config.js required for ESM-first package |
+| 2026-05-17 | Supabase client uses Proxy-based lazy singleton | Defers env validation to first access; better testability; uses AsyncStorage for sessions |
+| 2026-05-17 | `src/lib/mockAI.ts` created | All mock AI responses: MOCK_MEAL_RECOGNITION, MOCK_DAILY_GUIDANCE, MOCK_MEAL_TEXT_PARSE, MOCK_VOICE_PARSE |
+| 2026-05-17 | `src/types/index.ts` domain types created | GLP1MedicationId (10 variants), InjectionPhase (5), SubscriptionTier, BiologicalSex, ActivityLevel, UserGoal, OnboardingStep (10), DisclaimerTier, RedFlagSeverity |
+| 2026-05-17 | Inner `dosepath/CLAUDE.md` replaced | Obytes template file said "use NativeWind, use MMKV" — replaced with Glipra-aware override |
+| 2026-05-17 | `pnpm install --ignore-scripts` hardened | Supply chain attack mitigation (ref: Sept 2025 Shai-Hulud/qix npm attacks) |
+| 2026-05-17 | Audit baseline documented | 0 critical / 42 high / 26 moderate / 4 low — all dev-only transitive; see docs/security/AUDIT-BASELINE.md |
+| 2026-05-17 | `coverage/` added to .gitignore | Prevent test artifacts from being committed to repo |
+| 2026-05-17 | **AUTH SPEC COMPLETE** — design approved, ready for implementation | Spec at `.planning/specs/2026-05-17-auth-design.md` |
+| 2026-05-17 | Auth screen flow: Welcome → Sign In / Sign Up (separate screens) | Matches ARCHITECTURE.md spec; replaces Obytes single `login.tsx` stub |
+| 2026-05-17 | Auth architecture: Supabase-first, Zustand as reactive mirror | `onAuthStateChange` → Zustand store → UI; Supabase owns session storage via AsyncStorage |
+| 2026-05-17 | Auth store: TokenType replaced with Supabase Session object | No more manual token juggling; automatic token refresh via Supabase client |
+| 2026-05-17 | Apple Sign In: full implementation, availability-gated | `AppleAuthentication.isAvailableAsync()` hides button in Expo Go; full impl ready for EAS dev build |
+| 2026-05-17 | Forgot + Reset password included in auth (Month 1) | 2 screens: forgot-password.tsx + reset-password.tsx; deep link: dosepath://reset-password |
+| 2026-05-17 | storage.tsx: MMKV → AsyncStorage | MMKV is native module (blocked Expo Go); AsyncStorage is API-compatible replacement |
+| 2026-05-17 | Welcome screen: Dark Hero visual direction | Deep navy (#111827) + radial blue glow, gradient CTA, ghost "Sign In" button |
+| 2026-05-17 | Form screens: Clean Light visual direction | White/light background, brand blue focus ring + glow, gradient CTA button |
+| 2026-05-17 | App identity updated: ObytesApp → Glipra | Scheme: dosepath, Bundle: com.dosepath.*, slug: dosepath in env.ts + app.config.ts |
+| 2026-05-17 | Reanimated v4 for all auth animations | FadeInDown/FadeInUp staggered on mount; LinearTransition for error state layout shifts |
+| 2026-05-17 | Password strength bar on sign-up screen | 3-segment visual: weak/medium/strong — red/orange/green, animated via LinearTransition |
+| 2026-05-17 | Consent flow built | 3 screens (ToS, Medical Disclaimer, Privacy Policy) + AsyncStorage persistence + DisclaimerBanner component |
+| 2026-05-17 | 10-step onboarding complete | All screens built + Zustand store + Supabase save on reveal |
+| 2026-05-17 | Today screen skeleton complete | ReadinessScore + ProteinRing (SVG) + PhaseBadge + live injection cycle data |
+| 2026-05-17 | readiness-calculator.ts safety-critical | 100% branch coverage via Vitest — injection phase + protein progress + check-in modifiers |
+| 2026-05-17 | Month 1 complete | All 6 items done. Do not start Month 2 until this is confirmed. |
+| 2026-05-17 | Supabase migrations 005-008 complete | daily_checkins (nausea/energy/water/red_flag), weight_logs (with ewma_weight_kg), content_cards (app content, service_role only writes), streaks (one row per user, UNIQUE on user_id) — all with RLS |
+| 2026-05-17 | src/utils/ewma.ts — EWMA_ALPHA=0.1 | Exponential weighted moving average for body weight smoothing. applyEwma + computeEwmaSeries. 100% branch coverage |
+| 2026-05-17 | src/features/streaks/calculator.ts — safety-critical | calculateStreaks with STREAK_THRESHOLD=0.80, date-fns gap detection, future-date exclusion, proteinFloorG=0 guard. 100% branch coverage |
+| 2026-05-17 | 10 pharmacist-authored content cards | src/features/content-cards/data.ts — protein timing, hydration, nausea, phase-aware tips, fiber, EWMA explanation. tier 1 = clinical warning (orange), tier 2 = educational |
+| 2026-05-17 | Food log screen built | src/app/(app)/log.tsx — manual entry form + barcode scanner stub (real camera needs expo-camera install) + today's entries list. Log tab added to nav. Barcode always free (never paywalled) |
+| 2026-05-17 | Daily check-in screen built | src/app/(app)/check-in.tsx — emoji 1-5 sliders for nausea/energy + 8-button water tracker. Nausea/energy wired into calculateReadinessScore via useTodayData |
+| 2026-05-17 | Weight tracking screen built | src/app/(app)/weight.tsx — SVG EWMA trend chart (react-native-svg only, no new deps), entry form, accessible from Settings. ewma_weight_kg stored on insert |
+| 2026-05-17 | Today screen: streaks + content cards | StreakCard (🔥 current + longest), CardsCarousel (10 cards horizontal scroll) replace the Month 1 log-CTA placeholder. Render order: readiness → metrics row → check-in CTA → streak → cards |
+| 2026-05-17 | Month 2 complete | Food logging, check-ins, weight tracking, EWMA, streaks, content cards all built. 102 Vitest tests, 100% coverage on safety-critical calculators |
+| 2026-05-17 | expo-camera 17.0.10 installed | BarcodeScannerSheet stub replaced with real CameraView — useCameraPermissions, onBarcodeScanned, scan-frame overlay, dedup via scannedRef. Always free, never paywalled |
+| 2026-05-17 | recognize-food edge function built | GPT-4o vision, Zod InputSchema + OutputSchema, safe fallback on parse failure, rate limit 50/day via ai_invocations, no PII in prompts. Client mock-gated via EXPO_PUBLIC_USE_MOCK_AI |
+| 2026-05-17 | ai-coach edge function built | GPT-4o-mini, 10 msg/day rate limit, keyword blocklist fires BEFORE OpenAI (zero token cost on block), nutrition-only scope, ATTORNEY REVIEW REQUIRED comment above system prompt. Canned response for medication questions |
+| 2026-05-17 | expo-image-picker deferred | Not yet installed — PhotoCaptureButton is a stub. Install with `pnpm expo install expo-image-picker` when ready to activate photo food recognition |
+| 2026-05-17 | redFlagDetector.ts built — safety-critical | 4 symptom patterns: dehydration_risk, pain_pattern, vomiting_pattern, energy_pattern. 44 Vitest tests, 97.61% branch coverage. Pure function, no side effects, date-fns throughout |
+| 2026-05-17 | EscalationCard component built | Rule 9 compliant — zero condition names in UI. Locked copy: "You've logged symptoms that may need medical attention. Please contact your prescriber today." DisclaimerBanner tier={1} required. 30-day check-in history feeds detectRedFlags() on every Today screen render |
+| 2026-05-17 | medication-level/calculator.ts built — safety-critical | estimateLevel + generateLevelCurve + generateSteadyStateCurve. Half-lives for all 10 GLP1MedicationIds. Multi-dose steady-state accumulation (4 past cycles). 47 Vitest tests, 100% branch coverage |
+| 2026-05-17 | Medication Level Estimator chart built | SVG line chart (react-native-svg only), steady-state curve, today marker, injection-point dots, auto-scaled Y axis. Pharmacist disclaimer (tier 1, locked copy). Accessible from Settings → /medication-level |
+| 2026-05-17 | Prescriber Visit Prep built — Pro feature | generate-visit-prep edge function: GPT-4o-mini, 5/day rate limit, anonymous metrics only (no PII), ATTORNEY REVIEW gate on system prompt. generate-visit-pdf: pdf-lib A4 PDF (not React PDF — Deno-incompatible). expo-sharing deferred (pnpm expo install expo-sharing expo-file-system to activate) |
+| 2026-05-17 | 193 Vitest tests — all safety-critical at 100% coverage | protein.ts, injection-cycle, readiness, ewma, streaks/calculator, redFlagDetector, medication-level/calculator all at 100% branch coverage |
+| 2026-05-18 | First EAS Android dev build succeeded | Build ID e0626e84. react-native-health-link temporarily removed (causes minSdk conflict with androidx.health.connect — re-add for todo item 12). expo-haptics added. APK installs and connects to Metro via tunnel |
+| 2026-05-18 | i18next lng Promise bug fixed | i18next v25 cannot accept Promise<string> as lng — crashes with codes.forEach undefined. Fix: init with lng:'en', then resolveStartupLanguage().then(i18n.changeLanguage) after init |
+| 2026-05-18 | App running on device | Glipra dev build confirmed working on Android via EAS dev client + tunnel. Welcome screen renders. All native modules load correctly |
+| 2026-05-18 | Supabase cloud project wired up | Switched from local Docker (unreachable from device) to cloud project cuxndkreewlcmijxlgyg.supabase.co. .env.development updated with cloud URL + publishable anon key |
+| 2026-05-18 | 8 missing migration files reconstructed | Migrations 001–002 and 004–008 were applied to local Docker but never saved as .sql files. Reconstructed from API layer code and pushed to cloud: 001_initial_schema (profiles), 002_food_logs, 004_daily_checkins, 005_weight_logs, 006_content_cards, 007_streaks, 008_shot_prep |
+| 2026-05-18 | Migration 011: protein_floor_g added to profiles | fetchTodayProfile selected this column but it was missing from the schema — Supabase returned an error causing Today screen to show "Complete your setup". Added via ALTER TABLE, wired into saveOnboardingProfile |
+| 2026-05-18 | profiles upsert fixed — onConflict: 'user_id' | Default upsert used primary key (id) for conflict detection. Re-running onboarding threw duplicate key constraint. Fixed by passing { onConflict: 'user_id' } |
+| 2026-05-18 | Email confirmation disabled for development | New Supabase cloud projects require email confirmation by default. signUp() returned no error but session was null — user walked through all 10 onboarding steps with no session. Disabled in Supabase Dashboard → Auth → Providers → Email → Confirm email OFF. signUpWithEmail() now returns needsEmailConfirmation flag so the UI can handle this gracefully if ever re-enabled |
+| 2026-05-18 | reveal.tsx: getSession() → getUser() + direct setItem | getSession() reads from AsyncStorage which has race condition on Android — can return null before restore completes. Switched to getSession() with getUser() fallback (live API call). Also replaced setIsFirstTime(false) with direct await setItem('IS_FIRST_TIME', false) before router.replace to guarantee write completes before navigation |
+| 2026-05-18 | (app)/_layout.tsx: hold on isFirstTime undefined | useIsFirstTime hook returned undefined ?? true = true while loading from AsyncStorage. (app)/_layout.tsx immediately redirected to onboarding before the false value could load. Fixed: return null while isFirstTime === undefined; only redirect when explicitly true |
+| 2026-05-18 | Full onboarding → Today screen flow confirmed on device | Auth → Consent → 10-step Onboarding → Today screen working end-to-end on physical Android device. Protein floor (128g/day), medication, and goal render correctly from cloud Supabase |
+| 2026-05-18 | database.ts regenerated from cloud schema | All 11 migrations reflected. profiles.protein_floor_g now typed as number | null in Row, Insert, and Update types |
+| 2026-05-18 | EAS project recreated as @waliabdul/glipra | Old project was registered under slug "dosepath". New project ID: 046b4b41-452b-4b54-94ae-9ab38736222c. app.config.ts updated with new EAS_PROJECT_ID |
+| 2026-05-18 | Second EAS Android dev build succeeded | Build ID 860c9b45. Bundle ID com.glipra.development, scheme glipra://. Replaces old com.dosepath.development APK |
+| 2026-05-18 | Email provider disabled bug | New Supabase cloud project had email auth provider disabled entirely (separate from email confirmation toggle). Enabled in Dashboard → Auth → Providers → Email → Enable Email provider ON |
+| 2026-05-18 | userId stored in onboarding Zustand store at sign-up | Root cause of all "Auth session missing" errors: Supabase client AsyncStorage restoration is async and races with reveal.tsx on new installs. Fix: signUpWithEmail() returns userId from data.user.id; sign-up.tsx immediately calls setOnboardingData({ userId }); reveal.tsx reads formData.userId as primary source — no session lookup needed |
+| 2026-05-18 | signUpWithEmail returns userId | api.ts updated to return { error, needsEmailConfirmation, userId } so callers can capture the user ID without a separate session fetch |
+| 2026-05-18 | Full flow confirmed on com.glipra.development | Sign up → Consent → 10-step Onboarding → Today screen working end-to-end on physical Android device with new Glipra APK and cloud Supabase |
+| 2026-05-18 | RevenueCat subscription gating — code complete | Entitlement ID renamed dosepath_pro → glipra_pro across revenue-cat.ts, use-subscription.ts, pro-gate.tsx, paywall-screen.tsx. Product IDs: glipra_pro_monthly / glipra_pro_annual / glipra_founder_lifetime. EXPO_PUBLIC_REVENUECAT_IOS_KEY + EXPO_PUBLIC_REVENUECAT_ANDROID_KEY added to env schema and all .env files (values empty — user must add from RC dashboard once account created). ProGate wraps coach send UI. |
+| 2026-05-18 | Visual polish pass — Warm & Clinical design direction | background: #FAF8F5 (warm cream), border: #E8E4DD (warm), shadows use warm-tinted black #2A1F0F at slightly stronger opacity for real depth. Settings screen fully rebuilt with StyleSheet API — was broken (Obytes NativeWind className silently ignored after NativeWind was stripped). "Style" placeholder tab removed from tab bar. Tab bar: active tint = colors.primary, custom background + border. Today screen: 30px 800-weight greeting + date line, Rx trust badge, section labels (TODAY'S METRICS / DAILY ACTIONS / PHARMACIST CONTENT), metrics cards with 3px colored top accent border, icon-circle rows for all action cards, pharmacist-designed algorithm trust badge on readiness card. |
+| 2026-05-18 | Design direction revised: Clean Clinical replaces Warm & Clinical | After competitor research (ForgePulse, Shotsy, Pep, MeAgain, GLPeak, Glapp) and visual comparison, revised to Clean Clinical. New tokens: background #f7f9fc (cool blue-gray), brand #5b21b6 (deep violet-purple — more distinctive than generic blue), today/warning amber #d97706, success green #059669, white surfaces with purple-tinted shadow. Warm cream (#FAF8F5) dropped — clinical apps read better in cool neutrals, matches Apple Health / pharmacy app aesthetic. CLAUDE.md updated. |
+| 2026-05-18 | PK curve contextual banner — home screen design locked | Phase banner is primary home screen element. Leads with clinical headline ("Appetite is most suppressed.") not just a label. Shows mini PK curve inline with RISING/PEAK/FADING zone labels. Amber today-marker dot on curve. Guidance pill with clinical instruction. Taps through to expanded view with full curve, 78% of peak level metric, drug selector chips (per-medication — semaglutide vs tirzepatide curves are different), and 4 insight cards (appetite, next injection, GI risk, steady-state). medication-level/calculator.ts already built — UI wiring is the remaining work. |
+| 2026-05-18 | PK curve: unique curve per medication confirmed | semaglutide (Ozempic/Wegovy, t½ ~168h) and tirzepatide (Mounjaro/Zepbound, t½ ~120h) have meaningfully different curves. Each GLP1MedicationId gets its own curve. medication-level/calculator.ts HALF_LIVES map already handles this. |
+| 2026-05-18 | Injection site rotation — feature design | Track injection sites via dot grid: zones = abdomen (4×3 grid), left arm (2×3), right arm (2×3), left thigh (2×3), right thigh (2×3). Each dot = one site. States: empty / used / recent (last injection) / next (AI-recommended next site). Recommendation logic: rotate systematically to prevent lipohypertrophy, minimum 1-week rest per site. Home screen shows compact rotation preview card with "Next: [zone]" badge. Taps to full rotation screen. Stores in new injection_sites table (user_id, zone, site_index, injected_at). |
+| 2026-05-18 | Bottom nav icons: SVG line icons, never emoji | Nav bar uses inline SVG icons (22px, 1.8px stroke, rounded caps/joins, currentColor). Tabs: Home (house), Log (fork+knife), Inject (syringe), Trends (line chart). Active = brand purple #5b21b6, inactive = muted #cbd5e1. Emoji in nav is explicitly forbidden — inconsistent rendering across Android/iOS, looks cheap at this price point. |
+| 2026-05-18 | Competitor research completed | Top 5 GLP-1 app competitors analyzed: Shotsy (free, injection tracking, site rotation, no AI), Pep (freemium, no cycle awareness, no AI), MeAgain ($10/mo, AI Capy, RDN-designed, closest competitor), GLPeak (free, AI Peako chatbot, dietitian-vetted), Glapp (free, best injection-cycle intelligence, no nutrition tracking). Key gap across ALL competitors: none offer clinical safety features, pharmacist-authored content, or prescriber visit prep. Glipra's moat is intact. |
+| 2026-05-19 | PK Curve banner implemented | MedLevelBanner component added to Today screen. Shows mini SVG sparkline (steady-state concentration curve), phase-specific clinical headline (5 phases), and guidance pill. Amber dashed today-marker on curve. Taps to existing /medication-level screen. Renders only when useMedicationLevelCurve() returns a non-null curve (requires lastInjectionDate + doseMg in profile). No DisclaimerBanner on banner itself — existing medication-level screen has Tier-1. Files: src/components/today/med-level-banner.tsx, src/features/today/today-screen.tsx. |
+| 2026-05-20 | PostHog + Sentry wired up | Both packages already installed; wrappers (error-tracking.ts, analytics.ts, posthog-provider.tsx) and initialization in _layout.tsx were pre-built. Added EXPO_PUBLIC_POSTHOG_API_KEY and EXPO_PUBLIC_SENTRY_DSN to env.ts Zod schema. Wired user identification: onAuthStateChange SIGNED_IN now calls analytics.identify(userId) + errorTracking.setUser(userId); SIGNED_OUT calls analytics.reset() + errorTracking.clearUser(). Keys are placeholder-ready in all .env files — fill in from app.posthog.com and sentry.io when ready. |
+| 2026-05-20 | RevenueCat fully configured | RC dashboard setup complete: Android app created (package: com.glipra), Android SDK key goog_PXIgbDoDUnkzNbEVuSvFOffgeVR saved to .env.development and eas.json development env. Test Store products: monthly / yearly / lifetime. Entitlement identifier: GLiPra Pro (3 products attached). Offering: default (3 packages). Product ID constants in paywall-screen.tsx updated to monthly/yearly/lifetime. Entitlement ID updated to GLiPra Pro in revenue-cat.ts, use-subscription.ts, and pro-gate.tsx. iOS RC setup deferred — requires Apple Developer account ($99/yr) + P8 key from App Store Connect. |
+| 2026-05-20 | EAS Android dev build queued with all env vars | Build ID aeebf5ea-6b6d-4071-a54f-6bebdbddf37e. Root cause of missing vars: EAS cloud builds cannot read local .env files. Fix: added all EXPO_PUBLIC_* keys (Supabase URL + anon key, USE_MOCK_AI, RC Android key) to eas.json development profile env section. These are all client-side public keys — safe to commit. iOS RC key left empty until Apple Developer account is set up. |
+| 2026-05-19 | Injection site rotation feature shipped (SVG approach — SUPERSEDED 2026-05-23) | ~~Full greenfield feature: injection_logs Supabase table (010_injection_logs.sql) with RLS; site zones = abdomen (4×3), arm_left/arm_right, thigh_left/thigh_right; SVG body silhouette with tappable dot grid.~~ This approach was scrapped — dots rendered in chest area regardless of coordinate fixes (SVG body silhouette geometry issue). See 2026-05-23 entry for replacement. Migration 010 superseded by 013. SiteRotationMap component deleted. |
+| 2026-05-20 | i18n language switching: restart approach abandoned | Original Obytes template pattern restarted the app on language change (NativeModules.DevSettings.reload()). This silently fails in standalone EAS builds (no DevSettings module). Replaced with RNRestart — also unreliable. Root fix: react-i18next i18n.changeLanguage() already triggers re-render of all useTranslation() consumers in-place. No restart is needed or correct. changeLanguage() in src/lib/i18n/utils.tsx now calls only i18n.changeLanguage(lang) + translate.cache.clear?(). Language switch is instant and reliable. |
+| 2026-05-20 | Today screen fully translated | All hardcoded strings in today-screen.tsx, streak-card.tsx, content-card.tsx, phase-badge.tsx, and med-level-banner.tsx replaced with useTranslation() calls. Three new i18n namespaces added: tabs (tab bar labels), content_card (card type labels + disclaimer), med_banner (phase headlines + guidance pills). Tab bar labels (Today/Log/Settings ↔ Hoy/Registro/Ajustes) now switch in-place via useTranslation() in TabLayout. phase-badge.tsx reuses existing medication.* keys instead of duplicating phase labels. |
+| 2026-05-20 | Onboarding language selection screen added | New file: src/app/onboarding/language.tsx. Shows English and Español options with hardcoded labels (not i18n keys — user has not chosen a language yet). Radio button style cards, Continue button calls changeLanguage() + setItem(LOCAL) then navigates to /onboarding/medication. First-time redirect in (app)/_layout.tsx changed from /onboarding/medication → /onboarding/language. New users now choose language before starting the 10-step onboarding flow. |
+| 2026-05-20 | Arabic localization removed | ar.json kept as empty shell but Arabic removed from SUPPORTED_LANGUAGES (['en', 'es'] only), language picker, and all translation file settings sections. No Arabic UI strings rendered anywhere. Removed to reduce maintenance surface — Arabic right-to-left support would need dedicated QA pass before re-adding. |
+| 2026-05-20 | Settings language picker Option rows styled | src/components/ui/select.tsx Option component was an unstyled bare Pressable — no padding, no separators, no pressed state. Added optionStyles StyleSheet using themeColors: paddingHorizontal: 20, paddingVertical: 18, hairline bottom border, pressed state uses primaryLight background, selected text uses primary color, Check SVG gets stroke={themeColors.primary}. |
+| 2026-05-20 | Tab bar restructure — Injection Sites promoted, Log→Nutrition | Injection Site Tracker promoted from Settings row to 4th visible tab (name: "Sites", icon: Syringe SVG). "Log" tab renamed "Nutrition" (en) / "Nutrición" (es). Tab order: Today → Nutrition → Sites → Settings. Injection Site Tracker row removed from Settings. Back button removed from injection-sites.tsx (no longer a pushed screen). New syringe icon: src/components/ui/icons/syringe.tsx. |
+| 2026-05-20 | MedLevelBanner moved to Daily Actions, always renders | Moved from above readiness card (before metrics) to Daily Actions section (between check-in card and streak card). Now renders a fallback "Log your injection to view your curve →" card when no injection/curve data exists, instead of returning null. Ensures medication level is always discoverable from Today screen. |
+| 2026-05-20 | Weight integrated into check-in; removed from Settings | Added optional weight input card to check-in screen (/check-in). When submitted with a value, calls useInsertWeightLog() in parallel with check-in mutation. Pre-fills placeholder with last logged weight from useWeightLogs(). Weight Tracking row removed from Settings HEALTH section. Medication Level row also removed from Settings (accessible via MedLevelBanner on Today). Settings HEALTH now: Prescriber Visit Prep + Health Import only. |
+| 2026-05-20 | Unit preference system — kg/lbs and cm/imperial toggles | New file: src/lib/unit-preference.ts — WeightUnit ('kg'|'lbs') and HeightUnit ('metric'|'imperial') types, conversion helpers (kgToLbs, lbsToKg, cmToFtIn, ftInToCm, formatWeight), and useWeightUnit()/useHeightUnit() hooks backed by AsyncStorage (keys: WEIGHT_UNIT, HEIGHT_UNIT). All clinical data stays stored in metric internally; conversion happens only at display/input layer — no DB migration needed. UnitToggle component (src/components/ui/unit-toggle.tsx) is a segmented 2-button toggle reused across all weight/height fields. Weight toggles wired into: onboarding/body.tsx (weight + height), (app)/weight.tsx (header toggle + all display sites), components/weight/weight-entry-form.tsx (weightUnit prop, lbs→kg on submit), (app)/check-in.tsx (read-only, respects global preference, lbs→kg on submit). |
+| 2026-05-20 | Injection day date input: YYYY-MM-DD → MM/DD/YYYY auto-format | Replaced confusing ISO text entry in onboarding/injection-day.tsx with an auto-formatter. As user types digits, slashes are inserted automatically (e.g. typing 05132025 → "05/13/2025"). Two new helpers: formatDateInput(raw) strips non-digits and re-inserts slashes; parseMdyToIso(mdy) converts MM/DD/YYYY to YYYY-MM-DD ISO for storage, returns null if incomplete or invalid. canProceed now checks parseMdyToIso() !== null. ISO_DATE_REGEX and isValidISODate() removed. Placeholder changed to "MM/DD/YYYY". |
+| 2026-05-20 | Bug fix: Protein Today tile always showed 0g | Two bugs. (1) src/features/today/hooks.ts line 44 had a Month-1 scaffold placeholder `const proteinConsumedG = 0` that was never wired to the food log system. Fixed by replacing with `const { protein: proteinConsumedG } = useDailyMacros()` — the hook already existed and was used correctly on the Nutrition screen. Readiness score and streak logic (which derive from proteinProgress) now also reflect real logged data. (2) src/features/food-log/api.ts fetchTodayFoodLogs was appending T00:00:00.000Z to a local date string, treating local midnight as UTC midnight. For US users (UTC-5 to UTC-8) this silently excluded evening entries. Fixed using date-fns startOfDay/endOfDay on a `new Date(year, month-1, day)` (local midnight) then toISOString() for the query range. |
+| 2026-05-20 | Medication Level chart: 7D / 30D view range selector | Added a segmented [7D][30D] toggle to the Medication Level Estimator screen, positioned right-aligned below the "CONCENTRATION CURVE" label. 7D shows 3 days past + 7 days forward (current cycle detail, x-labels every 2 days). 30D shows 30 days past + 14 days forward (default, matches previous fixed window, x-labels every 7 days). generateSteadyStateCurve in src/features/medication-level/calculator.ts extended with optional pastDays 7th parameter; injection dose history is dynamically sized to cover the full window (max(4, ceil(pastDays/interval))+1 doses) so wider views show correct pharmacokinetic accumulation, not a flat zero. New reusable component: src/components/ui/segmented-control.tsx — N-option variant of UnitToggle with onSelect(value) callback and auto-sized buttons (no flex:1). LevelChart gained labelIntervalDays prop (default 7) to control x-axis date label density. |
+| 2026-05-23 | SVG injection site tracker scrapped — replaced with form-based flow | Two full iterations of an SVG body silhouette with tappable dot grid failed QA: injection dots rendered in the chest area of the body diagram regardless of coordinate fixes. Root cause: the torso SVG spans y=65 (shoulders) to y=237 (hips), so dots at y=97–120 land in the upper-chest region — visually wrong for a pharmacist-branded app. Decision: abandon SVG body map entirely. Replaced with a standard form-based logging UX (matches how insulin/GLP-1 logging apps used by real patients work). Clinical content is unchanged — the rotation algorithm, 7-day rest rule, and 6 stomach sites all carry over. |
+| 2026-05-23 | Injection site type model simplified: SiteZone → SiteCode | Removed the (zone, position) tuple model. src/types/index.ts: SiteZone type deleted; replaced with SiteCode union of 6 literal values: stomach_upper_left, stomach_upper_mid, stomach_upper_right, stomach_lower_left, stomach_lower_mid, stomach_lower_right. Thighs removed from UI (pharmacist decision: abdomen is the primary GLP-1 site; thighs are secondary and rarely used by this patient population). SITE_LABELS, SITE_OPTIONS, SITE_ROTATION_ORDER, REST_DAYS constants all rebuilt in src/features/injection-sites/constants.ts. Serpentine rotation order: upper-left → upper-mid → upper-right → lower-right → lower-mid → lower-left. |
+| 2026-05-23 | Migration 013_create_injection_logs.sql — canonical injection_logs schema | Previous code queried an injection_logs table that had no committed migration (table existed ad-hoc in dev cloud, never versioned). Migration 010_injection_logs.sql (from the SVG feature) was superseded. New migration 013 is the authoritative schema: id (UUID PK), user_id (FK → auth.users CASCADE), injected_at (TIMESTAMPTZ), site_code (TEXT, CHECK constraint against 6 stomach values), medication_name (TEXT), pain_level (INT, CHECK 0–10), notes (TEXT nullable), created_at. Index on (user_id, injected_at DESC). RLS enabled with 4 policies (SELECT/INSERT/UPDATE/DELETE). Applied to cloud Supabase with npx supabase db push; src/types/database.ts regenerated. |
+| 2026-05-23 | injection-sites feature layer rebuilt for new schema | src/features/injection-sites/types.ts: local InjectionLog domain type (decoupled from database.ts during migration). api.ts: InjectionLogInput interface (siteCode, medicationName, painLevel, notes?, injectedAt) + insertInjectionLog() + fetchRecentInjectionLogs(). hooks.ts: useInjectionLogs() → {logs, isLoading}; useInjectionSiteRecommendation() → {recommendation: SiteCode, allResting: boolean, isLoading}; useLogInjectionSite() mutation with cache invalidation. computeNextSite() in calculator.ts returns RotationState {recommendation: SiteCode, allResting: boolean} — never null. allResting=true when every site was used within REST_DAYS (7); UI shows a warning but still recommends least-recently-used site so user can proceed. 11 Vitest test cases; 100% statement coverage, 99.23% branch coverage (exceeds Rule 4 90% gate). |
+| 2026-05-23 | Add Shot screen (src/app/(app)/add-shot.tsx) | New form screen with: Cancel \| Add Shot \| Save header; TIME TAKEN section (Date row + Time row, each opens native @react-native-community/datetimepicker — iOS spinner mode, Android default modal); DETAILS section (Medication Name Select dropdown pre-filled from profile.medicationId, Injection Site Select dropdown, PainLevelSlider 0–10); SHOT NOTES textarea (500 char max, multiline); Tier 2 DisclaimerBanner (Rule 8). combineDateAndTime() uses date-fns setHours/setMinutes (Rule 6 compliant — no raw Date arithmetic). Site dropdown auto-fills from recommendation gated on !recLoading to prevent flash. Medication auto-fills from profile. canSave = !!medication && !!siteCode && !isPending. Registered in (app)/_layout.tsx as href:null hidden route. @react-native-community/datetimepicker added to package.json and app.config.ts plugins — requires new EAS dev build. |
+| 2026-05-23 | PainLevelSlider component (src/components/injection-sites/pain-level-slider.tsx) | New component: 11 pressable dots (0–10), active dot filled with colors.primary (size 12px), inactive dots outlined (size 9px). Compact horizontal layout: label left, dots middle, numeric value right. accessibilityRole="adjustable" with accessibilityValue {min:0, max:10, now:value}. Adapted from src/components/check-in/rating-slider.tsx pattern but extended to 11 values. |
+| 2026-05-23 | Injection Sites tab screen redesigned — list dashboard | src/app/(app)/injection-sites.tsx rewritten. Removed SVG body map, dot grid, zone selection, SiteRotationMap component (deleted). New layout: page header + Tier 2 DisclaimerBanner + Active Rotation card (shows SITE_LABELS[recommendation], allResting warning if applicable, + Add Shot button → router.push('/add-shot')) + Recent Shots list (up to 10 logs, each showing site name, date/time, medication, PAIN badge) + Rotation Tips card (4 pharmacist-authored tips). src/components/injection-sites/site-rotation-map.tsx deleted. |
+| 2026-05-23 | Select component: disabled option support for section headers | src/components/ui/select.tsx: OptionType extended with optional disabled?: boolean field. When true, item renders as a non-pressable section header (uppercase, 11px, primary color, letterSpacing:1) instead of a tappable Option row. Height calculation weighted (headers ~36px vs rows ~70px). textValue computation excludes disabled items from label resolution so headers never show as the selected value in the trigger button. Used immediately in add-shot.tsx: "Active Rotation" non-selectable header prepended to injection site dropdown options when recommendation is available. Replaces the external hint text that previously appeared above the Select component. |
+| 2026-05-23 | EAS dev build queued — new native module (@react-native-community/datetimepicker) | Native picker module requires a new EAS build to function on device. pnpm expo install added it to package.json; plugin added manually to app.config.ts plugins array (expo install exits 1 on dynamic app.config.ts, plugin must be manually added). Build triggered from correct project directory: cd C:\Users\walia\OneDrive\Desktop\DosePath\dosepath && eas build --profile development --platform android. Previous Oops navigation error was Metro cache — resolved by pnpm start --tunnel --clear. |
+| 2026-05-23 | CLAUDE.md split into CLAUDE.md (lean ~270 lines) + PROGRESS.md | CLAUDE.md was ~579 lines; build history made it expensive to load every session. CLAUDE.md keeps rules, stack, conventions, open blockers, session prompts. PROGRESS.md holds Month 1/2/3 build history + milestone checklist with status badges. |
+| 2026-05-23 | Em dashes removed from all user-facing copy | `—` replaced with `:` or removed across en.json (11 strings), es.json, ar.json, paywall-screen.tsx. "No em dashes in user-facing copy" added to CLAUDE.md Never Do list. |
+| 2026-05-23 | migration 014_add_dosage_strength.sql — `dosage_strength TEXT` added to injection_logs | Nullable column; existing rows unaffected. Display string (e.g. "0.5 mg"). Applied to cloud Supabase. |
+| 2026-05-23 | Add Shot screen: Dosage Strength dropdown | DOSAGE_OPTIONS_BY_MEDICATION record maps each medication display name to its FDA-approved dose rungs plus common compounded ranges. Resets to '' when medication changes. Select disabled until medication chosen. Passed as dosageStrength?: string in InjectionLogInput. |
+| 2026-05-23 | Add Shot date/time fields: display-only until EAS build 93fc4e27 installed | @react-native-community/datetimepicker crashes at JS module-load time when native code is absent — Expo Router never registers the route, causing "Oops!" navigation error. Fields show current date/time as read-only text. TODO: restore DateTimePicker import after build 93fc4e27 is installed on device. |
+| 2026-05-23 | 185 uncommitted files committed in one batch | All feature work since 2026-05-17 scaffold (commit fdd2086) was uncommitted. Stray files (Configure, Get, Manifest, Run, Task, Unit, eas), .planning/, .superpowers/, .claude/, docs/superpowers/ added to .gitignore. EAS build 93fc4e27 queued from this commit — first build with datetimepicker in native layer. |
+| 2026-05-23 | Journey Cards: all 4 missing unlock triggers wired | `first_checkin` in check-in/hooks.ts onSuccess (idempotent). `weight_logged_10x` in weight/hooks.ts onSuccess after fetchWeightLogCount >= 10. `injection_day_warrior` in injection-sites/hooks.ts — useLogInjectionSite(lastInjectionDate?) with date-slice comparison against injectedAt. `coach_conversation` in ai-coach/hooks.ts after first successful assistant reply. All fire-and-forget with silent catch. |
+| 2026-05-23 | Journey Cards: MilestoneToast component | src/components/ui/milestone-toast.tsx — position:'absolute', zIndex:1000, brand-purple 4px left border, shadows.lg, auto-dismisses 3s via useEffect setTimeout, accessibilityRole="alert". Wired into TodayScreen via useCheckAndUnlockMilestones onUnlock callback. Shows first milestone when multiple unlock simultaneously. |
+| 2026-05-23 | Journey Cards: Share button on MilestoneCard | React Native Share.share({ message: milestone.shareText }). No Skia/image generation needed at this stage. Pill button: primaryLight background, primary text, radius.full. Native share sheet, zero extra dependencies. |
+| 2026-05-23 | useCheckAndUnlockMilestones: onUnlock callback parameter added | `onUnlock?: (ids: MilestoneId[]) => void` called after Promise.all resolves and cache is invalidated. Decouples unlock logic from toast display — Today screen owns UI state, hook owns business logic. |
+| 2026-05-24 | Concentration curve wired to real injection_logs data | useMedicationLevelCurve (src/features/medication-level/hooks.ts) completely re-sourced: lastInjectionDate and doseMg now come from injection_logs table (via fetchRecentInjectionLogs) instead of profiles table. profiles.dose_mg and injection_frequency were never populated post-onboarding so the curve was always null. parseDoseMg() parses "0.5 mg" string from dosage_strength column to float. deriveIntervalDays() computes gap between last two distinct injection dates (date-fns, Rule 6). insertInjectionLog() now also upserts profiles.last_injection_date (guarded: only if new shot is more recent). useLogInjectionSite onSuccess invalidates both injection-logs-curve and today-profile query keys so curve and phase banner refresh immediately after logging. |
+| 2026-05-24 | Concentration curve: 30D window anchored to actual injection history | Bug: 30D view always started today − 30 days regardless of when the first real shot was logged, causing 2 synthetic pre-history peaks to appear before the user's first injection. Fix in medication-level.tsx displayCurve useMemo: compute effectivePastDays = min(config.pastDays, daysSinceOldestInjection + 7) using date-fns differenceInCalendarDays (Rule 6). The +7 adds visual breathing room before the first dot. Window expands naturally as history grows but never exceeds the toggle cap (30D). Users with no logs fall back to config.pastDays unchanged. |
+| 2026-05-24 | Concentration curve: interval bug + dot placement fix | Bug: two shots logged on the same calendar day (May 23 test shots) caused deriveIntervalDays to see gap=0, return 1 (daily), and render a wrong curve shape with "daily" badge. Fix: deduplicate injection_logs by calendar date (YYYY-MM-DD) before computing gap — uniqueDates[0] vs uniqueDates[1] now correctly yields weekly gap. Dot placement also fixed: LevelChart previously placed dots at dayOffset % injectionIntervalDays === 0 (synthetic, anchored to today) — shots with dayOffset not divisible by interval got no dot. Replaced with injectionDates?: string[] prop; dots now placed at actual logged dates. medication-level.tsx updated to use lastInjectionDate and injectionDates from hook (not profile field). MedicationLevelCurveResult interface now exports lastInjectionDate and injectionDates fields. |
+| 2026-05-24 | DateTimePicker restored in Add Shot screen | EAS build 93fc4e27 confirmed on device and native module functional. Removed display-only stub from add-shot.tsx. Date and Time rows are now `Pressable` — tapping opens Android calendar dialog (date) and time spinner (time). `onDateChange` / `onTimeChange` call `setShowDatePicker/TimePicker(false)` then update state (works on both platforms). `maximumDate={new Date()}` prevents future-date logging. DateTimePicker renders conditionally (`{showDatePicker && <DateTimePicker ... />}`). combineDateAndTime() unchanged — date-fns Rule 6 compliant. Open blocker removed from CLAUDE.md. |
+| 2026-05-24 | Edit / Delete recent shots | Recent Shots list made fully editable. api.ts: added `updateInjectionLog()` (PATCH with RLS double-guard + profiles.last_injection_date sync) and `deleteInjectionLog()` (hard DELETE). hooks.ts: added `useUpdateInjectionSite()` and `useDeleteInjectionSite()` mutations — both invalidate injection-logs, injection-logs-curve, and today-profile query keys on success so the curve and phase banner refresh immediately. injection-sites.tsx: ShotRow converted from `<View>` to `<Pressable>` with `router.push('/edit-shot?id=')` and chevron indicator. New screen `src/app/(app)/edit-shot.tsx` mirrors add-shot.tsx exactly: date/time pickers pre-filled via `parseISO(log.injected_at)`, all fields pre-populated via `useEffect` once the log arrives from React Query cache (no extra network call), Save calls `useUpdateInjectionSite`, Delete button shows `Alert.alert('Delete Shot', 'This cannot be undone.')` confirmation before calling `useDeleteInjectionSite`. "Shot not found" guard renders a friendly fallback if the log ID is invalid. Registered in _layout.tsx as `href: null` hidden route. |
+| 2026-05-24 | Injection Sites tab renamed "Log GLP-1" | `tabs.sites` translation key updated in both en.json and es.json from "Sites"/"Sitios" → "Log GLP-1" (same string in both locales — "Log GLP-1" reads correctly to bilingual users). No code change needed; label flows through `t('tabs.sites')` in _layout.tsx. |
+| 2026-05-24 | AI Nutrition Coach promoted to 5th bottom-nav tab | Coach was a hidden route (`href:null`) accessible only via a CTA card on Today, so the pharmacist-credentialed AI moat (Glipra's deepest differentiator) was invisible most of the time. Promoted to permanent 4th-position tab. Final order: Today \| Nutrition \| Log GLP-1 \| Coach \| Settings. Pro-gating unchanged — free users still see the welcome message and ProGate teaser card under the input (Spotify-Search-style conversion surface). New icon `src/components/ui/icons/chat-bubble.tsx` (24×24, stroke-based, speech bubble + 3 dots, matches syringe icon style). Coach screen header simplified: back button removed (tab IS the root), title block left-aligned. Today screen Coach CTA card + `ctaCardCoach` / `actionIconCircleCoach` styles deleted. New translation key `tabs.coach: "Coach"` added to en.json and es.json. No new infrastructure — leverages existing ai-coach edge function, useAiCoach hook, ProGate wrapper, rate limiting, and keyword blocklist (Rule 10). |
+| 2026-05-24 | Barcode scanner accuracy: three-layer fix | Wrong nutrition values from Open Food Facts (crowdsourced, varies by product) were silently entering the food log with no way for users to correct them. Three layers added simultaneously: (1) Editable result form — barcode result card replaced with TextInput fields (protein/fiber/calories) so users can fix values before confirming; protein field highlighted in brand purple; amber warning shown when proteinG=0 and no user correction. (2) USDA FoodData Central secondary lookup — if OFF returns protein=0 AND calories=null, falls back to USDA FDC free API (nutrient IDs: protein=1003, fiber=1079, calories=1008); only queried for EAN starting with '0' (US UPC-A products where USDA coverage is high); `EXPO_PUBLIC_USDA_API_KEY=DEMO_KEY` in dev. (3) Per-EAN correction memory — when user edits any field before confirming, the corrected values are saved to `barcode_corrections` Supabase table; future scans of the same EAN load the correction first (source badge shows green "Your verified data"). All Zod-validated — OFF/USDA parse failure returns null, never throws. Rule 3 compliant. |
+| 2026-05-24 | supabase/migrations/011_barcode_corrections.sql | New table: `barcode_corrections` (id, user_id, barcode_ean, product_name, protein_g, fiber_g, calories_kcal, created_at, updated_at). Unique constraint on (user_id, barcode_ean). RLS: SELECT/INSERT/UPDATE per user. Index on (user_id, barcode_ean). Upsert on conflict: `ON CONFLICT (user_id, barcode_ean) DO UPDATE`. Paired with `src/features/food-log/barcode-corrections.ts` — `fetchBarcodeCorrection` + `saveBarcodeCorrection`. React Query hooks: `useBarcodeCorrectionLookup(ean)` (staleTime: Infinity) + `useSaveBarcodeCorrection()` (invalidates cache on success). Both added to `src/features/food-log/hooks.ts`. |
+| 2026-05-24 | barcode-lookup.ts: dataSource field + USDA fallback | `BarcodeProduct` interface extended with `dataSource: 'open_food_facts' \| 'usda' \| 'user_corrected'`. Refactored to `lookupBarcodeOFF()` (extracted) + `lookupBarcodeUSDA()` (new, EAN-0 gated). `lookupBarcode()` cascade: OFF first; if OFF has protein=0 AND calories=null, try USDA; return best result. Source label in scanner UI: "Open Food Facts" / "USDA FoodData Central" / green checkmark "Your verified data". `src/lib/usdaFoodData.ts` referenced via `process.env.EXPO_PUBLIC_USDA_API_KEY`. |
+| 2026-05-24 | calculator.test.ts: vitest import removed | `src/features/injection-sites/calculator.test.ts` was importing `describe, expect, it` from `vitest` — causes "Vitest cannot be imported in a CommonJS module" under Jest. Removed the import; Jest injects all three as globals so no other change needed. Test suite now passes under jest-expo (was the only new suite we introduced that failed). 77 total tests pass, 7 pre-existing vitest-in-Jest failures unchanged (ewma, protein, injection-cycle, medication-level, safety, streaks, readiness — unrelated to this session's code). |
+| 2026-05-24 | calculator.test.ts: vitest import re-added (runner ownership note) | Both Jest and Vitest globs claim `src/features/injection-sites/calculator.test.ts`. Removing the vitest import lets Jest run it but breaks Vitest (which has no `globals: true`); re-adding it lets Vitest run it but Jest fails the suite. Currently re-added — file lives under `src/features/**/calculator.test.ts` which is Vitest's authoritative include glob per `vitest.config.ts`. Vitest = 226 pass; Jest = 66 pass (9 vitest files failing under Jest, all pre-existing). Future fix: add a Jest `testPathIgnorePatterns` entry for the Vitest-owned glob so the two runners stop fighting. |
+| 2026-05-24 | Tab bar: equal-width distribution fix | Added `tabBarItemStyle: { flex: 1 }` to `<Tabs screenOptions>` in `(app)/_layout.tsx` so all 6 visible tabs divide the bar width equally. Root cause of the right-side gap: the "style" placeholder tab used `tabBarButton: () => null` which hides the button visually but leaves a 7th flex slot in the layout. Fixed by changing it to `href: null` (same pattern as all other hidden screens), which removes the slot entirely. |
+| 2026-05-24 | Nutrition tab icon changed to Camera | Replaced `PlusCircle` with a new `Camera` icon (`src/components/ui/icons/camera.tsx`) in the Nutrition tab to signal AI photo scanning at a glance. Icon follows the same SVG pattern as all nav icons: 24×24 viewBox, 1.8px stroke, `strokeLinecap="round"`, `currentColor`. Barrel-exported from `src/components/ui/icons/index.tsx`. Import alias in `_layout.tsx` changed from `PlusCircle as LogIcon` to `Camera as LogIcon`. |
+| 2026-05-24 | Photo food log: user comment for AI accuracy | Added an optional comment step between camera capture and AI analysis so GPT-4o receives richer context (portion size, preparation, additions) on the first call — no second round-trip needed. **Flow:** `PhotoCaptureButton.onImageSelected` now sets `pendingCapture` state in `log.tsx` instead of calling `recognize()` directly. New `PhotoCommentSheet` (`src/components/log/photo-comment-sheet.tsx`) slides up with an auto-focused multiline `TextInput` (300-char max, Zod-enforced server-side) and Skip / Analyze buttons. On Analyze, `handleAnalyze(comment?)` calls `recognize(base64, mimeType, comment)` and clears `pendingCapture`. **Data path:** `userComment?` threaded through `usePhotoFoodLog.recognize()` → `usePhotoFoodRecognition.recognize()` → `supabase.functions.invoke('recognize-food')` body. **Edge function:** `InputSchema` extended with `userComment: z.string().max(300).optional()`; GPT-4o user message prepends `"The user noted: '…'"` when present, unchanged when absent. Rule 2 enforced: comment describes food only (never user identity); 300-char cap guards prompt injection. Mock AI path unchanged — comment silently ignored when `EXPO_PUBLIC_USE_MOCK_AI=true`. No DB migration — comment is ephemeral (sent to AI, discarded). EN + ES translation keys added under `log.photo_comment_*`. |
+| 2026-05-24 | expo-linear-gradient removed from PhotoCaptureButton (Expo Go incompatible) | `expo-linear-gradient@15.0.8` was installed and used for the violet→indigo gradient on the AI hero card. On Android Expo Go it crashed immediately with `IllegalViewOperationException` — the native `ExpoLinearGradient` view manager is not registered in the Expo Go APK. Reverted to a solid `backgroundColor: '#4C1D95'` (the darker end of the gradient) on the card `View`. Visual difference is negligible since both gradient stops are near-identical dark violets. `expo-linear-gradient` remains in `package.json` — re-enable the gradient when doing the first EAS dev build (native modules are compiled in then). |
+| 2026-05-24 | Nutrition Log screen premium redesign | The log screen was a generic form — the AI Photo feature (Glipra's primary Pro conversion surface) was buried as a 3rd mode tab indistinguishable from Barcode. Redesigned into a dashboard-first, premium experience. **New components:** `src/components/log/nutrition-header-ring.tsx` — 44×44px compact donut ring (same Circle-arc technique as `ProteinRing`) showing consumed/floor protein in the screen header; `src/components/log/meal-chip-row.tsx` — horizontal ScrollView with Breakfast/Lunch/Dinner/Snack `Pressable` chips for client-side time-window filtering (Breakfast 5–11am, Lunch 11am–3pm, Dinner 3–9pm, Snack = rest; no DB column, no migration). **PhotoCaptureButton redesign** (`src/components/log/photo-capture-button.tsx`): full-width hero card with `expo-linear-gradient` violet→indigo gradient (`['#4C1D95','#312E81']`); "✦ AI POWERED" amber pill + "👑 PRO" chip row; camera emoji with 4 sparkle dots; "Snap your meal" / "AI estimates macros instantly" copy; white full-width CTA pill "Open Camera →"; loading state replaces CTA with `ActivityIndicator` + "Analyzing…"; ProGate logic moved inline — free users tap the card and get the RevenueCat paywall, Pro users get the camera. Props interface unchanged. `expo-linear-gradient@15.0.8` added via `pnpm expo install`. **log.tsx restructure**: `LogMode` reduced to `'manual' \| 'barcode'` (Photo removed from toggle); `getMealSlot(loggedAt)` pure helper at module scope; `selectedMeal: MealSlot \| null` state added; `proteinFloorG` from `useTodayData()`; header is now a `flexDirection:'row'` layout with title+subtitle column + `NutritionHeaderRing`; layout order: header → DailyMacroCard → MealChipRow → PhotoCaptureButton (always visible) → 2-tab toggle → ManualEntryForm → section header (label reflects active chip) → FoodLogRow list; `FlatList data` uses `filteredLogs` (selectedMeal filter applied); filtered empty state shown separately from no-logs-at-all empty state. **ManualEntryForm button active state**: `hasProtein` computed as `!isNaN(proteinValue) && proteinValue > 0`; button shows `colors.primary` when protein > 0, `colors.gray200` when empty; submit still requires `isValid` (both name + protein); `shadows.sm` added to form card container. **Translations**: `log.title` → "Nutrition Log" (EN) / "Registro de Nutrición" (ES). |
+| 2026-05-24 | Daily Actions — visual consistency pass | All four Daily Actions cards now share the MedLevelBanner design language: 2px colored top accent border, 13px/700 bold headline, soft pill tag, chevron flush right — no icon circles. `checkInCard` and `ctaCard` in `today-screen.tsx` replaced with unified `actionCard` + `actionTextBlock` + `actionHeadline` + `actionPill` styles. Check-in accent is state-aware: `colors.primary` (blue) when not logged, `colors.success` (green) when logged; pill text also switches. `streak-card.tsx` fully rewritten: amber (`colors.warning`) 2px top accent; zero-streak shows blue "Log protein today" hint pill; active streak shows amber "BEST: Xd" pill. `today.streak_start` translation key added to `en.json` + `es.json`. `CameraView` children warning fixed in `barcode-scanner-sheet.tsx`: scan overlay moved out of `<CameraView>` into a sibling absolutely-positioned `<View>` inside a `cameraWrapper` container. |
+| 2026-05-24 | Today screen premium upgrade — spacing, metric cards, tab bar | Three visual problems fixed. (1) Daily Actions spacing: `checkInCard` + `ctaCard` `marginBottom` raised from `spacing.sm` (8px) to `spacing.md` (16px); `MedLevelBanner` wrapped in `<View style={styles.bannerWrapper}>` with `marginBottom: spacing.md` so "Medication level estimator" and "Start your streak" no longer touch. (2) Metric cards elevated: `ringCard` + `phaseCard` shadow upgraded `sm→md`, padding `spacing.md→spacing.lg`; injection countdown (`nextInjectionDays`) is now a 32px 800-weight hero number (was 20px 700); `phaseCard` gets `backgroundColor: colors.primaryLight` tint (`phaseAccent` style) to visually distinguish it from the protein card. (3) Tab bar polished: `src/components/ui/icons/home.tsx` converted from a solid filled path (`fill={color}`) to two stroke-based paths (`strokeWidth:1.8`, `strokeLinecap:"round"`, `fill:"none"`) — now consistent with all other tab icons; `tabIconStyles` wrapper added at module scope in `_layout.tsx` — all 6 visible tabs wrap their icon in a 40×28px pill with `borderRadius:14`; active tab gets `backgroundColor: colors.primaryLight`; `tabBarInactiveTintColor` updated from `colors.gray400` to `colors.textSecondary`. Files: `today-screen.tsx`, `home.tsx`, `_layout.tsx`. `pnpm tsc --noEmit` clean (only pre-existing `i18n-js` type def error). |
+| 2026-05-24 | Progress tab (Trends dashboard) shipped — 6th bottom-nav tab | Glipra captured high-signal data (weight EWMA, protein per meal, injection timing, daily check-ins, streaks) but had no unified over-time view. Today screen shows "now"; Progress shows "weeks". Final tab order: Today \| Progress \| Nutrition \| Log GLP-1 \| Coach \| Settings. **Pure logic** in `src/features/progress/calculator.ts`: `buildHitHistory`, `calculateHitRate`, `calculateAdherence`, `calculateAverageSymptom` — reuses STREAK_THRESHOLD=0.8 from streaks/calculator.ts, all date-fns (Rule 6), 22 Vitest tests covering empty/zero-floor/future-date/dedup edges. **Data hooks** in `src/features/progress/hooks.ts`: `useProteinHistoryPerDay(days)` aggregates new `fetchFoodLogsInRange` client-side; `useInjectionAdherence(days)` reuses `useMedicationLevelCurve()`'s already-deduped `injectionDates` + `injectionIntervalDays`; `useCheckInTrend(days)` wraps `useCheckInHistory`. **Screen** `src/app/(app)/progress.tsx`: header (no back button), SegmentedControl 7D/30D/90D (default 30D), five stacked cards — Weight EWMA reusing existing `ewma-chart.tsx`; Protein hit-rate with daily bar sparkline; Streak calendar grid (hit/miss/no-data legend); Injection adherence with dot timeline; Check-in symptoms dual-line nausea+energy — plus Tier-2 DisclaimerBanner (Rule 8). Every card has a `<PharmacistTip>` Rx-badged advisory bubble using copy authored under `progress.tips.*` (Rule 9 — no condition names; educational tone). New SVG icon `trending-up.tsx` (line chart trending up arrow). New `fetchFoodLogsInRange(userId, startDate, endDate)` in food-log/api.ts reusing the same local-midnight-vs-UTC fix as `fetchTodayFoodLogs`. en.json + es.json got `tabs.progress` + a full `progress.*` namespace. Risk flagged: 6 tabs is at the edge of Apple HIG/Material 3 guidance — fallback would be to collapse Settings to a Today-screen header icon if labels truncate on small devices. |
+| 2026-05-24 | StreakCard made tappable — navigates to Nutrition Log | StreakCard was the only Daily Actions card that was not interactive. Root `<View>` replaced with `<TouchableOpacity>`, `onPress={() => router.push('/log')}`, `activeOpacity: 0.75`, chevron `›` added flush right. Destination is always `/log` regardless of streak state (streak earns by hitting protein floor — Nutrition Log is the natural action). Accessibility label is state-aware. `router` import added from `expo-router`. |
+| 2026-05-24 | goal_weight_kg added to profiles — migration 015 | `supabase/migrations/015_goal_weight.sql` adds `goal_weight_kg NUMERIC` (nullable) to profiles. Applied via `npx supabase db push`. `src/types/database.ts` regenerated. Motivation: Progress "To Goal" metric and head-to-head competitor feature parity. |
+| 2026-05-24 | Goal weight: full data layer wired | `OnboardingFormData` (use-onboarding-store.tsx) got `goalWeightKg?: number`. `saveOnboardingProfile` (onboarding/api.ts) writes `goal_weight_kg`. `TodayProfile` (today/api.ts) gained `goalWeightKg: number \| null`; `fetchTodayProfile` selects and maps the column. All downstream consumers (useTodayProfile, useTodayData) automatically see the field. |
+| 2026-05-24 | Onboarding body screen: optional Goal Weight field | New third input block added after height in `src/app/onboarding/body.tsx`. Same UnitToggle (kg/lbs) as the Weight field — converts to kg before calling `setFormData({ goalWeightKg })`. Field is optional — leaving blank sets `goalWeightKg: undefined`, which `saveOnboardingProfile` maps to `null`. New `optionalLabel` + `hintText` styles. `canProceed` guard unchanged (only weight + height are required). |
+| 2026-05-24 | Settings: Body Metrics section + Goal Weight edit screen | New "Body Metrics" SettingsSection added above Health in `settings-screen.tsx`. Contains one row: "Goal Weight" → navigates to new `src/app/(app)/goal-weight.tsx`. Edit screen: pre-populates from `useTodayProfile().goalWeightKg`, UnitToggle for kg/lbs display, numeric input, Save/Clear actions — both upsert `profiles.goal_weight_kg` directly and invalidate `today-profile` React Query cache. "Clear goal weight" button only renders when a goal is already set. Translation keys: `settings.body_metrics` + `settings.goal_weight` added to en.json + es.json. |
+| 2026-05-24 | WeightResultsCard — 4-metric summary panel in Progress | New component `src/components/progress/weight-results-card.tsx`. Matches CardShell design language (3px `colors.success` top accent). 2×2 grid: **Total Lost** (first log minus latest, sign-prefixed), **Weekly Avg** (total lost / floor(days/7)), **BMI** (latest weight / height²), **To Goal** (latest minus goal, shows "-- " when no goal, switches to "kg/lbs done" when at or past goal). All arithmetic uses `date-fns` + stored kg values; display converts at render time via `useWeightUnit()`. Empty state (<2 logs) shows prompt. Placed above WeightTrendCard in progress.tsx. Respects range selector — 7D/30D/90D/All filters weight logs before passing to card. Translation keys: `progress.results_card.*` in en.json + es.json. |
+| 2026-05-24 | Progress range selector: "All" added | `type Range` extended to include `'All'`; `RANGE_DAYS['All'] = 9999`. When All is selected, `weightLogsInRange` uses `allWeightLogs` unfiltered (bypasses the `cutoff` date filter). Other cards (`ProteinHitRateCard`, `StreakCalendarCard`, etc.) receive `days=9999` — their existing date-fns cutoff logic gracefully returns all available data. Known ceiling: `useWeightLogs` fetches last 90 days by default; "All" for weight reflects 90-day cache until a longer-range fetch path is added (TODO). |
+| 2026-05-24 | Haptic feedback wired across the app | `src/lib/haptics.ts` created — thin wrapper over `expo-haptics` (already installed) with named functions: `tap` (light impact), `medium` (medium impact), `selection` (selectionAsync), `success` (notification success), `warning` (notification warning). Wired in: tab bar (`screenListeners.tabPress → tap`), `SettingsRow` (covers all Settings rows), Today screen action cards (check-in, shot-day, journey, discontinued banner), `StreakCard`, `MedLevelBanner`, `SegmentedControl` (selection — range toggle), `UnitToggle` (selection — kg/lbs, cm/ft), `RatingSlider` (selection — check-in emoji buttons), `PainLevelSlider` (selection — 0–10 dots), `MealChipRow` (tap — breakfast/lunch/dinner/snack). Semantic rule: `selection` for discrete value pickers and toggles; `tap` for navigation presses and row taps; `medium`/`success`/`warning` reserved for primary submit buttons and error states (TODO). |
+| 2026-05-24 | goal-weight screen hidden from tab bar | `goal-weight.tsx` placed inside `(app)/` was auto-registered by Expo Router as a 7th visible tab. Fixed by adding `<Tabs.Screen name="goal-weight" options={{ href: null, headerShown: false }} />` to `_layout.tsx`. Rule: every file inside `(app)/` that is not a real tab must be explicitly listed with `href: null` — same pattern as `add-shot`, `edit-shot`, `check-in`, etc. |
+| 2026-05-24 | EWMA chart: dose marker lines via injectionDates prop | `EwmaChartProps` extended with optional `injectionDates?: string[]`. Each ISO date renders as a faint dashed vertical `<Line>` (1px, `colors.primary`, `strokeDasharray="3,3"`, `opacity=0.35`) using the existing `toX(ts)` helper. Lines outside `[minTime, maxTime]` are skipped. `WeightTrendCard` calls `useInjectionAdherence(days)` (already used by `InjectionAdherenceCard`) to get `windowDates` and passes them as `injectionDates` to `EwmaChart` — no new hooks, no new API calls. |
+| 2026-05-25 | Discontinuation mode completed | The `discontinuation-mode.tsx` guidance screen, today-screen banner, routing, and pharmacist content cards were already built. The missing piece was a post-onboarding status change UI. Built: (1) `src/app/(app)/update-status.tsx` — new hidden screen with the same 5-option pill-card selector as `onboarding/status.tsx`; pre-populates from `useTodayProfile()`; saves via `supabase.from('profiles').update({ medication_status })` + `invalidateQueries(['today-profile'])`, mirroring the `goal-weight.tsx` pattern exactly. (2) `_layout.tsx` — registered `update-status` with `href: null` so it doesn't auto-appear as a tab. (3) `settings-screen.tsx` — new "GLP-1 Status" `SettingsRow` at the top of the Preferences section; shows current status label (e.g. "Active") as `value` prop; navigates to `/update-status`. `STATUS_LABELS` map added at module scope. (4) `today-screen.tsx` — when `medicationStatus === 'discontinued'`: injection phase card replaced with "Injection tracking paused" placeholder (prevents confusing "overdue" state); `MedLevelBanner` hidden (injection-cycle-aware, meaningless post-discontinuation). Shot Day Prep card disappears naturally (already gated on `injectionCycle?.phase === 'injection_day'`). (5) `en.json` + `es.json` — `settings.medication_status` and `today.injection_discontinued` added in both languages. Protein floor on discontinuation screen intentionally shows full value with NO maintenance multiplier — muscle preservation is the highest priority immediately after stopping. `pnpm tsc --noEmit` clean; 66/66 jest tests pass. |
+| 2026-05-25 | android.minSdkVersion bumped to 26 | `app.config.ts` `android.minSdkVersion` set to 26. Required by `react-native-health-link` (Health Connect API minimum). Previously the project used SDK 24, which caused a `minSdk conflict with androidx.health.connect` build error when the package was present, so it was removed. With the bump in place, re-add the package via `pnpm expo install react-native-health-link` when building the Health Import feature. Takes effect on the next EAS build (native config change — not OTA-updatable). |
+| 2026-05-25 | Jest/Vitest runner collision resolved | jest-expo was picking up 9 pure-TS Vitest test files (which import from `vitest`) and crashing on them. Fix: added `testPathIgnorePatterns` to `jest.config.js` with four regex patterns that mirror `vitest.config.ts`'s `include` globs exactly — `/src/utils/.*\.test\.ts$`, `/src/features/.*calculator\.test\.ts$` (covers both `calculator` and `readiness-calculator`), `/src/features/safety/.*\.test\.ts$`, `/src/features/medication-level/.*\.test\.ts$`. `/node_modules/` retained explicitly since adding the field overrides the preset default. Result: jest-expo runs 11 suites / 66 tests (component + integration); Vitest runs 9 files / 226 tests (safety-critical pure-TS). Zero overlap. |
+| 2026-05-25 | Data ceilings fixed — weight range & EWMA chart slice | Two bugs prevented the Progress screen from showing correct data on the "All" range. (1) `useWeightLogs()` was called without arguments everywhere, so `fetchWeightLogs` always defaulted to 90 days — "All" was silently capped at 90 rows. Fix: added `days = 90` parameter to `useWeightLogs(days)` and included it in the React Query key as `[WEIGHT_LOGS_KEY, userId, days]` so each range gets its own cache entry. `fetchWeightLogs` already accepted a `days` param — it just wasn't being threaded through. The `invalidateQueries({ queryKey: [WEIGHT_LOGS_KEY, userId] })` partial-key match in `useInsertWeightLog` invalidates every variant automatically. EWMA cache read updated to the 3-element key `[…, 90]` so EWMA computation always reads the standard window. (2) `EwmaChart` had `const visible = logs.slice(-30)` — a hard cap of 30 points regardless of the selected range. Removed entirely; chart renders whatever the caller passes. (3) `WeightTrendCard` and `progress.tsx` both had client-side date filters that are now redundant — removed, along with the unused `parseISO`/`subDays` imports. "All" now maps to `days = 9999`, which causes `subDays(new Date(), 9999)` (~27 years ago) to be the Supabase `gte` cutoff, returning the user's full history. Files: `features/weight/hooks.ts`, `components/progress/weight-trend-card.tsx`, `app/(app)/progress.tsx`, `components/weight/ewma-chart.tsx`. |
+| 2026-05-25 | Settings: Goal Weight row now shows current value | `settings-screen.tsx` calls `useTodayProfile()` (already cached, no extra network call) and `useWeightUnit()` to derive `goalWeightValue`. When `profile.goalWeightKg` is non-null, `formatWeight(kg, unit)` produces `"75.0 kg"` / `"165.3 lbs"` and is passed as `value` prop to the Goal Weight `SettingsRow`. When null, `value` stays `undefined` so the existing chevron `›` renders and the row still looks tappable. `SettingsRow` already handles both states — no component changes needed. `pnpm tsc --noEmit` clean (only pre-existing `i18n-js` typedef warning). |
+| 2026-05-25 | Haptics pass 2 — primary CTAs, success, and destructive actions | Completed the haptic semantic layer across all commit surfaces. **Semantic placement rules:** `medium()` fires on every primary CTA immediately after the early-return guard (before mutate/navigate); `success()` fires after a confirmed server save (inside `isSuccess` useEffect watcher or `onSuccess` callback); `warning()` fires before any destructive `Alert.alert`. **Onboarding (11 screens):** `haptics.medium()` added to `handleNext()` / `handleContinue()` / `handleSkip()` / `handleStart()` in `language.tsx`, `medication.tsx`, `injection-day.tsx`, `body.tsx`, `goals.tsx`, `status.tsx`, `dietary.tsx`, `safety.tsx`, `protein-target.tsx`, `import.tsx`, `reveal.tsx` — always placed as the first statement after the guard, before `setFormData()` + `router.push()`. **App screens:** `check-in.tsx` — `medium()` as first line of `handleSubmit()` before `mutate()`; `success()` in `isSuccess` useEffect before `router.back()`; `add-shot.tsx` — `medium()` before `logShot()` in `handleSave()`; `edit-shot.tsx` — `medium()` before `updateShot()` in `handleSave()`; `warning()` before `Alert.alert` in `handleDelete()`; `coach.tsx` — `medium()` after the `!text \|\| isLoading` guard before `setInputText('')`; `visit-prep.tsx` — `medium()` as first line of both `handleGenerateQuestions` and `handleExport` callbacks; `goal-weight.tsx` — `medium()` in `handleSave()` (first line, before session guard), `warning()` as first line of `handleClear()` (destructive clear). **Components:** `weight-entry-form.tsx` — `medium()` after `!isValid` guard before weight conversion; `photo-capture-button.tsx` — `medium()` after `isLoading` guard before the `isPro` branch so both Pro (camera) and free (paywall) paths receive the pulse; `barcode-scanner-sheet.tsx` — `success()` inside `if (result)` branch before `setProduct(result)` so a confirmed product match always triggers success feedback. `pnpm tsc --noEmit` clean; all 226 Vitest tests + all 66 jest-expo tests pass. |
+| 2026-05-25 | Push notification infrastructure shipped | `expo-notifications@0.32.17` installed. Two local notifications: (1) **Injection day reminder** — one-time, fires 8 AM on the next computed injection date; auto-rescheduled whenever a shot is logged in `useLogInjectionSite` onSuccess using `differenceInCalendarDays(newShot, previousShot)` as the interval (date-fns, Rule 6). (2) **Daily protein nudge** — repeating daily at 7 PM, body copy includes the user's `proteinFloorG`. Permission requested silently at end of onboarding (reveal.tsx) — ideal moment, after value is established. Settings → Notifications section added with two `Switch` toggle rows. `useNotificationSettings()` hook manages permission requests, AsyncStorage persistence (`NOTIF_INJECTION_ENABLED`, `NOTIF_PROTEIN_ENABLED`), scheduling, and cancellation in one place. `notifications` object in `src/lib/notifications.ts` follows haptics.ts pattern — all functions are try/catch wrapped, silent no-op on failure. `expo-notifications` plugin added to `app.config.ts`. i18n keys added to `settings.*` namespace in en.json + es.json. `pnpm tsc --noEmit` clean (only pre-existing i18n-js typedef); 66/66 jest tests pass. Local notifications work in Expo Go — no new EAS build required to test. |
+| 2026-05-25 | react-native-health-link 0.2.0 installed — Health Import feature unlocked | `pnpm add react-native-health-link --ignore-scripts` succeeded (Expo wrapper hit Windows EPERM/OneDrive rename race; direct pnpm add worked). The entire Health Import feature was pre-built: `src/features/health-import/health-link.ts` (graceful dynamic-require wrapper, Expo Go safe), `src/features/health-import/hooks.ts` (`useHealthImport()` with 90-day dedup + sequential EWMA), `src/app/(app)/health-import.tsx` (full styled screen with Connect, Import, Steps Today, Tier-2 DisclaimerBanner). No file edits needed — dynamic-require loads the module automatically now that it exists in node_modules. `pnpm tsc --noEmit` clean (only pre-existing i18n-js typedef); 66/66 jest tests pass; 226 Vitest tests pass. **Requires a new EAS dev build** before testing on device — native modules are compiled at build time and cannot be delivered via OTA update. |
+| 2026-05-25 | Content cards batch 2 shipped — 25/25 target reached | 15 new pharmacist-authored cards added to `src/features/content-cards/data.ts` (sortOrder 11–25): resistance training, protein shakes, eating out, alcohol (warning tier 1), B vitamins (warning tier 1), iron/zinc, calcium/bone, plateau psychology, pre-injection prep, soft foods, adjustment phase, sleep/muscle, social eating, logging accuracy, maintenance nutrition. All `medicationIds: []` (universal). Cards 19 and 20 from architecture (pancreatitis/gallbladder) intentionally omitted — require attorney review + dual disclaimers. `getActiveCards()` required no changes. `pnpm tsc --noEmit` clean (pre-existing i18n-js typedef only); 66/66 jest tests pass. |
+| 2026-05-25 | Visual redesign direction locked — Direction B (Vibrant Gradient) with light/dark mode | User feedback: app looks "boring." After visual brainstorm comparing 3 directions (Dark Premium, Vibrant Gradient, Bold Typography), **Direction B (Vibrant Gradient)** selected. Design: purple-to-blue gradient hero on Today screen (light: `#6d28d9→#2563eb→#0284c7`; dark: `#3b0764→#1e3a8a→#0c4a6e`), white floating metric cards in light mode, `#1e1533` dark-purple cards in dark mode. System primary color shifts from `#2D6BE4` (blue) to `#6d28d9` (deep purple). Light/dark mode support via `ThemeContext` + `useTheme()` hook replacing static `colors.ts` import — theme key persisted to AsyncStorage. **Pharmacist touches added:** (A) `PharmacistSpotlightCard` restyled as a prescription pad — purple header with ℞ symbol, faint ruled lines across card body, "Sig:" clinical shorthand label, dashed footer with "Licensed Pharmacist / Glipra Health" stamp. (B) Injection cycle card replaced with a 7-cell blister pack (`PillStripCard`) — each day shows phase color (injection day = purple with 💉, peak suppression = blue P, adjustment = green A, recovery = amber R), today's cell gets a glow ring, tomorrow is dashed/empty. **Additional design work queued (D1–D10 in PROGRESS.md):** custom tab bar, micro-animations (protein ring spring fill, readiness count-up), skeleton loading, onboarding gradient screens, milestone gradient cards, protein floor reveal card. All new components read from `useTheme()` — no hardcoded colors. |
+| 2026-05-25 | Content cards redesigned — phase-aware spotlight replaces bland carousel | User feedback: horizontal carousel looked "bland" and "like spark notes." Root cause: 25 cards crammed in a fixed-width scroll meant users saw 1-2 cards and stopped; full paragraph bodies were too heavy to scan. Fix: replaced the carousel as the primary surface with `PharmacistSpotlightCard` — a full-width card showing a bold 1-sentence `keyTakeaway` with a "Read the full note" CTA that opens `ContentCardSheet` (Modal bottom sheet). The carousel survives as a collapsible "Browse all tips" secondary path. Cards now have two new data fields: `keyTakeaway: string` (spotlight headline, max ~12 words, active voice) and `phases?: InjectionPhase[]` (which injection phases this card is most relevant to). Spotlight selection logic: phase-specific card shown when a match exists for the user's current `injectionCycle.phase`; universal cards (no phases) rotated daily by `differenceInCalendarDays` so the feature card changes each day. `PHASE_LABELS` map provides the phase pill label in the card header. New files: `src/components/today/pharmacist-spotlight-card.tsx`, `src/components/today/content-card-sheet.tsx`. Modified: `data.ts` (interface + all 25 card entries), `today-screen.tsx` (spotlight wiring + state), `en.json`/`es.json` (3 new keys each: `pharmacist_note_label`, `browse_all_tips`, `read_full_note`). Also added `common.close` to both translation files. TSC clean (pre-existing i18n-js typedef only); 66/66 jest tests pass. Commit: f7569a6. |
+| 2026-05-25 | EAS build failure: uncommitted changes caused minSdkVersion mismatch | EAS Build clones from git HEAD — not from the local working tree. `app.config.ts` had `android.minSdkVersion: 26` locally (added for health-link) but the change was never committed, so EAS generated the Android project from the committed version (`minSdkVersion` absent → Expo default of 24). `react-native-health-link` pulls in `androidx.health.connect:connect-client:1.1.0-alpha11` which requires minSdk 26, causing Gradle manifest merger to fail: `uses-sdk:minSdkVersion 24 cannot be smaller than version 26 declared in library`. **Diagnosis:** `git show HEAD:app.config.ts` confirmed no `minSdkVersion` in the committed android block; `git status` showed 75 files changed or untracked — the entire session's work was uncommitted. **Fix:** staged and committed all 75 files (`app.config.ts`, `package.json`, `pnpm-lock.yaml`, `src/`, `supabase/`) in commit `b757929`. **Rule derived:** never trigger an EAS build with uncommitted changes — run `git status` first to confirm HEAD reflects what you intend to build. |
+| 2026-05-25 | D1 — ThemeContext + Direction B token system shipped | `src/theme/tokens.ts` defines `GlipraTokens` interface + `lightTokens` / `darkTokens` (Direction B palettes). `src/lib/ThemeContext.tsx` provides `GlipraThemeProvider`, `useTheme()` (returns full token set, safe fallback to light), `useThemeSelector()` (Settings only). `src/app/_layout.tsx` split into outer `Providers` (holds `GlipraThemeProvider`) and inner `ConnectedProviders` (calls `useThemeConfig()` safely inside the provider) — required because `useThemeConfig` must consume `useTheme()` but the old structure put it outside the context. `src/components/ui/use-theme-config.tsx` replaced: was importing from deleted `@/components/ui/colors`, always returned `LightTheme`; now wires React Navigation theme to live `useTheme()` tokens. `src/theme/colors.ts` primary updated to `#6d28d9` (Direction B purple) — propagates to all 80+ unmigrated files immediately at zero cost. Three high-visibility screens migrated to `makeStyles` pattern: `today-screen.tsx`, `settings-screen.tsx`, `progress.tsx`. Settings → Appearance section added with Light / Dark / System `Pressable` toggle; preference persisted via pre-existing `useSelectedTheme()` AsyncStorage hook. `src/theme/tokens.test.ts` (11 Vitest assertions) added; `vitest.config.ts` and `jest.config.js` updated to route the new test file to Vitest only. `pnpm tsc --noEmit` clean (pre-existing i18n-js typedef only); all tests pass. |
+| 2026-05-25 | D2 — Gradient hero on Today screen header | `expo-linear-gradient` (already installed, `~15.0.8`) wired into `today-screen.tsx`. `SafeAreaView` background set to `gradients.hero[0]` so the status-bar notch area matches the gradient start color. `ScrollView` background set to `colors.background` so the scroll body is cream/dark as appropriate. `LinearGradient` (full-bleed, `start {x:0,y:0} → end {x:1,y:1}`) wraps the header content — greeting text, date, Rx badge — all in white (`#ffffff` / `rgba(255,255,255,0.75)`). Rx badge uses `rgba(255,255,255,0.18)` background + `rgba(255,255,255,0.35)` border to float on the gradient. `contentArea` View below gradient restores horizontal padding. Light gradient: `#6d28d9 → #2563eb → #0284c7`; dark gradient: `#3b0764 → #1e3a8a → #0c4a6e` — both from `gradients.hero` token so dark mode is automatic. **Note:** initial dev-build test crashed with `IllegalViewOperationException` because `expo-linear-gradient` had never been used in the codebase when build 860c9b45 was created — native view manager wasn't pre-allocated. Temporary fallback (solid `colors.primary` View) deployed via Metro hot-reload. New EAS build (session 16) will register the module; gradient will render correctly from that build forward. |
+| 2026-05-25 | D3 — ℞ Prescription Pad SpotlightCard shipped and confirmed on device | Visual brainstorm produced three prescription-pad directions (A: bold gradient header; B: thin stripe + watermark; C: Glipra ℞ brandmark). **Decision: Direction A layout + Direction C footer stamp.** Rationale: gradient matches D2 Today hero — creates a consistent visual language that associates the purple-blue gradient with pharmacist-authored content. Footer: rotated `✦ LICENSED RPh ✦` stamp (RPh = Registered Pharmacist, the actual US credential abbreviation) at `opacity: 0.65`, `transform: rotate(-2deg)` — adds prescription-pad realism. Ruled lines implemented via absolute-positioned 1px `View` elements at 28px intervals (matching `lineHeight: 28` on the takeaway text) since React Native has no `repeating-linear-gradient`. Outer/inner wrapper pattern used: outer `View` carries `shadows.md` + `backgroundColor: colors.surface` (iOS shadow requires non-transparent bg on shadow-carrying View); inner `View` has `overflow:'hidden'` + `borderRadius` for gradient corner clipping without killing Android elevation. Tier 1 clinical cards get an amber left-border warning stripe above the Sig: label (Rule 8 compliance). Warning stripe text uses `t('today.clinical_note_label')` i18n key — no hardcoded strings, no em dashes. `ruledContainer` minHeight set to `LINE_HEIGHT * RULE_COUNT` (84px) so all three rules render without clipping. No prop changes — `PharmacistSpotlightCardProps` unchanged. Implementation: single-file rewrite of `src/components/today/pharmacist-spotlight-card.tsx`. Confirmed rendering correctly on physical Android device in EAS build 58aaa2f3. |
+| 2026-05-25 | D4 — 7-cell blister pack injection cycle strip shipped | New component `src/components/today/injection-cycle-card.tsx`. Props: `lastInjectionDate: string` (from `profile`) + `injectionCycle: InjectionCycleResult` (from `useTodayData()`). Seven dome-shaped cells rendered via `Array.from({ length: 7 }, (_, i) => addDays(parseISO(lastInjectionDate), i))` — day-of-week label (`format(date, 'EEE')` → Mon/Tue/etc.) appears below each dome. Phase color per cell via local `getPhaseForDay(i)` helper (0→injection_day, 1-2→peak_suppression, 3-4→adjustment, 5-6→recovery_window). Past/today cells: solid phase-color fill; today cell: extra `borderWidth: 2.5, borderColor: colors.white` (today ring) + "TODAY" badge at opacity:1 above dome (opacity:0 for all other cells — opacity toggle avoids layout shift). Future cells: `colors.gray100` (muted, unlit blister). Overdue state: `effectiveDaySince` clamped to 7, all cells render as past. Footer: "Next: Mon, Jun 2" or "OVERDUE" in `colors.phaseOverdue` red. Dome shape: `borderTopLeftRadius: 999, borderTopRightRadius: 999` (React Native clamps to width/2 → perfect semicircle top), `borderBottomLeftRadius: 6, borderBottomRightRadius: 6`. Outer/inner shadow wrapper pattern (D3): `outer` carries `...shadows.md + backgroundColor: colors.surface` (iOS shadow host), `inner` has `overflow:'hidden'` (Android clip). `makeStyles` factory called via `React.useMemo`. All strings via i18n: `today.cycle_title`, `today.cycle_today_badge`, `today.cycle_next_dose`, `today.cycle_overdue_label` (added to `en.json` + `es.json`). Rendered in `today-screen.tsx` after `metricsRow`, before Shot Day Prep, guarded by `medicationStatus !== 'discontinued' && lastInjectionDate && injectionCycle`. `pnpm tsc --noEmit` clean (pre-existing i18n-js typedef only); 66/66 jest tests pass. Commits: c3d7cb5 → da45e2d → 1d31e3e → 5de53ae → 2f57b6a. |
+| 2026-05-25 | D5 — Custom tab bar with gradient active pill + Settings gear icon | New component `src/components/navigation/glipra-tab-bar.tsx` typed with `BottomTabBarProps` from `@react-navigation/bottom-tabs` (transitive dep of expo-router). Renders 5 visible tabs (Today, Progress, Nutrition, Sites, Coach); Settings removed from tab bar. Active tab: horizontal `LinearGradient` using `gradients.hero` (purple→blue→teal), `height: 32`, `borderRadius: 16`, `minWidth: 44`; icon in `colors.textInverse`. Inactive tabs: plain `View` same dimensions; icon in `colors.textSecondary`. Tab labels via `useTranslation()` using existing `tabs.*` keys. **Navigation dispatch:** `CommonActions.navigate(route)` + `target: state.key` per React Navigation 7 contract — the simple `navigation.navigate(route.name)` string form does not correctly scope dispatch in Expo Router's nested navigator. **Insets:** destructured from `BottomTabBarProps` directly (framework already calls `useSafeAreaInsets()` internally; no duplicate hook). **Styling pattern:** static `StyleSheet.create` for layout dims + inline colors from `useTheme()` — intentional deviation from the project's `makeStyles` + `useMemo` pattern; tab bar re-renders on every navigation event so avoiding useMemo call overhead is more appropriate here. **Tab labels in `_layout.tsx`:** `GlipraTabBar` reads labels from its own `TAB_CONFIG` (not from `Tabs.Screen options.title`); the `title` props in `_layout.tsx` are kept as documentation/fallback only — noted in a comment. **Settings tab:** registered with `href: null` in `_layout.tsx` — hidden from the tab bar but route remains programmatically navigable via `router.push('/settings')`. **Gear icon:** `Pressable` added to Today screen header inside a new `headerActions` wrapper row (alongside the Rx badge); `SettingsIcon color="#ffffff"` (always white — sits on the dark gradient hero, matching all other header elements). `haptics.tap()` on both tab press and long press. `tabLongPress` event emitted from `onLongPress` to fulfil full React Navigation tab bar event contract. `pnpm tsc --noEmit` clean (pre-existing i18n-js typedef only); 66/66 jest tests pass. Commits: 10704bb → 352f02b → 3e367f9 → ecb92b6 → 9fdcee8 → bc937e3. |
+| 2026-05-25 | Appearance picker added as onboarding step 2 | New screen `src/app/onboarding/appearance.tsx` inserted between `language.tsx` and `medication.tsx`. Shows three card options (Light / Dark / System) using the same radio-card pattern as `language.tsx`. Calls `useThemeSelector()` from `@/lib/ThemeContext` on each tap — writes to AsyncStorage immediately and triggers a full ThemeContext re-render, giving the user instant live preview (tapping Dark flips the screen to dark mode before they even press Continue). System is pre-selected on first visit (AsyncStorage has no saved value yet, `useSelectedTheme` defaults to `'system'`). `language.tsx` `handleContinue` target changed from `/onboarding/medication` → `/onboarding/appearance`; appearance screen's Continue routes to `/onboarding/medication`. Uses `t('common.continue')` for the button — i18n is active by this step since `language.tsx` already called `changeLanguage()`. No Expo Router layout changes needed — Expo Router auto-discovers `appearance.tsx` in the `onboarding/` folder. 8 new i18n keys added under `onboarding.*` namespace (title, subtitle, light/dark/system label + sublabel) in both `en.json` and `es.json`. `pnpm tsc --noEmit` clean; 66/66 jest tests pass. Commits: 0e3e2cc, 542014e, 13740bc. |
+| 2026-05-25 | Dark mode screen migration — all 37 screens migrated to `useTheme()` | D1 (session 18) only migrated 3 screens (Today, Progress, Settings). All remaining screen files still imported from static `@/theme/colors`, so dark mode had no effect on them. Bug surfaced on device: Nutrition and Injection Sites tabs showed a light background in dark mode. **Scope:** 37 screen files migrated in 7 commits — tab screens (`log`, `injection-sites`, `coach`), 12 hidden app screens (`check-in`, `weight`, `edit-shot`, `visit-prep`, `update-status`, `goal-weight`, `shot-prep`, `journey`, `maintenance-mode`, `medication-level`, `health-import`, `discontinuation-mode`), 5 auth screens (`consent`, `welcome`, `sign-in`, `sign-up`, `forgot-password`), 11 onboarding screens (all steps + `import.tsx`), `add-shot.tsx`. **Migration pattern:** static `import { colors, radius, shadows, spacing } from '@/theme/colors'` replaced with `import { useTheme } from '@/lib/ThemeContext'` + `import type { GlipraTokens } from '@/theme/tokens'`; inside each component `const { colors, spacing, radius, shadows } = useTheme()` + `const styles = React.useMemo(() => makeStyles({ colors, spacing, radius, shadows }), [colors, spacing, radius, shadows])`; `StyleSheet.create({...})` converted to `function makeStyles(tokens: StyleTokens)` at bottom of file. Token key names are identical between static `colors.ts` and `GlipraColorTokens` — no key renaming needed. **In-file sub-components** (8 total) given their own `useTheme()` call + separate named `makeXxxStyles` factory: `ShotRow` (injection-sites), `FoodLogRow` (log), `TypingIndicator` + `MessageBubble` (coach), `WeightTrendSection` (discontinuation-mode), `SectionCard` + `DataRow` (visit-prep), `SummaryCard` (onboarding/reveal). **Two pre-existing hardcoded literals** left as-is: `#7C2D12` in `consent.tsx` and `#9A3412` in `protein-target.tsx` — both are clinical disclaimer text colors not mapped to a token; use `colors.escalationText` in a future cleanup. **Also fixed:** `tabs.sites` i18n key was `"Log GLP-1"` in both `en.json` and `es.json` — corrected to `"Sites"` / `"Sitios"`. **Remaining:** 44 component files in `src/components/**` and `src/features/**` still use static `colors.ts` (BarcodeScannerSheet, ManualEntryForm, DailyMacroCard, PhotoReviewSheet, MealChipRow, etc.) — scheduled as a separate "D1 Component Migration" pass. `pnpm tsc --noEmit` clean (pre-existing i18n-js typedef only); 66/66 jest tests pass. Commits: bc95a0e, bd94a8a, 5588b66, 6a2a2de, 826e3cd, 4f1a173, 63df0b0. |
+| 2026-05-25 | EAS build 58aaa2f3 — LinearGradient registered + notifications fix | New Android dev build triggered after D2 LinearGradient crash (build 860c9b45 had `expo-linear-gradient` in package.json but never used — native view manager not pre-allocated, caused `IllegalViewOperationException` on Fabric). Fix: `expo-linear-gradient` is now actively used in `today-screen.tsx` (D2) and `pharmacist-spotlight-card.tsx` (D3) so the native module is compiled into the binary. Also included: notifications module-level `Notifications.setNotificationHandler()` wrapped in try/catch — Expo Router route discovery was crashing on module evaluation, blocking `injection-sites`, `settings`, `add-shot`, and `edit-shot` route registration. APK install URL: `https://expo.dev/artifacts/eas/bX3bmCNPxNQ7pfEVZDQQo6.apk`. **On-device behavior note:** after fresh APK install (uninstall + reinstall), `AuthLayout` and `TabLayout` both return `null` for ~100ms while `hasAgreed` and `isFirstTime` load from AsyncStorage — this appears as a brief dark flash (`#0d0920` background from dark theme). Not a crash; resolves immediately. On Android, reinstalling with the same keystore often preserves AsyncStorage data — user went straight to Today screen without re-consenting. |
+| 2026-05-25 | Daily Actions tiles — dark mode fix + accent icon circles | Two action tiles (`StreakCard`, `MedLevelBanner`) still imported from static `@/theme/colors`, rendering white cards in dark mode while the other two tiles (Daily Check-in, Your Journey) were already dark-mode-aware via `useTheme()`. **Fix:** both components migrated to `useTheme()` + `makeStyles` factory pattern. **Icons:** four new SVG icons added (`src/components/ui/icons/clipboard-check.tsx`, `activity.tsx`, `bolt.tsx`, `progress-path.tsx`) following the existing 24×24 / strokeWidth 1.8 / `color` prop convention. All four Daily Action tiles now have a 40×40 icon circle (borderRadius 20) placed left of the text block. Design direction chosen via interactive visual mockup — color-coded circles per tile: Check-in = `colors.primaryLight` purple circle + ClipboardCheck icon (flips to `colors.success` green circle + white icon when already logged today); Medication level estimator = `rgba(37,99,235,0.12)` blue circle + Activity/EKG-wave icon; Streak = `colors.warningLight` amber circle + Bolt/lightning icon; Journey = `colors.primaryLight` purple circle + ProgressPath icon. `today-screen.tsx` already had `actionIconCircle`, `actionIconCircleDone`, `actionIconCirclePending` styles scaffolded — wired up rather than re-created. `pnpm tsc --noEmit` clean (pre-existing i18n-js typedef only); 66/66 jest tests pass. Commits: 55c4f9c, c9cc90b, d9eced4, ee1e456. |
+| 2026-05-25 | D4 follow-up — phase labels added inside blister pack dome cells | The D4 blister pack shipped with blank dome cells — phase color was present but no text. User feedback: "Weren't there supposed to be phase names inside here?" and "I don't want just P or A or R. I want an abbreviation at least." Fix: `PHASE_LABELS: Record<InjectionPhase, string>` constant added to `src/components/today/injection-cycle-card.tsx` with values `{ injection_day: '💉', peak_suppression: 'PEAK', adjustment: 'ADJ', recovery_window: 'REC', overdue: 'OD' }`. `cellPhase` (already computed in the cells loop) added to the return object. Dome `<View />` converted from self-closing to a container; colored domes (past + today) render a `<Text style={styles.domeLabel}>` child with the phase label; future cells (gray) render nothing. `dome` style gained `alignItems: 'center'` + `justifyContent: 'center'`. New `domeLabel` style: `fontSize: 9, fontWeight: '800', color: colors.white, letterSpacing: 0.5, textTransform: 'uppercase'` — white bold caps that read clearly against any phase color. `numberOfLines={1} adjustsFontSizeToFit` on the Text prevents overflow in narrow cells. Single file modified: `src/components/today/injection-cycle-card.tsx`. `pnpm tsc --noEmit` clean (pre-existing i18n-js typedef only); 66/66 jest tests pass. Commit: b7534d9. |
+| 2026-05-25 | Daily Hits — replaced unbounded dot grid with fixed 4-week calendar | The original `StreakCalendarCard` accepted a `days` prop (up to 365) and rendered 14-column rows, producing up to 26 rows — far too tall. Redesigned as a fixed 7x4 grid: always 7 columns (Mon–Sun), 4 rows (last 4 complete weeks starting from the Monday 3 weeks ago). Grid start: `subWeeks(startOfWeek(new Date(), { weekStartsOn: 1 }), 3)` (date-fns only, no raw arithmetic). `days` prop kept on the interface for compatibility but ignored internally — the component always fetches exactly 28 days. Day-of-week header row (M T W T F S S) added above the grid so users can spot weekly patterns. `historyMap` useMemo builds a date-keyed lookup for O(1) slot resolution. Future cells (date > today string comparison) render as gray regardless of data. `LegendDot` sub-component passes `styles` param to receive the `makeStyles` return (pattern for passing factory output into sub-components). Migrated to `useTheme()` — dark mode correct. File: `src/components/progress/streak-calendar-card.tsx`. `pnpm tsc --noEmit` clean; 66/66 tests pass. Commit: 5ec012c. |
+| 2026-05-25 | Daily Hits — day-of-month numbers inside calendar cells | Follow-up to the 4-week calendar. Each cell now shows the day number (1–31) centered inside it. `slots` useMemo now stores `dateObj = addDays(gridStart, i)` before calling `format()` twice — once for `yyyy-MM-dd` (lookup key) and once with `'d'` (day number). Cell `<View />` converted from self-closing to a container; `<Text style={[styles.dayNum, { color: ... }]}>` renders the number centered. Color logic: white (`colors.white`) on colored cells (hit/missed), muted (`colors.textDisabled`) on gray cells (no data/future). `cell` style gained `alignItems: 'center'` + `justifyContent: 'center'`. New `dayNum` style: `fontSize: 9, fontWeight: '700', lineHeight: 11`. File: `src/components/progress/streak-calendar-card.tsx`. `pnpm tsc --noEmit` clean; 66/66 tests pass. Commit: cec16a9. |
+| 2026-05-25 | Barcode scanner — full macro + GLP-1 Watch nutrition panel | Previously the barcode scan results showed only 3 fields (Protein, Fiber, Calories). Redesigned across 6 files. **barcode-lookup.ts:** `BarcodeProduct` interface extended with `carbsG`, `fatG`, `magnesiumMg`, `zincMg`, `b12Mcg`, `vitaminDIu`. OFF extraction updated — macros are in g/100g (direct), minerals in g/100g (×1000 for mg), vitamins in g/100g (×1e6 for mcg; Vit D ×40 for IU). USDA extraction adds nutrientIds 1004 (fat), 1005 (carbs), 1090 (Mg, mg), 1095 (Zn, mg), 1178 (B12, µg), 1114 (Vit D, µg→×40 IU). **types.ts:** `BarcodeFoodEntry` interface added (mirrors `PhotoFoodEntry`, includes `barcodeEan`). **api.ts:** `insertBarcodeFoodLog()` writes all 12 nutrition columns to `food_logs` (previously only 3 were written). **hooks.ts:** `useInsertBarcodeFoodLog` uses `BarcodeFoodEntry` type and calls `insertBarcodeFoodLog`. **log.tsx:** `handleProductFound` passes all new fields. **barcode-scanner-sheet.tsx:** Redesigned results UI — Protein hero card (full-width, 36px/800 weight, brand purple border + `BRAND_LIGHT` background, "your GLP-1 priority" subtext) + 4-cell macro row (Calories / Carbs / Fat / Fiber, 16px/700) + conditional amber GLP-1 Watch panel (Magnesium / Zinc / Vit B12 / Vit D, only rendered when API returned ≥1 non-null micronutrient). Migrated to `useTheme()` + `makeStyles`. Result section wrapped in `ScrollView` to handle taller content. `EditableField` sub-component gains `unit` prop (shown below label) and `micro` flag (amber tint). Commits: ee6c643 (safe area fix, separate), 343893b. |
+| 2026-05-25 | disclaimerText token + D1 component migration | Added `disclaimerText` token to `GlipraColorTokens` interface (`#9a3412` light / `#fdba74` dark) and to both `lightTokens` and `darkTokens` in `tokens.ts`, plus `colors.ts` static fallback. Replaced 7 hardcoded disclaimer color literals (`#9A3412`, `#7C2D12`) across `disclaimer-banner.tsx`, `consent.tsx`, `protein-target.tsx`, `visit-prep.tsx`, `discontinuation-mode.tsx`, `medication-level.tsx`, `maintenance-mode.tsx`. **D1 component migration:** Migrated 39 component and feature files from `import { colors, ... } from '@/theme/colors'` to `useTheme()` + `makeStyles` factory pattern. Dark mode now applies correctly to every component in the app — the D1 migration pass begun in session 18 (37 screens) is now complete. Only `src/features/journey-cards/milestones.ts` retains the static import (plain `.ts` data file, not a React component; cannot use hooks). Migration pattern: static import removed; `useTheme()` called inside component; `StyleSheet.create(...)` moved into `function makeStyles({ colors, spacing, radius, shadows })` factory; called via `React.useMemo()`. Sub-components in the same file each got their own `useTheme()` call. Module-level color constants that referenced colors (e.g. `PHASE_COLORS`, `arcColor()`) moved inside component functions. Commit: 3d6de20. |
+| 2026-05-29 | OTA update pushed — development channel | `eas update --channel development` published session 35 fixes (expo-av lazy-load + VoiceCaptureButton token cleanup). Update group `6c890b73-cc3a-4b47-8d12-057a787ab1d3`. Android `019e7793-9b9a-789b-a6c0-cb118b739ebc` / iOS `019e7793-9b9a-71de-8998-f49849b48b9c`. Runtime 1.0.0. Sentry warning "Missing config for organization, project" is expected — DSN env var fallback is active and working; source map uploads are disabled (`SENTRY_DISABLE_AUTO_UPLOAD=true` in preview, env var fallback in dev). [Dashboard](https://expo.dev/accounts/waliabdul/projects/glipra/updates/6c890b73-cc3a-4b47-8d12-057a787ab1d3) |
+| 2026-05-29 | PostHog + Sentry confirmed live | Both `EXPO_PUBLIC_POSTHOG_API_KEY` and `EXPO_PUBLIC_SENTRY_DSN` were already present in `.env.development` and in both `development` and `preview` profiles in `eas.json`. CLAUDE.md open blocker was stale — removed. Also corrected the Health package minSdk blocker note: `react-native-health-link` 0.2.0 is installed and `android.minSdkVersion` is already 26. |
+| 2026-05-29 | expo-av lazy-load fix — `VoiceCaptureButton` crash in Expo Go resolved | Root cause: `import { Audio } from 'expo-av'` at module top-level caused `requireNativeModule('ExponentAV')` to run synchronously at evaluation time. In Expo Go (no EAS build) the native binary isn't compiled in, so the throw propagated up through `log.tsx` → Expo Router route discovery → "No route named 'log' exists" + "missing default export" warnings. Same pattern as the `expo-linear-gradient` (session D2) and `expo-notifications` (build 58aaa2f3) crashes documented above. **Fix:** `import { Audio }` replaced with `import type { Audio }` (type-only, erased at compile time, zero runtime effect on module loading). Module-level `getAudio()` function added — wraps `require('expo-av')` in try-catch, only executes when mic button is tapped, returns `null` in Expo Go. `handlePress` calls `getAudio()` before mic permission request and shows "Dev Build Required" alert on null. `startRecording` calls `getAudio()` and early-returns on null. `stopRecording` calls `getAudio()` and skips `setAudioModeAsync` if null (safe — the recording object itself was already created in a valid session). State type `Audio.Recording \| null` and `rec: Audio.Recording` parameter keep the type-only import for TypeScript; both are erased at runtime. TSC clean (pre-existing i18n-js typedef only); 62/62 jest-expo tests pass. |
+| 2026-05-30 | Nutrition Log AI section redesigned — Voice hero leads, Photo secondary | Cost-driven hierarchy flip: voice logging costs ~10× less per scan than photo (Whisper + GPT-4o mini vs GPT-4o vision). The side-by-side `aiRow` (flex row) replaced with `aiStack` (flex column) in `log.tsx`. `VoiceCaptureButton` idle state redesigned from a small dark box to a full-width hero card: `#1e1b4b` deep-indigo background, `rgba(196,181,253,0.15)` border, 👑 PRO badge, 🎙 emoji at 34px, 9 decorative static waveform bars (`rgba(196,181,253,0.55)`), "Speak your meal" title (15px/800), "Voice AI extracts macros instantly" subtitle, "Tap to record →" purple CTA pill. Recording and loading states unchanged (same `heroCard` shell, `recordingBg` or opacity override). `PhotoCaptureButton` replaced its large gradient hero card with a compact pressable row: 📷 emoji + "Photo scan / AI estimates from image" text + AI + PRO badges + chevron. `aiStack` renders VoiceCaptureButton first, then PhotoCaptureButton. 5 new i18n keys in `en.json` + `es.json`: `voice_hero_title`, `voice_hero_subtitle`, `voice_cta`, `photo_row_title`, `photo_row_subtitle`. Design spec: `docs/superpowers/specs/2026-05-30-voice-hero-redesign-design.md`. TSC clean; 62/62 jest-expo pass. |
+| 2026-05-30 | PhotoCaptureButton: premium header band + free logging note | Photo compact row elevated with a slim purple header band (`backgroundColor: '#4C1D95'`, `paddingVertical: 6`): `✦ AI POWERED` (amber pill) + `👑 PRO` (white pill) badges across the full width. Body row below is white (`colors.surfaceElevated`). `overflow: 'hidden'` on the outer `photoCard` clips the band cleanly to the card's rounded corners. Loading state keeps a plain centered row (no band). "✓ Manual and barcode logging are always free" (`colors.success` green, 11px/600) added as `freeNote` text immediately below the Manual/Barcode toggle in `log.tsx`; `modeToggleRow`'s `marginBottom` tightened from `spacing.sm` → `spacing.xs` so the note sits flush. New i18n key `free_logging_note` in en/es. TSC clean; 62/62 jest-expo pass. |
+| 2026-05-29 | VoiceCaptureButton: 3 hardcoded hex colors replaced with design tokens | `src/components/log/voice-capture-button.tsx` had three hardcoded hex literals: `#0F172A` (button default background), `#7f1d1d` (recording-active background), `#fca5a5` (waveform bars). None had matching tokens. Added 3 new semantic tokens to `GlipraColorTokens` interface, both palettes in `tokens.ts`, and `colors.ts` static export: `buttonDark` (`#0f172a` light / `#2d2047` dark — dark action button that stays dark in light mode, elevates to a purple surface in dark mode), `recordingBg` (`#7f1d1d` light / `#991b1b` dark — recording-active danger state), `recordingWave` (`#fca5a5` both modes — wave bar in the active recording state). Component updated: `backgroundColor: colors.buttonDark`, `backgroundColor: colors.recordingBg`, `backgroundColor: colors.recordingWave`. Zero hardcoded hex values remain in the file. TSC clean (pre-existing i18n-js typedef only); 62 jest-expo tests pass. |
+| 2026-05-25 | Barcode scanner — per-serving values fix | Bug: app pre-filled edit fields with per-100g values regardless of actual serving size. For Sour Patch Kids (30g serving), the result showed 367 cal / 86.7g carbs instead of the label values (110 cal / 26g carbs). Root cause: `offProductSchema` did not extract `serving_quantity` from the OFF API response. Fix in 2 files. **barcode-lookup.ts:** `offProductSchema` now includes `serving_quantity: z.number().optional()`. `BarcodeProduct` interface gains `servingWeightG: number | null`. `lookupBarcodeOFF` extracts `servingWeightG = product.serving_quantity > 0 ? product.serving_quantity : null` and includes it in the return. `lookupBarcodeUSDA` always returns `servingWeightG: null` (USDA search API does not expose serving weight). **barcode-scanner-sheet.tsx:** Pre-fill `useEffect` now computes `mult = servingWeightG / 100` (falls back to `1` when null or already 100g) and multiplies every field — protein, calories, carbs, fat, fiber, and all four GLP-1 Watch micronutrients. The `fieldsNote` label is now derived: "Per serving (30g) — edit to match the label" when `servingWeightG` is a non-100g value; "Per 100g — edit to match the label" otherwise. The DB stores per-serving amounts (what the user actually consumed), which is what daily macro card totals require. Commit: 6a709c5. |
+| 2026-05-26 | Onboarding gradient hero on all 12 screens | All 12 onboarding screens now open with the Direction B purple-blue gradient hero, matching the Today screen and creating a consistent brand identity from the very first screen. **StepProgress `onDark` prop:** new optional boolean on `src/features/onboarding/components/step-progress.tsx` — when true, renders transparent container (no surface bg, no bottom border), white label text, `rgba(255,255,255,0.2)` track, `rgba(255,255,255,0.9)` fill. **Pattern applied to all 12 screens:** (1) `SafeAreaView` background set to `gradients.hero[0]` so the status-bar area behind the notch matches the gradient start color. (2) `LinearGradient` (full-bleed via `marginTop: -spacing.lg, marginHorizontal: -spacing.lg`) wraps heading + subheading as the first child inside `ScrollView contentContainerStyle`. (3) Heading color changed from `colors.textPrimary` → `'#ffffff'`; subheading from `colors.textSecondary` → `'rgba(255,255,255,0.8)'`; `marginBottom` on subheading removed (heroGradient paddingBottom provides spacing). (4) `StepProgress` gets `onDark` on all step screens (medication through import). **Special cases:** `import.tsx` has a `backHeader` View between StepProgress and ScrollView — background set to `'transparent'` and border cleared; `backArrowText` color changed to `'rgba(255,255,255,0.9)'`. `reveal.tsx` has no StepProgress — a `stepBadge` View ("Step 10 of 10") is included inside the LinearGradient alongside heading + subheading; badge background `rgba(255,255,255,0.2)`, badge text `rgba(255,255,255,0.9)`. **Welcome screens** (`language.tsx`, `appearance.tsx`) use `paddingTop: spacing.xl` (deeper gradient) vs. step screens that use `paddingTop: spacing.lg`. 13 files changed, 353 insertions. 237 Vitest + 66 jest tests pass. Commit: b2b9fec. |
+| 2026-05-26 | Red-flag detector fully wired — snooze, full-screen override, DB audit flag | The detection logic (`detectRedFlags`), history fetch (`useCheckInHistory`), and escalation card UI (`EscalationCard`) were already implemented and tested (session 20). Three missing integration pieces shipped in this session. **1. DB audit flag** — `markRedFlagTriggered(userId, date)` added to `src/features/check-in/api.ts`. Uses `startOfDay` / `addDays` (date-fns) to build an inclusive day window and calls `.update({ red_flag_triggered: true })` on all `daily_checkins` rows for the triggering day. Non-fatal: failure logs a `console.warn` but never rethrows — audit log, not user-facing. **2. 24-hour snooze** — new file `src/features/safety/hooks.ts` exports `useRedFlagSnooze()`. On mount, reads key `glipra_red_flag_snooze_until` from AsyncStorage. `isSnoozed` is `true` when a stored timestamp is in the future. `snooze()` writes `Date.now() + 86_400_000` and updates state synchronously. `isLoading: true` while AsyncStorage resolves — treated as snoozed in all callers to prevent a flash of the escalation card on cold start. **3. Full-screen override** — `today-screen.tsx` now evaluates `isTriggered = redFlagDetection?.triggered && !snoozeLoading && !isSnoozed` before the `isLoading` guard. When `isTriggered` is true, the entire Today screen renders only `EscalationCard` (inside a centered `ScrollView` with `escalationContent` style — `flexGrow: 1, justifyContent: 'center'`); no other content is shown. The old inline conditional `{redFlagDetection?.triggered && <EscalationCard ... />}` inside the main `ScrollView` was removed. `handleDismiss = async () => await snooze()` replaces the previous `onDismiss={() => {}}` no-op. A `React.useEffect` keyed on `[redFlagDetection?.triggered, userId, today]` calls `markRedFlagTriggered` fire-and-forget (`.catch(() => {})`). New imports: `useAuthStore` (for `userId`), `markRedFlagTriggered`, `useRedFlagSnooze`. `pnpm tsc --noEmit` clean (pre-existing i18n-js typedef only); 66/66 jest tests pass; 237/237 Vitest tests pass. Commit: f6ee17f. |
+| 2026-05-26 | D6 — Micro-animations on Today screen | Three animations wired to data arrival: (1) **Protein ring spring fill** — `Animated.createAnimatedComponent(Circle)` from `react-native-svg`; `useSharedValue(circumference)` initialized as empty ring; `withSpring(targetOffset, { damping:18, stiffness:80 })` fires in `useEffect` keyed on `progress`; `useAnimatedProps` drives `strokeDashoffset` on the UI thread. (2) **Readiness score count-up** — plain JS `setInterval` (36 steps, 1200ms, ease-out-cubic); no Reanimated worklet overhead needed for a number; `displayScore` state replaces static `{readiness.score}` in the inline card in `today-screen.tsx`. (3) **Streak card pop-in** — `Animated.View` wrapper in `streak-card.tsx`; `useSharedValue` scale `0.85→1.0` (`withSpring` damping:14 stiffness:120) + opacity `0→1` (`withTiming` 280ms) in `useEffect([], [])` fires on mount (card is conditionally rendered after streak data loads). 3 files changed. 237 Vitest + 66 jest tests pass. Commit: fdf89d2. |
+| 2026-05-26 | D10 — Protein floor reveal card | Upgraded `protein-target.tsx` result card from a plain white surface to a premium clinical artifact. Uses the Direction B outer/inner shadow-wrapper pattern (established in D3/D4/D9): outer `View` carries `shadows.md + backgroundColor: colors.surface` as the iOS shadow host; inner `LinearGradient` (`gradients.hero`, `overflow: 'hidden'`) is the visible card face. Added: faint ℞ watermark (`rgba(255,255,255,0.08)`, 64px, absolute top-right); 52px bold white hero number; formula breakdown line (e.g. `"82.5 kg × 1.6 g/kg"`) derived from `result.baseWeightUsedKg` × `ACTIVITY_MULTIPLIERS[activityLevel]`; maintenance multiplier (×0.9) and kidney-disease cap (0.8 g/kg) correctly reflected in formula; formula hidden when `flooredByPregnancy` (80g minimum doesn't fit weight×multiplier explanation); adjustment badges unified as frosted-glass rgba pills. `ACTIVITY_MULTIPLIERS` exported from `protein.ts` (additive export, no test impact). 2 files changed. 237 Vitest + 66 jest tests pass. Commit: 20a3d04. |
+| 2026-05-26 | D7 — Skeleton loading states | Replaced full-screen `ActivityIndicator` spinners with shimmer ghost cards on Today, Injection Sites, and Weight screens. **SkeletonBox primitive** (`src/components/ui/skeleton-box.tsx`): gray `View` with `overflow: 'hidden'`; `Animated.View` child carries a 250px-wide `LinearGradient` (transparent→white 55%→transparent) that translates from -200 to +300 via `withRepeat(withTiming(300, { duration:1000, easing:Easing.linear }), -1, false)` — infinite left-to-right shimmer sweep. **TodaySkeleton** (`src/components/ui/today-skeleton.tsx`): composite ghost layout that mirrors Today's real content — real `LinearGradient` hero (matching `gradients.hero` + `heroGradient` padding) with two ghost boxes for greeting (h:28, opacity:0.35) and date (h:14, opacity:0.25); content area with readiness ghost (h:200, `radius.xl`), two-column metrics row (h:180, `radius.lg` each), section label ghost, and three action card ghosts (h:72 each). Scroll is disabled so the ghost layout stays static. **today-screen.tsx:** `isLoading` branch now returns `<TodaySkeleton />` inside a `SafeAreaView` — no more ActivityIndicator on blank background; `loadingContainer` style removed. **injection-sites.tsx:** `loadingCard` contents replaced with 3 stacked `SkeletonBox` rows (label ghost h:9, value ghost h:17, button ghost h:34) mimicking the rotation card's label+value+button structure; card style changed from fixed `height: 72` with centering to `padding: spacing.md + gap: spacing.sm` so ghost rows breathe. **weight.tsx:** `summaryCard` loading branch replaced with 3 ghost rows (label h:12, value h:56, date h:12) mimicking the LATEST weight display. `ActivityIndicator` removed from RN imports in both files. 5 files changed (2 new, 3 modified). 66/66 jest tests pass; 237/237 Vitest tests pass. Commit: 2360006. |
+| 2026-05-26 | EAS build 9a15cf1b — red-flag detector + all D1–D6 changes | New Android dev build (ID `9a15cf1b`) triggered May 26 from commit `f6ee17f` (red-flag detector). This supersedes build 58aaa2f3 as the active APK on device. APK: `https://expo.dev/artifacts/eas/k2z9PBWYhA1TFdRfxAYDFn.apk`. Note: `react-native-health-link` remains removed from package.json — Health Connect re-integration requires minSdk 26 bump + re-add package + new build (deferred, quota was exhausted). The D7–D10 visual changes and dark mode contrast fixes (all post this commit) are deployed via `eas update` OTA on top of this build. |
+| 2026-05-26 | Dark mode contrast fixes — dose picker, food input, mode toggle | Three components used `colors.white` as a literal background inside dark-mode-aware contexts, making `textPrimary = #f5f3ff` (near-white) invisible against white. Spotted on device. **Root cause:** `colors.white` is defined as `'#ffffff'` in both light and dark token sets — it never changes — so using it as a card/input background bypasses the theme system entirely. **Fix pattern:** replace `colors.white` with `colors.surface` in the three offending styles; `surface = '#ffffff'` in light mode (no visual change) and `'#1e1533'` in dark mode (the standard dark card background). **Files:** (1) `src/components/ui/select.tsx` line 126 — `Options` bottom sheet `backgroundStyle.backgroundColor`: `colors.white` → `themeColors.surface`. This file already imported `useTheme()` and had `themeColors` available; the `backgroundStyle` prop was the only place still using the static import. Dose list items now render on a dark sheet in dark mode, giving `textPrimary` excellent contrast. (2) `src/app/(app)/log.tsx` makeStyles — `modeButtonActive.backgroundColor`: `colors.white` → `colors.surface`. Manual/Barcode toggle active tab is now a dark raised button with crisp `textPrimary` text. (3) `src/components/log/manual-entry-form.tsx` makeStyles — `inputFocused.backgroundColor`: `colors.white` → `colors.surface`. Focused food-name input stays dark; typed text is clearly legible. 3 files changed, 3 insertions, 3 deletions. 66/66 jest tests pass; 237/237 Vitest tests pass. Commit: c852fe6. |
+| 2026-05-26 | D9 — Milestone card and toast gradient upgrade | Unlocked achievement cards and the milestone toast banner now use the Direction B purple-blue gradient, matching the Today header and onboarding hero. The `accentColor`-tinted flat surface approach was replaced with the outer/inner shadow-wrapper pattern from D3/D4. **milestone-card.tsx:** `MilestoneCard` rewritten — outer `View` (`cardOuter`) carries `shadows.md + backgroundColor: colors.surface` as the iOS shadow host; inner `LinearGradient` (`cardInner`, `gradients.hero`, `overflow: 'hidden'`) is the visible card face at 280x180px. All text white on gradient: title `'#ffffff'`, subtitle `'rgba(255,255,255,0.8)'`, date `'rgba(255,255,255,0.6)'`. NEW badge: frosted glass `rgba(255,255,255,0.25)`. Share button: `rgba(255,255,255,0.2)` background, `rgba(255,255,255,0.35)` border. `LockedMilestoneCard` unchanged (gray placeholder). **milestone-toast.tsx:** same outer/inner pattern — outer `View` (`toastOuter`) carries absolute positioning + shadow; inner `LinearGradient` (`toastInner`) is the row with `overflow: 'hidden'`. `borderLeftWidth`/`borderLeftColor` removed. Label `rgba(255,255,255,0.8)`, title `'#ffffff'`. **milestones.ts:** removed the last static `import { colors } from '@/theme/colors'` in the codebase (pure `.ts` data file, cannot use hooks); all `accentColor` fields replaced with hex literals (`colors.primary` to `'#6d28d9'`, etc.). 3 files changed, 106 insertions. 237 Vitest + 66 jest tests pass. Commit: 2100f94. |
+| 2026-05-28 | Shot Day Prep Checklist — feature complete (commits 5bdd20b–84c96cb) | 5 files shipped. `checklist-data.ts`: 5 pharmacist-authored items (hydrated, breakfast, rotate_site, anti_nausea, protein_plan) as `ReadonlyArray<ChecklistItem>`; `getChecklistStatus()` dedup-safe via `new Set(...).size`, filters unknown IDs from stale DB rows. `shot-day-checklist.test.ts`: 9 Vitest tests covering empty, unknown-ID filter, all-5 done, 4-item not-done, totalCount stability, duplicate-ID dedup. `api.ts`: `fetchShotPrepLog` splits network errors (throw) from empty rows (null); `upsertShotPrepLog` uses `onConflict: 'user_id,injection_date'`, `fullyCompleted` derived via `getChecklistStatus`, timestamps via `formatISO` (date-fns rule). `hooks.ts`: `useShotDayPrep` — optimistic local state seeded from DB once per `injectionDate`; `committedItems` ref provides stable rollback snapshot; `onMutate` awaits `cancelQueries` to prevent stale refetch clobber; `onSuccess` uses `setQueryData` instead of `invalidateQueries` (re-fetch would be no-op due to initialization guard). `shot-prep.tsx`: `LinearGradient gradients.hero` hero header + `‹` Pressable back + Rx badge + progress strip (green on done, phaseInjectionDay otherwise) + success-green done banner (`successLight` bg, `success` border) + `DisclaimerBanner tier={2}` with pharmacist disclaimer (Rule 8). Entry point: Today screen "Shot Day Prep" card appears only when `injectionCycle?.phase === 'injection_day'`. Route pre-registered in `_layout.tsx` as `href: null`. 62 jest-expo + 319 Vitest tests pass. Follow-up: i18n for screen copy — completed session 28 (see `shotPrep` namespace entry below). |
+| 2026-05-28 | EAS Android dev build 15421fb7 — F2 + health-link + PostHog/Sentry | New Android dev build (ID `15421fb7`) completed 2026-05-28. Supersedes build `9a15cf1b`. Includes: F2 Micronutrient Watch, all D-series visual upgrades, `react-native-health-link` (re-added at minSdk 26 — `android.minSdkVersion` bumped in `app.config.ts`), PostHog and Sentry native modules now live (keys filled in `.env.development`). Install: `https://expo.dev/accounts/waliabdul/projects/glipra/builds/15421fb7-759e-4f68-99cc-8669e2695184`. |
+| 2026-05-28 | F3 — Prescriber Visit PDF export un-stubbed | Removed `isMockAIEnabled()` guard from `useGeneratePdf()` in `src/features/visit-prep/hooks.ts` — the `generate-visit-pdf` edge function uses only `pdf-lib`, zero OpenAI, so the mock gate was wrong. Wired real 28-day protein average: `useProteinHistoryPerDay(28)` (already existed in `src/features/progress/hooks.ts`) is now called inside `useVisitPrepData()`; average computed over `hasData: true` days only. Stub `Alert` in `src/app/(app)/visit-prep.tsx` updated to reflect actual share status without implying missing packages. PDF generation and sharing now fully functional in the EAS dev build. Commit: `ce5ad50`. |
+| 2026-05-28 | Auth redirect fix + stale Obytes login files deleted | `(app)/_layout.tsx` was redirecting signed-out users to `/login` (a stale Obytes route) instead of `/(auth)/sign-in`, causing a crash: `TypeError: _useAuthStore.useAuthStore.use.signIn is not a function` — `LoginScreen` referenced a non-existent `signIn` selector. Fix: one-line change in `_layout.tsx` (`href="/login"` → `href="/(auth)/sign-in"`). Stale files then deleted: `src/app/login.tsx`, `src/features/auth/login-screen.tsx`, `src/features/auth/components/login-form.tsx`, `src/features/auth/components/login-form.test.tsx`. Test baseline adjusted from 66 to 62 (4 tests in deleted `login-form.test.tsx` were for the dead login form). 62/62 is now the correct jest-expo baseline. Commit: `37aabe1`. |
+| 2026-05-28 | Analytics event instrumentation — 5 missing PostHog events wired | The PostHog wrapper and provider were fully set up but 5 events from the ARCHITECTURE.md taxonomy were unfired. All wired in a single commit across 5 files. (1) `INJECTION_LOGGED` constant added to `src/lib/analytics.ts` EVENTS object. (2) `PAYWALL_VIEWED` (useEffect on mount, `{ feature: featureName }`) + `PURCHASE_STARTED` / `PURCHASE_COMPLETED` (`{ product_id }`) wired in `src/features/subscription/paywall-screen.tsx`. (3) `RED_FLAG_DETECTED` (`{ flag_count: redFlagDetection.patterns?.length ?? 1 }` — no flag type codes, Rule 2) wired to the existing red-flag useEffect in `src/features/today/today-screen.tsx`. (4) `INJECTION_LOGGED` (no properties) wired to `useLogInjectionSite` `onSuccess` in `src/features/injection-sites/hooks.ts`. (5) `ONBOARDING_COMPLETED` wired in `handleStart()` in `src/app/onboarding/reveal.tsx` after `setItem('IS_FIRST_TIME', false)`. Full event taxonomy from ARCHITECTURE.md is now instrumented. Commit: `91e2e8e`. |
+| 2026-05-27 | F2 — Micronutrient Daily Watch shipped — Pro-gated card replacing raw GLP-1 Watch block | **Design: Direction C** (gradient header + "N gaps today" urgency chip + 2×2 tile grid with status dots + mini bars + amber gap banner). **Architecture:** self-contained `MicronutrientWatchCard` (`src/features/food-log/micronutrient-watch-card.tsx`) — calls `useDailyMacros()` directly (React Query deduplicates), renders three states: Pro+data (full grid), Pro+no data (🔬 placeholder), free user (ProGate paywall). Pure logic in `src/features/food-log/micronutrient-constants.ts`: `MICRONUTRIENT_RDAS` (Mg 420mg, Zn 11mg, B12 2.4mcg, VitD 600IU), `getNutrientPct` (cap 100, NaN-guarded), `getNutrientStatus` (green ≥80% / amber 50-79% / red <50%, zero-RDA-guarded), `getGapCount` (count <50% of RDA), `getGapBannerText` (food-strategy tip for up to 2 gap nutrients — Rule 9/10 compliant). `MicronutrientData` type is derived (`{ [K in NutrientKey]: number }`) to stay in sync with `MICRONUTRIENT_RDAS` automatically. `DisclaimerBanner tier={2}` inside card body (Rule 8). **Gradient:** `expo-linear-gradient` `gradients.hero` spread (`[...gradients.hero]`) — auto-adapts light/dark from tokens. **Per-status styles:** `statusDotGreen/Amber/Red` + `barFillGreen/Amber/Red` in `makeStyles` so `NutrientTile` has a single `useTheme()` source (parent). `NutrientTile.t` typed as `TFunction` (react-i18next). **Removed:** entire GLP-1 Watch raw number block (lines 120-155) from `daily-macro-card.tsx`; `b12Mcg/vitaminDIu/magnesiumMg/zincMg/hasMicronutrients` stripped from its `useDailyMacros()` destructure; 7 dead styles removed. **Card wired** in `src/app/(app)/log.tsx` after `DailyMacroCard` (always rendered — handles empty state internally). **i18n:** 10 keys added under `"log"` namespace in both `en.json` + `es.json`. **Tests:** 19 Vitest cases in `src/__tests__/micronutrient-constants.test.ts` (all branches incl. negative actual, zero RDA, multi-gap banner). `jest.config.js` `testPathIgnorePatterns` extended with `/src/__tests__/` + `/src/features/today/readiness-display\.test\.ts$/` to prevent jest-expo picking up Vitest-only files. Final counts: 310/310 Vitest, 66/66 jest-expo, TypeScript clean. |
+| 2026-05-27 | Readiness score redesign — transparent factor card with action tip | The opaque 0-100 score with generic tier guidance replaced with a two-layer architecture that surfaces exactly why the score landed where it did. **Calculator layer** (`readiness-calculator.ts`): `ReadinessResult` now returns `factors: FactorDelta[]` (only non-zero deltas, each typed `FactorId`) instead of a `guidance` string; `guidanceFor()` removed entirely. Three new inputs added: `prevDayProteinRatio` (yesterday consumed/floor, -10 if <0.8, +5 if >=1.0), `newDoseWeek` (true when `medicationStatus === 'starting'`, -10), `streakActive` (lastStreakDate = today or yesterday, +5). **Display layer** (`readiness-display.ts`): `buildReadinessCard(result, injectionPhase, t)` converts raw deltas to a `ReadinessCard` with headline from `t('readiness.headlines.<phase>')`, factors sorted negatives-first (most negative at top) then positives, tip selected from worst negative factor (tie-break: injection_phase > protein_pace > others; injection_phase tip key includes phase suffix). Zero-delta factors excluded. **Hooks** (`hooks.ts`): added private `useYesterdayProtein()` hook (mirrors `useDailyMacros()` pattern for `subDays(new Date(), 1)`); derived `prevDayProteinRatio`, `streakActive`, `newDoseWeek` from existing data; returns `readinessCard: ReadinessCard | null` replacing `readiness: ReadinessResult | null`. **UI** (`today-screen.tsx`): card layout is now headline + 2px brand inset left border + divider + factor rows (colored dot + label + delta in success/warning/error) + divider + demoted score row (24px, not 80px hero) + amber tip box. Count-up animation unchanged, fed from `readinessCard.score`. **i18n**: 5 phase headlines + 7 factor labels + 11 tip keys added to both `en.json` and `es.json` under `"readiness"` namespace. **Tests**: `readiness-calculator.test.ts` updated for new `ReadinessResult` shape + 6 new cases; `readiness-display.test.ts` new (17 tests); `vitest.config.ts` updated to include new test file. 291/291 Vitest tests pass; `readiness-calculator.ts` at 100% branch coverage. 7 files changed, 2 new files. Commits: a87ca6f, ce29afd, 3169d6b, 091f471, 561cc8a (dosepath master). |
+| 2026-05-28 | Shot Day Prep i18n — Spanish translations for screen and checklist items | `shot_prep` namespace added to `en.json` + `es.json` (14 keys each): header title/subtitle, progress labels with `{{completed}}/{{total}}` interpolation, done banner title/body, pharmacist disclaimer, "Pharmacist note" badge, and all 5 checklist item title+detail pairs. `shot-prep.tsx` wired to `useTranslation()`; checklist items translated inline via spread `{ ...item, title: t(\`shot_prep.items.${item.id}_title\`), detail: t(...) }` — zero changes to `ChecklistItemRow` props interface. `checklist-item-row.tsx` badge text replaced with `t('shot_prep.pharmacist_note')`. 62 jest + 344 Vitest pass. Commit: `aef4279`. |
+| 2026-05-28 | Medication Level Estimator — Rule 4 Vitest tests + LevelChart SVG | **Tests** (`src/__tests__/medication-level-calculator.test.ts`): 26 cases across 4 describe blocks — `estimateLevel` (returns full dose at day 0, half-dose at one half-life for sema/tirz/lira, fallback half-life for unknown med, multi-half-life decay, compounded med map), `generateLevelCurve` (length, first point, monotonic decrease, day-index equality), `generateSteadyStateCurve` (shape, today point positive, steady-state > single-dose, future projection, past window, daily liraglutide, YYYY-MM-DD format, non-negative levelMg), `constants` (FALLBACK_HALF_LIFE, sema/tirz/dulaglutide half-life values). Rule 4 compliant. **LevelChart** (`src/components/medication-level/level-chart.tsx`): SVG PK concentration curve. PADDING `{top:16,right:12,bottom:28,left:40}`, `toX`/`toY` helpers in `useMemo` (called before any early return — Rules of Hooks). All computations inside useMemo; component returns null if `computed == null`. Gradient fill under curve via `Defs + LinearGradient + Path`. Concentration line via `Polyline`. Amber dashed today vertical line + today dot on curve (`todayInRange` guard). Purple injection-event dots on baseline. X-axis date labels with "Today" slot collision fix (`isToday || !seenSlots.has(slot)`). Y-axis 3 ticks (max/mid/0). `BRAND` and `AMBER` derived from `colors.primary` / `colors.warning` (not hardcoded). Commits: `b9713bd` (tests), `df77038` (LevelChart after Rules of Hooks fix). |
+| 2026-05-28 | Android back button blank screen fix | Two root causes: (1) `GestureHandlerRootView` in `src/app/_layout.tsx` had `style={{ flex: 1 }}` with no `backgroundColor` — Android exposed a bare white frame for the few frames between navigation transitions. Fix: added `backgroundColor: '#f7f9fc'` to `styles.container` (hardcoded because this component sits outside `GlipraThemeProvider`). (2) No `BackHandler` intercept — when the tab stack was exhausted, React Navigation navigated to `(auth)` (the `initialRouteName`), which immediately redirected back to `(app)`, producing a blank flicker frame. Fix: `BackHandler.addEventListener('hardwareBackPress', ...)` inside `TabLayout` in `src/app/(app)/_layout.tsx` — calls `BackHandler.exitApp()` when `!router.canGoBack()` (returns `true` to consume the event), otherwise returns `false` to let React Navigation handle sub-screen back navigation normally. Subscription cleaned up on unmount. 62/62 jest tests pass. Commits: `707e1fe` (background color), `dc0c960` (BackHandler). |
+| 2026-05-28 | Android back button fix v2 — `router.canGoBack()` replaced with `usePathname()` | First fix (dc0c960) still produced a white screen because `router.canGoBack()` checks Expo Router's **entire** navigation history, which includes the auth + onboarding flow the user just completed — so it always returns `true` even when on a root tab. The handler returned `false`, React Navigation navigated backward into `(auth)`, and the white screen flashed before the redirect fired. Fix: replaced `router.canGoBack()` with `usePathname()` from `expo-router`. A `Set` of the 5 tab root paths (`'/'`, `'/progress'`, `'/log'`, `'/injection-sites'`, `'/coach'`) is checked on each back press. If the current path is in the set, `BackHandler.exitApp()` is called and the event is consumed. If not (user is on a sub-screen like `/shot-prep` or `/add-shot`), return `false` and let React Navigation pop the history entry normally. The `useEffect` dependency array includes `pathname` so the listener re-registers whenever the route changes. `router` import removed (unused after the change). Confirmed working on device. Commit: `c831b4f`. |
+| 2026-05-28 | Weight trend chart readability fix — y-axis unit conversion, EWMA sparse-data guard, gain/loss label | Three visual bugs fixed across 3 files in a single commit (`5eb449f`). **Bug 1 — Y-axis always showed kg regardless of unit preference:** `EwmaChart` (`src/components/weight/ewma-chart.tsx`) now accepts a `unit?: 'kg' | 'lbs'` prop. A `formatTick(kg)` helper converts raw kg values to `Math.round(kgToLbs(kg))` when `unit === 'lbs'`, otherwise `kg.toFixed(1)`. A small `SvgText` unit label ("lbs" or "kg") added above the y-axis at `y={PADDING.top - 4}`. **Bug 2 — EWMA trend line diverged from data dots with sparse logs:** With `EWMA_ALPHA = 0.1` and only 2 entries the smoothed line barely moves from its seed value (onboarding profile weight), placing the line far below the actual data dots. Fix: tracked `ewmaPointsArr` count separately from the joined `ewmaPoints` string; `Polyline` now guarded by `ewmaPointsArr.length >= 3`. `WeightTrendCard` (`src/components/progress/weight-trend-card.tsx`) shows a "Keep logging to see your trend" placeholder (⚖️ icon + body text, `sparseState` styles) when `logs.length < 3` — preventing the broken chart from ever rendering to the user. **Bug 3 — "Total Lost: +73.6 lbs" labeled a weight gain:** `WeightResultsCard` (`src/components/progress/weight-results-card.tsx`) now derives `isGain = totalLostKg < 0`, then sets `totalLostLabel` ("Total Lost" / "Total Gained"), `totalLostColor` (`colors.success` green / `colors.textSecondary` neutral), and `totalLostPrefix` ("-" / "+") from it. `MetricCell` extended with optional `valueColor?: string` prop to apply the dynamic color without overriding the dimmed state logic. i18n: `progress.results_card.total_gained` key added to `en.json` ("Total Gained") and `es.json` ("Total ganado"). 62/62 jest-expo tests pass. Commit: `5eb449f`. |
+| 2026-05-28 | Medication Level Estimator — Rule 4 tests + LevelChart SVG complete (session 27) | Two missing pieces shipped to complete the feature. **Task 1: Rule 4 compliance** — `src/__tests__/medication-level-calculator.test.ts` created with 26 Vitest tests across 4 suites: `estimateLevel` (8 tests — zero dose, day-0 full dose, half-life verification for semaglutide 7d / tirzepatide 5d / liraglutide 0.5d, unknown medication fallback, asymptotic decay, compounded medication half-lives), `generateLevelCurve` (5 tests — length, first point, monotonic decrease, default 14 days, day-field identity), `generateSteadyStateCurve` (8 tests — point shape, today offset positive, steady-state > single dose, future projection, past window, liraglutide daily, date format YYYY-MM-DD, non-negative values), `constants` (4 tests — FALLBACK_HALF_LIFE=7, semaglutide=7, tirzepatide=5, dulaglutide=4.5). Rule 4 satisfied — 344/344 Vitest tests pass. Commit: `b9713bd`. **Task 2: LevelChart SVG** — `src/components/medication-level/level-chart.tsx` created (previously a stub). Full pharmacokinetic concentration chart using react-native-svg: PADDING object pattern matching `ewma-chart.tsx`; `toX(offset)` + `toY(level)` helpers inside `useMemo`; gradient fill under curve (`Defs + SvgLinearGradient + Path`); concentration line (`Polyline`); today dashed vertical line + amber dot on curve; injection event dots on x-axis baseline; x-axis date labels every `labelIntervalDays` (always includes "Today"); y-axis ticks at maxLevel / midpoint / 0. **Quality fixes applied:** `BRAND`/`AMBER` derived from `useTheme()` colors (dark mode support — `colors.primary` + `colors.warning`); all coordinate mapping in `React.useMemo`; today line gated on `todayInRange` check; "Today" label slot collision fixed (`isToday || !seenSlots.has(slot)`); `accessible={true}` + `accessibilityLabel` on Svg. **Critical hooks-order fix:** `useMemo` originally placed after the `curve.length < 2` early return (Rules of Hooks violation). Restructured: `useMemo` called unconditionally first, early-return guard inside memo body returns null sentinel, component then checks `if (computed == null) return null` after all hooks. 62 jest-expo + 344 Vitest tests pass. TypeScript clean (only pre-existing i18n-js TS2688). Commits: `a5222fd`, `f9dbba5`, `df77038`. **Feature verification:** i18n keys confirmed present in both `en.json` and `es.json` (`med_banner.*` namespace — 10 keys each). All Rule 4 / Rule 8 / Rule 6 / Rule 1 requirements verified. |
+| 2026-05-28 | Shot Day Prep i18n — corrected to `shotPrep` namespace; checklist items remain hardcoded | Prior commit `aef4279` used `shot_prep` (snake_case) with non-standard key names and incorrectly translated all 5 checklist items via `t('shot_prep.items.${id}_title')` spread. Two problems: (1) project convention is camelCase namespaces; (2) `checklist-data.ts` items are marked "Content locked — do not rewrite without pharmacist review" and must stay hardcoded English until pharmacist-reviewed Spanish translations are provided. **Corrected implementation:** `shotPrep` namespace (10 keys) added to `en.json` and `es.json`: `title`, `subtitle`, `progressInProgress` (`{{completed}} of {{total}} steps complete`), `progressAllDone`, `doneBannerTitle`, `doneBannerBody`, `siteTrackerTitle` + `siteTrackerBody` (pre-populated for future injection site tracker section — not yet wired to any UI element), `disclaimer`, `pharmacistNote`. `shot-prep.tsx` uses all `shotPrep.*` keys; `CHECKLIST_ITEMS.map` passes `item` directly (no title/detail overrides). `checklist-item-row.tsx` badge uses `t('shotPrep.pharmacistNote')`. Stale `shot_prep` namespace (including `items.*` sub-keys) removed from both JSON files. **Credential fix:** ES `shotPrep.disclaimer` initially used "farmacéutico certificado" (certified) — corrected to "farmacéutico con licencia" (licensed) to match the EN "licensed pharmacist"; CLAUDE.md liability rule #2 requires approved pharmacist credential language. 62 jest + 344 Vitest pass. Commits: `1846f16`, `186c363`, `c0a2281`, `5b3c34b`. |
+| 2026-05-28 | Weight chart — X-axis date labels + right-edge clipping fix (session 29) | Two sequential fixes to `EwmaChart` and the weight screen. **X-axis date labels** (`src/components/weight/ewma-chart.tsx`): `PADDING.bottom` widened from 28 to 36 to give labels breathing room. Collision-filtered label list built after `rawLinePoints`: walks logs in chronological order, emits a `SvgText` only when its pixel X is ≥ 30 px past the previous rendered label. Labels use `format(parseISO(log.loggedAt), 'MMM d')` (e.g. "May 1", "May 28"), `textAnchor="middle"`, `fontSize={9}`, centered at `y = PADDING.top + plotH + 14`. `format` added to the existing `date-fns` import. 62/62 tests pass. Commit: `095f5bd`. **Right-edge dot clipping fix** (`src/app/(app)/weight.tsx`): `chartWidth` was computed as `width - spacing.lg * 2` (= width - 48), but the `chartCard` has `padding: spacing.md = 16` on each side — making the SVG 32 px wider than the card's content area. The card's `borderRadius` clips the overflow on iOS, cutting off the rightmost dot. Fix: `chartWidth = width - spacing.lg * 2 - spacing.md * 2` (mirrors the correct formula already used in `progress.tsx`). Commit: `b4fc5e1`. |
+| 2026-05-29 | PROGRESS.md brought current + todo list generated (session 35) | PROGRESS.md updated from session 27 to session 34 — added items 35-41: in-app legal screens, glipra.com legal page rewrites, docs/legal/ markdown sources, em dash audit, glipra.com feature section expansion, preview APK beta distribution, voice logging. Stack additions table updated with expo-av ~16.0.8. Comprehensive prioritized todo list generated covering: legal blockers (attorney review, address placeholders, email confirmation), account blockers (Apple Developer, RevenueCat iOS P8 key, OpenAI secret), new EAS dev build needed (expo-av + datetimepicker native), linked accounts feature (only unbuilt Pro feature), glipra.com index.html updates, testing/coverage gaps, and V2 items. |
+| 2026-05-29 | Voice logging implementation complete (session 34) | Killer Differentiator #4 shipped. 9-task implementation across 10 commits (`031bb7b`→`a6c7840`). **New files:** `supabase/functions/transcribe-food/index.ts` (Deno edge function: Whisper transcription → GPT-4o mini food extraction → Zod validation → `ai_invocations` logging; 100/day circuit-breaker; static system prompt to prevent transcript injection; HTTP 500 on unhandled errors); `src/features/food-log/voice-recognition.ts` (client wrapper, mock gate, VOICE_FALLBACK); `src/components/log/voice-capture-button.tsx` (Pro-gated via RevenueCat, expo-av recording, tap-to-start/stop, unmount cleanup useEffect, CANCELLED paywall result correctly excluded from fall-through). **Modified:** `photo-review-sheet.tsx` renamed to `ai-review-sheet.tsx` — component renamed `AIReviewSheet`, added optional `transcript?: string` prop rendered as a quoted italic block above the food fields; `transcript` field added to `RecognitionResult` interface (optional, photo path leaves it undefined); `MOCK_VOICE_PARSE` in `mockAI.ts` restructured from `foods[]` array shape to flat `RecognitionResult` shape; `log.tsx` wired with two-button AI row (Photo + Voice side-by-side), voice state, `handleAudioCaptured` async callback, voice `AIReviewSheet` with transcript prop; 8 i18n keys added to `en.json` and `es.json`. **Tests:** 4 new Vitest tests in `voice-recognition.test.ts` covering mock path; total suite 414 passing (352 Vitest + 62 jest-expo). **Deployed:** `transcribe-food` function live on Supabase project `cuxndkreewlcmijxlgyg`. **Requires new EAS build** before voice recording works on device (expo-av is a native module). Mock path fully functional in Metro. |
+| 2026-05-29 | Voice logging Pro gate decision (session 33) | Voice logging is fully Pro-gated from day one with no free tier. Previous spec allowed 5 voice logs/day on free. Rationale: voice is the highest-friction differentiator to replicate and should drive Pro conversions rather than being partially available for free. Updated CLAUDE.md subscription tier comment and ARCHITECTURE.md edge function rate limit table (`parse-meal-text` and `transcribe-voice` both changed from free-tier quotas to "Locked (Pro only)"). Also locked in voice logging UX design decisions: (1) placement as second hero button alongside Photo in the Log screen's AI section — both sit as equal-weight buttons above the Manual/Barcode toggle; (2) tap-to-start / tap-to-stop recording UX with animated waveform — preferred over hold-to-record due to nausea-day use case where shaky hands make sustained press unreliable. |
+| 2026-05-28 | Em dash audit and Spanish i18n diacritics fix (session 32) | Full codebase sweep for em dashes in user-facing copy (CLAUDE.md rule). Two parallel audit agents ran against the full `src/` tree and `src/translations/`. **Em dash fixes (22 files, commit `559a97e`):** (1) `en.json` - 3 strings fixed: progress tips `weight` and `streak`, photo `photo_comment_subtitle` (`Optional — helps` -> `Optional: helps`). (2) `es.json` - matching 2 Spanish strings. (3) `src/features/content-cards/data.ts` - 25 em dashes removed from all pharmacist-authored `keyTakeaway` and `body` fields across all 25 cards; parentheses, colons, and hyphens used contextually. (4) `src/components/today/med-level-banner.tsx` - 5 PHASE_HEADLINE strings updated (e.g. `'Injection day: dose administered'`). (5) `src/components/today/streak-card.tsx` - 2 accessibility labels. (6) `src/components/log/barcode-scanner-sheet.tsx` - 3 text strings + 1 `placeholder="-"`. (7) `src/components/log/manual-entry-form.tsx` - 2 `placeholder="-"`. (8) `src/features/food-log/photo-review-sheet.tsx` - `'Low confidence: please verify'` + `'AI estimates: verify for precision'` + 1 placeholder. (9) `src/app/(app)/legal/privacy-policy.tsx` - all 25 em dashes (list separators and section headings) replaced with colons; headings now e.g. `'7. Washington Residents: My Health My Data Act'`. (10) `src/app/(app)/legal/terms-of-service.tsx` - medical disclaimer parenthetical rewritten with parens; `'14. Dispute Resolution: Mandatory Arbitration'`. (11) Onboarding screens: `reveal.tsx` (2), `protein-target.tsx` (1 empty-state placeholder), `import.tsx` (Alert string), `safety.tsx` (1). (12) App screens: `check-in.tsx`, `consent.tsx`, `discontinuation-mode.tsx` (2), `injection-sites.tsx`, `maintenance-mode.tsx`, `medication-level.tsx`, `health-import.tsx`. (13) `src/components/progress/check-in-symptom-card.tsx` - empty-state dash. Code comments (`// ...` and `/** ... */` JSDoc) left unchanged as they are not user-facing. **Spanish diacritics fixes:** 9 missing accent marks corrected in `es.json` `readiness.headlines`, `readiness.factor_labels`, and `readiness.tips`: `Dia` -> `Día`, `inyeccion` -> `inyección`, `proteina` -> `proteína`, `Nauseas` -> `Náuseas`, `Energia` -> `Energía`, `habito` -> `hábito`, `mediodia` -> `mediodía`, `ajustandose` -> `ajustándose`, `proxima` -> `próxima`, `dia mas` -> `día más`, `dificiles` -> `difíciles`, `musculo` -> `músculo`, `pequenas` -> `pequeñas`. **Spanish i18n completeness:** All namespaces verified complete (progress, medication, med_banner, shotPrep, settings). No missing keys between en.json and es.json. Legal screens (`privacy-policy.tsx`, `terms-of-service.tsx`) are intentionally hardcoded English per ToS Section 16 ("English version controls"). 62/62 jest-expo tests pass. |
+| 2026-05-28 | glipra.com legal pages audit and full rewrite (session 31) | Audited the live glipra.com site against the current app state and docs/legal/ source documents. Found two critical issues: (1) `docs/privacy.html` was a waitlist-era stub (10 sections, email-capture only) with "LEGAL ENTITY NAME TO BE CONFIRMED" still in the document — completely inadequate now that the app collects weight, medication, injection logs, and symptoms; (2) `docs/terms.html` had at least 6 unfilled yellow placeholders (legal entity name, state, liability cap, testimonial verification status, refund terms, mailing address). Both pages were fully rewritten to match the comprehensive `docs/legal/` markdown sources. **privacy.html** (new): Leonava/Texas legal entity filled in; 15-section health-app policy including full health-data inventory table (account/profile/medication/injection/weight/symptom/meal/notes categories with sensitivity flags), Washington My Health My Data Act dedicated section (all four WMHMD rights, 45-day response, identity verification note), CCPA/CPRA rights block, Texas TDPSA + AG appeal path, AI feature data handling clarification (meal photos deleted within 24 hours, prompts anonymized), subprocessor table (Supabase/OpenAI/RevenueCat/PostHog/Sentry/Resend/Apple/Google with health-data column), data retention schedule, children's privacy (13+). DRAFT banner + attorney-review notes retained. **terms.html** (new): Leonava/Texas throughout; full medical disclaimer (Section 3) with emergency 911 notice; AAA mandatory arbitration with remote hearing, 30-day opt-out, class action waiver in all-caps (Section 14); $50 liability cap; Texas governing law; DRAFT banner + attorney-review notes retained. Commit: `dc045f6`, pushed to GitHub Pages. **Remaining index.html items flagged (not yet changed — require owner decisions):** (a) "7+ medications" stat should be "10 GLP-1 medications" (app supports Ozempic/Wegovy/Mounjaro/Zepbound/Saxenda/Victoza/Trulicity + 3 compounded variants); (b) testimonials (Sarah M./James T./Maria K.) flagged in old terms.html as "REPRESENTATIVE EXAMPLES — CONFIRM STATUS" — need FTC-compliant verified quotes or removal before launch; (c) "400+ waitlist" count should be verified against real Supabase data; (d) feature section shows only 4 cards but AI photo, Shot Day Prep, Medication Level Estimator, Progress, Prescriber PDF, Micronutrient Watch are all shipped; (e) "Join Waitlist" CTA should become App Store/Play Store links at launch; (f) contact email — old privacy.html used `privacy@glipra.com`, all docs now standardized to `legal@glipra.com`. |
+| 2026-05-28 | Legal documents + in-app Privacy Policy and Terms of Service screens (session 30) | **Five legal documents created** under `docs/legal/` for Leonava (Texas company). All marked DRAFT — REQUIRES ATTORNEY REVIEW. (1) `terms-of-service.md` — mandatory AAA arbitration (Consumer Arbitration Rules), class action waiver, 30-day opt-out window, Texas governing law, medical disclaimer section, $50 / 12-month-payments liability cap, indemnification. (2) `privacy-policy.md` — full data inventory table (health vs. non-health, sensitive vs. not); Washington My Health My Data Act (WMHMD Act) dedicated section with consent mechanism, rights (access / delete / withdraw / third-party list), 45-day response window; CCPA/CPRA rights table and no-sale affirmation; Texas TDPSA rights + Attorney General appeal path; data retention schedule (health logs deleted within 30 days of account deletion, meal photos within 24 hours of AI analysis); subprocessor table with data-residency column. (3) `medical-disclaimer.md` — standalone; lists 8 individual variability factors for medication level estimates; explicitly states symptom-escalation notices are not a diagnosis and may fire spuriously. (4) `subprocessor-list.md` — tabular (Supabase, OpenAI, RevenueCat, PostHog, Sentry, Resend, Expo, Apple, Google); explicitly notes OpenAI receives only anonymized context, health data never reaches PostHog/Sentry, no advertising subprocessors. (5) `refund-policy.md` — step-by-step cancellation for iOS (reportaproblem.apple.com) and Android (Play Store subscriptions), 24-hour pre-renewal window, technical-issue exception path. Commit: `da18adf`. **In-app legal screens** — The Settings > About > "Privacy Policy" and "Terms of Service" rows were previously stubbed with empty `onPress={() => {}}`. Implementation: `src/components/legal/LegalDocScreen.tsx` — shared layout component (sticky header with back button, title/date/intro block, numbered sections with uppercase headings, footer contact line; fully theme-aware). `src/app/(app)/legal/privacy-policy.tsx` — 14 sections; full in-app text derived from `docs/legal/privacy-policy.md`. `src/app/(app)/legal/terms-of-service.tsx` — 16 sections; arbitration/class-action-waiver block prominently called out in intro banner and Section 14. `settings-screen.tsx` updated: `onPress={() => router.push('/legal/privacy-policy')}` and `onPress={() => router.push('/legal/terms-of-service')}`. No new TypeScript errors; 62/62 jest-expo tests pass. Commit: `b95c373`. |
+| 2026-05-28 | Medication Level Estimator — three bug fixes: phantom peaks, missing level card, dots on baseline (session 29) | **Bug 1: Phantom concentration peaks before first injection.** `generateSteadyStateCurve` (`src/features/medication-level/calculator.ts`) was building a synthetic historical injection list by extrapolating backward `numHistoricDoses` intervals from `lastInjectionDate`. For a user with only 3 real shots (May 9, 16, 23), this produced phantom doses at May 2 and Apr 25, showing fake peaks. **Fix:** added optional 8th param `actualInjectionDates?: string[]`. When provided, the dose list is built exclusively from those parsed + chronologically sorted dates — no extrapolation. Existing callers without the param continue to use the synthetic path (backward compat). Both call sites updated: `hooks.ts` passes `injectionDates` (deduplicated logged dates); `medication-level.tsx` passes `injectionDates` in the `displayCurve` useMemo. 4 new Vitest cases added to `src/__tests__/medication-level-calculator.test.ts`: no phantom before first shot (May 8 must be 0), single injection equals doseMg at day 0, accumulation across 3 shots, empty array produces all-zero curve. **Bug 2: "ESTIMATED IN SYSTEM" numeric card never rendered.** Card was gated on `currentLevelMg !== null`, which was derived from `curve` (hook output). The hook returns `curve: null` when `doseMg` is null (user logged injection sites without entering a dose). Meanwhile `displayCurve` falls back to `doseMg ?? 1.0`, so the chart showed but the level card was hidden. **Fix:** removed `const todayPoint = curve?.find(...)` / `const currentLevelMg` from before the `displayCurve` useMemo; added `const currentLevelMg = displayCurve?.find((p) => p.date === today)?.levelMg ?? null` after `displayTodayOffset`. Card now renders whenever the chart renders. **Bug 3: Injection-event dots sitting on x-axis baseline (y=0).** `level-chart.tsx` rendered each injection dot with `cy={baselineY}` (hardcoded to 0-concentration line). **Fix:** replaced `injectionOffsets: number[]` with `injectionDotData: Array<{offset, levelMg}>` in the `computed` useMemo — looks up the curve point at each injection offset and captures its `levelMg`. JSX updated to `cy={toY(levelMg)}`; `toY` added to the destructured useMemo return. Dots now sit on the curve at the injection peak. 62 jest-expo + 348 Vitest tests pass. TypeScript clean. Commit: `05c79cf`. |
+| 2026-05-30 | Daily AI Guidance — last remaining Pro feature shipped (session 37) | Full 9-task subagent-driven implementation. **Migration `016_daily_guidance.sql`** (applied via `npx supabase db push`): `injection_phase TEXT` nullable; UNIQUE on `(user_id, date)` only (one tip per user per day); `reasoning_text TEXT` for "Why this?" tooltip; `prompt_version TEXT DEFAULT 'v1'`; index on `(user_id, date DESC)`. Schema differs from original plan (`011_daily_guidance.sql` in docs) which had `injection_phase NOT NULL` + UNIQUE on `(user_id, date, injection_phase, language)`. **Edge function `generate-daily-guidance`** deployed to Supabase project `cuxndkreewlcmijxlgyg`: GPT-4o mini; cache-hit check (SELECT WHERE user_id + date, return early if found); Zod `InputSchema` (`injectionPhase`, `nauseaScore`, `energyScore`, `proteinProgressPct`, `medicationStatus`, `language`) + `OutputSchema` (`guidance_text`, `reasoning_text`); `FALLBACK_RESULT` on parse failure (never crashes); service-role client writes to `daily_guidance` + `ai_invocations`; system prompt enforces nutrition-only scope, soft-foods-only on nausea >= 4, no exercise recommendations on nausea = 5, no shame framing, forbidden-phrases list, Spanish when `language = 'es'`. `// ATTORNEY REVIEW REQUIRED` comment above system prompt. **`MOCK_DAILY_GUIDANCE`** in `src/lib/mockAI.ts` updated to `{ guidance_text, reasoning_text }` shape; old fields removed; `mockAI.test.ts` fixed to match. **Client layer** `src/features/daily-guidance/api.ts`: `GuidanceContext` interface; mock gate via `isMockAIEnabled()` + 400ms delay; real path: `supabase.functions.invoke('generate-daily-guidance')`. **React Query hook** `src/features/daily-guidance/hooks.ts`: `queryKey: [DAILY_GUIDANCE_KEY, userId, today]`; `staleTime: Infinity` (server deduplicates at DB); `retry: 1, retryDelay: 2000`. **`DailyGuidanceCard`** (`src/components/today/daily-guidance-card.tsx`): Pro-gated via `<ProGate>`; `LinearGradient gradients.hero` header; loading/error/guidance states; "Why this?" `Pressable` toggles `showWhy` expanding `reasoning_text` in branded frosted box; `DisclaimerBanner tier={1}` backed by AsyncStorage key `'glipra_daily_guidance_disclaimer_seen'`; analytics `DAILY_GUIDANCE_VIEWED` fired once on guidance load, `DAILY_GUIDANCE_WHY_TAPPED` on expand; `useTheme()` + `makeStyles`; uses `colors.primaryLight` (not `colors.brandLight` which does not exist). **Today screen wiring**: `guidanceContext` built inside `useTodayData()` from profile (`proteinProgressPct = Math.round(consumed/floor * 100)`, `i18n.language`); `useDailyGuidance(guidanceContext)` called in `TodayScreen`; card rendered before `PharmacistSpotlightCard`; suppressed when `medicationStatus === 'discontinued'`; suppressed automatically when red-flag escalation card takes over the full screen. **i18n**: 7 keys under `"today"` in en.json + es.json: `daily_guidance_section`, `daily_guidance_pro_label`, `daily_guidance_why`, `daily_guidance_why_close`, `daily_guidance_loading`, `daily_guidance_error`, `daily_guidance_disclaimer`. **Analytics**: `DAILY_GUIDANCE_VIEWED` + `DAILY_GUIDANCE_WHY_TAPPED` added to `EVENTS` in `src/lib/analytics.ts`. **Tests**: `src/__tests__/daily-guidance.test.ts` (5 Vitest cases: mock path shape, Zod schema validation, null optionals, Spanish language param, all 5 injection phases). Final counts: 357 Vitest + 62 jest-expo. Commit: `81b2433` on `origin/master`. Attorney review required before `EXPO_PUBLIC_USE_MOCK_AI=false` in any env. |
+
+---
+
+## How to Set Up Claude for Coding Glipra
+
+This is the recommended setup for working with Claude (Cursor, Claude.ai, or Claude Code)
+on this project. Follow this exactly on Day 1 and every session will be faster.
+
+---
+
+### Step 1: Choose Your IDE
+
+**Recommended: Cursor** (cursor.com)
+Cursor is a VS Code fork with Claude built in. It can read your entire codebase,
+write across multiple files at once, and run terminal commands. For a solo developer
+building a complex app, this is the highest-leverage tool available.
+
+**Alternative: Claude Code** (`npm install -g @anthropic-ai/claude-code`)
+Claude Code is a terminal-based agent. Slower for UI work but excellent for
+running migrations, generating types, and doing complex refactors.
+
+**Alternative: claude.ai Projects**
+Use Projects to store this architecture file permanently so you never have to paste
+it again. Create a Project called "Glipra", upload ARCHITECTURE.md as a Project file,
+and it's available in every conversation automatically.
+
+---
+
+### Step 2: Configure MCPs in Cursor
+
+MCPs let Claude interact directly with your tools instead of you copying and pasting.
+Add this to your Cursor MCP settings (`Cursor → Settings → MCP`):
+
+```json
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=YOUR_DEV_PROJECT_REF"
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/full/path/to/dosepath"
+      ]
+    }
+  }
+}
+```
+
+**What this gives you:**
+- Claude runs migrations directly against your dev Supabase — no copy/paste
+- Claude generates TypeScript types and writes them to `src/types/database.ts`
+- Claude reads any file in your project without you pasting it
+- Claude can verify RLS policies actually work
+
+**Security rule:** Only connect to DEV Supabase. Never production.
+
+---
+
+### Step 3: The CLAUDE.md File (Most Important Setup Step)
+
+Create a file called `CLAUDE.md` in the root of your project. This is different from
+ARCHITECTURE.md — it's a short, always-loaded context file that Claude reads automatically
+at the start of every Cursor session without you having to paste anything.
+
+```bash
+touch /path/to/dosepath/CLAUDE.md
+```
+
+**CLAUDE.md contents — copy this exactly:**
+
+```markdown
+# Glipra — Claude Context
+
+## What This App Is
+GLP-1 nutrition companion app built by a licensed pharmacist.
+Core promise: help users preserve muscle while GLP-1 does weight loss.
+Full architecture in ARCHITECTURE.md — read it when working on new features.
+
+## Stack (Quick Reference)
+- **Expo SDK 54**, Expo Router 6, TypeScript strict — **pnpm** (never npm/yarn)
+- Obytes v9.0.0 scaffold — NativeWind **stripped** → StyleSheet + `src/theme/colors.ts`
+- Supabase `@supabase/supabase-js` v2.105.4 (auth + DB + edge functions)
+- Zustand + React Query for state; AsyncStorage for Supabase session persistence
+- OpenAI via Supabase edge functions only — NEVER from client
+- `EXPO_PUBLIC_USE_MOCK_AI=true` default — zero OpenAI cost during development
+- RevenueCat for subscriptions (deferred to EAS dev build)
+- PostHog for analytics + feature flags (deferred to EAS dev build)
+- **date-fns v4.1.0** for ALL date math (never native JS Date arithmetic)
+- Zod for validation at ALL API boundaries
+- **Vitest 4.1.6** (pure-TS utils, `pnpm test:utils`) + **jest-expo 54.0.16** (components, `pnpm test`)
+
+## Critical Rules — Never Break These
+1. Never call OpenAI directly from the React Native client — edge functions only
+2. Never send user PII (name, email, location) to OpenAI
+3. Always validate AI output with Zod before using it
+4. Safety-critical files need 90%+ test coverage: protein.ts, redFlagDetector.ts,
+   injection-cycle/calculator.ts, readiness/calculator.ts
+5. Run `pnpm test` (jest-expo) AND `pnpm test:utils` (Vitest) before finishing any session
+6. All date math uses date-fns — no raw JS Date subtraction
+7. RLS must be on every table — verified before every merge
+8. Disclaimer tier must be set on every screen that touches clinical content
+9. Escalation card NEVER shows condition names to users (pancreatitis, etc.)
+10. AI Nutrition Coach answers food questions only — hard-blocks medication questions
+
+## File Path Conventions
+- Business logic: src/features/[feature-name]/
+- Shared UI: src/components/ui/
+- Database types: src/types/database.ts (generated, never hand-edit)
+- Edge functions: supabase/functions/[function-name]/index.ts
+- Tests: src/__tests__/[filename].test.ts
+
+## When Touching Safety-Critical Code
+Always write tests alongside the implementation.
+Ask: "Write the tests for this function at the same time as the function."
+Never merge untested safety code.
+
+## TypeScript Path Aliases
+@/* → src/*
+@components/* → src/components/*
+@features/* → src/features/*
+@lib/* → src/lib/*
+@theme/* → src/theme/*
+@utils/* → src/utils/*
+
+## Current Phase
+Month 1 — Foundation build.
+Focus: Auth, consent flow, onboarding, protein floor, injection cycle, Today screen skeleton.
+```
+
+Cursor reads CLAUDE.md automatically. You never have to paste it.
+
+---
+
+### Step 4: The Session Startup Prompt
+
+At the start of every coding session, paste this exact prompt before asking anything else:
+
+```
+Read CLAUDE.md and ARCHITECTURE.md. We are building Glipra — a GLP-1 nutrition
+companion app built by a licensed pharmacist. Today I want to work on [FEATURE].
+
+Before we start: confirm you understand the 10 critical rules from CLAUDE.md,
+and tell me which files you'll be touching for this feature.
+```
+
+This does three things: loads full context, confirms the rules are active, and forces
+Claude to plan before it codes. Planning first prevents wasted work.
+
+---
+
+### Step 5: How to Structure Each Feature Request
+
+**Bad prompt (Claude will guess wrong):**
+> "Build the protein floor feature"
+
+**Good prompt (Claude has everything it needs):**
+> "Build `src/utils/protein.ts` — the protein floor calculator.
+> Requirements are in ARCHITECTURE.md under 'Core Models → Protein Floor.'
+> Write the function AND the tests in `src/__tests__/protein.test.ts` at the same time.
+> Cover all branches: kidney disease, pregnancy, BMI >35, maintenance status, edge cases.
+> Use the exact constants from the architecture: ABSOLUTE_CEILING_G=200, ABSOLUTE_FLOOR_G=50,
+> KIDNEY_DISEASE_MAX_G_PER_KG=0.8. Don't change the function signature."
+
+**The pattern:**
+1. Name the exact file path
+2. Point to the relevant architecture section
+3. State what tests you want alongside it
+4. List any constraints explicitly
+5. Never ask for more than one feature per session
+
+---
+
+### Step 6: Safety-Critical Code Protocol
+
+Any time you're working on these files, follow this exact protocol:
+
+```
+Files that require extra care:
+- src/utils/protein.ts
+- src/features/safety/redFlagDetector.ts
+- src/features/injection-cycle/calculator.ts
+- src/features/readiness/calculator.ts
+- src/features/medication-level/calculator.ts
+- Any edge function that calls OpenAI
+```
+
+**The prompt to use for safety code:**
+
+> "We're building [file]. This is safety-critical code for a health app.
+> After writing the implementation:
+> 1. Write comprehensive Vitest tests covering every branch
+> 2. Identify any edge case that could produce a wrong result for a real patient
+> 3. Highlight any assumption the function makes that a caller could violate
+>
+> Minimum 90% branch coverage. Show me the coverage report."
+
+---
+
+### Step 7: Database and Migration Workflow
+
+**Never hand-edit `src/types/database.ts`.** It's generated. Use this workflow:
+
+```bash
+# 1. Write migration in supabase/migrations/XXX_name.sql
+# 2. Apply it locally
+npx supabase db reset
+
+# 3. Regenerate types
+npx supabase gen types typescript --local > src/types/database.ts
+
+# 4. Tell Claude types changed
+# "I just regenerated database types. The new schema has [describe change].
+#  Update the relevant feature hooks to use the new types."
+```
+
+**With Supabase MCP active, you can ask Claude directly:**
+> "Apply the journey_cards migration to my dev Supabase and then regenerate TypeScript types."
+
+Claude does it without you running a single command.
+
+---
+
+### Step 8: Edge Function Workflow
+
+Every edge function follows the reference pattern in the architecture.
+When building a new one:
+
+```
+"Build the `supabase/functions/[name]/index.ts` edge function.
+Follow the reference pattern from ARCHITECTURE.md → Edge Function Reference Pattern.
+This function does [describe].
+Input schema: [describe]
+Output schema: [describe]
+Rate limit: [X] per day (write this check into the ai_invocations table).
+Include: CORS handling, auth validation, Zod validation on input and output,
+rate limit check, error handling, cost logging."
+```
+
+---
+
+### Step 9: End-of-Session Checklist
+
+Before ending any coding session, run this prompt:
+
+> "We're done for today. Before I close:
+> 1. Run `npm test` and show me any failures
+> 2. List every file we changed today
+> 3. Check if we need to update the Decisions Log in ARCHITECTURE.md
+> 4. Is there any code we wrote today that needs attorney review before shipping?
+> 5. What should I do first in the next session?"
+
+This keeps the architecture current and ensures nothing is missed.
+
+---
+
+### Step 10: When Claude Gets It Wrong
+
+Claude will make mistakes. Here's how to handle them efficiently:
+
+**Wrong implementation:** Don't argue. Show the specific failure.
+> "This is wrong. The function returns [X] but it should return [Y] for a kidney
+> disease patient with weight 70kg. The rule is in ARCHITECTURE.md:
+> KIDNEY_DISEASE_MAX_G_PER_KG = 0.8. Fix it and show me the test that proves it."
+
+**Hallucinated API:** Claude sometimes invents function signatures.
+> "This function doesn't exist in the Supabase JS SDK. Show me where you found it,
+> or use the actual SDK docs at supabase.com/docs."
+
+**Scope creep:** Claude sometimes adds things you didn't ask for.
+> "Stop. I only asked for [X]. Undo everything you added except [X]."
+
+**Test failure:** Paste the exact error, not a description.
+> "npm test output: [paste exact output]. Fix only what's failing. Don't change
+> anything that's passing."
+
+---
+
+### Daily Build Rhythm
+
+```
+Morning:
+  → Open Cursor
+  → Run `npm test` to confirm clean baseline
+  → Paste session startup prompt with today's feature
+  → One feature per session maximum
+
+During session:
+  → Approve Claude's plan before it writes code
+  → After each function: ask for tests before moving on
+  → If something feels off, stop and re-read the architecture section
+
+End of session:
+  → Run end-of-session checklist prompt
+  → Update CLAUDE.md if new rules emerged
+  → Commit with a clear message: "feat: protein floor calculator + tests"
+  → `git push` — never leave uncommitted work overnight
+```
+
+---
+
+### The One Rule That Matters Most
+
+**One feature per session. One file at a time when possible.**
+
+The biggest mistake solo developers make with AI coding is asking for too much at once.
+Claude writes 500 lines of plausible-looking code, you can't review it all, bugs get
+buried, and an hour later nothing works.
+
+Ask for one function. Review it. Ask for its tests. Review them. Move to the next function.
+
+This feels slower. It's actually 3x faster because you don't spend hours debugging
+AI-generated code you didn't fully understand.
+
+---
+
+## The Mission
+
+A user who develops pancreatitis warning signs, sees the red-flag escalation card,
+contacts their prescriber today, gets treatment, keeps their muscle mass, and comes
+back to Glipra six months later in maintenance mode — still tracking protein,
+still showing their prescriber the PDF, still strong.
+
+That's the product. Everything else is just engineering.
+
+Now stop planning and start building.

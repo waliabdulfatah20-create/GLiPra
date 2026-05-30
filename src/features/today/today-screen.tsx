@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { EscalationCard } from '@/components/safety/escalation-card';
 import { CardsCarousel } from '@/components/today/cards-carousel';
 import { ContentCardSheet } from '@/components/today/content-card-sheet';
+import { DailyGuidanceCard } from '@/components/today/daily-guidance-card';
 import { PharmacistSpotlightCard } from '@/components/today/pharmacist-spotlight-card';
 import { MedLevelBanner } from '@/components/today/med-level-banner';
 import { PhaseBadge } from '@/components/today/phase-badge';
@@ -36,6 +37,7 @@ import { getActiveCards } from '@/features/content-cards/data';
 import { useCheckAndUnlockMilestones } from '@/features/journey-cards/hooks';
 import { MILESTONES, type Milestone, type MilestoneId } from '@/features/journey-cards/milestones';
 import { useTodayData } from '@/features/today/hooks';
+import { useDailyGuidance } from '@/features/daily-guidance/hooks';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
@@ -96,6 +98,7 @@ export function TodayScreen() {
     streak,
     isStreakLoading,
     redFlagDetection,
+    guidanceContext,
   } = useTodayData();
 
   const { checkIn } = useTodayCheckIn();
@@ -106,6 +109,12 @@ export function TodayScreen() {
   const today = format(new Date(), 'yyyy-MM-dd');
 
   const { isSnoozed, isLoading: snoozeLoading, snooze } = useRedFlagSnooze();
+
+  const {
+    data: dailyGuidance,
+    isLoading: isGuidanceLoading,
+    isError: isGuidanceError,
+  } = useDailyGuidance(guidanceContext);
 
   // isTriggered: detection fired AND snooze has loaded AND snooze is not active
   const isTriggered =
@@ -556,6 +565,18 @@ export function TodayScreen() {
         </TouchableOpacity>
 
         {/* Nutrition Coach moved to its own bottom-nav tab — CTA removed 2026-05-24 */}
+
+        {/* ── Daily AI Guidance ─────────────────────────────────── */}
+        {profile.medicationStatus !== 'discontinued' && (
+          <>
+            <SectionLabel label={t('today.daily_guidance_section')} />
+            <DailyGuidanceCard
+              guidance={dailyGuidance}
+              isLoading={isGuidanceLoading}
+              isError={isGuidanceError}
+            />
+          </>
+        )}
 
         {/* ── Pharmacist Content ────────────────────────────────── */}
         <SectionLabel label={t('today.pharmacist_content')} />

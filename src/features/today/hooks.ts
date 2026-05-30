@@ -13,6 +13,7 @@ import { useDailyMacros } from '@/features/food-log/hooks';
 import { useStreak } from '@/features/streaks/hooks';
 import { detectRedFlags } from '@/features/safety/redFlagDetector';
 import type { RedFlagDetection } from '@/features/safety/redFlagDetector';
+import type { GuidanceContext } from '@/features/daily-guidance/api';
 
 export function useTodayProfile() {
   const session = useAuthStore.use.session();
@@ -43,7 +44,7 @@ function useYesterdayProtein(): { proteinG: number; isLoading: boolean } {
 }
 
 export function useTodayData() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { data: profile, isLoading, error } = useTodayProfile();
   const { checkIn } = useTodayCheckIn();
   const { history: checkInHistory } = useCheckInHistory(30);
@@ -65,6 +66,18 @@ export function useTodayData() {
   const proteinFloorG = profile?.proteinFloorG ?? 0;
   const { protein: proteinConsumedG } = useDailyMacros();
   const proteinProgress = proteinFloorG > 0 ? proteinConsumedG / proteinFloorG : 0;
+
+  const guidanceContext: GuidanceContext | null = profile
+    ? {
+        injectionPhase: injectionCycle?.phase ?? null,
+        nauseaScore: checkIn?.nausea ?? null,
+        energyScore: checkIn?.energy ?? null,
+        proteinProgressPct:
+          proteinFloorG > 0 ? Math.round((proteinConsumedG / proteinFloorG) * 100) : null,
+        medicationStatus: profile.medicationStatus ?? null,
+        language: (i18n.language === 'es' ? 'es' : 'en') as 'en' | 'es',
+      }
+    : null;
 
   const prevDayProteinRatio =
     proteinFloorG > 0 ? yesterdayProteinG / proteinFloorG : undefined;
@@ -116,5 +129,6 @@ export function useTodayData() {
     streak: streakData.streak,
     isStreakLoading: streakData.isLoading,
     redFlagDetection,
+    guidanceContext,
   };
 }

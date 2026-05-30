@@ -1,7 +1,7 @@
 # Glipra — Build Progress
 # Full history of what has been built. Not needed by Claude during coding.
 # Update this file at the end of each session.
-# Last updated: 2026-05-30 (session 37)
+# Last updated: 2026-05-30 (session 37, corrected after code audit)
 
 ---
 
@@ -52,11 +52,24 @@
 | 39 | glipra.com feature section expanded — 8 "Also included" cards added to `#solution`: Manual Macro Entry (free), Barcode Scanner (free), AI Photo Recognition (Pro), Shot Day Prep (free), Medication Level Estimator (free), Progress Dashboard (free), Prescriber Visit PDF (Pro), Micronutrient Watch (Pro) | ✅ |
 | 40 | Preview APK build for beta distribution — `eas.json` preview profile changed to `distribution: internal`, Sentry source map upload disabled (`SENTRY_DISABLE_AUTO_UPLOAD=true`), all env vars wired; shareable APK link: `https://expo.dev/accounts/waliabdul/projects/glipra/builds/7c9951d5` | ✅ |
 | 41 | Voice logging (Killer Differentiator #4) — fully Pro-gated, no free tier. `transcribe-food` Supabase edge function (Whisper transcription → GPT-4o mini food extraction, Zod-validated, 100/day circuit-breaker, static system prompt to prevent injection, service-role `ai_invocations` logging); `voice-recognition.ts` client wrapper + 4 Vitest tests; `VoiceCaptureButton` (expo-av, tap-to-start/stop, unmount cleanup, CANCELLED paywall guard); `PhotoReviewSheet` renamed `AIReviewSheet` with optional `transcript?` prop rendering quoted block; `log.tsx` two-button AI row (Photo + Voice side-by-side above Manual/Barcode toggle); 8 i18n keys en/es; edge function deployed to Supabase. 414 tests passing (352 Vitest + 62 jest-expo). Requires new EAS dev build for on-device testing (expo-av is native). | ✅ |
-| 42 | VoiceCaptureButton design token cleanup — 3 hardcoded hex colors (`#0F172A`, `#7f1d1d`, `#fca5a5`) replaced with 3 new semantic tokens (`buttonDark`, `recordingBg`, `recordingWave`) added to `GlipraColorTokens`, both palettes in `tokens.ts`, and `colors.ts`. `buttonDark` uses different values per mode (`#0f172a` light / `#2d2047` dark) so the button is always visible. Zero hardcoded hex in the file. | ✅ |
-| 44 | Nutrition Log AI section redesigned — Voice hero leads, Photo secondary — cost-driven hierarchy flip. `VoiceCaptureButton` idle state becomes full-width deep-indigo hero card (PRO badge, mic emoji, static waveform bars, "Speak your meal", CTA pill). `PhotoCaptureButton` becomes compact row. `aiRow` (flex row) replaced with `aiStack` (flex column); Voice renders first. 5 new i18n keys en/es. | ✅ |
-| 45 | PhotoCaptureButton premium band + free logging note — slim `#4C1D95` purple header band with `✦ AI POWERED` + `👑 PRO` badges restores premium feel to the secondary photo row. "✓ Manual and barcode logging are always free" in green below the Manual/Barcode toggle. 1 new i18n key en/es. | ✅ |
-| 43 | expo-av Expo Go crash fixed + OTA shipped — `import { Audio }` replaced with `import type { Audio }` (erased at compile time) + `getAudio()` lazy-require wrapper with try-catch. Prevents `requireNativeModule('ExponentAV')` from running at module evaluation time and crashing the entire `log.tsx` route in Expo Go. Nutrition tab now loads without a dev build. OTA pushed to `development` channel (update group `6c890b73-cc3a-4b47-8d12-057a787ab1d3`); PostHog + Sentry CLAUDE.md blockers confirmed stale and removed. | ✅ |
+| 42 | VoiceCaptureButton design token cleanup — DOCUMENTED BUT NOT COMMITTED to `81b2433`. The semantic tokens (`buttonDark`, `recordingBg`, `recordingWave`) were never added to `tokens.ts`/`colors.ts`; `voice-capture-button.tsx` still uses hardcoded hex (`#0F172A` L214, `#7f1d1d` L226, `#fca5a5` L253). Verified absent in 2026-05-30 audit. | ❌ not in code |
+| 44 | Nutrition Log AI section redesigned (Voice hero leads, Photo secondary) — VOICE-HERO REDESIGN NOT COMMITTED to `81b2433`. `log.tsx` still uses the `aiRow` two-button layout (L202); the idle state is the compact icon+label+subtitle button, not a hero card. Only the i18n keys (`voice_hero_title`, `voice_hero_subtitle`, `voice_cta`) were committed and are currently dead code. Verified in 2026-05-30 audit. | ❌ not in code |
+| 45 | PhotoCaptureButton premium band + free logging note — NOT COMMITTED as described to `81b2433`. `free_logging_note` key exists in en/es but is never rendered; `photo-capture-button.tsx` uses `#4C1D95` as a full card background with AI POWERED/PRO badges, not a slim header band, and there is no green "always free" note below the toggle. Verified in 2026-05-30 audit. | ❌ not in code |
+| 43 | expo-av Expo Go crash fix + OTA — CODE FIX NOT PRESENT in `81b2433`. `voice-capture-button.tsx:7` is still a plain `import { Audio } from 'expo-av'` (no `import type`, no `getAudio()` lazy-require wrapper), so the described `requireNativeModule('ExponentAV')` crash guard is absent. The CLAUDE.md PostHog/Sentry blocker cleanup did happen; the OTA push to `development` is not code-verifiable. Verified in 2026-05-30 audit. | ⚠️ partial |
 | 46 | Daily AI Guidance (last remaining Pro feature) — fully shipped. Migration `016_daily_guidance.sql` (UNIQUE on `user_id, date`; `injection_phase` nullable; `reasoning_text` for "Why?" tooltip; `prompt_version`). Edge function `generate-daily-guidance` deployed to Supabase: GPT-4o mini, cache-hit check, Zod InputSchema + OutputSchema, FALLBACK_RESULT on parse failure, `ai_invocations` log, nutrition-only scope, nausea/energy-aware (soft foods when nausea >= 4, no exercise on nausea=5), Spanish support, ATTORNEY REVIEW REQUIRED gate. Client: `src/features/daily-guidance/api.ts` (mock gate, 400ms delay), `src/features/daily-guidance/hooks.ts` (staleTime: Infinity, 1/day). `DailyGuidanceCard`: Pro-gated via `<ProGate>`, gradient header, loading/error/guidance states, "Why this?" toggle expands `reasoning_text`, DisclaimerBanner tier=1 (AsyncStorage-backed first-view ack). Suppressed when `medicationStatus === 'discontinued'`. 7 i18n keys en/es. 2 analytics events (DAILY_GUIDANCE_VIEWED, DAILY_GUIDANCE_WHY_TAPPED). `guidanceContext` wired into `useTodayData()`. 5 Vitest tests. Fixed `mockAI.test.ts` to match new `MOCK_DAILY_GUIDANCE` shape. 357 Vitest + 62 jest-expo pass. | ✅ |
+
+### Correction note (2026-05-30 audit)
+
+A code audit against committed HEAD `81b2433` found that sessions **42, 43, 44, 45** were
+logged ahead of the code: their descriptions were written, but the consuming component
+changes were never committed to this repo. Only the redesign's translation keys landed,
+which are now **dead code**: `voice_hero_title`, `voice_hero_subtitle`, `voice_cta`, and
+`free_logging_note` exist in `en.json`/`es.json` but no component references them.
+
+The build currently under on-device test (`81b2433`) ships the **session-41 voice UI**
+(side-by-side Photo/Voice buttons, compact mic button) and the **session-46 Daily AI
+Guidance** feature only. Sessions 41 and 46 are verified accurate. The voice-hero redesign
+and token cleanup remain to be built (see Direction B backlog below if re-prioritized).
 
 ### Upcoming — Visual Redesign (Direction B)
 

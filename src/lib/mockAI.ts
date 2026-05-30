@@ -38,13 +38,12 @@ export const MOCK_MEAL_RECOGNITION = {
 } as const;
 
 export const MOCK_DAILY_GUIDANCE = {
-  message:
-    'Today is your adjustment phase. Appetite suppression is at its strongest. ' +
-    'Focus on hitting your protein floor with high-density sources like eggs, ' +
-    'cottage cheese, or Greek yogurt. Aim for 25–30g per meal to preserve muscle.',
-  protein_tip: 'Greek yogurt (17g per 150g serving) is easy on nausea days.',
-  hydration_reminder: true,
-  phase_aware: true,
+  guidance_text:
+    'Today is your adjustment phase. Appetite suppression is near its peak right now. ' +
+    'Focus on high-density protein you can eat in small amounts: Greek yogurt, cottage cheese, or eggs. ' +
+    'Aim for 25-30g per sitting to protect muscle while appetite is low.',
+  reasoning_text:
+    'Adjustment phase suppresses appetite most strongly at days 3-4, making small high-density portions the best strategy.',
 } as const;
 
 export const MOCK_MEAL_TEXT_PARSE = {

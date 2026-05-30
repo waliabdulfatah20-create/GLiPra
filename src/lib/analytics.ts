@@ -49,6 +49,10 @@ export const EVENTS = {
 
   // Milestones
   MILESTONE_UNLOCKED: 'milestone_unlocked',
+
+  // Daily guidance
+  DAILY_GUIDANCE_VIEWED: 'daily_guidance_viewed',
+  DAILY_GUIDANCE_WHY_TAPPED: 'daily_guidance_why_tapped',
 } as const;
 
 // ---------------------------------------------------------------------------

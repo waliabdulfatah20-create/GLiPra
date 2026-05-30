@@ -156,7 +156,14 @@
     "cycle_today_badge": "HOY",
     "cycle_next_dose": "Próxima: {{date}}",
     "cycle_overdue_label": "ATRASADA",
-    "settings_button_label": "Abrir configuración"
+    "settings_button_label": "Abrir configuración",
+    "daily_guidance_section": "GUIA DEL DIA",
+    "daily_guidance_pro_label": "CONSEJO NUTRICIONAL IA",
+    "daily_guidance_why": "Por que este consejo?",
+    "daily_guidance_why_close": "Cerrar",
+    "daily_guidance_loading": "Generando tu consejo diario...",
+    "daily_guidance_error": "No se pudo cargar el consejo de hoy. Intenta mas tarde.",
+    "daily_guidance_disclaimer": "Orientacion nutricional generada por IA basada en tu fase de inyeccion y registro del dia. Solo cubre estrategias de proteinas y alimentacion. Para preguntas sobre medicacion, contacta a tu prescriptor."
   },
   "shotPrep": {
     "title": "Preparación del Día de Inyección",
@@ -231,7 +238,13 @@
     "voice_processing": "Analizando...",
     "voice_transcript_label": "Dijiste",
     "voice_permission_denied_title": "Se requiere acceso al micrófono",
-    "voice_permission_denied_body": "Activa el acceso al micrófono en Configuración para usar el registro por voz."
+    "voice_permission_denied_body": "Activa el acceso al micrófono en Configuración para usar el registro por voz.",
+    "voice_hero_title": "Habla tu comida",
+    "voice_hero_subtitle": "La IA de voz extrae los macros al instante",
+    "voice_cta": "Toca para grabar →",
+    "photo_row_title": "Escaneo fotográfico",
+    "photo_row_subtitle": "La IA estima desde la imagen",
+    "free_logging_note": "✓ El registro manual y por código de barras siempre es gratis"
   },
   "checkin": {
     "title": "Check-in diario",

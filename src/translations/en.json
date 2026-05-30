@@ -156,7 +156,14 @@
     "cycle_today_badge": "TODAY",
     "cycle_next_dose": "Next: {{date}}",
     "cycle_overdue_label": "OVERDUE",
-    "settings_button_label": "Open settings"
+    "settings_button_label": "Open settings",
+    "daily_guidance_section": "TODAY'S GUIDANCE",
+    "daily_guidance_pro_label": "AI NUTRITION TIP",
+    "daily_guidance_why": "Why this?",
+    "daily_guidance_why_close": "Close",
+    "daily_guidance_loading": "Generating your daily tip...",
+    "daily_guidance_error": "Could not load today's tip. Try again later.",
+    "daily_guidance_disclaimer": "AI-generated nutrition guidance based on your injection phase and check-in. Covers protein and food strategies only. For medication questions, contact your prescriber."
   },
   "shotPrep": {
     "title": "Shot Day Prep",
@@ -231,7 +238,13 @@
     "voice_processing": "Analyzing...",
     "voice_transcript_label": "You said",
     "voice_permission_denied_title": "Microphone Access Required",
-    "voice_permission_denied_body": "Enable microphone access in Settings to use voice logging."
+    "voice_permission_denied_body": "Enable microphone access in Settings to use voice logging.",
+    "voice_hero_title": "Speak your meal",
+    "voice_hero_subtitle": "Voice AI extracts macros instantly",
+    "voice_cta": "Tap to record →",
+    "photo_row_title": "Photo scan",
+    "photo_row_subtitle": "AI estimates from image",
+    "free_logging_note": "✓ Manual and barcode logging are always free"
   },
   "checkin": {
     "title": "Daily Check-in",

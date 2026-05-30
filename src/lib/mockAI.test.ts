@@ -33,11 +33,10 @@ describe('mockAI', () => {
 
   describe('MOCK_DAILY_GUIDANCE', () => {
     it('has expected shape', () => {
-      expect(MOCK_DAILY_GUIDANCE.message).toBeTruthy();
-      expect(typeof MOCK_DAILY_GUIDANCE.message).toBe('string');
-      expect(MOCK_DAILY_GUIDANCE.protein_tip).toBeTruthy();
-      expect(typeof MOCK_DAILY_GUIDANCE.hydration_reminder).toBe('boolean');
-      expect(typeof MOCK_DAILY_GUIDANCE.phase_aware).toBe('boolean');
+      expect(MOCK_DAILY_GUIDANCE.guidance_text).toBeTruthy();
+      expect(typeof MOCK_DAILY_GUIDANCE.guidance_text).toBe('string');
+      expect(MOCK_DAILY_GUIDANCE.reasoning_text).toBeTruthy();
+      expect(typeof MOCK_DAILY_GUIDANCE.reasoning_text).toBe('string');
     });
   });
 

@@ -39,6 +39,15 @@ export async function fetchBarcodeCorrection(
     proteinG: Number(row.protein_g),
     fiberG: row.fiber_g != null ? Number(row.fiber_g) : null,
     caloriesKcal: row.calories_kcal != null ? Number(row.calories_kcal) : null,
+    // Corrections store only protein/fiber/calories; remaining macros and
+    // micronutrients are not captured, so they are explicitly unknown.
+    carbsG: null,
+    fatG: null,
+    magnesiumMg: null,
+    zincMg: null,
+    b12Mcg: null,
+    vitaminDIu: null,
+    servingWeightG: null,
     dataSource: 'user_corrected',
   };
 }

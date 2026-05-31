@@ -41,6 +41,42 @@ export type Database = {
         }
         Relationships: []
       }
+      barcode_corrections: {
+        Row: {
+          barcode_ean: string
+          calories_kcal: number | null
+          created_at: string
+          fiber_g: number | null
+          id: string
+          product_name: string
+          protein_g: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          barcode_ean: string
+          calories_kcal?: number | null
+          created_at?: string
+          fiber_g?: number | null
+          id?: string
+          product_name: string
+          protein_g: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          barcode_ean?: string
+          calories_kcal?: number | null
+          created_at?: string
+          fiber_g?: number | null
+          id?: string
+          product_name?: string
+          protein_g?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       content_cards: {
         Row: {
           body: string

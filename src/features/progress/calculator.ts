@@ -127,7 +127,6 @@ export function calculateAdherence(
   if (expected === 0)
     return 0;
 
-  const windowStart = subDays(asOf, days - 1);
   const seen = new Set<string>();
   for (const raw of injectionDates) {
     const d = parseISO(raw);
@@ -141,7 +140,7 @@ export function calculateAdherence(
     seen.add(raw.slice(0, 10));
   }
 
-  // Belt: also discard dates older than windowStart computed via date-fns
+  // Belt: also discard dates older than the window computed via date-fns
   // (defensive — already covered above, but keeps the intent obvious)
   const inWindow = Array.from(seen).filter(
     d => differenceInCalendarDays(asOf, parseISO(d)) <= days - 1,

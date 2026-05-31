@@ -26,7 +26,7 @@ import { formatWeight, kgToLbs, lbsToKg, useWeightUnit } from '@/lib/unit-prefer
 
 function parsePositiveNumber(value: string): number | null {
   const num = Number.parseFloat(value);
-  if (isNaN(num) || num <= 0)
+  if (Number.isNaN(num) || num <= 0)
     return null;
   return num;
 }

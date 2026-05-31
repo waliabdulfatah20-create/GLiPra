@@ -43,7 +43,6 @@ export type RedFlagDetection = {
 const PAIN_KEYWORDS = ['pain', 'ache', 'cramp', 'sharp', 'stabbing', 'severe', 'hurt'];
 const VOMIT_KEYWORDS = ['vomit', 'throwing up', 'threw up', 'nausea is overwhelming'];
 const DEHYDRATION_WATER_THRESHOLD = 500; // ml
-const LOOKBACK_WINDOW = 30; // days
 
 /**
  * Helper: filter check-ins to valid date range (on or before today)

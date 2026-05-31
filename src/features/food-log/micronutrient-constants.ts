@@ -14,14 +14,14 @@ export type NutrientStatus = 'green' | 'amber' | 'red';
 
 /** % of RDA achieved, capped at 100, rounded to nearest integer */
 export function getNutrientPct(actual: number, rda: number): number {
-  if (rda <= 0 || !isFinite(rda))
+  if (rda <= 0 || !Number.isFinite(rda))
     return 0;
   return Math.min(100, Math.round((Math.max(0, actual) / rda) * 100));
 }
 
 /** green >= 80% | amber 50-79% | red < 50% */
 export function getNutrientStatus(actual: number, rda: number): NutrientStatus {
-  if (rda <= 0 || !isFinite(rda))
+  if (rda <= 0 || !Number.isFinite(rda))
     return 'red';
   const pct = (actual / rda) * 100;
   if (pct >= 80)

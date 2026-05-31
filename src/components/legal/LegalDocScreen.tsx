@@ -89,7 +89,7 @@ type StyleTokens = {
   radius: GlipraTokens['radius'];
 };
 
-function makeStyles({ colors, spacing, radius }: StyleTokens) {
+function makeStyles({ colors, spacing }: StyleTokens) {
   return StyleSheet.create({
     container: {
       flex: 1,

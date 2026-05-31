@@ -23,13 +23,13 @@ let Sentry: SentryModule | null = null;
 
 try {
   // Prefer @sentry/react-native (the canonical package)
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  // eslint-disable-next-line ts/no-require-imports
   Sentry = require('@sentry/react-native') as SentryModule;
 }
 catch {
   try {
     // Fall back to sentry-expo if present
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // eslint-disable-next-line ts/no-require-imports
     Sentry = require('sentry-expo') as SentryModule;
   }
   catch {

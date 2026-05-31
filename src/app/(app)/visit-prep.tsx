@@ -126,7 +126,7 @@ export default function VisitPrepScreen() {
     // module doesn't crash in environments where it isn't installed.
     try {
       const FileSystem = require('expo-file-system/legacy');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      // eslint-disable-next-line ts/no-require-imports
       const Sharing = require('expo-sharing');
       if (await Sharing.isAvailableAsync()) {
         const fileUri = `${FileSystem.cacheDirectory}visit-prep.pdf`;
@@ -499,7 +499,7 @@ function makeSectionCardStyles({ colors, spacing, radius, shadows }: StyleTokens
   });
 }
 
-function makeDataRowStyles({ colors, spacing, radius, shadows }: StyleTokens) {
+function makeDataRowStyles({ colors, spacing }: StyleTokens) {
   return StyleSheet.create({
     dataRow: {
       flexDirection: 'row',

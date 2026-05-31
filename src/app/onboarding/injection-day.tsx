@@ -62,7 +62,7 @@ function parseMdyToIso(mdy: string): string | null {
     return null;
   const iso = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
   const date = new Date(iso);
-  if (isNaN(date.getTime()))
+  if (Number.isNaN(date.getTime()))
     return null;
   return iso;
 }

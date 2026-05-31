@@ -79,7 +79,7 @@ export function PhotoCaptureButton({
     if (!isPro) {
       // Open RevenueCat paywall for non-Pro users
       try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        // eslint-disable-next-line ts/no-require-imports
         const { RevenueCatUI } = require('react-native-purchases-ui');
         RevenueCatUI.presentPaywallIfNeeded({
           requiredEntitlementIdentifier: 'GLiPra Pro',

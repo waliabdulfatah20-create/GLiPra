@@ -50,7 +50,7 @@ type StyleTokens = {
   radius: GlipraTokens['radius'];
 };
 
-function makeStyles({ colors, spacing, radius }: StyleTokens) {
+function makeStyles({ spacing, radius }: StyleTokens) {
   return StyleSheet.create({
     badge: {
       flexDirection: 'row',

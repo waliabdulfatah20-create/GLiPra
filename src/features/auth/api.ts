@@ -35,7 +35,7 @@ export async function signInWithApple(): Promise<{ error: string | null }> {
     });
     const { error } = await supabase.auth.signInWithIdToken({
       provider: 'apple',
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // eslint-disable-next-line ts/no-non-null-assertion
       token: credential.identityToken!,
     });
     return { error: error?.message ?? null };

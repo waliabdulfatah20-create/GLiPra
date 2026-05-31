@@ -29,7 +29,7 @@ export const ENTITLEMENT_ID = 'GLiPra Pro';
 
 function getPurchasesModule(): typeof import('react-native-purchases').default | null {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // eslint-disable-next-line ts/no-require-imports
     const mod = require('react-native-purchases');
     if (mod && mod.default && typeof mod.default.configure === 'function') {
       return mod.default;
@@ -72,7 +72,7 @@ export function initializeRevenueCat(userId?: string): void {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // eslint-disable-next-line ts/no-require-imports
     const { LOG_LEVEL } = require('react-native-purchases');
     Purchases.setLogLevel(LOG_LEVEL.WARN);
     Purchases.configure({ apiKey, appUserID: userId ?? null });
@@ -102,7 +102,7 @@ export async function getSubscriptionTier(): Promise<SubscriptionTier> {
     if (!entitlement)
       return 'free';
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line ts/no-explicit-any
     const raw = entitlement as any;
     const productId: string
       = raw.latestPurchasedProductIdentifier
@@ -140,7 +140,7 @@ export async function restorePurchases(): Promise<SubscriptionTier> {
     if (!entitlement)
       return 'free';
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line ts/no-explicit-any
     const raw = entitlement as any;
     const productId: string
       = raw.latestPurchasedProductIdentifier

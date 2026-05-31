@@ -47,7 +47,7 @@ export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
   const [focusedField, setFocusedField] = React.useState<string | null>(null);
 
   const proteinValue = Number.parseFloat(form.proteinG);
-  const hasProtein = !isNaN(proteinValue) && proteinValue > 0;
+  const hasProtein = !Number.isNaN(proteinValue) && proteinValue > 0;
   const isValid = form.name.trim().length > 0 && hasProtein;
 
   function handleChange(field: keyof FormState, value: string) {

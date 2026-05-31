@@ -55,12 +55,12 @@ export function Button({
   ref,
   label: text,
   loading = false,
-  variant = 'default',
+  variant: _variant = 'default',
   disabled = false,
   size = 'default',
-  className = '',
+  className: _className = '',
   testID,
-  textClassName = '',
+  textClassName: _textClassName = '',
   ...props
 }: Props & { ref?: React.RefObject<View | null> }) {
   return (

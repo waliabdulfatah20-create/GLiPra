@@ -41,7 +41,7 @@ export function WeightEntryForm({
   const [notes, setNotes] = React.useState('');
 
   const parsedInput = Number.parseFloat(weightInput);
-  const isValid = !isNaN(parsedInput) && parsedInput > 0;
+  const isValid = !Number.isNaN(parsedInput) && parsedInput > 0;
 
   function handleSubmit() {
     if (!isValid)

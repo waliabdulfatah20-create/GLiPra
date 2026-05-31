@@ -65,8 +65,6 @@ export default function MedicationLevelScreen() {
 
   const { profile, isLoading: profileLoading, injectionCycle } = useTodayData();
   const {
-    curve,
-    todayOffset,
     isLoading: curveLoading,
     medicationId,
     doseMg,

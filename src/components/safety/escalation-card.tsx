@@ -28,7 +28,7 @@ type EscalationCardProps = {
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
-export function EscalationCard({ detection, onDismiss }: EscalationCardProps) {
+export function EscalationCard({ detection: _detection, onDismiss }: EscalationCardProps) {
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),

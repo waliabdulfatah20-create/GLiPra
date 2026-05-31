@@ -95,7 +95,7 @@ export default function CheckInScreen() {
     haptics.medium();
     // Log weight first if a valid value was entered (optional field)
     const parsedWeight = Number.parseFloat(weightInput);
-    if (!isNaN(parsedWeight) && parsedWeight > 0) {
+    if (!Number.isNaN(parsedWeight) && parsedWeight > 0) {
       // Always store in kg — convert if user entered lbs
       const weightKg = weightUnit === 'lbs' ? lbsToKg(parsedWeight) : parsedWeight;
       logWeight({ weightKg });

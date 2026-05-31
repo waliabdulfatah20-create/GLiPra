@@ -8,7 +8,13 @@
 //   - On every confirm → the confirmed values are upserted as personal defaults,
 //     so repeat scans of the same food pre-fill with the saved values.
 
+import type { RecognitionResult } from './photo-recognition';
+import type { PhotoFoodEntry } from './types';
+import type { GlipraTokens } from '@/theme/tokens';
+
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
+
 import {
   KeyboardAvoidingView,
   Modal,
@@ -20,31 +26,25 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
-
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
-
 import { useConfirmPhotoLog, useUserFoodDefault } from './hooks';
-import type { RecognitionResult } from './photo-recognition';
-import type { PhotoFoodEntry } from './types';
 
 // ---------------------------------------------------------------------------
 // Props
 // ---------------------------------------------------------------------------
 
-export interface AIReviewSheetProps {
+export type AIReviewSheetProps = {
   result: RecognitionResult | null;
   onClose: () => void;
   /** Populated on voice entries — the Whisper transcript spoken by the user. */
   transcript?: string;
-}
+};
 
 // ---------------------------------------------------------------------------
 // Editable form state (all macro fields stored as strings for TextInput)
 // ---------------------------------------------------------------------------
 
-interface FormState {
+type FormState = {
   name: string;
   servingDescription: string;
   proteinG: string;
@@ -56,7 +56,7 @@ interface FormState {
   vitaminDIu: string;
   magnesiumMg: string;
   zincMg: string;
-}
+};
 
 function resultToForm(r: RecognitionResult): FormState {
   return {
@@ -94,16 +94,16 @@ function parseEntry(form: FormState): PhotoFoodEntry {
   return {
     name: form.name.trim(),
     servingDescription: form.servingDescription.trim(),
-    proteinG: Math.max(0, parseFloat(form.proteinG) || 0),
-    carbsG: form.carbsG !== '' ? Math.max(0, parseFloat(form.carbsG) || 0) : null,
-    fatG: form.fatG !== '' ? Math.max(0, parseFloat(form.fatG) || 0) : null,
-    fiberG: form.fiberG !== '' ? Math.max(0, parseFloat(form.fiberG) || 0) : null,
+    proteinG: Math.max(0, Number.parseFloat(form.proteinG) || 0),
+    carbsG: form.carbsG !== '' ? Math.max(0, Number.parseFloat(form.carbsG) || 0) : null,
+    fatG: form.fatG !== '' ? Math.max(0, Number.parseFloat(form.fatG) || 0) : null,
+    fiberG: form.fiberG !== '' ? Math.max(0, Number.parseFloat(form.fiberG) || 0) : null,
     caloriesKcal:
-      form.caloriesKcal !== '' ? Math.max(0, parseFloat(form.caloriesKcal) || 0) : null,
-    b12Mcg: form.b12Mcg !== '' ? Math.max(0, parseFloat(form.b12Mcg) || 0) : null,
-    vitaminDIu: form.vitaminDIu !== '' ? Math.max(0, parseFloat(form.vitaminDIu) || 0) : null,
-    magnesiumMg: form.magnesiumMg !== '' ? Math.max(0, parseFloat(form.magnesiumMg) || 0) : null,
-    zincMg: form.zincMg !== '' ? Math.max(0, parseFloat(form.zincMg) || 0) : null,
+      form.caloriesKcal !== '' ? Math.max(0, Number.parseFloat(form.caloriesKcal) || 0) : null,
+    b12Mcg: form.b12Mcg !== '' ? Math.max(0, Number.parseFloat(form.b12Mcg) || 0) : null,
+    vitaminDIu: form.vitaminDIu !== '' ? Math.max(0, Number.parseFloat(form.vitaminDIu) || 0) : null,
+    magnesiumMg: form.magnesiumMg !== '' ? Math.max(0, Number.parseFloat(form.magnesiumMg) || 0) : null,
+    zincMg: form.zincMg !== '' ? Math.max(0, Number.parseFloat(form.zincMg) || 0) : null,
   };
 }
 
@@ -138,42 +138,46 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
     // (they represent the user's preferred portions, not the AI guess)
     if (defaults) {
       setForm(defaultsToForm({ ...defaults, name: result.name }));
-    } else {
+    }
+    else {
       setForm(resultToForm(result));
     }
   }, [result, defaults]);
 
   function handleField(field: keyof FormState, value: string) {
-    setForm((prev) => (prev ? { ...prev, [field]: value } : prev));
+    setForm(prev => (prev ? { ...prev, [field]: value } : prev));
   }
 
   async function handleConfirm() {
-    if (!form || confirming) return;
+    if (!form || confirming)
+      return;
     const entry = parseEntry(form);
-    if (!entry.name) return;
+    if (!entry.name)
+      return;
     confirm(entry, originalAiName.current);
     onClose();
   }
 
-  const confidenceColor =
-    result?.confidence === 'high'
+  const confidenceColor
+    = result?.confidence === 'high'
       ? colors.proteinGood
       : result?.confidence === 'medium'
         ? colors.warning
         : colors.proteinLow;
 
-  const confidenceLabel =
-    result?.confidence === 'high'
+  const confidenceLabel
+    = result?.confidence === 'high'
       ? 'High confidence'
       : result?.confidence === 'medium'
         ? 'Medium confidence'
         : 'Low confidence - please verify';
 
-  const hasMicroData =
-    form &&
-    (form.b12Mcg !== '' || form.vitaminDIu !== '' || form.magnesiumMg !== '' || form.zincMg !== '');
+  const hasMicroData
+    = form
+      && (form.b12Mcg !== '' || form.vitaminDIu !== '' || form.magnesiumMg !== '' || form.zincMg !== '');
 
-  if (!result || !form) return null;
+  if (!result || !form)
+    return null;
 
   return (
     <Modal
@@ -199,7 +203,7 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
           {/* Header */}
           <View style={styles.headerRow}>
             <Text style={styles.headerTitle}>AI identified</Text>
-            <View style={[styles.confidenceBadge, { backgroundColor: confidenceColor + '20' }]}>
+            <View style={[styles.confidenceBadge, { backgroundColor: `${confidenceColor}20` }]}>
               <View style={[styles.confidenceDot, { backgroundColor: confidenceColor }]} />
               <Text style={[styles.confidenceText, { color: confidenceColor }]}>
                 {confidenceLabel}
@@ -216,12 +220,18 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
             keyboardShouldPersistTaps="handled"
           >
             {/* Transcript block — visible on voice entries only */}
-            {transcript ? (
-              <View style={styles.transcriptBlock}>
-                <Text style={styles.transcriptLabel}>{t('log.voice_transcript_label')}</Text>
-                <Text style={styles.transcriptText}>"{transcript}"</Text>
-              </View>
-            ) : null}
+            {transcript
+              ? (
+                  <View style={styles.transcriptBlock}>
+                    <Text style={styles.transcriptLabel}>{t('log.voice_transcript_label')}</Text>
+                    <Text style={styles.transcriptText}>
+                      "
+                      {transcript}
+                      "
+                    </Text>
+                  </View>
+                )
+              : null}
 
             {/* Food name + serving */}
             <SectionHeader title="FOOD" />
@@ -229,7 +239,7 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
               <TextInput
                 style={styles.textInput}
                 value={form.name}
-                onChangeText={(v) => handleField('name', v)}
+                onChangeText={v => handleField('name', v)}
                 placeholder="Food name"
                 placeholderTextColor={colors.textDisabled}
                 returnKeyType="next"
@@ -240,7 +250,7 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
               <TextInput
                 style={styles.textInput}
                 value={form.servingDescription}
-                onChangeText={(v) => handleField('servingDescription', v)}
+                onChangeText={v => handleField('servingDescription', v)}
                 placeholder="e.g. 1 cup, 150g"
                 placeholderTextColor={colors.textDisabled}
                 returnKeyType="next"
@@ -255,32 +265,32 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
                 label="Protein"
                 unit="g"
                 value={form.proteinG}
-                onChangeText={(v) => handleField('proteinG', v)}
+                onChangeText={v => handleField('proteinG', v)}
                 highlight
               />
               <MacroInput
                 label="Carbs"
                 unit="g"
                 value={form.carbsG}
-                onChangeText={(v) => handleField('carbsG', v)}
+                onChangeText={v => handleField('carbsG', v)}
               />
               <MacroInput
                 label="Fat"
                 unit="g"
                 value={form.fatG}
-                onChangeText={(v) => handleField('fatG', v)}
+                onChangeText={v => handleField('fatG', v)}
               />
               <MacroInput
                 label="Calories"
                 unit="kcal"
                 value={form.caloriesKcal}
-                onChangeText={(v) => handleField('caloriesKcal', v)}
+                onChangeText={v => handleField('caloriesKcal', v)}
               />
               <MacroInput
                 label="Fiber"
                 unit="g"
                 value={form.fiberG}
-                onChangeText={(v) => handleField('fiberG', v)}
+                onChangeText={v => handleField('fiberG', v)}
               />
             </View>
 
@@ -296,25 +306,25 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
                     label="B-12"
                     unit="mcg"
                     value={form.b12Mcg}
-                    onChangeText={(v) => handleField('b12Mcg', v)}
+                    onChangeText={v => handleField('b12Mcg', v)}
                   />
                   <MacroInput
                     label="Vit D"
                     unit="IU"
                     value={form.vitaminDIu}
-                    onChangeText={(v) => handleField('vitaminDIu', v)}
+                    onChangeText={v => handleField('vitaminDIu', v)}
                   />
                   <MacroInput
                     label="Mg"
                     unit="mg"
                     value={form.magnesiumMg}
-                    onChangeText={(v) => handleField('magnesiumMg', v)}
+                    onChangeText={v => handleField('magnesiumMg', v)}
                   />
                   <MacroInput
                     label="Zinc"
                     unit="mg"
                     value={form.zincMg}
-                    onChangeText={(v) => handleField('zincMg', v)}
+                    onChangeText={v => handleField('zincMg', v)}
                   />
                 </View>
               </>
@@ -371,15 +381,18 @@ function SectionHeader({ title }: { title: string }) {
       textTransform: 'uppercase',
       marginTop: spacing.md,
       marginBottom: spacing.sm,
-    }}>{title}</Text>
+    }}
+    >
+      {title}
+    </Text>
   );
 }
 
-interface FieldRowProps {
+type FieldRowProps = {
   label: string;
   unit: string;
   children: React.ReactNode;
-}
+};
 
 function FieldRow({ label, children }: FieldRowProps) {
   const { colors, spacing } = useTheme();
@@ -391,20 +404,21 @@ function FieldRow({ label, children }: FieldRowProps) {
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
       gap: spacing.sm,
-    }}>
+    }}
+    >
       <Text style={{ fontSize: 14, color: colors.textSecondary, width: 80 }}>{label}</Text>
       <View style={{ flex: 1 }}>{children}</View>
     </View>
   );
 }
 
-interface MacroInputProps {
+type MacroInputProps = {
   label: string;
   unit: string;
   value: string;
   onChangeText: (v: string) => void;
   highlight?: boolean;
-}
+};
 
 function MacroInput({ label, unit, value, onChangeText, highlight = false }: MacroInputProps) {
   const { colors, spacing, radius } = useTheme();
@@ -420,8 +434,9 @@ function MacroInput({ label, unit, value, onChangeText, highlight = false }: Mac
         padding: spacing.sm,
         alignItems: 'center',
       },
-      highlight && { backgroundColor: colors.primaryLight, borderColor: colors.primary + '60' },
-    ]}>
+      highlight && { backgroundColor: colors.primaryLight, borderColor: `${colors.primary}60` },
+    ]}
+    >
       <TextInput
         style={[
           { fontSize: 18, fontWeight: '700', color: colors.textPrimary, textAlign: 'center', padding: 0, width: '100%' },
@@ -437,7 +452,10 @@ function MacroInput({ label, unit, value, onChangeText, highlight = false }: Mac
       <Text style={[
         { fontSize: 10, color: colors.textSecondary, marginTop: 1 },
         highlight && { color: colors.primary },
-      ]}>{unit}</Text>
+      ]}
+      >
+        {unit}
+      </Text>
       <Text style={{ fontSize: 11, fontWeight: '600', color: colors.textSecondary, marginTop: 2 }}>{label}</Text>
     </View>
   );
@@ -447,12 +465,12 @@ function MacroInput({ label, unit, value, onChangeText, highlight = false }: Mac
 // Styles
 // ---------------------------------------------------------------------------
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

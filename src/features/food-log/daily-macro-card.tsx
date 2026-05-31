@@ -3,13 +3,13 @@
 // Micronutrient data (B12, vitamin D, magnesium, zinc) is now shown in the
 // dedicated MicronutrientWatchCard (Pro-gated) rendered below this card on log.tsx.
 
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { StyleSheet, Text, View } from 'react-native';
 import { useTodayProfile } from '@/features/today/hooks';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 import { useDailyMacros } from './hooks';
 
@@ -32,14 +32,16 @@ export function DailyMacroCard() {
   const { data: profile, isLoading: profileLoading } = useTodayProfile();
   const proteinFloor = profile?.proteinFloorG ?? 0;
 
-  if (macrosLoading || profileLoading) return null;
+  if (macrosLoading || profileLoading)
+    return null;
 
   // Don't render the card if nothing has been logged yet
-  if (protein === 0 && carbs === 0 && fat === 0 && calories === 0) return null;
+  if (protein === 0 && carbs === 0 && fat === 0 && calories === 0)
+    return null;
 
   const proteinProgress = proteinFloor > 0 ? Math.min(1, protein / proteinFloor) : 0;
-  const proteinColor =
-    proteinProgress >= 0.9
+  const proteinColor
+    = proteinProgress >= 0.9
       ? colors.proteinGood
       : proteinProgress >= 0.6
         ? colors.warning
@@ -57,9 +59,15 @@ export function DailyMacroCard() {
               <Text style={styles.primaryMetricLabel}>Protein</Text>
             </View>
             <Text style={[styles.primaryValue, { color: proteinColor }]}>
-              {protein.toFixed(1)}g
+              {protein.toFixed(1)}
+              g
               {proteinFloor > 0 && (
-                <Text style={styles.proteinFloorText}> / {Math.round(proteinFloor)}g</Text>
+                <Text style={styles.proteinFloorText}>
+                  {' '}
+                  /
+                  {Math.round(proteinFloor)}
+                  g
+                </Text>
               )}
             </Text>
             {/* Progress bar */}
@@ -92,19 +100,28 @@ export function DailyMacroCard() {
             <View style={styles.secondaryRow}>
               {carbs > 0 && (
                 <View style={styles.secondaryBlock}>
-                  <Text style={styles.secondaryValue}>{carbs.toFixed(1)}g</Text>
+                  <Text style={styles.secondaryValue}>
+                    {carbs.toFixed(1)}
+                    g
+                  </Text>
                   <Text style={styles.secondaryLabel}>Carbs</Text>
                 </View>
               )}
               {fat > 0 && (
                 <View style={styles.secondaryBlock}>
-                  <Text style={styles.secondaryValue}>{fat.toFixed(1)}g</Text>
+                  <Text style={styles.secondaryValue}>
+                    {fat.toFixed(1)}
+                    g
+                  </Text>
                   <Text style={styles.secondaryLabel}>Fat</Text>
                 </View>
               )}
               {fiber > 0 && (
                 <View style={styles.secondaryBlock}>
-                  <Text style={styles.secondaryValue}>{fiber.toFixed(1)}g</Text>
+                  <Text style={styles.secondaryValue}>
+                    {fiber.toFixed(1)}
+                    g
+                  </Text>
                   <Text style={styles.secondaryLabel}>Fiber</Text>
                 </View>
               )}
@@ -117,12 +134,12 @@ export function DailyMacroCard() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

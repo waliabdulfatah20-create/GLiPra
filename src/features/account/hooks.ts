@@ -21,10 +21,12 @@ export function useExportData(): UseExportDataResult {
     setError(null);
     try {
       return await exportUserData();
-    } catch (err: unknown) {
+    }
+    catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Unknown error');
       return null;
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };
@@ -49,10 +51,12 @@ export function useDeleteAccount(): UseDeleteAccountResult {
     try {
       await deleteAccount();
       return true;
-    } catch (err: unknown) {
+    }
+    catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Unknown error');
       return false;
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };

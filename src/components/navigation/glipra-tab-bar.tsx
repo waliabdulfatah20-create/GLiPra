@@ -2,15 +2,15 @@ import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { CommonActions } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import {
   ChatBubble as CoachIcon,
   Home as HomeIcon,
   Camera as LogIcon,
-  Syringe as SyringeIcon,
   TrendingUp as ProgressIcon,
+  Syringe as SyringeIcon,
 } from '@/components/ui/icons';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
@@ -20,18 +20,18 @@ import { useTheme } from '@/lib/ThemeContext';
 const VISIBLE_TAB_NAMES = ['index', 'progress', 'log', 'injection-sites', 'coach'] as const;
 type VisibleTabName = typeof VISIBLE_TAB_NAMES[number];
 
-interface TabConfig {
+type TabConfig = {
   labelKey: string;
   testID: string;
   Icon: React.ComponentType<{ color: string }>;
-}
+};
 
 const TAB_CONFIG: Record<VisibleTabName, TabConfig> = {
-  index:             { labelKey: 'tabs.today',     testID: 'today-tab',    Icon: HomeIcon },
-  progress:          { labelKey: 'tabs.progress',  testID: 'progress-tab', Icon: ProgressIcon },
-  log:               { labelKey: 'tabs.nutrition', testID: 'log-tab',      Icon: LogIcon },
-  'injection-sites': { labelKey: 'tabs.sites',     testID: 'sites-tab',    Icon: SyringeIcon },
-  coach:             { labelKey: 'tabs.coach',     testID: 'coach-tab',    Icon: CoachIcon },
+  'index': { labelKey: 'tabs.today', testID: 'today-tab', Icon: HomeIcon },
+  'progress': { labelKey: 'tabs.progress', testID: 'progress-tab', Icon: ProgressIcon },
+  'log': { labelKey: 'tabs.nutrition', testID: 'log-tab', Icon: LogIcon },
+  'injection-sites': { labelKey: 'tabs.sites', testID: 'sites-tab', Icon: SyringeIcon },
+  'coach': { labelKey: 'tabs.coach', testID: 'coach-tab', Icon: CoachIcon },
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -41,7 +41,7 @@ export function GlipraTabBar({ state, navigation, insets }: BottomTabBarProps) {
   const { colors, spacing, gradients } = useTheme();
 
   const visibleRoutes = state.routes.filter(
-    (r) => VISIBLE_TAB_NAMES.includes(r.name as VisibleTabName),
+    r => VISIBLE_TAB_NAMES.includes(r.name as VisibleTabName),
   );
 
   return (
@@ -58,9 +58,10 @@ export function GlipraTabBar({ state, navigation, insets }: BottomTabBarProps) {
       {visibleRoutes.map((route) => {
         const name = route.name as VisibleTabName;
         const config = TAB_CONFIG[name];
-        if (!config) return null;
-        const isFocused =
-          state.routes.findIndex((r) => r.key === route.key) === state.index;
+        if (!config)
+          return null;
+        const isFocused
+          = state.routes.findIndex(r => r.key === route.key) === state.index;
 
         const onPress = () => {
           haptics.tap();
@@ -94,20 +95,22 @@ export function GlipraTabBar({ state, navigation, insets }: BottomTabBarProps) {
             accessibilityState={{ selected: isFocused }}
             accessibilityLabel={t(config.labelKey)}
           >
-            {isFocused ? (
-              <LinearGradient
-                colors={gradients.hero}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.activePill}
-              >
-                <config.Icon color={iconColor} />
-              </LinearGradient>
-            ) : (
-              <View style={styles.inactivePill}>
-                <config.Icon color={iconColor} />
-              </View>
-            )}
+            {isFocused
+              ? (
+                  <LinearGradient
+                    colors={gradients.hero}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.activePill}
+                  >
+                    <config.Icon color={iconColor} />
+                  </LinearGradient>
+                )
+              : (
+                  <View style={styles.inactivePill}>
+                    <config.Icon color={iconColor} />
+                  </View>
+                )}
             <Text
               style={[
                 styles.label,

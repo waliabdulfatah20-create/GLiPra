@@ -5,17 +5,17 @@ import {
   Circle,
   Defs,
   Line,
-  LinearGradient as SvgLinearGradient,
   Path,
   Polyline,
   Stop,
   Svg,
+  LinearGradient as SvgLinearGradient,
   Text as SvgText,
 } from 'react-native-svg';
 
 import { useTheme } from '@/lib/ThemeContext';
 
-export interface LevelChartProps {
+export type LevelChartProps = {
   curve: Array<{ date: string; dayOffset: number; levelMg: number }>;
   /** dayOffset value that maps to today (usually 0) */
   todayOffset: number;
@@ -25,7 +25,7 @@ export interface LevelChartProps {
   labelIntervalDays: number;
   width: number;
   height: number;
-}
+};
 
 const PADDING = { top: 16, right: 12, bottom: 28, left: 40 };
 
@@ -50,11 +50,12 @@ export function LevelChart({
   // (Rules of Hooks: hooks must be called unconditionally on every render)
   const computed = React.useMemo(() => {
     // Guard inside the memo so curve.length < 2 never causes an out-of-bounds access
-    if (curve.length < 2) return null;
+    if (curve.length < 2)
+      return null;
 
     const minOffset = curve[0].dayOffset;
     const maxOffset = curve[curve.length - 1].dayOffset;
-    const maxLevel = Math.max(...curve.map((p) => p.levelMg));
+    const maxLevel = Math.max(...curve.map(p => p.levelMg));
     const levelRange = maxLevel || 1;
     const offsetRange = maxOffset - minOffset || 1;
 
@@ -68,18 +69,18 @@ export function LevelChart({
     const baselineY = toY(0);
 
     const curvePoints = curve
-      .map((p) => `${toX(p.dayOffset).toFixed(1)},${toY(p.levelMg).toFixed(1)}`)
+      .map(p => `${toX(p.dayOffset).toFixed(1)},${toY(p.levelMg).toFixed(1)}`)
       .join(' ');
 
     const firstX = toX(curve[0].dayOffset).toFixed(1);
     const lastX = toX(curve[curve.length - 1].dayOffset).toFixed(1);
-    const fillPath =
-      `M ${firstX},${baselineY.toFixed(1)} ` +
-      curve.map((p) => `L ${toX(p.dayOffset).toFixed(1)},${toY(p.levelMg).toFixed(1)}`).join(' ') +
-      ` L ${lastX},${baselineY.toFixed(1)} Z`;
+    const fillPath
+      = `M ${firstX},${baselineY.toFixed(1)} ${
+        curve.map(p => `L ${toX(p.dayOffset).toFixed(1)},${toY(p.levelMg).toFixed(1)}`).join(' ')
+      } L ${lastX},${baselineY.toFixed(1)} Z`;
 
     const todayX = toX(todayOffset);
-    const todayPoint = curve.find((p) => p.dayOffset === todayOffset);
+    const todayPoint = curve.find(p => p.dayOffset === todayOffset);
     const todayY = todayPoint != null ? toY(todayPoint.levelMg) : null;
 
     // Build date to offset lookup for injection dot placement
@@ -88,8 +89,9 @@ export function LevelChart({
     const injectionDotData = injectionDates
       .map((d) => {
         const offset = dateToOffset[d];
-        if (offset === undefined || offset < minOffset || offset > maxOffset) return null;
-        const point = curve.find((p) => p.dayOffset === offset);
+        if (offset === undefined || offset < minOffset || offset > maxOffset)
+          return null;
+        const point = curve.find(p => p.dayOffset === offset);
         return { offset, levelMg: point?.levelMg ?? 0 };
       })
       .filter((item): item is { offset: number; levelMg: number } => item !== null);
@@ -126,7 +128,8 @@ export function LevelChart({
   // computed is null when curve.length < 2 — early return AFTER all hooks
   const todayInRange = computed != null && todayOffset >= computed.minOffset && todayOffset <= computed.maxOffset;
 
-  if (computed == null) return null;
+  if (computed == null)
+    return null;
 
   const { curvePoints, fillPath, baselineY, todayX, todayY, injectionDotData, xLabels, yTicks, toX, toY } = computed;
 
@@ -148,8 +151,10 @@ export function LevelChart({
 
         {/* X-axis baseline */}
         <Line
-          x1={PADDING.left} y1={baselineY}
-          x2={PADDING.left + plotW} y2={baselineY}
+          x1={PADDING.left}
+          y1={baselineY}
+          x2={PADDING.left + plotW}
+          y2={baselineY}
           stroke={colors.border}
           strokeWidth={1}
         />
@@ -160,8 +165,10 @@ export function LevelChart({
           return (
             <React.Fragment key={value}>
               <Line
-                x1={PADDING.left - 3} y1={y}
-                x2={PADDING.left} y2={y}
+                x1={PADDING.left - 3}
+                y1={y}
+                x2={PADDING.left}
+                y2={y}
                 stroke={colors.border}
                 strokeWidth={1}
               />
@@ -194,8 +201,10 @@ export function LevelChart({
         {/* Today dashed vertical line — only when today is in chart range */}
         {todayInRange && (
           <Line
-            x1={todayX} y1={PADDING.top}
-            x2={todayX} y2={baselineY}
+            x1={todayX}
+            y1={PADDING.top}
+            x2={todayX}
+            y2={baselineY}
             stroke={AMBER}
             strokeWidth={1}
             strokeDasharray="3,3"

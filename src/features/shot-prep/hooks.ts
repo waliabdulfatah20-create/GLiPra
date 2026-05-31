@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import type { ChecklistItemId } from './checklist-data';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { fetchShotPrepLog, upsertShotPrepLog } from './api';
-import { getChecklistStatus, type ChecklistItemId } from './checklist-data';
+import { getChecklistStatus } from './checklist-data';
 
 export function useShotDayPrep(injectionDate: string) {
   const session = useAuthStore.use.session();
@@ -60,10 +61,11 @@ export function useShotDayPrep(injectionDate: string) {
 
   const toggleItem = useCallback(
     (id: ChecklistItemId) => {
-      if (!userId) return;
+      if (!userId)
+        return;
       setLocalCompleted((prev) => {
         const next = prev.includes(id)
-          ? prev.filter((x) => x !== id)
+          ? prev.filter(x => x !== id)
           : [...prev, id];
         doUpsert(next);
         return next;

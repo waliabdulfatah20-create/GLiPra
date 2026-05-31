@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
-  CHECKLIST_ITEMS,
   CHECKLIST_ITEM_IDS,
+  CHECKLIST_ITEMS,
   getChecklistStatus,
 } from '@/features/shot-prep/checklist-data';
 
-describe('CHECKLIST_ITEMS', () => {
+describe('cHECKLIST_ITEMS', () => {
   it('has exactly 5 items', () => {
     expect(CHECKLIST_ITEMS).toHaveLength(5);
   });
@@ -16,7 +16,7 @@ describe('CHECKLIST_ITEMS', () => {
     }
   });
   it('item IDs match CHECKLIST_ITEM_IDS order', () => {
-    expect(CHECKLIST_ITEMS.map((i) => i.id)).toEqual(CHECKLIST_ITEM_IDS);
+    expect(CHECKLIST_ITEMS.map(i => i.id)).toEqual(CHECKLIST_ITEM_IDS);
   });
 });
 

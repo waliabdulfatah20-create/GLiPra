@@ -153,7 +153,8 @@ serve(async (req: Request) => {
     if (countError) {
       console.error('Rate-limit query failed:', countError.message);
       // Fail open on DB error — do not block the user.
-    } else if ((count ?? 0) >= DAILY_LIMIT) {
+    }
+    else if ((count ?? 0) >= DAILY_LIMIT) {
       return new Response(
         JSON.stringify({ error: 'Daily PDF limit reached (5/day)' }),
         {
@@ -167,7 +168,8 @@ serve(async (req: Request) => {
     let body: unknown;
     try {
       body = await req.json();
-    } catch {
+    }
+    catch {
       return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -311,7 +313,8 @@ serve(async (req: Request) => {
           color: rgb(0.07, 0.07, 0.07),
         });
         curY -= 14;
-      } else {
+      }
+      else {
         // Simple two-line split at word boundary near maxChars
         const breakIdx = question.lastIndexOf(' ', maxChars);
         const line1 = question.slice(0, breakIdx);
@@ -385,7 +388,8 @@ serve(async (req: Request) => {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (error: unknown) {
+  }
+  catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Internal server error';
     console.error('generate-visit-pdf unhandled error:', message);
     return new Response(JSON.stringify({ error: message }), {

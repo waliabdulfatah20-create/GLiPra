@@ -2,13 +2,13 @@ import { subDays } from 'date-fns';
 
 import { supabase } from '@/lib/supabase';
 
-export interface WeightLogEntry {
+export type WeightLogEntry = {
   id: string;
   weightKg: number;
   ewmaWeightKg: number | null;
   loggedAt: string;
   notes: string | null;
-}
+};
 
 /**
  * Insert a new weight log entry for the given user.
@@ -60,7 +60,8 @@ export async function fetchWeightLogCount(userId: string): Promise<number> {
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId);
 
-  if (error) return 0;
+  if (error)
+    return 0;
   return count ?? 0;
 }
 
@@ -85,7 +86,7 @@ export async function fetchWeightLogs(
     throw new Error(`Failed to fetch weight logs: ${error.message}`);
   }
 
-  return (data ?? []).map((row) => ({
+  return (data ?? []).map(row => ({
     id: row.id as string,
     weightKg: row.weight_kg as number,
     ewmaWeightKg: row.ewma_weight_kg as number | null,

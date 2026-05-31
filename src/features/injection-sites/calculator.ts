@@ -1,7 +1,8 @@
-import { differenceInCalendarDays, parseISO } from 'date-fns';
+import type { SiteCode } from './constants';
 
-import { REST_DAYS, SITE_ROTATION_ORDER, type SiteCode } from './constants';
 import type { InjectionLog } from './types';
+import { differenceInCalendarDays, parseISO } from 'date-fns';
+import { REST_DAYS, SITE_ROTATION_ORDER } from './constants';
 
 /**
  * Result of computing the rotation state.
@@ -10,10 +11,10 @@ import type { InjectionLog } from './types';
  *    should show a warning banner ("All sites within rest period") but still
  *    recommend the least-recently-used site so the user can proceed if needed.
  */
-export interface RotationState {
+export type RotationState = {
   recommendation: SiteCode;
   allResting: boolean;
-}
+};
 
 /**
  * Compute the next recommended injection site.
@@ -44,7 +45,8 @@ export function computeNextSite(
   const lastUsedAt = new Map<SiteCode, string>();
   for (const log of logs) {
     const code = log.site_code as SiteCode;
-    if (!SITE_ROTATION_ORDER.includes(code)) continue; // defensive: unknown code
+    if (!SITE_ROTATION_ORDER.includes(code))
+      continue; // defensive: unknown code
     const existing = lastUsedAt.get(code) ?? '';
     if (log.injected_at > existing) {
       lastUsedAt.set(code, log.injected_at);
@@ -54,7 +56,8 @@ export function computeNextSite(
   // Pass 1 — first non-resting site in rotation order.
   for (const code of SITE_ROTATION_ORDER) {
     const last = lastUsedAt.get(code);
-    if (!last) return { recommendation: code, allResting: false };
+    if (!last)
+      return { recommendation: code, allResting: false };
     const daysSince = differenceInCalendarDays(todayDate, parseISO(last));
     if (daysSince >= REST_DAYS) {
       return { recommendation: code, allResting: false };

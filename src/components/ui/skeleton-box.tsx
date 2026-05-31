@@ -8,10 +8,10 @@
  *   <SkeletonBox style={{ height: 20, width: '60%', marginBottom: 8 }} />
  */
 
-import * as React from 'react';
-import { StyleSheet, View } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as React from 'react';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -22,9 +22,9 @@ import Animated, {
 
 import { useTheme } from '@/lib/ThemeContext';
 
-interface SkeletonBoxProps {
+type SkeletonBoxProps = {
   style?: StyleProp<ViewStyle>;
-}
+};
 
 export function SkeletonBox({ style }: SkeletonBoxProps) {
   const { colors } = useTheme();

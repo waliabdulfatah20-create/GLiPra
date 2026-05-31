@@ -1,10 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
+import type { Language } from './resources';
 import { getLocales } from 'expo-localization';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { I18nManager } from 'react-native';
 
-import type { Language } from './resources';
+import { I18nManager } from 'react-native';
 import { resources } from './resources';
 import { getLanguage } from './utils';
 
@@ -23,7 +23,8 @@ export const SUPPORTED_LANGUAGES: Language[] = ['en', 'es'];
  */
 async function resolveStartupLanguage(): Promise<string> {
   const saved = await getLanguage();
-  if (saved && SUPPORTED_LANGUAGES.includes(saved as Language)) return saved as string;
+  if (saved && SUPPORTED_LANGUAGES.includes(saved as Language))
+    return saved as string;
 
   const deviceCode = (getLocales()[0]?.languageCode ?? 'en').split('-')[0];
   return SUPPORTED_LANGUAGES.includes(deviceCode as Language) ? deviceCode : 'en';

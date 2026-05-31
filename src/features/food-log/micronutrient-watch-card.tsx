@@ -2,33 +2,34 @@
 // Pro-gated card. Direction C design: gradient header, gaps chip, 2x2 tile grid, gap banner.
 // Rule 8: DisclaimerBanner tier={2}. Rule 9/10: food-strategy copy only, no condition names.
 
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import type { TFunction } from 'react-i18next';
+import type { NutrientKey, NutrientStatus } from './micronutrient-constants';
+import type { GlipraTokens } from '@/theme/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTranslation, type TFunction } from 'react-i18next';
 
+import * as React from 'react';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, View } from 'react-native';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { ProGate } from '@/features/subscription/pro-gate';
-import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
+import { useTheme } from '@/lib/ThemeContext';
 import { useDailyMacros } from './hooks';
 import {
-  MICRONUTRIENT_RDAS,
-  type NutrientKey,
-  type NutrientStatus,
   getGapBannerText,
   getGapCount,
   getNutrientPct,
   getNutrientStatus,
+  MICRONUTRIENT_RDAS,
+
 } from './micronutrient-constants';
 
-interface NutrientConfig {
+type NutrientConfig = {
   key: NutrientKey;
   labelKey: string;
   value: number;
   unit: string;
-}
+};
 
 export function MicronutrientWatchCard() {
   const { colors, gradients, spacing, radius, shadows } = useTheme();
@@ -37,10 +38,11 @@ export function MicronutrientWatchCard() {
     [colors, spacing, radius, shadows],
   );
   const { t } = useTranslation();
-  const { magnesiumMg, zincMg, b12Mcg, vitaminDIu, hasMicronutrients, isLoading } =
-    useDailyMacros();
+  const { magnesiumMg, zincMg, b12Mcg, vitaminDIu, hasMicronutrients, isLoading }
+    = useDailyMacros();
 
-  if (isLoading) return null;
+  if (isLoading)
+    return null;
 
   const microData = { magnesiumMg, zincMg, b12Mcg, vitaminDIu };
   const gapCount = hasMicronutrients ? getGapCount(microData) : 0;
@@ -48,9 +50,9 @@ export function MicronutrientWatchCard() {
 
   const nutrients: NutrientConfig[] = [
     { key: 'magnesiumMg', labelKey: 'log.nutrient_magnesium', value: magnesiumMg, unit: 'mg' },
-    { key: 'zincMg',      labelKey: 'log.nutrient_zinc',       value: zincMg,      unit: 'mg' },
-    { key: 'b12Mcg',      labelKey: 'log.nutrient_b12',        value: b12Mcg,      unit: 'mcg' },
-    { key: 'vitaminDIu',  labelKey: 'log.nutrient_vitd',       value: vitaminDIu,  unit: 'IU' },
+    { key: 'zincMg', labelKey: 'log.nutrient_zinc', value: zincMg, unit: 'mg' },
+    { key: 'b12Mcg', labelKey: 'log.nutrient_b12', value: b12Mcg, unit: 'mcg' },
+    { key: 'vitaminDIu', labelKey: 'log.nutrient_vitd', value: vitaminDIu, unit: 'IU' },
   ];
 
   return (
@@ -83,33 +85,35 @@ export function MicronutrientWatchCard() {
 
         {/* Body */}
         <View style={styles.body}>
-          {!hasMicronutrients ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyIcon}>🔬</Text>
-              <Text style={styles.emptyText}>{t('log.no_micro_data')}</Text>
-            </View>
-          ) : (
-            <>
-              <View style={styles.grid}>
-                {nutrients.map((n) => (
-                  <NutrientTile
-                    key={n.key}
-                    label={t(n.labelKey)}
-                    value={n.value}
-                    unit={n.unit}
-                    rda={MICRONUTRIENT_RDAS[n.key]}
-                    styles={styles}
-                    t={t}
-                  />
-                ))}
-              </View>
-              {gapText && (
-                <View style={styles.gapBanner}>
-                  <Text style={styles.gapBannerText}>{gapText}</Text>
+          {!hasMicronutrients
+            ? (
+                <View style={styles.emptyState}>
+                  <Text style={styles.emptyIcon}>🔬</Text>
+                  <Text style={styles.emptyText}>{t('log.no_micro_data')}</Text>
                 </View>
+              )
+            : (
+                <>
+                  <View style={styles.grid}>
+                    {nutrients.map(n => (
+                      <NutrientTile
+                        key={n.key}
+                        label={t(n.labelKey)}
+                        value={n.value}
+                        unit={n.unit}
+                        rda={MICRONUTRIENT_RDAS[n.key]}
+                        styles={styles}
+                        t={t}
+                      />
+                    ))}
+                  </View>
+                  {gapText && (
+                    <View style={styles.gapBanner}>
+                      <Text style={styles.gapBannerText}>{gapText}</Text>
+                    </View>
+                  )}
+                </>
               )}
-            </>
-          )}
           <DisclaimerBanner tier={2}>
             <Text style={styles.disclaimerText}>{t('log.micronutrient_disclaimer')}</Text>
           </DisclaimerBanner>
@@ -119,14 +123,14 @@ export function MicronutrientWatchCard() {
   );
 }
 
-interface NutrientTileProps {
+type NutrientTileProps = {
   label: string;
   value: number;
   unit: string;
   rda: number;
   styles: ReturnType<typeof makeStyles>;
   t: TFunction;
-}
+};
 
 function NutrientTile({ label, value, unit, rda, styles, t }: NutrientTileProps) {
   const pct = getNutrientPct(value, rda);
@@ -151,7 +155,10 @@ function NutrientTile({ label, value, unit, rda, styles, t }: NutrientTileProps)
       <Text style={styles.tileName}>{label}</Text>
       <Text style={styles.tileValue}>
         {display}
-        <Text style={styles.tileUnit}> {unit}</Text>
+        <Text style={styles.tileUnit}>
+          {' '}
+          {unit}
+        </Text>
       </Text>
       <Text style={styles.tilePct}>
         {pct >= 100 ? t('log.goal_met') : t('log.pct_of_goal', { pct })}
@@ -169,12 +176,12 @@ function NutrientTile({ label, value, unit, rda, styles, t }: NutrientTileProps)
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

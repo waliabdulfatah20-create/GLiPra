@@ -2,16 +2,16 @@
 // Assembles the last-4-weeks data summary, provides AI question generation,
 // and a PDF generation mutation.
 
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { format, subDays } from 'date-fns';
+import { useState } from 'react';
 
-import { supabase } from '@/lib/supabase';
-import { isMockAIEnabled, MOCK_VISIT_PREP_QUESTIONS } from '@/lib/mockAI';
 import { useAuthStore } from '@/features/auth/use-auth-store';
+import { useProteinHistoryPerDay } from '@/features/progress/hooks';
 import { useTodayData } from '@/features/today/hooks';
 import { useWeightLogs } from '@/features/weight/hooks';
-import { useProteinHistoryPerDay } from '@/features/progress/hooks';
+import { isMockAIEnabled, MOCK_VISIT_PREP_QUESTIONS } from '@/lib/mockAI';
+import { supabase } from '@/lib/supabase';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -35,7 +35,8 @@ export type VisitPrepData = {
 
 /** Convert internal medication ID to a display name for the PDF. */
 function medicationIdToName(id: string | undefined | null): string | null {
-  if (!id) return null;
+  if (!id)
+    return null;
   const map: Record<string, string> = {
     semaglutide_ozempic: 'Semaglutide (Ozempic)',
     semaglutide_wegovy: 'Semaglutide (Wegovy)',
@@ -51,7 +52,8 @@ function medicationIdToName(id: string | undefined | null): string | null {
 
 /** Convert internal injection phase key to a human-readable label. */
 function phaseLabel(phase: string | null | undefined): string | null {
-  if (!phase) return null;
+  if (!phase)
+    return null;
   const map: Record<string, string> = {
     injection_day: 'Injection Day',
     peak_suppression: 'Peak Suppression (Days 1–2)',
@@ -79,7 +81,8 @@ function useRecentCheckIns(): {
   const { data, isLoading } = useQuery({
     queryKey: ['visit-prep-checkins', userId],
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId)
+        return [];
       const { data: rows, error } = await supabase
         .from('daily_checkins')
         .select('nausea, energy')
@@ -88,7 +91,8 @@ function useRecentCheckIns(): {
         .order('checked_in_at', { ascending: false })
         .limit(7);
 
-      if (error) throw new Error(`Failed to fetch check-ins: ${error.message}`);
+      if (error)
+        throw new Error(`Failed to fetch check-ins: ${error.message}`);
       return (rows ?? []) as CheckInRow[];
     },
     enabled: !!userId,
@@ -115,9 +119,9 @@ export function useVisitPrepData(): VisitPrepData {
   const ewmaWeightKg = latestLog?.ewmaWeightKg ?? null;
 
   // 28-day average protein — only count days where the user logged food (hasData)
-  const loggedDays = proteinHistory.filter((d) => d.hasData);
-  const avgProteinG =
-    loggedDays.length > 0
+  const loggedDays = proteinHistory.filter(d => d.hasData);
+  const avgProteinG
+    = loggedDays.length > 0
       ? loggedDays.reduce((sum, d) => sum + d.proteinG, 0) / loggedDays.length
       : 0;
 
@@ -181,7 +185,7 @@ export function useVisitPrep(): UseVisitPrepResult {
 
     // Mock gate — zero OpenAI cost during development (Rule from CLAUDE.md cost section).
     if (isMockAIEnabled()) {
-      await new Promise<void>((resolve) => setTimeout(resolve, 800));
+      await new Promise<void>(resolve => setTimeout(resolve, 800));
       setQuestions([...MOCK_VISIT_PREP_QUESTIONS]);
       setIsLoading(false);
       return;
@@ -200,8 +204,8 @@ export function useVisitPrep(): UseVisitPrepResult {
         daysSinceInjection: data.daysSinceInjection ?? 0,
       };
 
-      const { data: result, error: fnError } =
-        await supabase.functions.invoke('generate-visit-prep', { body });
+      const { data: result, error: fnError }
+        = await supabase.functions.invoke('generate-visit-prep', { body });
 
       if (fnError) {
         throw new Error(fnError.message ?? 'Question generation failed');
@@ -213,10 +217,12 @@ export function useVisitPrep(): UseVisitPrepResult {
       }
 
       setQuestions(raw.questions);
-    } catch (err: unknown) {
+    }
+    catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Unknown error';
       setError(msg);
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };
@@ -271,15 +277,17 @@ export function useGeneratePdf(): GeneratePdfResult {
 
       const pdfBase64 = (result as { pdfBase64?: string })?.pdfBase64;
       if (typeof pdfBase64 !== 'string') {
-        throw new Error('Invalid response from PDF function');
+        throw new TypeError('Invalid response from PDF function');
       }
 
       return pdfBase64;
-    } catch (err: unknown) {
+    }
+    catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Unknown error';
       setError(msg);
       return null;
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };

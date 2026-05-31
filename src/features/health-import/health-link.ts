@@ -12,10 +12,10 @@ import { startOfDay, subDays } from 'date-fns';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export interface HealthWeightReading {
+export type HealthWeightReading = {
   weightKg: number;
   loggedAt: string; // ISO 8601
-}
+};
 
 // ─── Module load (graceful stub) ──────────────────────────────────────────────
 
@@ -26,7 +26,8 @@ try {
   // Dynamic require so bundler doesn't hard-fail in Expo Go
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   HealthLink = require('react-native-health-link').default ?? require('react-native-health-link');
-} catch {
+}
+catch {
   // Package not installed or native module not linked — run in stub mode
   HealthLink = null;
 }
@@ -39,11 +40,13 @@ try {
  * Returns false if the package is not installed or unavailable.
  */
 export async function isHealthAvailable(): Promise<boolean> {
-  if (HealthLink === null) return false;
+  if (HealthLink === null)
+    return false;
   try {
     const result = await HealthLink.isAvailable();
     return result === true;
-  } catch {
+  }
+  catch {
     return false;
   }
 }
@@ -54,7 +57,8 @@ export async function isHealthAvailable(): Promise<boolean> {
  * Returns false immediately if health-link is unavailable.
  */
 export async function requestHealthPermissions(): Promise<boolean> {
-  if (HealthLink === null) return false;
+  if (HealthLink === null)
+    return false;
   try {
     const granted = await HealthLink.requestPermissions({
       permissions: {
@@ -63,7 +67,8 @@ export async function requestHealthPermissions(): Promise<boolean> {
       },
     });
     return granted === true;
-  } catch {
+  }
+  catch {
     return false;
   }
 }
@@ -78,7 +83,8 @@ export async function requestHealthPermissions(): Promise<boolean> {
 export async function fetchHealthWeightLogs(
   days = 90,
 ): Promise<HealthWeightReading[]> {
-  if (HealthLink === null) return [];
+  if (HealthLink === null)
+    return [];
 
   try {
     const endDate = new Date();
@@ -91,7 +97,8 @@ export async function fetchHealthWeightLogs(
       ascending: true,
     });
 
-    if (!Array.isArray(results)) return [];
+    if (!Array.isArray(results))
+      return [];
 
     return results.map((reading: { value: number; unit?: string; startDate?: string; date?: string; timestamp?: string }) => {
       const rawValue: number = reading.value ?? 0;
@@ -103,15 +110,16 @@ export async function fetchHealthWeightLogs(
         : rawValue;
 
       // Normalise the date field — library may use startDate, date, or timestamp
-      const rawDate: string =
-        reading.startDate ?? reading.date ?? reading.timestamp ?? new Date().toISOString();
+      const rawDate: string
+        = reading.startDate ?? reading.date ?? reading.timestamp ?? new Date().toISOString();
 
       return {
         weightKg: Math.round(weightKg * 100) / 100,
         loggedAt: new Date(rawDate).toISOString(),
       };
     });
-  } catch {
+  }
+  catch {
     return [];
   }
 }
@@ -121,7 +129,8 @@ export async function fetchHealthWeightLogs(
  * Returns null if health-link is unavailable or permission is denied.
  */
 export async function fetchTodaySteps(): Promise<number | null> {
-  if (HealthLink === null) return null;
+  if (HealthLink === null)
+    return null;
 
   try {
     const now = new Date();
@@ -134,7 +143,8 @@ export async function fetchTodaySteps(): Promise<number | null> {
       ascending: false,
     });
 
-    if (!Array.isArray(results) || results.length === 0) return null;
+    if (!Array.isArray(results) || results.length === 0)
+      return null;
 
     // Sum all step readings for today
     const total = results.reduce(
@@ -142,7 +152,8 @@ export async function fetchTodaySteps(): Promise<number | null> {
       0,
     );
     return Math.round(total);
-  } catch {
+  }
+  catch {
     return null;
   }
 }

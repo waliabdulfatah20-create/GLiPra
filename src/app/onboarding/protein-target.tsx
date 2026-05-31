@@ -1,23 +1,23 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import type { ProteinResult } from '@/utils/protein';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
+
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { LinearGradient } from 'expo-linear-gradient';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 import {
-  calculateProteinFloor,
   ACTIVITY_MULTIPLIERS,
+  calculateProteinFloor,
   KIDNEY_DISEASE_MAX_G_PER_KG,
   MAINTENANCE_MULTIPLIER,
 } from '@/utils/protein';
-import type { ProteinResult } from '@/utils/protein';
 
 export default function ProteinTargetScreen() {
   const router = useRouter();
@@ -33,23 +33,23 @@ export default function ProteinTargetScreen() {
   );
 
   const result = useMemo<ProteinResult | null>(() => {
-    const { weightKg, heightCm, hasKidneyDisease, isPregnant, activityLevel, medicationStatus } =
-      formData;
+    const { weightKg, heightCm, hasKidneyDisease, isPregnant, activityLevel, medicationStatus }
+      = formData;
 
     if (
-      weightKg === undefined ||
-      heightCm === undefined ||
-      hasKidneyDisease === undefined ||
-      isPregnant === undefined ||
-      activityLevel === undefined
+      weightKg === undefined
+      || heightCm === undefined
+      || hasKidneyDisease === undefined
+      || isPregnant === undefined
+      || activityLevel === undefined
     ) {
       return null;
     }
 
     const bmi = weightKg / ((heightCm / 100) * (heightCm / 100));
 
-    const phase: 'weight_loss' | 'maintenance' =
-      medicationStatus === 'maintenance' || medicationStatus === 'tapering'
+    const phase: 'weight_loss' | 'maintenance'
+      = medicationStatus === 'maintenance' || medicationStatus === 'tapering'
         ? 'maintenance'
         : 'weight_loss';
 
@@ -67,20 +67,22 @@ export default function ProteinTargetScreen() {
   // Formula line: "82.5 kg × 1.6 g/kg" — hidden when floored by pregnancy
   // (pregnancy minimum 80g doesn't fit a weight × multiplier explanation)
   const formulaText = React.useMemo(() => {
-    if (!result || !formData.activityLevel || result.flooredByPregnancy) return null;
+    if (!result || !formData.activityLevel || result.flooredByPregnancy)
+      return null;
 
     const activityMultiplier = ACTIVITY_MULTIPLIERS[formData.activityLevel];
     let displayMultiplier: number;
 
     if (result.cappedByKidneyDisease) {
       displayMultiplier = KIDNEY_DISEASE_MAX_G_PER_KG; // 0.8
-    } else {
-      const phase: 'weight_loss' | 'maintenance' =
-        formData.medicationStatus === 'maintenance' || formData.medicationStatus === 'tapering'
+    }
+    else {
+      const phase: 'weight_loss' | 'maintenance'
+        = formData.medicationStatus === 'maintenance' || formData.medicationStatus === 'tapering'
           ? 'maintenance'
           : 'weight_loss';
-      displayMultiplier =
-        phase === 'maintenance' ? activityMultiplier * MAINTENANCE_MULTIPLIER : activityMultiplier;
+      displayMultiplier
+        = phase === 'maintenance' ? activityMultiplier * MAINTENANCE_MULTIPLIER : activityMultiplier;
     }
 
     const weight = result.baseWeightUsedKg.toFixed(1);
@@ -92,7 +94,8 @@ export default function ProteinTargetScreen() {
   const canProceed = acknowledged && result !== null;
 
   const handleNext = () => {
-    if (!canProceed || result === null) return;
+    if (!canProceed || result === null)
+      return;
     haptics.medium();
     setFormData({ proteinFloorG: result.proteinFloorG, proteinFloorAcknowledged: true });
     router.push('/onboarding/import');
@@ -145,28 +148,28 @@ export default function ProteinTargetScreen() {
             )}
 
             {/* Adjustment badges — frosted-glass pills on gradient */}
-            {result !== null &&
-              (result.usedIdealBodyWeight ||
-                result.cappedByKidneyDisease ||
-                result.flooredByPregnancy) && (
-                <View style={styles.badgeRow}>
-                  {result.usedIdealBodyWeight && (
-                    <View style={styles.badge}>
-                      <Text style={styles.badgeText}>Adjusted for BMI</Text>
-                    </View>
-                  )}
-                  {result.cappedByKidneyDisease && (
-                    <View style={styles.badge}>
-                      <Text style={styles.badgeText}>Kidney-safe limit</Text>
-                    </View>
-                  )}
-                  {result.flooredByPregnancy && (
-                    <View style={styles.badge}>
-                      <Text style={styles.badgeText}>Pregnancy minimum</Text>
-                    </View>
-                  )}
-                </View>
-              )}
+            {result !== null
+              && (result.usedIdealBodyWeight
+                || result.cappedByKidneyDisease
+                || result.flooredByPregnancy) && (
+              <View style={styles.badgeRow}>
+                {result.usedIdealBodyWeight && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>Adjusted for BMI</Text>
+                  </View>
+                )}
+                {result.cappedByKidneyDisease && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>Kidney-safe limit</Text>
+                  </View>
+                )}
+                {result.flooredByPregnancy && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>Pregnancy minimum</Text>
+                  </View>
+                )}
+              </View>
+            )}
           </LinearGradient>
         </View>
 
@@ -182,7 +185,7 @@ export default function ProteinTargetScreen() {
         {/* Acknowledgment checkbox */}
         <Pressable
           style={styles.checkboxRow}
-          onPress={() => setAcknowledged((prev) => !prev)}
+          onPress={() => setAcknowledged(prev => !prev)}
           accessibilityRole="checkbox"
           accessibilityState={{ checked: acknowledged }}
           accessibilityLabel="I understand this is an estimate. I will confirm with my prescriber."
@@ -219,12 +222,12 @@ export default function ProteinTargetScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

@@ -6,8 +6,8 @@
  * Unique constraint: (user_id, milestone_id)
  */
 
-import { supabase } from '@/lib/supabase';
 import type { MilestoneId } from '@/features/journey-cards/milestones';
+import { supabase } from '@/lib/supabase';
 
 /**
  * Fetch all milestone IDs that have been unlocked for the given user.
@@ -24,13 +24,13 @@ export async function fetchUnlockedMilestones(userId: string): Promise<Milestone
     throw new Error(`fetchUnlockedMilestones: ${error.message}`);
   }
 
-  return (data ?? []).map((row) => row.milestone_id as MilestoneId);
+  return (data ?? []).map(row => row.milestone_id as MilestoneId);
 }
 
-export interface UnlockedMilestone {
+export type UnlockedMilestone = {
   milestoneId: MilestoneId;
   unlockedAt: string; // ISO string
-}
+};
 
 /**
  * Fetch all unlocked milestones with their unlock timestamps.
@@ -49,7 +49,7 @@ export async function fetchUnlockedMilestonesWithDates(
     throw new Error(`fetchUnlockedMilestonesWithDates: ${error.message}`);
   }
 
-  return (data ?? []).map((row) => ({
+  return (data ?? []).map(row => ({
     milestoneId: row.milestone_id as MilestoneId,
     unlockedAt: row.unlocked_at,
   }));

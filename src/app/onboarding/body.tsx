@@ -1,6 +1,9 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useState } from 'react';
+
 import {
   Pressable,
   ScrollView,
@@ -10,24 +13,22 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { LinearGradient } from 'expo-linear-gradient';
+import { UnitToggle } from '@/components/ui/unit-toggle';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
-import { UnitToggle } from '@/components/ui/unit-toggle';
+import { haptics } from '@/lib/haptics';
+import { useTheme } from '@/lib/ThemeContext';
 import {
   ftInToCm,
   lbsToKg,
   useHeightUnit,
   useWeightUnit,
 } from '@/lib/unit-preference';
-import { haptics } from '@/lib/haptics';
-import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 function parsePositiveNumber(value: string): number | null {
-  const num = parseFloat(value);
-  if (isNaN(num) || num <= 0) return null;
+  const num = Number.parseFloat(value);
+  if (isNaN(num) || num <= 0)
+    return null;
   return num;
 }
 
@@ -50,7 +51,7 @@ export default function BodyScreen() {
   const { colors, spacing, radius, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius]
+    [colors, spacing, radius],
   );
 
   // Parsed weight in the user's chosen unit (kg or lbs)
@@ -73,7 +74,8 @@ export default function BodyScreen() {
   const canProceed = weightRaw !== null && isHeightValid;
 
   const handleNext = () => {
-    if (!canProceed || weightRaw === null) return;
+    if (!canProceed || weightRaw === null)
+      return;
     haptics.medium();
 
     // Convert to metric for storage
@@ -82,15 +84,16 @@ export default function BodyScreen() {
     let heightCm: number;
     if (isMetricHeight) {
       heightCm = heightCmParsed!;
-    } else {
+    }
+    else {
       const ft = ftParsed!;
       const inches = typeof inParsed === 'number' ? inParsed : 0;
       heightCm = ftInToCm(ft, inches);
     }
 
     const goalWeightRaw = parsePositiveNumber(goalWeightText);
-    const goalWeightKg =
-      goalWeightRaw !== null
+    const goalWeightKg
+      = goalWeightRaw !== null
         ? weightUnit === 'lbs'
           ? lbsToKg(goalWeightRaw)
           : goalWeightRaw
@@ -204,8 +207,9 @@ export default function BodyScreen() {
                   value={inText}
                   onChangeText={(t) => {
                     // Clamp to 0-11 range
-                    const n = parseInt(t, 10);
-                    if (t === '' || (n >= 0 && n <= 11)) setInText(t);
+                    const n = Number.parseInt(t, 10);
+                    if (t === '' || (n >= 0 && n <= 11))
+                      setInText(t);
                   }}
                   placeholder="9"
                   placeholderTextColor={colors.textDisabled}
@@ -257,11 +261,11 @@ export default function BodyScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { EWMA_ALPHA, applyEwma, computeEwmaSeries } from '@/utils/ewma';
+import { applyEwma, computeEwmaSeries, EWMA_ALPHA } from '@/utils/ewma';
 
 // ─── applyEwma ────────────────────────────────────────────────────────────────
 
@@ -72,7 +72,7 @@ describe('computeEwmaSeries', () => {
   });
 
   it('converges toward a stable weight over many identical readings', () => {
-    const readings = Array(20).fill(80) as number[];
+    const readings = Array.from({ length: 20 }).fill(80) as number[];
     const result = computeEwmaSeries(readings);
     expect(result).toBe(80);
   });
@@ -95,7 +95,7 @@ describe('computeEwmaSeries', () => {
 
 // ─── EWMA_ALPHA constant ──────────────────────────────────────────────────────
 
-describe('EWMA_ALPHA', () => {
+describe('eWMA_ALPHA', () => {
   it('is exported and equals 0.1', () => {
     expect(EWMA_ALPHA).toBe(0.1);
   });

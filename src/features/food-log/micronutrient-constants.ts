@@ -14,16 +14,20 @@ export type NutrientStatus = 'green' | 'amber' | 'red';
 
 /** % of RDA achieved, capped at 100, rounded to nearest integer */
 export function getNutrientPct(actual: number, rda: number): number {
-  if (rda <= 0 || !isFinite(rda)) return 0;
+  if (rda <= 0 || !isFinite(rda))
+    return 0;
   return Math.min(100, Math.round((Math.max(0, actual) / rda) * 100));
 }
 
 /** green >= 80% | amber 50-79% | red < 50% */
 export function getNutrientStatus(actual: number, rda: number): NutrientStatus {
-  if (rda <= 0 || !isFinite(rda)) return 'red';
+  if (rda <= 0 || !isFinite(rda))
+    return 'red';
   const pct = (actual / rda) * 100;
-  if (pct >= 80) return 'green';
-  if (pct >= 50) return 'amber';
+  if (pct >= 80)
+    return 'green';
+  if (pct >= 50)
+    return 'amber';
   return 'red';
 }
 
@@ -32,7 +36,7 @@ export type MicronutrientData = { [K in NutrientKey]: number };
 /** Count of nutrients strictly below 50% of their RDA */
 export function getGapCount(data: MicronutrientData): number {
   return (Object.keys(MICRONUTRIENT_RDAS) as NutrientKey[]).filter(
-    (key) => data[key] / MICRONUTRIENT_RDAS[key] < 0.5,
+    key => data[key] / MICRONUTRIENT_RDAS[key] < 0.5,
   ).length;
 }
 
@@ -57,10 +61,11 @@ const NUTRIENT_FOOD_TIPS: Record<NutrientKey, string> = {
  */
 export function getGapBannerText(data: MicronutrientData): string | null {
   const gaps = (Object.keys(MICRONUTRIENT_RDAS) as NutrientKey[]).filter(
-    (key) => data[key] / MICRONUTRIENT_RDAS[key] < 0.5,
+    key => data[key] / MICRONUTRIENT_RDAS[key] < 0.5,
   );
-  if (gaps.length === 0) return null;
-  const named = gaps.slice(0, 2).map((k) => NUTRIENT_LABELS[k]).join(' and ');
-  const tips = gaps.slice(0, 2).map((k) => NUTRIENT_FOOD_TIPS[k]).join(', or ');
+  if (gaps.length === 0)
+    return null;
+  const named = gaps.slice(0, 2).map(k => NUTRIENT_LABELS[k]).join(' and ');
+  const tips = gaps.slice(0, 2).map(k => NUTRIENT_FOOD_TIPS[k]).join(', or ');
   return `Low ${named} today. Try ${tips}.`;
 }

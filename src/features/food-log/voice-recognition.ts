@@ -2,14 +2,14 @@
 // Rule 1: audio sent to edge function, never directly to OpenAI.
 // Cost: returns MOCK_VOICE_PARSE when EXPO_PUBLIC_USE_MOCK_AI=true.
 
-import { supabase } from '@/lib/supabase';
-import { isMockAIEnabled, MOCK_VOICE_PARSE } from '@/lib/mockAI';
 import type { RecognitionResult } from './photo-recognition';
+import { isMockAIEnabled, MOCK_VOICE_PARSE } from '@/lib/mockAI';
+import { supabase } from '@/lib/supabase';
 
-export interface VoiceInput {
+export type VoiceInput = {
   audioBase64: string;
   mimeType: string;
-}
+};
 
 const VOICE_FALLBACK: RecognitionResult = {
   transcript: '',
@@ -28,7 +28,8 @@ const VOICE_FALLBACK: RecognitionResult = {
 };
 
 export async function transcribeVoice(input: VoiceInput): Promise<RecognitionResult> {
-  if (isMockAIEnabled()) return MOCK_VOICE_PARSE;
+  if (isMockAIEnabled())
+    return MOCK_VOICE_PARSE;
 
   try {
     const { data, error } = await supabase.functions.invoke('transcribe-food', {
@@ -39,7 +40,8 @@ export async function transcribeVoice(input: VoiceInput): Promise<RecognitionRes
       return VOICE_FALLBACK;
     }
     return data as RecognitionResult;
-  } catch (err) {
+  }
+  catch (err) {
     console.error('[transcribeVoice] unexpected error:', err);
     return VOICE_FALLBACK;
   }

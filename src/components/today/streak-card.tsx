@@ -1,23 +1,23 @@
+import type { GlipraTokens } from '@/theme/tokens';
 import { router } from 'expo-router';
 import * as React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import Animated, {
+  useAnimatedStyle,
   useSharedValue,
   withSpring,
   withTiming,
-  useAnimatedStyle,
 } from 'react-native-reanimated';
-
 import { Bolt } from '@/components/ui/icons';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
-export interface StreakCardProps {
+export type StreakCardProps = {
   currentStreak: number;
   longestStreak: number;
-}
+};
 
 export function StreakCard({ currentStreak, longestStreak }: StreakCardProps) {
   const { t } = useTranslation();
@@ -80,12 +80,12 @@ export function StreakCard({ currentStreak, longestStreak }: StreakCardProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

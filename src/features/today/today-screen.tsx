@@ -1,7 +1,13 @@
+import type { ContentCard } from '@/features/content-cards/data';
+import type { Milestone, MilestoneId } from '@/features/journey-cards/milestones';
+import type { GlipraTokens } from '@/theme/tokens';
+import type { InjectionPhase } from '@/types';
 import { differenceInCalendarDays, format } from 'date-fns';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Pressable,
   ScrollView,
@@ -11,41 +17,36 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTranslation } from 'react-i18next';
-
 import { EscalationCard } from '@/components/safety/escalation-card';
 import { CardsCarousel } from '@/components/today/cards-carousel';
 import { ContentCardSheet } from '@/components/today/content-card-sheet';
 import { DailyGuidanceCard } from '@/components/today/daily-guidance-card';
-import { PharmacistSpotlightCard } from '@/components/today/pharmacist-spotlight-card';
+import { InjectionCycleCard } from '@/components/today/injection-cycle-card';
 import { MedLevelBanner } from '@/components/today/med-level-banner';
+import { PharmacistSpotlightCard } from '@/components/today/pharmacist-spotlight-card';
 import { PhaseBadge } from '@/components/today/phase-badge';
 import { ProteinRing } from '@/components/today/protein-ring';
-import { InjectionCycleCard } from '@/components/today/injection-cycle-card';
 import { StreakCard } from '@/components/today/streak-card';
-import { MilestoneToast } from '@/components/ui/milestone-toast';
-import { TodaySkeleton } from '@/components/ui/today-skeleton';
 import {
   ClipboardCheck,
   ProgressPath,
   Settings as SettingsIcon,
   TrendingUp,
 } from '@/components/ui/icons';
-import { useTodayCheckIn } from '@/features/check-in/hooks';
-import type { ContentCard } from '@/features/content-cards/data';
-import { getActiveCards } from '@/features/content-cards/data';
-import { useCheckAndUnlockMilestones } from '@/features/journey-cards/hooks';
-import { MILESTONES, type Milestone, type MilestoneId } from '@/features/journey-cards/milestones';
-import { useTodayData } from '@/features/today/hooks';
-import { useDailyGuidance } from '@/features/daily-guidance/hooks';
-import { haptics } from '@/lib/haptics';
-import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
-import type { InjectionPhase } from '@/types';
+import { MilestoneToast } from '@/components/ui/milestone-toast';
+import { TodaySkeleton } from '@/components/ui/today-skeleton';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { markRedFlagTriggered } from '@/features/check-in/api';
+import { useTodayCheckIn } from '@/features/check-in/hooks';
+import { getActiveCards } from '@/features/content-cards/data';
+import { useDailyGuidance } from '@/features/daily-guidance/hooks';
+import { useCheckAndUnlockMilestones } from '@/features/journey-cards/hooks';
+import { MILESTONES } from '@/features/journey-cards/milestones';
 import { useRedFlagSnooze } from '@/features/safety/hooks';
+import { useTodayData } from '@/features/today/hooks';
 import { analytics, EVENTS } from '@/lib/analytics';
+import { haptics } from '@/lib/haptics';
+import { useTheme } from '@/lib/ThemeContext';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -117,8 +118,8 @@ export function TodayScreen() {
   } = useDailyGuidance(guidanceContext);
 
   // isTriggered: detection fired AND snooze has loaded AND snooze is not active
-  const isTriggered =
-    !!redFlagDetection?.triggered && !snoozeLoading && !isSnoozed;
+  const isTriggered
+    = !!redFlagDetection?.triggered && !snoozeLoading && !isSnoozed;
 
   // Write audit flag to DB when triggered (non-blocking, non-fatal)
   React.useEffect(() => {
@@ -145,7 +146,8 @@ export function TodayScreen() {
   // Readiness score count-up animation — ticks 0 → score over 1.2 s when data arrives
   const [displayScore, setDisplayScore] = React.useState(0);
   React.useEffect(() => {
-    if (!readinessCard?.score) return;
+    if (!readinessCard?.score)
+      return;
     const target = readinessCard.score;
     const DURATION_MS = 1200;
     const STEPS = 36;
@@ -154,9 +156,10 @@ export function TodayScreen() {
     const timer = setInterval(() => {
       step++;
       const t = step / STEPS;
-      const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+      const eased = 1 - (1 - t) ** 3; // ease-out cubic
       setDisplayScore(Math.round(eased * target));
-      if (step >= STEPS) clearInterval(timer);
+      if (step >= STEPS)
+        clearInterval(timer);
     }, stepMs);
     return () => clearInterval(timer);
   }, [readinessCard?.score]);
@@ -179,12 +182,13 @@ export function TodayScreen() {
     const all = getActiveCards();
     if (currentPhase) {
       const phaseMatch = all.find(
-        (c) => c.phases?.includes(currentPhase as InjectionPhase),
+        c => c.phases?.includes(currentPhase as InjectionPhase),
       );
-      if (phaseMatch) return phaseMatch;
+      if (phaseMatch)
+        return phaseMatch;
     }
     // Fallback: rotate universal cards by day-of-year so it changes daily
-    const universal = all.filter((c) => !c.phases?.length);
+    const universal = all.filter(c => !c.phases?.length);
     const dayOfYear = differenceInCalendarDays(
       new Date(),
       new Date(new Date().getFullYear(), 0, 0),
@@ -199,7 +203,8 @@ export function TodayScreen() {
     const first = ids[0];
     if (first) {
       const m = MILESTONES[first];
-      if (m) setToastMilestone(m);
+      if (m)
+        setToastMilestone(m);
     }
   }, []);
 
@@ -303,302 +308,309 @@ export function TodayScreen() {
         {/* ── Content area — padded, sits below the gradient hero ─ */}
         <View style={styles.contentArea}>
 
-        {/* ── Conditional banners ───────────────────────────────── */}
-        {profile?.phase === 'maintenance' && (
-          <View style={styles.maintenanceBanner}>
-            <Text style={styles.maintenanceBannerText}>
-              {t('today.maintenance_banner')}
-            </Text>
-          </View>
-        )}
-
-        {profile?.medicationStatus === 'discontinued' && (
-          <TouchableOpacity
-            style={styles.discontinuedBanner}
-            onPress={() => { haptics.tap(); router.push('/discontinuation-mode'); }}
-            activeOpacity={0.75}
-            accessibilityRole="button"
-            accessibilityLabel="Open Life After GLP-1 guidance"
-          >
-            <Text style={styles.discontinuedBannerText}>
-              {t('today.discontinued_banner')}
-            </Text>
-          </TouchableOpacity>
-        )}
-
-        {/* ── Readiness Score ───────────────────────────────────── */}
-        {readinessCard && (
-          <View style={styles.readinessCard}>
-            {/* Headline */}
-            <Text style={styles.readinessHeadline}>{readinessCard.headline}</Text>
-
-            {/* Divider */}
-            <View style={styles.readinessDivider} />
-
-            {/* Factor rows */}
-            {readinessCard.factors.map((factor) => (
-              <View key={factor.label} style={styles.readinessFactorRow}>
-                <View
-                  style={[
-                    styles.readinessFactorDot,
-                    {
-                      backgroundColor:
-                        factor.sentiment === 'positive'
-                          ? colors.success
-                          : factor.delta < -10
-                          ? colors.error
-                          : colors.warning,
-                    },
-                  ]}
-                />
-                <Text style={styles.readinessFactorLabel}>{factor.label}</Text>
-                <Text
-                  style={[
-                    styles.readinessFactorDelta,
-                    {
-                      color:
-                        factor.sentiment === 'positive'
-                          ? colors.success
-                          : factor.delta < -10
-                          ? colors.error
-                          : colors.warning,
-                    },
-                  ]}
-                >
-                  {factor.delta > 0 ? `+${factor.delta}` : `${factor.delta}`}
-                </Text>
-              </View>
-            ))}
-
-            {/* Divider */}
-            <View style={styles.readinessDivider} />
-
-            {/* Score row (demoted) */}
-            <View style={styles.readinessScoreRow}>
-              <Text style={styles.readinessScoreLabel}>{t('today.readiness_title')}</Text>
-              <Text style={styles.readinessScore}>{displayScore}</Text>
-              <View style={styles.readinessTrustBadge}>
-                <Text style={styles.readinessTrustText}>{t('today.readiness_trust')}</Text>
-              </View>
-            </View>
-
-            {/* Tip box */}
-            <View style={styles.readinessTipBox}>
-              <Text style={styles.readinessTipText}>{readinessCard.tip}</Text>
-            </View>
-          </View>
-        )}
-
-        {/* ── Today's Metrics ───────────────────────────────────── */}
-        <SectionLabel label={t('today.metrics_title')} />
-        <View style={styles.metricsRow}>
-          {/* Protein ring — top accent in primary */}
-          <View style={[styles.ringCard, { borderTopColor: colors.primary }]}>
-            <Text style={styles.cardLabel}>{t('today.protein_label')}</Text>
-            <View style={styles.ringWrapper}>
-              <ProteinRing
-                proteinConsumedG={proteinConsumedG}
-                proteinFloorG={proteinFloorG}
-                size={130}
-              />
-            </View>
-          </View>
-
-          {/* Injection phase — hidden when discontinued */}
-          {profile?.medicationStatus === 'discontinued' ? (
-            <View style={[styles.phaseCard, { borderTopColor: colors.textDisabled }]}>
-              <Text style={styles.cardLabel}>{t('today.injection_label')}</Text>
-              <Text style={styles.noDataText}>{t('today.injection_discontinued')}</Text>
-            </View>
-          ) : (
-            <View style={[styles.phaseCard, styles.phaseAccentBg, { borderTopColor: phaseAccentColor }]}>
-              <Text style={styles.cardLabel}>{t('today.injection_label')}</Text>
-              {injectionCycle ? (
-                <>
-                  <PhaseBadge
-                    phase={injectionCycle.phase}
-                    daysSinceInjection={injectionCycle.daysSinceInjection}
-                  />
-                  {injectionCycle.daysUntilNextInjection !== null && (
-                    <Text style={styles.nextInjection}>
-                      {t('today.next_injection')}{'\n'}
-                      <Text style={styles.nextInjectionDays}>
-                        {injectionCycle.daysUntilNextInjection}d
-                      </Text>
-                    </Text>
-                  )}
-                  {injectionCycle.isOverdue && (
-                    <Text style={styles.overdueText}>{t('today.injection_overdue_inline')}</Text>
-                  )}
-                </>
-              ) : (
-                <Text style={styles.noDataText}>
-                  {t('today.no_injection_data')}
-                </Text>
-              )}
+          {/* ── Conditional banners ───────────────────────────────── */}
+          {profile?.phase === 'maintenance' && (
+            <View style={styles.maintenanceBanner}>
+              <Text style={styles.maintenanceBannerText}>
+                {t('today.maintenance_banner')}
+              </Text>
             </View>
           )}
-        </View>
 
-        {/* ── Injection Cycle Strip (D4) ───────────────────────── */}
-        {profile?.medicationStatus !== 'discontinued' &&
-          profile?.lastInjectionDate &&
-          injectionCycle && (
+          {profile?.medicationStatus === 'discontinued' && (
+            <TouchableOpacity
+              style={styles.discontinuedBanner}
+              onPress={() => { haptics.tap(); router.push('/discontinuation-mode'); }}
+              activeOpacity={0.75}
+              accessibilityRole="button"
+              accessibilityLabel="Open Life After GLP-1 guidance"
+            >
+              <Text style={styles.discontinuedBannerText}>
+                {t('today.discontinued_banner')}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {/* ── Readiness Score ───────────────────────────────────── */}
+          {readinessCard && (
+            <View style={styles.readinessCard}>
+              {/* Headline */}
+              <Text style={styles.readinessHeadline}>{readinessCard.headline}</Text>
+
+              {/* Divider */}
+              <View style={styles.readinessDivider} />
+
+              {/* Factor rows */}
+              {readinessCard.factors.map(factor => (
+                <View key={factor.label} style={styles.readinessFactorRow}>
+                  <View
+                    style={[
+                      styles.readinessFactorDot,
+                      {
+                        backgroundColor:
+                        factor.sentiment === 'positive'
+                          ? colors.success
+                          : factor.delta < -10
+                            ? colors.error
+                            : colors.warning,
+                      },
+                    ]}
+                  />
+                  <Text style={styles.readinessFactorLabel}>{factor.label}</Text>
+                  <Text
+                    style={[
+                      styles.readinessFactorDelta,
+                      {
+                        color:
+                        factor.sentiment === 'positive'
+                          ? colors.success
+                          : factor.delta < -10
+                            ? colors.error
+                            : colors.warning,
+                      },
+                    ]}
+                  >
+                    {factor.delta > 0 ? `+${factor.delta}` : `${factor.delta}`}
+                  </Text>
+                </View>
+              ))}
+
+              {/* Divider */}
+              <View style={styles.readinessDivider} />
+
+              {/* Score row (demoted) */}
+              <View style={styles.readinessScoreRow}>
+                <Text style={styles.readinessScoreLabel}>{t('today.readiness_title')}</Text>
+                <Text style={styles.readinessScore}>{displayScore}</Text>
+                <View style={styles.readinessTrustBadge}>
+                  <Text style={styles.readinessTrustText}>{t('today.readiness_trust')}</Text>
+                </View>
+              </View>
+
+              {/* Tip box */}
+              <View style={styles.readinessTipBox}>
+                <Text style={styles.readinessTipText}>{readinessCard.tip}</Text>
+              </View>
+            </View>
+          )}
+
+          {/* ── Today's Metrics ───────────────────────────────────── */}
+          <SectionLabel label={t('today.metrics_title')} />
+          <View style={styles.metricsRow}>
+            {/* Protein ring — top accent in primary */}
+            <View style={[styles.ringCard, { borderTopColor: colors.primary }]}>
+              <Text style={styles.cardLabel}>{t('today.protein_label')}</Text>
+              <View style={styles.ringWrapper}>
+                <ProteinRing
+                  proteinConsumedG={proteinConsumedG}
+                  proteinFloorG={proteinFloorG}
+                  size={130}
+                />
+              </View>
+            </View>
+
+            {/* Injection phase — hidden when discontinued */}
+            {profile?.medicationStatus === 'discontinued'
+              ? (
+                  <View style={[styles.phaseCard, { borderTopColor: colors.textDisabled }]}>
+                    <Text style={styles.cardLabel}>{t('today.injection_label')}</Text>
+                    <Text style={styles.noDataText}>{t('today.injection_discontinued')}</Text>
+                  </View>
+                )
+              : (
+                  <View style={[styles.phaseCard, styles.phaseAccentBg, { borderTopColor: phaseAccentColor }]}>
+                    <Text style={styles.cardLabel}>{t('today.injection_label')}</Text>
+                    {injectionCycle
+                      ? (
+                          <>
+                            <PhaseBadge
+                              phase={injectionCycle.phase}
+                              daysSinceInjection={injectionCycle.daysSinceInjection}
+                            />
+                            {injectionCycle.daysUntilNextInjection !== null && (
+                              <Text style={styles.nextInjection}>
+                                {t('today.next_injection')}
+                                {'\n'}
+                                <Text style={styles.nextInjectionDays}>
+                                  {injectionCycle.daysUntilNextInjection}
+                                  d
+                                </Text>
+                              </Text>
+                            )}
+                            {injectionCycle.isOverdue && (
+                              <Text style={styles.overdueText}>{t('today.injection_overdue_inline')}</Text>
+                            )}
+                          </>
+                        )
+                      : (
+                          <Text style={styles.noDataText}>
+                            {t('today.no_injection_data')}
+                          </Text>
+                        )}
+                  </View>
+                )}
+          </View>
+
+          {/* ── Injection Cycle Strip (D4) ───────────────────────── */}
+          {profile?.medicationStatus !== 'discontinued'
+            && profile?.lastInjectionDate
+            && injectionCycle && (
             <InjectionCycleCard
               lastInjectionDate={profile.lastInjectionDate}
               injectionCycle={injectionCycle}
             />
           )}
 
-        {/* ── Shot Day Prep (injection day only) ────────────────── */}
-        {injectionCycle?.phase === 'injection_day' && (
+          {/* ── Shot Day Prep (injection day only) ────────────────── */}
+          {injectionCycle?.phase === 'injection_day' && (
+            <TouchableOpacity
+              style={styles.shotDayCard}
+              onPress={() => { haptics.tap(); router.push('/shot-prep'); }}
+              activeOpacity={0.75}
+              accessibilityRole="button"
+              accessibilityLabel="Open injection day checklist"
+            >
+              <View style={styles.shotDayLeft}>
+                <Text style={styles.shotDayEmoji}>💉</Text>
+              </View>
+              <View style={styles.shotDayContent}>
+                <Text style={styles.shotDayTitle}>{t('today.shot_day_title')}</Text>
+                <Text style={styles.shotDayBody}>{t('today.shot_day_body')}</Text>
+              </View>
+              <Text style={[styles.rowChevron, { color: colors.phaseInjectionDay }]}>›</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* ── Daily Actions ─────────────────────────────────────── */}
+          <SectionLabel label={t('today.daily_actions')} />
+
+          {/* Check-in */}
           <TouchableOpacity
-            style={styles.shotDayCard}
-            onPress={() => { haptics.tap(); router.push('/shot-prep'); }}
+            style={[
+              styles.actionCard,
+              { borderTopColor: hasCheckedInToday ? colors.success : colors.primary },
+            ]}
+            onPress={() => { haptics.tap(); router.push('/check-in'); }}
             activeOpacity={0.75}
             accessibilityRole="button"
-            accessibilityLabel="Open injection day checklist"
+            accessibilityLabel={
+              hasCheckedInToday ? 'Edit today\'s check-in' : 'Start daily check-in'
+            }
           >
-            <View style={styles.shotDayLeft}>
-              <Text style={styles.shotDayEmoji}>💉</Text>
+            <View
+              style={[
+                styles.actionIconCircle,
+                hasCheckedInToday ? styles.actionIconCircleDone : styles.actionIconCirclePending,
+              ]}
+            >
+              <ClipboardCheck
+                color={hasCheckedInToday ? colors.white : colors.primary}
+                width={20}
+                height={20}
+              />
             </View>
-            <View style={styles.shotDayContent}>
-              <Text style={styles.shotDayTitle}>{t('today.shot_day_title')}</Text>
-              <Text style={styles.shotDayBody}>{t('today.shot_day_body')}</Text>
+            <View style={styles.actionTextBlock}>
+              <Text style={styles.actionHeadline}>{t('today.checkin_title')}</Text>
+              <View style={[styles.actionPill, hasCheckedInToday && styles.actionPillDone]}>
+                <Text style={[styles.actionPillText, hasCheckedInToday && styles.actionPillTextDone]}>
+                  {hasCheckedInToday ? t('today.checkin_logged') : t('today.checkin_action')}
+                </Text>
+              </View>
             </View>
-            <Text style={[styles.rowChevron, { color: colors.phaseInjectionDay }]}>›</Text>
+            <Text style={styles.rowChevron}>›</Text>
           </TouchableOpacity>
-        )}
 
-        {/* ── Daily Actions ─────────────────────────────────────── */}
-        <SectionLabel label={t('today.daily_actions')} />
-
-        {/* Check-in */}
-        <TouchableOpacity
-          style={[
-            styles.actionCard,
-            { borderTopColor: hasCheckedInToday ? colors.success : colors.primary },
-          ]}
-          onPress={() => { haptics.tap(); router.push('/check-in'); }}
-          activeOpacity={0.75}
-          accessibilityRole="button"
-          accessibilityLabel={
-            hasCheckedInToday ? "Edit today's check-in" : 'Start daily check-in'
-          }
-        >
-          <View
-            style={[
-              styles.actionIconCircle,
-              hasCheckedInToday ? styles.actionIconCircleDone : styles.actionIconCirclePending,
-            ]}
+          {/* Track Weight */}
+          <TouchableOpacity
+            style={[styles.actionCard, { borderTopColor: colors.primary }]}
+            onPress={() => { haptics.tap(); router.push('/weight'); }}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Track your weight"
           >
-            <ClipboardCheck
-              color={hasCheckedInToday ? colors.white : colors.primary}
-              width={20}
-              height={20}
+            <View style={[styles.actionIconCircle, styles.actionIconCirclePending]}>
+              <TrendingUp color={colors.primary} width={20} height={20} />
+            </View>
+            <View style={styles.actionTextBlock}>
+              <Text style={styles.actionHeadline}>{t('today.weight_title')}</Text>
+              <View style={styles.actionPill}>
+                <Text style={styles.actionPillText}>{t('today.weight_subtitle')}</Text>
+              </View>
+            </View>
+            <Text style={styles.rowChevron}>›</Text>
+          </TouchableOpacity>
+
+          {/* Medication Level — hidden when discontinued */}
+          {profile?.medicationStatus !== 'discontinued' && (
+            <View style={styles.bannerWrapper}>
+              <MedLevelBanner phase={injectionCycle?.phase ?? null} />
+            </View>
+          )}
+
+          {/* Streak */}
+          {!isStreakLoading && (
+            <StreakCard
+              currentStreak={streak?.currentStreak ?? 0}
+              longestStreak={streak?.longestStreak ?? 0}
             />
-          </View>
-          <View style={styles.actionTextBlock}>
-            <Text style={styles.actionHeadline}>{t('today.checkin_title')}</Text>
-            <View style={[styles.actionPill, hasCheckedInToday && styles.actionPillDone]}>
-              <Text style={[styles.actionPillText, hasCheckedInToday && styles.actionPillTextDone]}>
-                {hasCheckedInToday ? t('today.checkin_logged') : t('today.checkin_action')}
-              </Text>
+          )}
+
+          {/* Journey */}
+          <TouchableOpacity
+            style={[styles.actionCard, { borderTopColor: colors.primary }]}
+            onPress={() => { haptics.tap(); router.push('/journey'); }}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="View your journey milestones"
+          >
+            <View style={[styles.actionIconCircle, styles.actionIconCirclePending]}>
+              <ProgressPath color={colors.primary} width={20} height={20} />
             </View>
-          </View>
-          <Text style={styles.rowChevron}>›</Text>
-        </TouchableOpacity>
-
-        {/* Track Weight */}
-        <TouchableOpacity
-          style={[styles.actionCard, { borderTopColor: colors.primary }]}
-          onPress={() => { haptics.tap(); router.push('/weight'); }}
-          activeOpacity={0.75}
-          accessibilityRole="button"
-          accessibilityLabel="Track your weight"
-        >
-          <View style={[styles.actionIconCircle, styles.actionIconCirclePending]}>
-            <TrendingUp color={colors.primary} width={20} height={20} />
-          </View>
-          <View style={styles.actionTextBlock}>
-            <Text style={styles.actionHeadline}>{t('today.weight_title')}</Text>
-            <View style={styles.actionPill}>
-              <Text style={styles.actionPillText}>{t('today.weight_subtitle')}</Text>
+            <View style={styles.actionTextBlock}>
+              <Text style={styles.actionHeadline}>{t('today.journey_title')}</Text>
+              <View style={styles.actionPill}>
+                <Text style={styles.actionPillText}>{t('today.journey_subtitle')}</Text>
+              </View>
             </View>
-          </View>
-          <Text style={styles.rowChevron}>›</Text>
-        </TouchableOpacity>
+            <Text style={styles.rowChevron}>›</Text>
+          </TouchableOpacity>
 
-        {/* Medication Level — hidden when discontinued */}
-        {profile?.medicationStatus !== 'discontinued' && (
-          <View style={styles.bannerWrapper}>
-            <MedLevelBanner phase={injectionCycle?.phase ?? null} />
-          </View>
-        )}
+          {/* Nutrition Coach moved to its own bottom-nav tab — CTA removed 2026-05-24 */}
 
-        {/* Streak */}
-        {!isStreakLoading && (
-          <StreakCard
-            currentStreak={streak?.currentStreak ?? 0}
-            longestStreak={streak?.longestStreak ?? 0}
-          />
-        )}
+          {/* ── Daily AI Guidance ─────────────────────────────────── */}
+          {profile.medicationStatus !== 'discontinued' && (
+            <>
+              <SectionLabel label={t('today.daily_guidance_section')} />
+              <DailyGuidanceCard
+                guidance={dailyGuidance}
+                isLoading={isGuidanceLoading}
+                isError={isGuidanceError}
+              />
+            </>
+          )}
 
-        {/* Journey */}
-        <TouchableOpacity
-          style={[styles.actionCard, { borderTopColor: colors.primary }]}
-          onPress={() => { haptics.tap(); router.push('/journey'); }}
-          activeOpacity={0.75}
-          accessibilityRole="button"
-          accessibilityLabel="View your journey milestones"
-        >
-          <View style={[styles.actionIconCircle, styles.actionIconCirclePending]}>
-            <ProgressPath color={colors.primary} width={20} height={20} />
-          </View>
-          <View style={styles.actionTextBlock}>
-            <Text style={styles.actionHeadline}>{t('today.journey_title')}</Text>
-            <View style={styles.actionPill}>
-              <Text style={styles.actionPillText}>{t('today.journey_subtitle')}</Text>
-            </View>
-          </View>
-          <Text style={styles.rowChevron}>›</Text>
-        </TouchableOpacity>
-
-        {/* Nutrition Coach moved to its own bottom-nav tab — CTA removed 2026-05-24 */}
-
-        {/* ── Daily AI Guidance ─────────────────────────────────── */}
-        {profile.medicationStatus !== 'discontinued' && (
-          <>
-            <SectionLabel label={t('today.daily_guidance_section')} />
-            <DailyGuidanceCard
-              guidance={dailyGuidance}
-              isLoading={isGuidanceLoading}
-              isError={isGuidanceError}
+          {/* ── Pharmacist Content ────────────────────────────────── */}
+          <SectionLabel label={t('today.pharmacist_content')} />
+          {spotlightCard && (
+            <PharmacistSpotlightCard
+              card={spotlightCard}
+              phaseLabel={spotlightPhaseLabel}
+              onReadMore={() => setSheetCard(spotlightCard)}
             />
-          </>
-        )}
+          )}
+          <Pressable
+            style={styles.browseAllLink}
+            onPress={() => setShowCarousel(v => !v)}
+            accessibilityRole="button"
+            accessibilityLabel="Browse all pharmacist tips"
+          >
+            <Text style={styles.browseAllText}>{t('today.browse_all_tips')}</Text>
+          </Pressable>
+          {showCarousel && <CardsCarousel cards={getActiveCards()} />}
+          <ContentCardSheet card={sheetCard} onClose={() => setSheetCard(null)} />
 
-        {/* ── Pharmacist Content ────────────────────────────────── */}
-        <SectionLabel label={t('today.pharmacist_content')} />
-        {spotlightCard && (
-          <PharmacistSpotlightCard
-            card={spotlightCard}
-            phaseLabel={spotlightPhaseLabel}
-            onReadMore={() => setSheetCard(spotlightCard)}
-          />
-        )}
-        <Pressable
-          style={styles.browseAllLink}
-          onPress={() => setShowCarousel((v) => !v)}
-          accessibilityRole="button"
-          accessibilityLabel="Browse all pharmacist tips"
-        >
-          <Text style={styles.browseAllText}>{t('today.browse_all_tips')}</Text>
-        </Pressable>
-        {showCarousel && <CardsCarousel cards={getActiveCards()} />}
-        <ContentCardSheet card={sheetCard} onClose={() => setSheetCard(null)} />
-
-        </View>{/* end contentArea */}
+        </View>
+        {/* end contentArea */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -606,12 +618,12 @@ export function TodayScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
@@ -655,7 +667,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     greeting: {
       fontSize: 30,
       fontWeight: '800',
-      color: '#ffffff',          // always white — sits on dark gradient
+      color: '#ffffff', // always white — sits on dark gradient
       letterSpacing: -0.5,
       marginBottom: 4,
     },
@@ -851,14 +863,14 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       padding: spacing.md,
       marginBottom: spacing.sm,
       borderWidth: 1,
-      borderColor: colors.phaseInjectionDay + '40',
+      borderColor: `${colors.phaseInjectionDay}40`,
       ...shadows.sm,
     },
     shotDayLeft: {
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: colors.phaseInjectionDay + '20',
+      backgroundColor: `${colors.phaseInjectionDay}20`,
       alignItems: 'center',
       justifyContent: 'center',
       marginRight: spacing.md,

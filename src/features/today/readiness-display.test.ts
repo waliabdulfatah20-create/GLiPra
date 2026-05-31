@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { buildReadinessCard } from './readiness-display';
 import type { ReadinessResult } from './readiness-calculator';
+import { describe, expect, it } from 'vitest';
+import { buildReadinessCard } from './readiness-display';
 
 // Returns the key as-is — makes assertions easy
 const mockT = (key: string) => key;
@@ -81,7 +81,7 @@ describe('buildReadinessCard', () => {
     const card = buildReadinessCard(result, 'peak_suppression', mockT);
     expect(card.factors[0].delta).toBe(-15); // injection_phase
     expect(card.factors[1].delta).toBe(-10); // protein_pace
-    expect(card.factors[2].delta).toBe(5);   // energy
+    expect(card.factors[2].delta).toBe(5); // energy
   });
 
   // --- Tip selection ---

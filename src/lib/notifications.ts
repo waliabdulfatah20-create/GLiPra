@@ -16,8 +16,8 @@
  *   await notifications.scheduleDailyProteinNudge(128);
  */
 
+import { isFuture, parseISO, setHours, setMinutes, setSeconds } from 'date-fns';
 import * as Notifications from 'expo-notifications';
-import { addDays, isFuture, parseISO, setHours, setMinutes, setSeconds } from 'date-fns';
 
 // Show alerts even when the app is in the foreground.
 // Wrapped in try/catch: if the native module isn't initialized (e.g. during
@@ -31,7 +31,8 @@ try {
       shouldSetBadge: false,
     }),
   });
-} catch {
+}
+catch {
   // no-op — handler will be registered on next render cycle
 }
 
@@ -42,10 +43,12 @@ export type NotificationId = 'injection-reminder' | 'daily-protein-nudge';
 async function requestPermission(): Promise<'granted' | 'denied' | 'undetermined'> {
   try {
     const { status: existing } = await Notifications.getPermissionsAsync();
-    if (existing === 'granted') return 'granted';
+    if (existing === 'granted')
+      return 'granted';
     const { status } = await Notifications.requestPermissionsAsync();
     return status as 'granted' | 'denied' | 'undetermined';
-  } catch {
+  }
+  catch {
     return 'undetermined';
   }
 }
@@ -65,7 +68,8 @@ async function scheduleInjectionReminder(
     const base = parseISO(nextInjectionIsoDate);
     const fireDate = setSeconds(setMinutes(setHours(base, hourOfDay), 0), 0);
 
-    if (!isFuture(fireDate)) return;
+    if (!isFuture(fireDate))
+      return;
 
     await Notifications.scheduleNotificationAsync({
       identifier: 'injection-reminder',
@@ -79,7 +83,8 @@ async function scheduleInjectionReminder(
         date: fireDate,
       },
     });
-  } catch {
+  }
+  catch {
     // Silent fail — notifications are non-critical
   }
 }
@@ -108,7 +113,8 @@ async function scheduleDailyProteinNudge(
         minute: 0,
       },
     });
-  } catch {
+  }
+  catch {
     // Silent fail
   }
 }
@@ -117,7 +123,8 @@ async function scheduleDailyProteinNudge(
 async function cancel(id: NotificationId): Promise<void> {
   try {
     await Notifications.cancelScheduledNotificationAsync(id);
-  } catch {
+  }
+  catch {
     // Silent fail
   }
 }
@@ -126,7 +133,8 @@ async function cancel(id: NotificationId): Promise<void> {
 async function cancelAll(): Promise<void> {
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
-  } catch {
+  }
+  catch {
     // Silent fail
   }
 }
@@ -135,7 +143,8 @@ async function cancelAll(): Promise<void> {
 async function getScheduled(): Promise<Notifications.NotificationRequest[]> {
   try {
     return await Notifications.getAllScheduledNotificationsAsync();
-  } catch {
+  }
+  catch {
     return [];
   }
 }

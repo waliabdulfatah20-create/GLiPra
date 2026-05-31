@@ -3,17 +3,17 @@
 // Shows today's protein consumed vs. the user's protein floor.
 // Reuses the same Circle-based arc technique from ProteinRing (Today screen).
 
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+
 import { Circle, Svg } from 'react-native-svg';
-
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
-interface Props {
+type Props = {
   consumed: number;
   floor: number;
-}
+};
 
 const SIZE = 44;
 const STROKE = 4;
@@ -59,15 +59,18 @@ export function NutritionHeaderRing({ consumed, floor }: Props) {
         />
       </Svg>
       <View style={styles.center}>
-        <Text style={styles.label}>{Math.round(consumed)}g</Text>
+        <Text style={styles.label}>
+          {Math.round(consumed)}
+          g
+        </Text>
       </View>
     </View>
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
-}
+};
 
 function makeStyles({ colors }: StyleTokens) {
   return StyleSheet.create({

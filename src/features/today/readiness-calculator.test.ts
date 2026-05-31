@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
-
-import { calculateReadinessScore } from './readiness-calculator';
 import type { FactorDelta, FactorId } from './readiness-calculator';
+
+import { describe, expect, it } from 'vitest';
+import { calculateReadinessScore } from './readiness-calculator';
 
 const base = {
   proteinProgress: 0.5,
@@ -10,11 +10,11 @@ const base = {
 
 // Helper: check whether a specific factor id is present in the factors array
 function hasFactor(factors: FactorDelta[], id: FactorId): boolean {
-  return factors.some((f) => f.id === id);
+  return factors.some(f => f.id === id);
 }
 
 function getFactor(factors: FactorDelta[], id: FactorId): FactorDelta | undefined {
-  return factors.find((f) => f.id === id);
+  return factors.find(f => f.id === id);
 }
 
 describe('calculateReadinessScore — injection phase adjustments', () => {

@@ -74,7 +74,8 @@ let _client: PostHogInstance | null = null;
 let _initialized = false;
 
 function getClient(): PostHogInstance | null {
-  if (_initialized) return _client;
+  if (_initialized)
+    return _client;
   _initialized = true;
 
   try {
@@ -91,7 +92,8 @@ function getClient(): PostHogInstance | null {
       host: 'https://app.posthog.com',
     });
     return _client;
-  } catch {
+  }
+  catch {
     // posthog-react-native not installed — all methods will no-op
     return null;
   }
@@ -109,7 +111,8 @@ export const analytics = {
   identify: (anonymousId: string, properties?: Record<string, unknown>): void => {
     try {
       getClient()?.identify(anonymousId, properties);
-    } catch {
+    }
+    catch {
       // Silently ignore — analytics must never crash the app
     }
   },
@@ -120,7 +123,8 @@ export const analytics = {
   capture: (event: string, properties?: Record<string, unknown>): void => {
     try {
       getClient()?.capture(event, properties);
-    } catch {
+    }
+    catch {
       // Silently ignore
     }
   },
@@ -131,7 +135,8 @@ export const analytics = {
   reset: (): void => {
     try {
       getClient()?.reset();
-    } catch {
+    }
+    catch {
       // Silently ignore
     }
   },
@@ -143,7 +148,8 @@ export const analytics = {
   isFeatureEnabled: (flag: string): boolean => {
     try {
       return getClient()?.isFeatureEnabled(flag) ?? false;
-    } catch {
+    }
+    catch {
       return false;
     }
   },

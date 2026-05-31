@@ -1,15 +1,15 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useState } from 'react';
+
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { LinearGradient } from 'expo-linear-gradient';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 type Goal = 'muscle_preservation' | 'weight_management' | 'both';
 
@@ -17,17 +17,17 @@ const OPTIONS: { value: Goal; title: string; description: string }[] = [
   {
     value: 'muscle_preservation',
     title: 'Preserve muscle',
-    description: "I want to protect lean muscle while GLP-1 reduces my appetite",
+    description: 'I want to protect lean muscle while GLP-1 reduces my appetite',
   },
   {
     value: 'weight_management',
     title: 'Lose fat',
-    description: "I want to maximize fat loss while staying nourished",
+    description: 'I want to maximize fat loss while staying nourished',
   },
   {
     value: 'both',
     title: 'Both',
-    description: "I want to lose fat AND protect muscle",
+    description: 'I want to lose fat AND protect muscle',
   },
 ];
 
@@ -41,13 +41,14 @@ export default function GoalsScreen() {
   const { colors, spacing, radius, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius, gradients]
+    [colors, spacing, radius, gradients],
   );
 
   const canProceed = selected !== undefined;
 
   const handleNext = () => {
-    if (!canProceed) return;
+    if (!canProceed)
+      return;
     haptics.medium();
     setFormData({ goal: selected });
     router.push('/onboarding/status');
@@ -120,11 +121,11 @@ export default function GoalsScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

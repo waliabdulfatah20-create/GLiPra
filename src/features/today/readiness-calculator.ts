@@ -11,14 +11,14 @@ export type ReadinessInput = {
   streakActive?: boolean; // true when streak is alive
 };
 
-export type FactorId =
-  | 'injection_phase'
-  | 'protein_pace'
-  | 'prev_day_protein'
-  | 'nausea'
-  | 'energy'
-  | 'new_dose_week'
-  | 'streak';
+export type FactorId
+  = | 'injection_phase'
+    | 'protein_pace'
+    | 'prev_day_protein'
+    | 'nausea'
+    | 'energy'
+    | 'new_dose_week'
+    | 'streak';
 
 export type FactorDelta = { id: FactorId; delta: number };
 
@@ -35,10 +35,12 @@ export function calculateReadinessScore(input: ReadinessInput): ReadinessResult 
   if (input.injectionPhase === 'peak_suppression') {
     score -= 15;
     factors.push({ id: 'injection_phase', delta: -15 });
-  } else if (input.injectionPhase === 'recovery_window') {
+  }
+  else if (input.injectionPhase === 'recovery_window') {
     score += 10;
     factors.push({ id: 'injection_phase', delta: 10 });
-  } else if (input.injectionPhase === 'injection_day') {
+  }
+  else if (input.injectionPhase === 'injection_day') {
     score += 5;
     factors.push({ id: 'injection_phase', delta: 5 });
   }
@@ -74,7 +76,8 @@ export function calculateReadinessScore(input: ReadinessInput): ReadinessResult 
     if (input.prevDayProteinRatio < 0.8) {
       score -= 10;
       factors.push({ id: 'prev_day_protein', delta: -10 });
-    } else if (input.prevDayProteinRatio >= 1.0) {
+    }
+    else if (input.prevDayProteinRatio >= 1.0) {
       score += 5;
       factors.push({ id: 'prev_day_protein', delta: 5 });
     }

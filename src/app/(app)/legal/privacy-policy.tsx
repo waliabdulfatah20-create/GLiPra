@@ -1,6 +1,7 @@
-import * as React from 'react';
+import type { LegalSection } from '@/components/legal/LegalDocScreen';
 
-import { LegalDocScreen, type LegalSection } from '@/components/legal/LegalDocScreen';
+import * as React from 'react';
+import { LegalDocScreen } from '@/components/legal/LegalDocScreen';
 
 const SECTIONS: LegalSection[] = [
   {

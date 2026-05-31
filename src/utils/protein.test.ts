@@ -5,12 +5,13 @@
  * Run with: pnpm test:utils
  */
 
+import type { ProteinInput } from './protein';
 import { describe, expect, it } from 'vitest';
 import {
   ABSOLUTE_CEILING_G,
   ABSOLUTE_FLOOR_G,
-  type ProteinInput,
   calculateProteinFloor,
+
 } from './protein';
 
 // ─── Shared helpers ──────────────────────────────────────────────────────────
@@ -56,7 +57,7 @@ describe('normal cases — no conditions, BMI < 35', () => {
 
 // ─── BMI > 35 — ideal body weight branch ─────────────────────────────────────
 
-describe('BMI > 35 — uses Devine ideal body weight', () => {
+describe('bMI > 35 — uses Devine ideal body weight', () => {
   it('switches to ideal body weight and reports usedIdealBodyWeight: true', () => {
     // 170 cm → ~66.93 inches → 6.93 inches over 60
     // IBW = 47.75 + 2.3 × 6.93 ≈ 47.75 + 15.939 = 63.689 kg
@@ -70,13 +71,13 @@ describe('BMI > 35 — uses Devine ideal body weight', () => {
     expect(result.proteinFloorG).toBeCloseTo(76.4, 1);
   });
 
-  it('BMI exactly at threshold (35) still uses actual weight', () => {
+  it('bMI exactly at threshold (35) still uses actual weight', () => {
     const result = calculateProteinFloor(makeInput({ bmi: 35 }));
     expect(result.usedIdealBodyWeight).toBe(false);
     expect(result.baseWeightUsedKg).toBe(70);
   });
 
-  it('BMI 35.1 crosses threshold — uses ideal body weight', () => {
+  it('bMI 35.1 crosses threshold — uses ideal body weight', () => {
     const result = calculateProteinFloor(makeInput({ bmi: 35.1, weightKg: 100 }));
     expect(result.usedIdealBodyWeight).toBe(true);
     // base weight should not be the actual 100 kg

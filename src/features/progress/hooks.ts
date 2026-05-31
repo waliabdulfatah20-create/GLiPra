@@ -8,22 +8,22 @@
  * All date math via date-fns (Rule 6).
  */
 
+import type { DayHit, DayProteinEntry } from './calculator';
 import { useQuery } from '@tanstack/react-query';
-import { format, subDays } from 'date-fns';
 
+import { format, subDays } from 'date-fns';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { useCheckInHistory } from '@/features/check-in/hooks';
 import { fetchFoodLogsInRange } from '@/features/food-log/api';
 import { useMedicationLevelCurve } from '@/features/medication-level/hooks';
-import { useTodayData } from '@/features/today/hooks';
 
+import { useTodayData } from '@/features/today/hooks';
 import {
   buildHitHistory,
   calculateAdherence,
   calculateAverageSymptom,
   calculateHitRate,
-  type DayHit,
-  type DayProteinEntry,
+
 } from './calculator';
 
 // ---------------------------------------------------------------------------
@@ -33,12 +33,12 @@ import {
 // Also computes overall hitRate over the same window — saves the cards from
 // re-running the reducer.
 // ---------------------------------------------------------------------------
-export interface ProteinHistoryResult {
+export type ProteinHistoryResult = {
   history: DayHit[];
   hitRate: number;
   proteinFloorG: number;
   isLoading: boolean;
-}
+};
 
 export function useProteinHistoryPerDay(days: number): ProteinHistoryResult {
   const session = useAuthStore.use.session();
@@ -57,7 +57,7 @@ export function useProteinHistoryPerDay(days: number): ProteinHistoryResult {
   });
 
   // Aggregate raw logs into per-day protein entries (local-date slice).
-  const entries: DayProteinEntry[] = (data ?? []).map((log) => ({
+  const entries: DayProteinEntry[] = (data ?? []).map(log => ({
     date: log.loggedAt.slice(0, 10), // 'YYYY-MM-DD' from ISO 8601 prefix
     proteinG: log.proteinG,
   }));
@@ -80,7 +80,7 @@ export function useProteinHistoryPerDay(days: number): ProteinHistoryResult {
 // `injectionDates` (deduplicated, most-recent-first) and `injectionIntervalDays`
 // (derived from the gap between the last two distinct injections).
 // ---------------------------------------------------------------------------
-export interface AdherenceResult {
+export type AdherenceResult = {
   /** 0..1 adherence over the window */
   rate: number;
   /** Logged injection dates that fall inside the window (most-recent-first) */
@@ -88,11 +88,11 @@ export interface AdherenceResult {
   intervalDays: number;
   isLoading: boolean;
   hasData: boolean;
-}
+};
 
 export function useInjectionAdherence(days: number): AdherenceResult {
-  const { injectionDates, injectionIntervalDays, isLoading } =
-    useMedicationLevelCurve();
+  const { injectionDates, injectionIntervalDays, isLoading }
+    = useMedicationLevelCurve();
 
   const today = new Date();
   const rate = calculateAdherence(
@@ -103,7 +103,7 @@ export function useInjectionAdherence(days: number): AdherenceResult {
   );
 
   const cutoff = format(subDays(today, days - 1), 'yyyy-MM-dd');
-  const windowDates = injectionDates.filter((d) => d >= cutoff);
+  const windowDates = injectionDates.filter(d => d >= cutoff);
 
   return {
     rate,
@@ -120,26 +120,26 @@ export function useInjectionAdherence(days: number): AdherenceResult {
 // Wraps useCheckInHistory(days) and pre-computes both averages for the cards.
 // Returns per-day nausea + energy series (null when no check-in that day).
 // ---------------------------------------------------------------------------
-export interface SymptomDay {
+export type SymptomDay = {
   date: string;
   nausea: number | null;
   energy: number | null;
-}
+};
 
-export interface CheckInTrendResult {
+export type CheckInTrendResult = {
   days: SymptomDay[];
   avgNausea: number | null;
   avgEnergy: number | null;
   hasData: boolean;
   isLoading: boolean;
-}
+};
 
 export function useCheckInTrend(days: number): CheckInTrendResult {
   const { history, isLoading } = useCheckInHistory(days);
   const today = new Date();
 
   // Build an oldest→newest sequence covering every day in the window.
-  const byDate = new Map(history.map((h) => [h.date, h]));
+  const byDate = new Map(history.map(h => [h.date, h]));
   const window: SymptomDay[] = [];
   for (let i = days - 1; i >= 0; i--) {
     const date = format(subDays(today, i), 'yyyy-MM-dd');
@@ -152,12 +152,12 @@ export function useCheckInTrend(days: number): CheckInTrendResult {
   }
 
   const avgNausea = calculateAverageSymptom(
-    window.map((d) => ({ date: d.date, score: d.nausea })),
+    window.map(d => ({ date: d.date, score: d.nausea })),
     days,
     today,
   );
   const avgEnergy = calculateAverageSymptom(
-    window.map((d) => ({ date: d.date, score: d.energy })),
+    window.map(d => ({ date: d.date, score: d.energy })),
     days,
     today,
   );

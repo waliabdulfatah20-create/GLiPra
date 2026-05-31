@@ -2,9 +2,12 @@
 // Lets users change their medication_status after onboarding.
 // Mirrors the goal-weight.tsx pattern: direct Supabase update + cache invalidation.
 
+import type { MedicationStatus } from '@/features/today/api';
+import type { GlipraTokens } from '@/theme/tokens';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import * as React from 'react';
+
 import {
   Pressable,
   ScrollView,
@@ -13,23 +16,20 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { useTodayProfile } from '@/features/today/hooks';
 import { haptics } from '@/lib/haptics';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
-import type { MedicationStatus } from '@/features/today/api';
 
 // ─── Options ─────────────────────────────────────────────────────────────────
 
 const STATUS_OPTIONS: { value: MedicationStatus; label: string; description: string }[] = [
-  { value: 'starting',     label: 'Starting',     description: 'New prescription or just starting' },
-  { value: 'active',       label: 'Active',        description: 'Been on it a few weeks or months' },
-  { value: 'tapering',     label: 'Tapering',      description: 'Dose decreasing or reducing frequency' },
-  { value: 'maintenance',  label: 'Maintenance',   description: 'At goal dose, steady state' },
-  { value: 'discontinued', label: 'Discontinued',  description: 'No longer taking GLP-1 medication' },
+  { value: 'starting', label: 'Starting', description: 'New prescription or just starting' },
+  { value: 'active', label: 'Active', description: 'Been on it a few weeks or months' },
+  { value: 'tapering', label: 'Tapering', description: 'Dose decreasing or reducing frequency' },
+  { value: 'maintenance', label: 'Maintenance', description: 'At goal dose, steady state' },
+  { value: 'discontinued', label: 'Discontinued', description: 'No longer taking GLP-1 medication' },
 ];
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
@@ -47,7 +47,7 @@ export default function UpdateStatusScreen() {
   const { colors, spacing, radius } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius]
+    [colors, spacing, radius],
   );
 
   // Sync initial selection once profile loads
@@ -61,7 +61,8 @@ export default function UpdateStatusScreen() {
   const canSave = isDirty && !isSaving;
 
   async function handleSave() {
-    if (!canSave || !session?.user.id) return;
+    if (!canSave || !session?.user.id)
+      return;
     haptics.medium();
     setIsSaving(true);
 
@@ -84,7 +85,7 @@ export default function UpdateStatusScreen() {
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
-          <Text style={styles.backText}>{'‹ Back'}</Text>
+          <Text style={styles.backText}>‹ Back</Text>
         </Pressable>
         <Text style={styles.title}>GLP-1 Status</Text>
         <View style={styles.headerSpacer} />
@@ -142,11 +143,11 @@ export default function UpdateStatusScreen() {
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

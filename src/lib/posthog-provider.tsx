@@ -28,7 +28,8 @@ try {
     }>;
   };
   PostHogProvider = pkg.PostHogProvider;
-} catch {
+}
+catch {
   // Package not installed — stub mode
   PostHogProvider = null;
 }
@@ -37,9 +38,9 @@ try {
 // Exported provider
 // ---------------------------------------------------------------------------
 
-interface AnalyticsProviderProps {
+type AnalyticsProviderProps = {
   children: React.ReactNode;
-}
+};
 
 export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
   const apiKey = process.env.EXPO_PUBLIC_POSTHOG_API_KEY;

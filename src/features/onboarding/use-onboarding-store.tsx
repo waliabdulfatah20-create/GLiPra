@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-
-import { createSelectors } from '@/lib/utils';
 import type { GLP1MedicationId } from '@/types';
+
+import { create } from 'zustand';
+import { createSelectors } from '@/lib/utils';
 
 export type OnboardingFormData = {
   // Captured at sign-up — used by reveal.tsx so it never needs to re-fetch the session
@@ -39,11 +39,11 @@ type OnboardingState = {
   reset: () => void;
 };
 
-const _useOnboardingStore = create<OnboardingState>((set) => ({
+const _useOnboardingStore = create<OnboardingState>(set => ({
   formData: {},
 
-  setFormData: (patch) =>
-    set((state) => ({ formData: { ...state.formData, ...patch } })),
+  setFormData: patch =>
+    set(state => ({ formData: { ...state.formData, ...patch } })),
 
   reset: () => set({ formData: {} }),
 }));
@@ -51,5 +51,6 @@ const _useOnboardingStore = create<OnboardingState>((set) => ({
 export const useOnboardingStore = createSelectors(_useOnboardingStore);
 
 // Module-level action for use outside components
-export const setOnboardingData = (patch: Partial<OnboardingFormData>) =>
-  _useOnboardingStore.getState().setFormData(patch);
+export function setOnboardingData(patch: Partial<OnboardingFormData>) {
+  return _useOnboardingStore.getState().setFormData(patch);
+}

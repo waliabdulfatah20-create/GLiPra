@@ -1,14 +1,14 @@
-import * as React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-
-import { ContentCardView } from '@/components/today/content-card';
 import type { ContentCard } from '@/features/content-cards/data';
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
 
-export interface CardsCarouselProps {
+import * as React from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { ContentCardView } from '@/components/today/content-card';
+import { useTheme } from '@/lib/ThemeContext';
+
+export type CardsCarouselProps = {
   cards: ContentCard[];
-}
+};
 
 const CARD_WIDTH = 280;
 
@@ -26,7 +26,7 @@ export function CardsCarousel({ cards }: CardsCarouselProps) {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {cards.map((card) => (
+        {cards.map(card => (
           <View key={card.id} style={styles.cardWrapper}>
             <ContentCardView card={card} />
           </View>
@@ -36,9 +36,9 @@ export function CardsCarousel({ cards }: CardsCarouselProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   spacing: GlipraTokens['spacing'];
-}
+};
 
 function makeStyles({ spacing }: StyleTokens) {
   return StyleSheet.create({

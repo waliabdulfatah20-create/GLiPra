@@ -10,9 +10,9 @@
 // The module is loaded lazily so this file can be safely imported in
 // Expo Go (where the native module is absent).
 
-import { Platform } from 'react-native';
-
 import type { SubscriptionTier } from '@/types';
+
+import { Platform } from 'react-native';
 
 // ---------------------------------------------------------------------------
 // Config
@@ -35,7 +35,8 @@ function getPurchasesModule(): typeof import('react-native-purchases') | null {
       return mod.default;
     }
     return null;
-  } catch {
+  }
+  catch {
     return null;
   }
 }
@@ -59,14 +60,14 @@ export function initializeRevenueCat(userId?: string): void {
       return;
     }
 
-    const apiKey =
-      Platform.OS === 'ios' ? REVENUECAT_IOS_KEY : REVENUECAT_ANDROID_KEY;
+    const apiKey
+      = Platform.OS === 'ios' ? REVENUECAT_IOS_KEY : REVENUECAT_ANDROID_KEY;
 
     if (!apiKey) {
       console.warn(
-        '[RevenueCat] No API key configured — subscription features disabled.\n' +
-          'Set EXPO_PUBLIC_REVENUECAT_IOS_KEY / EXPO_PUBLIC_REVENUECAT_ANDROID_KEY ' +
-          'in your .env file before going live.',
+        '[RevenueCat] No API key configured — subscription features disabled.\n'
+        + 'Set EXPO_PUBLIC_REVENUECAT_IOS_KEY / EXPO_PUBLIC_REVENUECAT_ANDROID_KEY '
+        + 'in your .env file before going live.',
       );
       return;
     }
@@ -75,7 +76,8 @@ export function initializeRevenueCat(userId?: string): void {
     const { LOG_LEVEL } = require('react-native-purchases');
     Purchases.setLogLevel(LOG_LEVEL.WARN);
     Purchases.configure({ apiKey, appUserID: userId ?? null });
-  } catch (e) {
+  }
+  catch (e) {
     // Catches native module errors gracefully (Expo Go, simulator quirks, etc.)
     console.warn('[RevenueCat] Native module not available:', e);
   }
@@ -91,25 +93,28 @@ export function initializeRevenueCat(userId?: string): void {
 export async function getSubscriptionTier(): Promise<SubscriptionTier> {
   try {
     const Purchases = getPurchasesModule();
-    if (!Purchases) return 'free';
+    if (!Purchases)
+      return 'free';
 
     const customerInfo = await Purchases.getCustomerInfo();
     const entitlement = customerInfo.entitlements.active[ENTITLEMENT_ID];
 
-    if (!entitlement) return 'free';
+    if (!entitlement)
+      return 'free';
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const raw = entitlement as any;
-    const productId: string =
-      raw.latestPurchasedProductIdentifier ??
-      raw.productIdentifier ??
-      '';
+    const productId: string
+      = raw.latestPurchasedProductIdentifier
+        ?? raw.productIdentifier
+        ?? '';
 
     if (productId.includes('lifetime') || productId.includes('founder')) {
       return 'founder_lifetime';
     }
     return 'pro';
-  } catch {
+  }
+  catch {
     // Never crash on billing errors — return safe free fallback
     return 'free';
   }
@@ -126,25 +131,28 @@ export async function getSubscriptionTier(): Promise<SubscriptionTier> {
 export async function restorePurchases(): Promise<SubscriptionTier> {
   try {
     const Purchases = getPurchasesModule();
-    if (!Purchases) return 'free';
+    if (!Purchases)
+      return 'free';
 
     const customerInfo = await Purchases.restorePurchases();
     const entitlement = customerInfo.entitlements.active[ENTITLEMENT_ID];
 
-    if (!entitlement) return 'free';
+    if (!entitlement)
+      return 'free';
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const raw = entitlement as any;
-    const productId: string =
-      raw.latestPurchasedProductIdentifier ??
-      raw.productIdentifier ??
-      '';
+    const productId: string
+      = raw.latestPurchasedProductIdentifier
+        ?? raw.productIdentifier
+        ?? '';
 
     if (productId.includes('lifetime') || productId.includes('founder')) {
       return 'founder_lifetime';
     }
     return 'pro';
-  } catch {
+  }
+  catch {
     return 'free';
   }
 }

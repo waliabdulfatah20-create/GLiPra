@@ -59,12 +59,12 @@ const BLOCKED_KEYWORDS = [
 
 function containsBlockedKeyword(message: string): boolean {
   const lower = message.toLowerCase();
-  return BLOCKED_KEYWORDS.some((kw) => lower.includes(kw));
+  return BLOCKED_KEYWORDS.some(kw => lower.includes(kw));
 }
 
-const BLOCKED_RESPONSE =
-  'For medication questions, contact your prescriber or pharmacist directly. ' +
-  'I can help with protein goals, meal ideas, hydration, and food strategies.';
+const BLOCKED_RESPONSE
+  = 'For medication questions, contact your prescriber or pharmacist directly. '
+    + 'I can help with protein goals, meal ideas, hydration, and food strategies.';
 
 // ---------------------------------------------------------------------------
 // Schemas
@@ -94,7 +94,7 @@ type CoachOutput = z.infer<typeof OutputSchema>;
 // ---------------------------------------------------------------------------
 
 const FALLBACK_RESULT: CoachOutput = {
-  reply: "I'm having trouble right now. Please try again shortly.",
+  reply: 'I\'m having trouble right now. Please try again shortly.',
 };
 
 // ---------------------------------------------------------------------------
@@ -171,7 +171,8 @@ serve(async (req: Request) => {
     let body: unknown;
     try {
       body = await req.json();
-    } catch {
+    }
+    catch {
       return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -214,11 +215,12 @@ serve(async (req: Request) => {
     if (countError) {
       console.error('Rate-limit query failed:', countError.message);
       // Fail open only in this case — do not block the user on a DB error.
-    } else if ((count ?? 0) >= DAILY_LIMIT) {
+    }
+    else if ((count ?? 0) >= DAILY_LIMIT) {
       return new Response(
         JSON.stringify({
           error: 'Daily limit reached',
-          reply: "You've reached your daily limit of 10 coaching messages. Try again tomorrow!",
+          reply: 'You\'ve reached your daily limit of 10 coaching messages. Try again tomorrow!',
         }),
         {
           status: 429,
@@ -279,11 +281,13 @@ serve(async (req: Request) => {
       const outputParse = OutputSchema.safeParse(parsed);
       if (outputParse.success) {
         result = outputParse.data;
-      } else {
+      }
+      else {
         console.error('OutputSchema validation failed:', outputParse.error.flatten());
         // result stays as FALLBACK_RESULT
       }
-    } catch (parseError) {
+    }
+    catch (parseError) {
       console.error('JSON.parse of OpenAI content failed:', parseError);
       // result stays as FALLBACK_RESULT
     }
@@ -315,7 +319,8 @@ serve(async (req: Request) => {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (error: unknown) {
+  }
+  catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Internal server error';
     console.error('ai-coach unhandled error:', message);
     return new Response(JSON.stringify({ error: message }), {

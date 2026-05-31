@@ -49,8 +49,8 @@ type GuidanceOutput = z.infer<typeof OutputSchema>;
 
 const FALLBACK_RESULT: GuidanceOutput = {
   guidance_text:
-    'Focus on small high-protein portions today. Greek yogurt, eggs, and cottage cheese ' +
-    'are easy to eat even when appetite is low.',
+    'Focus on small high-protein portions today. Greek yogurt, eggs, and cottage cheese '
+    + 'are easy to eat even when appetite is low.',
   reasoning_text: 'General guidance - personalized tip unavailable right now.',
 };
 
@@ -108,7 +108,7 @@ Return JSON with this exact shape:
 }`;
 
   return language === 'es'
-    ? base + '\n\nRespond entirely in Spanish. Both fields must be in Spanish.'
+    ? `${base}\n\nRespond entirely in Spanish. Both fields must be in Spanish.`
     : base;
 }
 
@@ -177,7 +177,8 @@ serve(async (req: Request) => {
     let body: unknown;
     try {
       body = await req.json();
-    } catch {
+    }
+    catch {
       return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -243,10 +244,12 @@ serve(async (req: Request) => {
       const outputParse = OutputSchema.safeParse(parsed);
       if (outputParse.success) {
         result = outputParse.data;
-      } else {
+      }
+      else {
         console.error('OutputSchema validation failed:', outputParse.error.flatten());
       }
-    } catch (parseError) {
+    }
+    catch (parseError) {
       console.error('JSON.parse of OpenAI content failed:', parseError);
     }
 
@@ -289,7 +292,8 @@ serve(async (req: Request) => {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (error: unknown) {
+  }
+  catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Internal server error';
     console.error('generate-daily-guidance unhandled error:', message);
     return new Response(JSON.stringify({ error: message }), {

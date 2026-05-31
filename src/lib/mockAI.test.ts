@@ -1,7 +1,7 @@
 import {
   isMockAIEnabled,
-  MOCK_MEAL_RECOGNITION,
   MOCK_DAILY_GUIDANCE,
+  MOCK_MEAL_RECOGNITION,
   MOCK_MEAL_TEXT_PARSE,
   MOCK_VOICE_PARSE,
 } from './mockAI';
@@ -13,7 +13,7 @@ describe('mockAI', () => {
     });
   });
 
-  describe('MOCK_MEAL_RECOGNITION', () => {
+  describe('mOCK_MEAL_RECOGNITION', () => {
     it('has expected shape with foods array', () => {
       expect(MOCK_MEAL_RECOGNITION.foods).toHaveLength(3);
       expect(MOCK_MEAL_RECOGNITION.total_protein_g).toBeGreaterThan(0);
@@ -31,7 +31,7 @@ describe('mockAI', () => {
     });
   });
 
-  describe('MOCK_DAILY_GUIDANCE', () => {
+  describe('mOCK_DAILY_GUIDANCE', () => {
     it('has expected shape', () => {
       expect(MOCK_DAILY_GUIDANCE.guidance_text).toBeTruthy();
       expect(typeof MOCK_DAILY_GUIDANCE.guidance_text).toBe('string');
@@ -40,7 +40,7 @@ describe('mockAI', () => {
     });
   });
 
-  describe('MOCK_MEAL_TEXT_PARSE', () => {
+  describe('mOCK_MEAL_TEXT_PARSE', () => {
     it('has expected shape', () => {
       expect(MOCK_MEAL_TEXT_PARSE.foods).toHaveLength(2);
       expect(MOCK_MEAL_TEXT_PARSE.total_protein_g).toBeGreaterThan(0);
@@ -56,7 +56,7 @@ describe('mockAI', () => {
     });
   });
 
-  describe('MOCK_VOICE_PARSE', () => {
+  describe('mOCK_VOICE_PARSE', () => {
     it('has expected shape with transcript', () => {
       expect(MOCK_VOICE_PARSE.transcript).toContain('eggs');
       expect(MOCK_VOICE_PARSE.name).toBeTruthy();

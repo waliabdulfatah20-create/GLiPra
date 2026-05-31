@@ -1,12 +1,12 @@
 // Supabase queries for the food_logs table.
 // Column names follow the snake_case convention of the database schema.
 
+import type { BarcodeFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
 import { endOfDay as getEndOfDay, startOfDay as getStartOfDay } from 'date-fns';
+
 import { z } from 'zod';
 
 import { supabase } from '@/lib/supabase';
-
-import type { BarcodeFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
 
 // ---------------------------------------------------------------------------
 // Zod schema — validates rows coming out of the database
@@ -196,9 +196,10 @@ export async function getRecentCorrections(
     .order('created_at', { ascending: false })
     .limit(limit);
 
-  if (error || !data) return [];
+  if (error || !data)
+    return [];
 
-  return data.map((row) => ({
+  return data.map(row => ({
     originalName: row.original_ai_name,
     correctedName: row.corrected_name,
   }));
@@ -257,7 +258,8 @@ export async function getFoodDefault(
     .eq('food_name_key', foodNameKey.toLowerCase().trim())
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (error || !data)
+    return null;
 
   return {
     name: foodNameKey,
@@ -301,10 +303,10 @@ export async function fetchFoodLogsInRange(
   const { data, error } = await supabase
     .from('food_logs')
     .select(
-      'id, user_id, logged_at, name, serving_description, ' +
-      'protein_g, carbs_g, fat_g, fiber_g, calories_kcal, ' +
-      'b12_mcg, vitamin_d_iu, magnesium_mg, zinc_mg, ' +
-      'barcode_ean, source, created_at',
+      'id, user_id, logged_at, name, serving_description, '
+      + 'protein_g, carbs_g, fat_g, fiber_g, calories_kcal, '
+      + 'b12_mcg, vitamin_d_iu, magnesium_mg, zinc_mg, '
+      + 'barcode_ean, source, created_at',
     )
     .eq('user_id', userId)
     .gte('logged_at', rangeStart)
@@ -314,12 +316,14 @@ export async function fetchFoodLogsInRange(
   if (error) {
     throw new Error(`fetchFoodLogsInRange failed: ${error.message}`);
   }
-  if (!data) return [];
+  if (!data)
+    return [];
 
   const entries: FoodLogEntry[] = [];
   for (const row of data) {
     const parsed = foodLogRowSchema.safeParse(row);
-    if (parsed.success) entries.push(rowToEntry(parsed.data));
+    if (parsed.success)
+      entries.push(rowToEntry(parsed.data));
   }
   return entries;
 }
@@ -339,10 +343,10 @@ export async function fetchTodayFoodLogs(
   const { data, error } = await supabase
     .from('food_logs')
     .select(
-      'id, user_id, logged_at, name, serving_description, ' +
-      'protein_g, carbs_g, fat_g, fiber_g, calories_kcal, ' +
-      'b12_mcg, vitamin_d_iu, magnesium_mg, zinc_mg, ' +
-      'barcode_ean, source, created_at',
+      'id, user_id, logged_at, name, serving_description, '
+      + 'protein_g, carbs_g, fat_g, fiber_g, calories_kcal, '
+      + 'b12_mcg, vitamin_d_iu, magnesium_mg, zinc_mg, '
+      + 'barcode_ean, source, created_at',
     )
     .eq('user_id', userId)
     .gte('logged_at', rangeStart)
@@ -353,7 +357,8 @@ export async function fetchTodayFoodLogs(
     throw new Error(`fetchTodayFoodLogs failed: ${error.message}`);
   }
 
-  if (!data) return [];
+  if (!data)
+    return [];
 
   // Validate each row through Zod; drop malformed rows rather than crashing.
   const entries: FoodLogEntry[] = [];

@@ -1,5 +1,8 @@
 import type { Session } from '@supabase/supabase-js';
 
+import { supabase } from '@/lib/supabase';
+import { useAuthStore } from './use-auth-store';
+
 // Mock supabase BEFORE importing the store
 jest.mock('@/lib/supabase', () => ({
   supabase: {
@@ -12,9 +15,6 @@ jest.mock('@/lib/supabase', () => ({
     },
   },
 }));
-
-import { supabase } from '@/lib/supabase';
-import { useAuthStore } from './use-auth-store';
 
 const mockGetSession = supabase.auth.getSession as jest.Mock;
 const mockSignOut = supabase.auth.signOut as jest.Mock;

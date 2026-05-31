@@ -1,18 +1,18 @@
+import type { ContentCard } from '@/features/content-cards/data';
+import type { GlipraTokens } from '@/theme/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useTranslation } from 'react-i18next';
 
-import type { ContentCard } from '@/features/content-cards/data';
+import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
-export interface PharmacistSpotlightCardProps {
+export type PharmacistSpotlightCardProps = {
   card: ContentCard;
   onReadMore: () => void;
   phaseLabel?: string;
-}
+};
 
 // Height of one ruled line — must match takeaway lineHeight exactly.
 const LINE_HEIGHT = 28;
@@ -120,12 +120,12 @@ export function PharmacistSpotlightCard({
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

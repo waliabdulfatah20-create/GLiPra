@@ -7,8 +7,11 @@
 // Rule 10: Medication keyword blocking is enforced in the edge function, not here.
 //          The UI does not attempt client-side filtering — the server is authoritative.
 
+import type { CoachMessage } from '@/features/ai-coach/hooks';
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
 import { useRef, useState } from 'react';
+
 import {
   ActivityIndicator,
   FlatList,
@@ -21,14 +24,11 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { useAiCoach } from '@/features/ai-coach/hooks';
-import type { CoachMessage } from '@/features/ai-coach/hooks';
 import { ProGate } from '@/features/subscription/pro-gate';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 // ---------------------------------------------------------------------------
 // Welcome message — pre-loaded before the user sends anything.
@@ -38,8 +38,8 @@ const WELCOME_MESSAGE: CoachMessage = {
   id: 'welcome',
   role: 'assistant',
   content:
-    "Hi! I can help with protein goals, meal ideas, hydration, and food strategies. " +
-    "What would you like to know?",
+    'Hi! I can help with protein goals, meal ideas, hydration, and food strategies. '
+    + 'What would you like to know?',
   timestamp: new Date(),
 };
 
@@ -51,7 +51,7 @@ function TypingIndicator() {
   const { colors, spacing, radius } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius]
+    [colors, spacing, radius],
   );
   return (
     <View style={styles.typingRow}>
@@ -71,7 +71,7 @@ function MessageBubble({ message }: { message: CoachMessage }) {
   const { colors, spacing, radius } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius]
+    [colors, spacing, radius],
   );
   const isUser = message.role === 'user';
 
@@ -97,7 +97,7 @@ export default function CoachScreen() {
   const { colors, spacing, radius } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius]
+    [colors, spacing, radius],
   );
 
   // Combine the welcome message with live messages.
@@ -105,7 +105,8 @@ export default function CoachScreen() {
 
   const handleSend = async () => {
     const text = inputText.trim();
-    if (!text || isLoading) return;
+    if (!text || isLoading)
+      return;
 
     haptics.medium();
     setInputText('');
@@ -145,7 +146,7 @@ export default function CoachScreen() {
         <FlatList
           ref={flatListRef}
           data={allMessages}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           renderItem={({ item }) => <MessageBubble message={item} />}
           contentContainerStyle={styles.messageList}
           showsVerticalScrollIndicator={false}
@@ -195,11 +196,11 @@ export default function CoachScreen() {
 // Styles
 // ---------------------------------------------------------------------------
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

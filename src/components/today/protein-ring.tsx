@@ -1,23 +1,23 @@
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Circle, Svg } from 'react-native-svg';
 import Animated, {
+  useAnimatedProps,
   useSharedValue,
   withSpring,
-  useAnimatedProps,
 } from 'react-native-reanimated';
 
+import { Circle, Svg } from 'react-native-svg';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 // Animated SVG circle — animates strokeDashoffset on the UI thread via Reanimated
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-interface ProteinRingProps {
+type ProteinRingProps = {
   proteinConsumedG: number;
   proteinFloorG: number;
   size?: number;
-}
+};
 
 export function ProteinRing({
   proteinConsumedG,
@@ -31,8 +31,10 @@ export function ProteinRing({
   );
 
   function arcColor(p: number): string {
-    if (p >= 0.9) return colors.proteinGood;
-    if (p >= 0.6) return colors.proteinMid;
+    if (p >= 0.9)
+      return colors.proteinGood;
+    if (p >= 0.6)
+      return colors.proteinMid;
     return colors.proteinLow;
   }
 
@@ -87,17 +89,22 @@ export function ProteinRing({
       </Svg>
       <View style={styles.center}>
         <Text style={[styles.consumed, { color: fill }]}>
-          {Math.round(proteinConsumedG)}g
+          {Math.round(proteinConsumedG)}
+          g
         </Text>
-        <Text style={styles.floor}>of {Math.round(proteinFloorG)}g</Text>
+        <Text style={styles.floor}>
+          of
+          {Math.round(proteinFloorG)}
+          g
+        </Text>
       </View>
     </View>
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
-}
+};
 
 function makeStyles({ colors }: StyleTokens) {
   return StyleSheet.create({

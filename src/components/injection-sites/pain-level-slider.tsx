@@ -1,15 +1,15 @@
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
-interface PainLevelSliderProps {
+type PainLevelSliderProps = {
   /** Integer 0–10 */
   value: number;
   onChange: (value: number) => void;
-}
+};
 
 const VALUES = Array.from({ length: 11 }, (_, i) => i); // 0..10
 
@@ -55,11 +55,11 @@ export function PainLevelSlider({ value, onChange }: PainLevelSliderProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

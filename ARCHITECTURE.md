@@ -275,7 +275,7 @@ const HALF_LIVES: Record<GLP1MedicationId, number> = {
   semaglutide_wegovy: 7,
   tirzepatide_mounjaro: 5,
   tirzepatide_zepbound: 5,
-  liraglutide_saxenda: 0.5,    // daily injection, ~13 hours
+  liraglutide_saxenda: 0.5, // daily injection, ~13 hours
   liraglutide_victoza: 0.5,
   dulaglutide_trulicity: 4.5,
   // exenatide (~0.1 day half-life) is NOT in glp1_medications seed table — falls under 'other'
@@ -289,7 +289,7 @@ export function estimateLevel(
   medication: GLP1MedicationId
 ): number {
   const halfLife = HALF_LIVES[medication];
-  return dose_mg * Math.pow(0.5, daysSinceInjection / halfLife);
+  return dose_mg * 0.5 ** (daysSinceInjection / halfLife);
 }
 
 export function generateLevelCurve(
@@ -354,8 +354,6 @@ Already partially supported in schema (`custom_dose_description`) — make it
 prominent in UI. Microdosing community is large and underserved.
 
 ---
-
-
 
 ## Compliance & Safety Framework (Read First)
 
@@ -1171,7 +1169,7 @@ const ABSOLUTE_CEILING_G = 200;
 const ABSOLUTE_FLOOR_G = 50;
 const KIDNEY_DISEASE_MAX_G_PER_KG = 0.8;
 
-interface ProteinFloorInput {
+type ProteinFloorInput = {
   weight_kg: number;
   height_cm: number;
   goal: UserGoal;
@@ -1179,7 +1177,7 @@ interface ProteinFloorInput {
   is_pregnant: boolean;
   is_lactating: boolean;
   medication_status: MedicationStatus;
-}
+};
 
 export function calculateProteinFloor(input: ProteinFloorInput): {
   floor_g: number;
@@ -1205,12 +1203,13 @@ export function calculateProteinFloor(input: ProteinFloorInput): {
     };
   }
 
-  const bmi = input.weight_kg / Math.pow(input.height_cm / 100, 2);
+  const bmi = input.weight_kg / (input.height_cm / 100) ** 2;
   const reference_kg = bmi > 35 ? estimateIdealBodyWeight(input.height_cm) : input.weight_kg;
   const reference_lbs = reference_kg * 2.205;
 
   let multiplier = input.goal === 'muscle_preservation' ? 1.0 : 0.8;
-  if (input.medication_status === 'maintenance') multiplier *= 0.9;
+  if (input.medication_status === 'maintenance')
+    multiplier *= 0.9;
 
   const calculated = Math.round(reference_lbs * multiplier);
   return {
@@ -1218,8 +1217,8 @@ export function calculateProteinFloor(input: ProteinFloorInput): {
     reasoning: bmi > 35
       ? 'Calculated using ideal body weight for accuracy.'
       : input.medication_status === 'maintenance'
-      ? 'Adjusted for maintenance phase — preserving what you have.'
-      : 'Standard muscle-preservation target.',
+        ? 'Adjusted for maintenance phase — preserving what you have.'
+        : 'Standard muscle-preservation target.',
     safety_capped: calculated !== clamp(calculated, ABSOLUTE_FLOOR_G, ABSOLUTE_CEILING_G),
   };
 }
@@ -1242,14 +1241,17 @@ function clamp(n: number, min: number, max: number): number {
 export function calculateReadinessScore(input: {
   injection_phase: InjectionPhase;
   todays_checkin: CheckinField | null;
-  protein_progress: number;  // 0-1
+  protein_progress: number; // 0-1
   hour_of_day: number;
 }): { score: number; guidance: string } {
   let score = 70;
 
-  if (input.injection_phase === 'peak_suppression') score -= 15;
-  if (input.injection_phase === 'recovery_window') score += 10;
-  if (input.injection_phase === 'injection_day') score += 5;
+  if (input.injection_phase === 'peak_suppression')
+    score -= 15;
+  if (input.injection_phase === 'recovery_window')
+    score += 10;
+  if (input.injection_phase === 'injection_day')
+    score += 5;
 
   if (input.todays_checkin) {
     score -= (input.todays_checkin.nausea - 1) * 5;
@@ -1257,7 +1259,8 @@ export function calculateReadinessScore(input: {
   }
 
   const expected = Math.min(1, input.hour_of_day / 18);
-  if ((expected - input.protein_progress) > 0.2) score -= 10;
+  if ((expected - input.protein_progress) > 0.2)
+    score -= 10;
 
   score = Math.max(0, Math.min(100, score));
   return { score, guidance: getGuidanceForScore(score, input.injection_phase) };
@@ -1288,10 +1291,14 @@ export function didHitFloorToday(consumed: number, floor: number): boolean {
 import { differenceInCalendarDays } from 'date-fns';
 
 export function getInjectionPhase(daysSince: number): InjectionPhase {
-  if (daysSince === 0) return 'injection_day';
-  if (daysSince <= 2)  return 'peak_suppression';
-  if (daysSince <= 4)  return 'adjustment';
-  if (daysSince <= 7)  return 'recovery_window';
+  if (daysSince === 0)
+    return 'injection_day';
+  if (daysSince <= 2)
+    return 'peak_suppression';
+  if (daysSince <= 4)
+    return 'adjustment';
+  if (daysSince <= 7)
+    return 'recovery_window';
   return 'overdue';
 }
 ```
@@ -1299,12 +1306,12 @@ export function getInjectionPhase(daysSince: number): InjectionPhase {
 ### Discontinuation / Maintenance Mode
 
 ```ts
-type MedicationStatus =
-  | 'starting'      // First 4-8 weeks, dose escalating
-  | 'active'        // Standard ongoing use
-  | 'tapering'      // User-initiated wind-down
-  | 'discontinued'  // Stopped GLP-1
-  | 'maintenance';  // Goal weight reached, maintaining
+type MedicationStatus
+  = | 'starting' // First 4-8 weeks, dose escalating
+    | 'active' // Standard ongoing use
+    | 'tapering' // User-initiated wind-down
+    | 'discontinued' // Stopped GLP-1
+    | 'maintenance'; // Goal weight reached, maintaining
 
 // Protein floor multipliers by status:
 // starting, active, tapering: standard calculation
@@ -1323,13 +1330,13 @@ zone; thighs are secondary and rarely used by this patient population.
 ```ts
 // src/features/injection-sites/constants.ts
 
-export type SiteCode =
-  | 'stomach_upper_left'
-  | 'stomach_upper_mid'
-  | 'stomach_upper_right'
-  | 'stomach_lower_left'
-  | 'stomach_lower_mid'
-  | 'stomach_lower_right';
+export type SiteCode
+  = | 'stomach_upper_left'
+    | 'stomach_upper_mid'
+    | 'stomach_upper_right'
+    | 'stomach_lower_left'
+    | 'stomach_lower_mid'
+    | 'stomach_lower_right';
 
 // Serpentine order — maximally spaces consecutive injections
 export const SITE_ROTATION_ORDER: SiteCode[] = [
@@ -1347,10 +1354,10 @@ export const REST_DAYS = 7; // Clinical standard: 7 days before reuse
 ```ts
 // src/features/injection-sites/calculator.ts
 
-export interface RotationState {
+export type RotationState = {
   recommendation: SiteCode; // Always defined — falls back to LRU when all resting
-  allResting: boolean;       // True when every site used within REST_DAYS — show warning
-}
+  allResting: boolean; // True when every site used within REST_DAYS — show warning
+};
 
 export function computeNextSite(logs: InjectionLog[], today?: string): RotationState {
   // Pass 1: first site in rotation order that is either unused or rested (≥ REST_DAYS ago)
@@ -1917,13 +1924,13 @@ Avoids future painful migrations when prescriber portal is built.
 
 ```ts
 // src/features/offline/queue.ts
-interface QueuedOperation {
-  client_uuid: string;           // UUID generated client-side
+type QueuedOperation = {
+  client_uuid: string; // UUID generated client-side
   operation_type: 'food_log' | 'checkin' | 'weight';
   payload: any;
   client_timestamp: string;
   retry_count: number;
-}
+};
 // Stored in AsyncStorage key 'offline_queue'
 // Drained on: network reconnect, app foreground, manual sync trigger
 // Server uses client_uuid for idempotency (UNIQUE constraint)
@@ -2000,7 +2007,8 @@ serve(async (req: Request) => {
   try {
     // 2. Auth validation
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) throw new Error('No auth header');
+    if (!authHeader)
+      throw new Error('No auth header');
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -2009,7 +2017,8 @@ serve(async (req: Request) => {
     );
 
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
-    if (authErr || !user) throw new Error('Unauthorized');
+    if (authErr || !user)
+      throw new Error('Unauthorized');
 
     // 3. Rate limiting (from ai_invocations table)
     const today = new Date().toISOString().split('T')[0];
@@ -2049,8 +2058,8 @@ serve(async (req: Request) => {
       JSON.stringify(validatedOutput),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-
-  } catch (error) {
+  }
+  catch (error) {
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 400, headers: corsHeaders }
@@ -2076,8 +2085,7 @@ export async function recognizeMealPhoto(base64Image: string, prompt: string) {
     messages: [{
       role: 'user',
       content: [
-        { type: 'image_url',
-          image_url: { url: `data:image/jpeg;base64,${base64Image}` } },
+        { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64Image}` } },
         { type: 'text', text: prompt },
       ],
     }],
@@ -2131,13 +2139,16 @@ Example generated questions:
 
 **PDF generation pattern (edge function):**
 ```ts
-import { PDFDocument, StandardFonts, rgb } from 'npm:pdf-lib@1.17.1';
+import { PDFDocument, rgb, StandardFonts } from 'npm:pdf-lib@1.17.1';
 
 const pdfDoc = await PDFDocument.create();
 const page = pdfDoc.addPage([595, 842]); // A4
 const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 page.drawText('Glipra — Prescriber Visit Summary', {
-  x: 50, y: 800, size: 16, font,
+  x: 50,
+  y: 800,
+  size: 16,
+  font,
 });
 // Add user data, trends, suggested questions
 const pdfBytes = await pdfDoc.save();
@@ -2211,26 +2222,35 @@ CI blocks merges on test failure. No exceptions for safety-critical files.
 // src/theme/colors.ts
 export const colors = {
   bg: {
-    base: '#FAFAF8', elevated: '#F4F1ED',
-    surface: '#EDEAE5', overlay: '#E5E1DB',
+    base: '#FAFAF8',
+    elevated: '#F4F1ED',
+    surface: '#EDEAE5',
+    overlay: '#E5E1DB',
   },
   brand: {
-    teal: '#2D7B7B', tealLight: '#E8F4F4',
-    amber: '#E8A45A', amberLight: '#FDF3E7',
+    teal: '#2D7B7B',
+    tealLight: '#E8F4F4',
+    amber: '#E8A45A',
+    amberLight: '#FDF3E7',
   },
   text: {
-    primary: '#1A2B3C', secondary: '#6B7B8D',
-    tertiary: '#9BA8B4', inverse: '#FAFAF8',
+    primary: '#1A2B3C',
+    secondary: '#6B7B8D',
+    tertiary: '#9BA8B4',
+    inverse: '#FAFAF8',
   },
   semantic: {
     success: '#5A9E7B',
     warning: '#E8A45A',
-    danger: '#C0534F',    // RESERVED: clinical escalation ONLY
+    danger: '#C0534F', // RESERVED: clinical escalation ONLY
     info: '#4A8FB5',
   },
   micronutrient: {
-    b12: '#7B5EA7', iron: '#C0534F',
-    calcium: '#4A8FB5', magnesium: '#5A9E7B', fiber: '#8B7355',
+    b12: '#7B5EA7',
+    iron: '#C0534F',
+    calcium: '#4A8FB5',
+    magnesium: '#5A9E7B',
+    fiber: '#8B7355',
   },
 };
 ```
@@ -2352,8 +2372,8 @@ jobs:
     steps:
       - run: pnpm run typecheck
       - run: pnpm run lint
-      - run: pnpm test            # jest-expo (components + integration)
-      - run: pnpm test:utils      # Vitest (pure-TS safety code — 90% coverage gate)
+      - run: pnpm test # jest-expo (components + integration)
+      - run: pnpm test:utils # Vitest (pure-TS safety code — 90% coverage gate)
       - run: pnpm run test:rls
 
   ota-update-staging:
@@ -2382,7 +2402,8 @@ kidney disease users, fix ships in hours, not 7-day App Store review cycles.
 ```ts
 // Always verify signature before processing
 const expected = createHmac('sha256', REVENUECAT_WEBHOOK_SECRET).update(body).digest('hex');
-if (signature !== `Bearer ${expected}`) return new Response('Unauthorized', { status: 401 });
+if (signature !== `Bearer ${expected}`)
+  return new Response('Unauthorized', { status: 401 });
 // Always check last_event_id for idempotency before processing
 ```
 
@@ -2731,16 +2752,16 @@ zero cost, instant responses, fully realistic data for building UI.
 // Used when EXPO_PUBLIC_USE_MOCK_AI=true in .env.local
 
 export const MOCK_DAILY_GUIDANCE = {
-  guidance_text: "Today is day 3 of your cycle. Appetite returning — good window for protein.",
-  reasoning_text: "Day 3 post-injection is the adjustment phase. Appetite suppression easing.",
-  injection_phase: "adjustment",
-  prompt_version: "mock-1.0",
+  guidance_text: 'Today is day 3 of your cycle. Appetite returning — good window for protein.',
+  reasoning_text: 'Day 3 post-injection is the adjustment phase. Appetite suppression easing.',
+  injection_phase: 'adjustment',
+  prompt_version: 'mock-1.0',
 };
 
 export const MOCK_PARSED_MEAL = {
   items: [
     {
-      name: "Greek yogurt",
+      name: 'Greek yogurt',
       estimated_grams: 170,
       protein_g: 17,
       calories: 100,
@@ -2755,16 +2776,16 @@ export const MOCK_PARSED_MEAL = {
 
 export const MOCK_PHOTO_RECOGNITION = {
   items: [
-    { name: "Grilled chicken breast", estimated_grams: 140, protein_g: 42, calories: 231, carbs_g: 0, fat_g: 5, confidence: 0.88, is_estimated: true },
-    { name: "Mixed salad", estimated_grams: 80, protein_g: 2, calories: 20, carbs_g: 4, fat_g: 0.3, confidence: 0.82, is_estimated: true },
+    { name: 'Grilled chicken breast', estimated_grams: 140, protein_g: 42, calories: 231, carbs_g: 0, fat_g: 5, confidence: 0.88, is_estimated: true },
+    { name: 'Mixed salad', estimated_grams: 80, protein_g: 2, calories: 20, carbs_g: 4, fat_g: 0.3, confidence: 0.82, is_estimated: true },
   ],
   needs_review: false,
 };
 
 export const MOCK_COACH_RESPONSE = {
-  answer: "Greek yogurt is one of the best protein sources for GLP-1 users — soft texture, high protein density, and easy on a suppressed appetite. Aim for full-fat plain varieties to slow digestion.",
-  sources: ["pharmacist-content"],
-  disclaimer: "AI-generated educational suggestion. Not medical advice. Consult your prescriber.",
+  answer: 'Greek yogurt is one of the best protein sources for GLP-1 users — soft texture, high protein density, and easy on a suppressed appetite. Aim for full-fat plain varieties to slow digestion.',
+  sources: ['pharmacist-content'],
+  disclaimer: 'AI-generated educational suggestion. Not medical advice. Consult your prescriber.',
 };
 ```
 

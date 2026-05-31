@@ -2,11 +2,11 @@
 // These are static, pre-written by a licensed pharmacist.
 // Never auto-generated or modified by AI.
 
-export interface MaintenanceGuide {
+export type MaintenanceGuide = {
   id: string;
   title: string;
   body: string; // 2–4 sentences
-}
+};
 
 export const MAINTENANCE_GUIDES: MaintenanceGuide[] = [
   {

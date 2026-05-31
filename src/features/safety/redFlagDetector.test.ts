@@ -2,9 +2,10 @@
 // Comprehensive Vitest tests for redFlagDetector.ts
 // Rule 4: safety-critical code — targets 90%+ branch coverage
 
-import { describe, expect, it } from 'vitest';
+import type { RedFlagInput } from './redFlagDetector';
 
-import { detectRedFlags, getConsecutiveDays, type RedFlagInput } from './redFlagDetector';
+import { describe, expect, it } from 'vitest';
+import { detectRedFlags, getConsecutiveDays } from './redFlagDetector';
 
 const TODAY = '2026-05-17';
 
@@ -41,7 +42,7 @@ describe('empty and null inputs', () => {
       today: TODAY,
     });
     // nausea=5 and water<500, but needs 3+ consecutive days
-    expect(result.patterns.filter((p) => p.type === 'dehydration_risk')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'dehydration_risk')).toHaveLength(0);
   });
 });
 
@@ -57,7 +58,7 @@ describe('dehydration_risk pattern', () => {
     });
     // Only 2 days, so severity should be LOW (but currently only triggers for 3+)
     // Actually, spec says 3+ consecutive days, so this shouldn't trigger at all
-    expect(result.patterns.filter((p) => p.type === 'dehydration_risk')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'dehydration_risk')).toHaveLength(0);
   });
 
   it('triggers with severity MEDIUM when 3 consecutive days of nausea=5 + water<500', () => {
@@ -69,7 +70,7 @@ describe('dehydration_risk pattern', () => {
       ],
       today: TODAY,
     });
-    const dehydration = result.patterns.find((p) => p.type === 'dehydration_risk');
+    const dehydration = result.patterns.find(p => p.type === 'dehydration_risk');
     expect(dehydration).toBeDefined();
     expect(dehydration?.severity).toBe('medium');
     expect(dehydration?.daysSinceOnset).toBe(3);
@@ -85,7 +86,7 @@ describe('dehydration_risk pattern', () => {
       ],
       today: TODAY,
     });
-    const dehydration = result.patterns.find((p) => p.type === 'dehydration_risk');
+    const dehydration = result.patterns.find(p => p.type === 'dehydration_risk');
     expect(dehydration).toBeDefined();
     expect(dehydration?.severity).toBe('high');
     expect(dehydration?.daysSinceOnset).toBe(4);
@@ -101,7 +102,7 @@ describe('dehydration_risk pattern', () => {
       ],
       today: TODAY,
     });
-    expect(result.patterns.filter((p) => p.type === 'dehydration_risk')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'dehydration_risk')).toHaveLength(0);
   });
 
   it('does NOT trigger when water >= 500 threshold', () => {
@@ -113,7 +114,7 @@ describe('dehydration_risk pattern', () => {
       ],
       today: TODAY,
     });
-    expect(result.patterns.filter((p) => p.type === 'dehydration_risk')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'dehydration_risk')).toHaveLength(0);
   });
 
   it('does NOT trigger when water is null', () => {
@@ -125,7 +126,7 @@ describe('dehydration_risk pattern', () => {
       ],
       today: TODAY,
     });
-    expect(result.patterns.filter((p) => p.type === 'dehydration_risk')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'dehydration_risk')).toHaveLength(0);
   });
 
   it('breaks consecutive run when one day does not meet criteria', () => {
@@ -138,7 +139,7 @@ describe('dehydration_risk pattern', () => {
       today: TODAY,
     });
     // Only the most recent day matches, not 3+ consecutive
-    expect(result.patterns.filter((p) => p.type === 'dehydration_risk')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'dehydration_risk')).toHaveLength(0);
   });
 
   it('respects 14-day lookback window', () => {
@@ -151,7 +152,7 @@ describe('dehydration_risk pattern', () => {
       today: TODAY,
     });
     // Only 1 day in window, not 3+ consecutive
-    expect(result.patterns.filter((p) => p.type === 'dehydration_risk')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'dehydration_risk')).toHaveLength(0);
   });
 });
 
@@ -162,7 +163,7 @@ describe('pain_pattern', () => {
       checkIns: [{ date: TODAY, nausea: 5, energy: 3, water_ml: 600, notes: 'sharp pain in chest' }],
       today: TODAY,
     });
-    const pain = result.patterns.find((p) => p.type === 'pain_pattern');
+    const pain = result.patterns.find(p => p.type === 'pain_pattern');
     expect(pain).toBeDefined();
     expect(pain?.severity).toBe('medium');
     expect(pain?.daysSinceOnset).toBe(0);
@@ -175,7 +176,7 @@ describe('pain_pattern', () => {
         checkIns: [{ date: TODAY, nausea: 5, energy: 3, water_ml: 600, notes: `I have ${kw}` }],
         today: TODAY,
       });
-      expect(result.patterns.some((p) => p.type === 'pain_pattern')).toBe(true);
+      expect(result.patterns.some(p => p.type === 'pain_pattern')).toBe(true);
     }
   });
 
@@ -184,7 +185,7 @@ describe('pain_pattern', () => {
       checkIns: [{ date: TODAY, nausea: 5, energy: 3, water_ml: 600, notes: 'SEVERE PAIN' }],
       today: TODAY,
     });
-    expect(result.patterns.some((p) => p.type === 'pain_pattern')).toBe(true);
+    expect(result.patterns.some(p => p.type === 'pain_pattern')).toBe(true);
   });
 
   it('does NOT trigger when nausea < 5', () => {
@@ -192,7 +193,7 @@ describe('pain_pattern', () => {
       checkIns: [{ date: TODAY, nausea: 4, energy: 3, water_ml: 600, notes: 'sharp pain' }],
       today: TODAY,
     });
-    expect(result.patterns.filter((p) => p.type === 'pain_pattern')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'pain_pattern')).toHaveLength(0);
   });
 
   it('does NOT trigger when no pain keywords in notes', () => {
@@ -200,7 +201,7 @@ describe('pain_pattern', () => {
       checkIns: [{ date: TODAY, nausea: 5, energy: 3, water_ml: 600, notes: 'feeling queasy' }],
       today: TODAY,
     });
-    expect(result.patterns.filter((p) => p.type === 'pain_pattern')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'pain_pattern')).toHaveLength(0);
   });
 
   it('does NOT trigger for check-ins > 7 days ago', () => {
@@ -208,7 +209,7 @@ describe('pain_pattern', () => {
       checkIns: [{ date: '2026-05-09', nausea: 5, energy: 3, water_ml: 600, notes: 'severe pain' }],
       today: TODAY,
     });
-    expect(result.patterns.filter((p) => p.type === 'pain_pattern')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'pain_pattern')).toHaveLength(0);
   });
 
   it('correctly calculates daysSinceOnset', () => {
@@ -216,7 +217,7 @@ describe('pain_pattern', () => {
       checkIns: [{ date: '2026-05-14', nausea: 5, energy: 3, water_ml: 600, notes: 'pain' }],
       today: TODAY,
     });
-    const pain = result.patterns.find((p) => p.type === 'pain_pattern');
+    const pain = result.patterns.find(p => p.type === 'pain_pattern');
     expect(pain?.daysSinceOnset).toBe(3);
   });
 });
@@ -231,7 +232,7 @@ describe('vomiting_pattern', () => {
       ],
       today: TODAY,
     });
-    const vomiting = result.patterns.find((p) => p.type === 'vomiting_pattern');
+    const vomiting = result.patterns.find(p => p.type === 'vomiting_pattern');
     expect(vomiting).toBeDefined();
     expect(vomiting?.severity).toBe('medium');
     expect(vomiting?.daysSinceOnset).toBe(2);
@@ -246,7 +247,7 @@ describe('vomiting_pattern', () => {
       ],
       today: TODAY,
     });
-    const vomiting = result.patterns.find((p) => p.type === 'vomiting_pattern');
+    const vomiting = result.patterns.find(p => p.type === 'vomiting_pattern');
     expect(vomiting).toBeDefined();
     expect(vomiting?.severity).toBe('high');
     expect(vomiting?.daysSinceOnset).toBe(3);
@@ -263,7 +264,7 @@ describe('vomiting_pattern', () => {
         ],
         today: TODAY,
       });
-      expect(result.patterns.some((p) => p.type === 'vomiting_pattern')).toBe(true);
+      expect(result.patterns.some(p => p.type === 'vomiting_pattern')).toBe(true);
     }
   });
 
@@ -275,7 +276,7 @@ describe('vomiting_pattern', () => {
       ],
       today: TODAY,
     });
-    expect(result.patterns.some((p) => p.type === 'vomiting_pattern')).toBe(true);
+    expect(result.patterns.some(p => p.type === 'vomiting_pattern')).toBe(true);
   });
 
   it('does NOT trigger with only 1 day of vomit keywords', () => {
@@ -283,7 +284,7 @@ describe('vomiting_pattern', () => {
       checkIns: [{ date: TODAY, nausea: 3, energy: 3, water_ml: 600, notes: 'vomiting' }],
       today: TODAY,
     });
-    expect(result.patterns.filter((p) => p.type === 'vomiting_pattern')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'vomiting_pattern')).toHaveLength(0);
   });
 
   it('breaks consecutive run if keywords missing on intermediate day', () => {
@@ -295,7 +296,7 @@ describe('vomiting_pattern', () => {
       ],
       today: TODAY,
     });
-    expect(result.patterns.filter((p) => p.type === 'vomiting_pattern')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'vomiting_pattern')).toHaveLength(0);
   });
 
   it('respects 14-day lookback window', () => {
@@ -307,7 +308,7 @@ describe('vomiting_pattern', () => {
       today: TODAY,
     });
     // Only 1 day in window
-    expect(result.patterns.filter((p) => p.type === 'vomiting_pattern')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'vomiting_pattern')).toHaveLength(0);
   });
 });
 
@@ -324,7 +325,7 @@ describe('energy_pattern', () => {
       ],
       today: TODAY,
     });
-    const energy = result.patterns.find((p) => p.type === 'energy_pattern');
+    const energy = result.patterns.find(p => p.type === 'energy_pattern');
     expect(energy).toBeDefined();
     expect(energy?.severity).toBe('medium');
     expect(energy?.daysSinceOnset).toBe(5);
@@ -343,7 +344,7 @@ describe('energy_pattern', () => {
       ],
       today: TODAY,
     });
-    const energy = result.patterns.find((p) => p.type === 'energy_pattern');
+    const energy = result.patterns.find(p => p.type === 'energy_pattern');
     expect(energy).toBeDefined();
     expect(energy?.severity).toBe('high');
     expect(energy?.daysSinceOnset).toBe(7);
@@ -360,7 +361,7 @@ describe('energy_pattern', () => {
       ],
       today: TODAY,
     });
-    expect(result.patterns.filter((p) => p.type === 'energy_pattern')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'energy_pattern')).toHaveLength(0);
   });
 
   it('does NOT trigger when energy = 2 in the run', () => {
@@ -374,7 +375,7 @@ describe('energy_pattern', () => {
       ],
       today: TODAY,
     });
-    expect(result.patterns.filter((p) => p.type === 'energy_pattern')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'energy_pattern')).toHaveLength(0);
   });
 
   it('respects 30-day lookback window', () => {
@@ -389,7 +390,7 @@ describe('energy_pattern', () => {
       today: TODAY,
     });
     // Only 1 day in window
-    expect(result.patterns.filter((p) => p.type === 'energy_pattern')).toHaveLength(0);
+    expect(result.patterns.filter(p => p.type === 'energy_pattern')).toHaveLength(0);
   });
 });
 
@@ -420,7 +421,7 @@ describe('multiple patterns', () => {
       ],
       today: TODAY,
     });
-    const dehydration = result.patterns.find((p) => p.type === 'dehydration_risk');
+    const dehydration = result.patterns.find(p => p.type === 'dehydration_risk');
     expect(dehydration?.severity).toBe('high');
     expect(result.shouldEscalate).toBe(true);
   });
@@ -434,7 +435,7 @@ describe('multiple patterns', () => {
       ],
       today: TODAY,
     });
-    const dehydration = result.patterns.find((p) => p.type === 'dehydration_risk');
+    const dehydration = result.patterns.find(p => p.type === 'dehydration_risk');
     expect(dehydration?.severity).toBe('medium');
     expect(result.shouldEscalate).toBe(false);
   });
@@ -463,7 +464,7 @@ describe('future date exclusion', () => {
       ],
       today: TODAY,
     });
-    const dehydration = result.patterns.find((p) => p.type === 'dehydration_risk');
+    const dehydration = result.patterns.find(p => p.type === 'dehydration_risk');
     expect(dehydration).toBeDefined();
     expect(dehydration?.daysSinceOnset).toBe(3);
   });
@@ -478,7 +479,7 @@ describe('getConsecutiveDays helper', () => {
     ];
     const result = getConsecutiveDays(
       checkIns,
-      (c) => c.nausea === 5,
+      c => c.nausea === 5,
       3,
       30,
       TODAY,
@@ -494,7 +495,7 @@ describe('getConsecutiveDays helper', () => {
     ];
     const result = getConsecutiveDays(
       checkIns,
-      (c) => c.nausea === 5,
+      c => c.nausea === 5,
       3,
       30,
       TODAY,
@@ -510,7 +511,7 @@ describe('getConsecutiveDays helper', () => {
     ];
     const result = getConsecutiveDays(
       checkIns,
-      (c) => c.nausea === 5,
+      c => c.nausea === 5,
       2,
       30,
       TODAY,
@@ -525,7 +526,7 @@ describe('getConsecutiveDays helper', () => {
     ];
     const result = getConsecutiveDays(
       checkIns,
-      (c) => c.nausea === 5,
+      c => c.nausea === 5,
       3,
       30,
       TODAY,
@@ -541,7 +542,7 @@ describe('getConsecutiveDays helper', () => {
     ];
     const result = getConsecutiveDays(
       checkIns,
-      (c) => c.nausea === 5,
+      c => c.nausea === 5,
       2,
       30,
       TODAY,
@@ -556,7 +557,7 @@ describe('getConsecutiveDays helper', () => {
     ];
     const result = getConsecutiveDays(
       checkIns,
-      (c) => c.nausea === 5,
+      c => c.nausea === 5,
       2,
       30,
       TODAY,
@@ -577,7 +578,7 @@ describe('pattern descriptions', () => {
       ],
       today: TODAY,
     });
-    const dehydration = result.patterns.find((p) => p.type === 'dehydration_risk');
+    const dehydration = result.patterns.find(p => p.type === 'dehydration_risk');
     expect(dehydration?.description).toContain('4');
   });
 
@@ -589,7 +590,7 @@ describe('pattern descriptions', () => {
       ],
       today: TODAY,
     });
-    const vomiting = result.patterns.find((p) => p.type === 'vomiting_pattern');
+    const vomiting = result.patterns.find(p => p.type === 'vomiting_pattern');
     expect(vomiting?.description).toContain('2');
   });
 
@@ -604,7 +605,7 @@ describe('pattern descriptions', () => {
       ],
       today: TODAY,
     });
-    const energy = result.patterns.find((p) => p.type === 'energy_pattern');
+    const energy = result.patterns.find(p => p.type === 'energy_pattern');
     expect(energy?.description).toContain('5');
   });
 });

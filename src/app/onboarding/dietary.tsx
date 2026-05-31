@@ -1,15 +1,15 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useState } from 'react';
+
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { LinearGradient } from 'expo-linear-gradient';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 type DietaryPattern = 'omnivore' | 'vegetarian' | 'vegan' | 'pescatarian' | 'other';
 
@@ -31,13 +31,14 @@ export default function DietaryScreen() {
   const { colors, spacing, radius, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius, gradients]
+    [colors, spacing, radius, gradients],
   );
 
   const canProceed = selected !== undefined;
 
   const handleNext = () => {
-    if (!canProceed) return;
+    if (!canProceed)
+      return;
     haptics.medium();
     setFormData({ dietaryPattern: selected });
     router.push('/onboarding/goals');
@@ -89,11 +90,13 @@ export default function DietaryScreen() {
                   <Text style={[styles.cardLabel, isSelected && styles.cardLabelSelected]}>
                     {option.label}
                   </Text>
-                  {option.description ? (
-                    <Text style={[styles.cardDescription, isSelected && styles.cardDescriptionSelected]}>
-                      {option.description}
-                    </Text>
-                  ) : null}
+                  {option.description
+                    ? (
+                        <Text style={[styles.cardDescription, isSelected && styles.cardDescriptionSelected]}>
+                          {option.description}
+                        </Text>
+                      )
+                    : null}
                 </Pressable>
               );
             })}
@@ -122,11 +125,11 @@ export default function DietaryScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

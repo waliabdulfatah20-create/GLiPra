@@ -4,23 +4,23 @@
  * Uses the Direction B purple-blue gradient to match unlocked MilestoneCard.
  */
 
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import type { Milestone } from '@/features/journey-cards/milestones';
+import type { GlipraTokens } from '@/theme/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import * as React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
-import type { Milestone } from '@/features/journey-cards/milestones';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-interface MilestoneToastProps {
+type MilestoneToastProps = {
   /** The milestone to display. Pass null to hide the toast. */
   milestone: Milestone | null;
   onDismiss: () => void;
-}
+};
 
 // ---------------------------------------------------------------------------
 // Component
@@ -35,12 +35,14 @@ export function MilestoneToast({ milestone, onDismiss }: MilestoneToastProps) {
 
   // Auto-dismiss after 3 seconds whenever a milestone is shown.
   React.useEffect(() => {
-    if (!milestone) return;
+    if (!milestone)
+      return;
     const t = setTimeout(onDismiss, 3000);
     return () => clearTimeout(t);
   }, [milestone, onDismiss]);
 
-  if (!milestone) return null;
+  if (!milestone)
+    return null;
 
   return (
     // Outer View: shadow carrier + absolute positioning.
@@ -72,12 +74,12 @@ export function MilestoneToast({ milestone, onDismiss }: MilestoneToastProps) {
 // Styles
 // ---------------------------------------------------------------------------
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

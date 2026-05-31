@@ -1,16 +1,16 @@
-import * as React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useTranslation } from 'react-i18next';
-
 import type { ChecklistItem } from '@/features/shot-prep/checklist-data';
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
+import * as React from 'react';
 
-interface ChecklistItemRowProps {
+import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '@/lib/ThemeContext';
+
+type ChecklistItemRowProps = {
   item: ChecklistItem;
   isChecked: boolean;
   onToggle: () => void;
-}
+};
 
 export function ChecklistItemRow({
   item,
@@ -70,11 +70,11 @@ export function ChecklistItemRow({
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

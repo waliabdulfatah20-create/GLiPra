@@ -1,5 +1,5 @@
-import * as React from 'react';
 import type { SvgProps } from 'react-native-svg';
+import * as React from 'react';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 export function ChatBubble({ color = '#000', ...props }: SvgProps) {

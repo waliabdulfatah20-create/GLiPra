@@ -19,8 +19,10 @@ export default function AuthLayout() {
 
   if (status === 'signIn') {
     // Still loading consent state from AsyncStorage — hold until resolved
-    if (hasAgreed === undefined) return null;
-    if (!hasAgreed) return <Redirect href="/(auth)/consent" />;
+    if (hasAgreed === undefined)
+      return null;
+    if (!hasAgreed)
+      return <Redirect href="/(auth)/consent" />;
     return <Redirect href="/(app)/" />;
   }
 

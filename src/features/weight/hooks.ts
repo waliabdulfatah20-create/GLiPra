@@ -1,11 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-
-import { useAuthStore } from '@/features/auth/use-auth-store';
-import { fetchWeightLogs, fetchWeightLogCount, insertWeightLog, deleteWeightLog } from '@/features/weight/api';
 import type { WeightLogEntry } from '@/features/weight/api';
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAuthStore } from '@/features/auth/use-auth-store';
+import { unlockMilestone } from '@/features/journey-cards/api';
+import { deleteWeightLog, fetchWeightLogCount, fetchWeightLogs, insertWeightLog } from '@/features/weight/api';
 import { analytics, EVENTS } from '@/lib/analytics';
 import { applyEwma } from '@/utils/ewma';
-import { unlockMilestone } from '@/features/journey-cards/api';
 
 const WEIGHT_LOGS_KEY = 'weight-logs';
 
@@ -52,7 +52,8 @@ export function useInsertWeightLog(): {
 
   const mutation = useMutation({
     mutationFn: async (entry: { weightKg: number; notes?: string }) => {
-      if (!userId) throw new Error('Not authenticated');
+      if (!userId)
+        throw new Error('Not authenticated');
 
       // Get the latest EWMA from the 90-day cache (if available).
       // Always read the default-window key — that cache is always populated
@@ -114,7 +115,8 @@ export function useDeleteWeightLog(): {
 
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      if (!userId) throw new Error('Not authenticated');
+      if (!userId)
+        throw new Error('Not authenticated');
       await deleteWeightLog(id);
     },
     onMutate: async (id: string) => {
@@ -131,7 +133,7 @@ export function useDeleteWeightLog(): {
         snapshots.push({ queryKey: query.queryKey as string[], previous });
         queryClient.setQueryData<WeightLogEntry[]>(
           query.queryKey as string[],
-          (old) => (old ?? []).filter((l) => l.id !== id),
+          old => (old ?? []).filter(l => l.id !== id),
         );
       }
       return { snapshots };

@@ -5,23 +5,23 @@
  * Both metrics live on the same 1-5 axis so they're directly comparable.
  */
 
-import { useTranslation } from 'react-i18next';
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
-import { Line, Polyline, Svg } from 'react-native-svg';
 
+import { Line, Polyline, Svg } from 'react-native-svg';
 import { useCheckInTrend } from '@/features/progress/hooks';
 import { tipI18nKey } from '@/features/progress/pharmacist-tips';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 import { CardShell } from './card-shell';
 import { PharmacistTip } from './pharmacist-tip';
 
-interface CheckInSymptomCardProps {
+type CheckInSymptomCardProps = {
   days: number;
   width: number;
-}
+};
 
 const CHART_HEIGHT = 100;
 const MIN_SCORE = 1;
@@ -34,8 +34,8 @@ export function CheckInSymptomCard({ days, width }: CheckInSymptomCardProps) {
     () => makeStyles({ colors, spacing }),
     [colors, spacing],
   );
-  const { days: trend, avgNausea, avgEnergy, hasData, isLoading } =
-    useCheckInTrend(days);
+  const { days: trend, avgNausea, avgEnergy, hasData, isLoading }
+    = useCheckInTrend(days);
 
   function buildPolyline(values: (number | null)[]): string {
     // Each contiguous run of non-null values becomes a polyline segment.
@@ -43,21 +43,22 @@ export function CheckInSymptomCard({ days, width }: CheckInSymptomCardProps) {
     const defined = values
       .map((v, i) => ({ v, i }))
       .filter((p): p is { v: number; i: number } => p.v != null);
-    if (defined.length === 0) return '';
+    if (defined.length === 0)
+      return '';
     const stepX = trend.length > 1 ? width / (trend.length - 1) : 0;
     return defined
       .map((p) => {
         const x = p.i * stepX;
-        const y =
-          CHART_HEIGHT -
-          ((p.v - MIN_SCORE) / (MAX_SCORE - MIN_SCORE)) * CHART_HEIGHT;
+        const y
+          = CHART_HEIGHT
+            - ((p.v - MIN_SCORE) / (MAX_SCORE - MIN_SCORE)) * CHART_HEIGHT;
         return `${x},${y}`;
       })
       .join(' ');
   }
 
-  const nauseaPoints = buildPolyline(trend.map((d) => d.nausea));
-  const energyPoints = buildPolyline(trend.map((d) => d.energy));
+  const nauseaPoints = buildPolyline(trend.map(d => d.nausea));
+  const energyPoints = buildPolyline(trend.map(d => d.energy));
 
   return (
     <CardShell
@@ -149,10 +150,10 @@ function SummaryStat({
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
-}
+};
 
 function makeStyles({ colors, spacing }: StyleTokens) {
   return StyleSheet.create({

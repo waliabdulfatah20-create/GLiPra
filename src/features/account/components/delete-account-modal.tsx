@@ -4,7 +4,10 @@
 // Built on React Native's Modal + StyleSheet + theme tokens (mirrors
 // photo-comment-sheet.tsx — NOT the dead NativeWind ui/modal.tsx).
 
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
+
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -17,17 +20,14 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
-
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
-interface Props {
+type Props = {
   visible: boolean;
   isLoading: boolean;
   onConfirm: () => void;
   onCancel: () => void;
-}
+};
 
 export function DeleteAccountModal({ visible, isLoading, onConfirm, onCancel }: Props) {
   const { t } = useTranslation();
@@ -42,7 +42,8 @@ export function DeleteAccountModal({ visible, isLoading, onConfirm, onCancel }: 
 
   // Reset the field whenever the modal opens.
   React.useEffect(() => {
-    if (visible) setInput('');
+    if (visible)
+      setInput('');
   }, [visible]);
 
   const matches = input.trim().toUpperCase() === confirmWord.toUpperCase();
@@ -105,11 +106,13 @@ export function DeleteAccountModal({ visible, isLoading, onConfirm, onCancel }: 
               accessibilityState={{ disabled: !canDelete }}
               accessibilityLabel={t('account.delete_button')}
             >
-              {isLoading ? (
-                <ActivityIndicator color={colors.white} size="small" />
-              ) : (
-                <Text style={styles.deleteText}>{t('account.delete_button')}</Text>
-              )}
+              {isLoading
+                ? (
+                    <ActivityIndicator color={colors.white} size="small" />
+                  )
+                : (
+                    <Text style={styles.deleteText}>{t('account.delete_button')}</Text>
+                  )}
             </Pressable>
           </View>
         </View>
@@ -118,11 +121,11 @@ export function DeleteAccountModal({ visible, isLoading, onConfirm, onCancel }: 
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

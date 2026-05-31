@@ -16,15 +16,15 @@
 //   3. Set REVENUECAT_API_KEY_IOS / REVENUECAT_API_KEY_ANDROID in env
 //   4. Remove the stub guard at the top of the hook and uncomment the live path
 
-import { useCallback, useEffect, useState } from 'react';
-
 import type { SubscriptionTier } from '@/types';
+
+import { useCallback, useEffect, useState } from 'react';
 
 // ---------------------------------------------------------------------------
 // Public interface
 // ---------------------------------------------------------------------------
 
-export interface SubscriptionState {
+export type SubscriptionState = {
   tier: SubscriptionTier;
   isLoading: boolean;
   /** true when tier is 'pro' or 'founder_lifetime' */
@@ -32,7 +32,7 @@ export interface SubscriptionState {
   isFounderLifetime: boolean;
   /** Restore previously purchased subscriptions */
   restore: () => Promise<void>;
-}
+};
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -60,7 +60,8 @@ function getPurchasesModule(): typeof import('react-native-purchases') | null {
       return mod.default;
     }
     return null;
-  } catch {
+  }
+  catch {
     return null;
   }
 }
@@ -73,7 +74,8 @@ function tierFromEntitlements(
   entitlements: Record<string, { isActive: boolean }>,
 ): SubscriptionTier {
   const proEntitlement = entitlements[ENTITLEMENT_ID];
-  if (!proEntitlement?.isActive) return 'free';
+  if (!proEntitlement?.isActive)
+    return 'free';
 
   // Distinguish lifetime from recurring by checking the product identifier
   // in the entitlement's active subscription. The founder product id
@@ -82,10 +84,10 @@ function tierFromEntitlements(
   // we check the latestPurchasedProductIdentifier when available.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const raw = proEntitlement as any;
-  const productId: string =
-    raw.latestPurchasedProductIdentifier ??
-    raw.productIdentifier ??
-    '';
+  const productId: string
+    = raw.latestPurchasedProductIdentifier
+      ?? raw.productIdentifier
+      ?? '';
 
   if (productId.includes('lifetime') || productId.includes('founder')) {
     return 'founder_lifetime';
@@ -134,19 +136,20 @@ export function useSubscription(): SubscriptionState {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const restore = useCallback(async () => {
-    setState((prev) => ({ ...prev, isLoading: true }));
+    setState(prev => ({ ...prev, isLoading: true }));
     try {
       const customerInfo = await Purchases.restorePurchases();
       const tier = tierFromEntitlements(customerInfo.entitlements.active);
-      setState((prev) => ({
+      setState(prev => ({
         ...prev,
         tier,
         isPro: tier !== 'free',
         isFounderLifetime: tier === 'founder_lifetime',
         isLoading: false,
       }));
-    } catch {
-      setState((prev) => ({ ...prev, isLoading: false }));
+    }
+    catch {
+      setState(prev => ({ ...prev, isLoading: false }));
     }
   }, [Purchases]);
 
@@ -169,7 +172,8 @@ export function useSubscription(): SubscriptionState {
     (async () => {
       try {
         const customerInfo = await Purchases.getCustomerInfo();
-        if (cancelled) return;
+        if (cancelled)
+          return;
         const tier = tierFromEntitlements(customerInfo.entitlements.active);
         setState({
           tier,
@@ -178,7 +182,8 @@ export function useSubscription(): SubscriptionState {
           isFounderLifetime: tier === 'founder_lifetime',
           restore,
         });
-      } catch {
+      }
+      catch {
         if (!cancelled) {
           setState({
             tier: 'free',

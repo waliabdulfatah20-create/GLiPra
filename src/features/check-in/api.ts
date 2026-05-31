@@ -1,4 +1,4 @@
-import { format, startOfDay, addDays } from 'date-fns';
+import { addDays, format, startOfDay } from 'date-fns';
 
 import { supabase } from '@/lib/supabase';
 
@@ -48,8 +48,8 @@ export async function fetchTodayCheckIn(
   userId: string,
   today: string, // 'yyyy-MM-dd'
 ): Promise<CheckInRecord | null> {
-  const dayStart = format(startOfDay(new Date(today)), "yyyy-MM-dd'T'HH:mm:ss");
-  const dayEnd = format(startOfDay(addDays(new Date(today), 1)), "yyyy-MM-dd'T'HH:mm:ss");
+  const dayStart = format(startOfDay(new Date(today)), 'yyyy-MM-dd\'T\'HH:mm:ss');
+  const dayEnd = format(startOfDay(addDays(new Date(today), 1)), 'yyyy-MM-dd\'T\'HH:mm:ss');
 
   const { data, error } = await supabase
     .from('daily_checkins')
@@ -65,7 +65,8 @@ export async function fetchTodayCheckIn(
     throw new Error(`Failed to fetch check-in: ${error.message}`);
   }
 
-  if (!data) return null;
+  if (!data)
+    return null;
 
   return {
     nausea: data.nausea,
@@ -81,13 +82,13 @@ export async function fetchTodayCheckIn(
  * Used by red-flag detection to analyze patterns over time.
  * Returns entries in YYYY-MM-DD format compatible with redFlagDetector.
  */
-export interface CheckInHistoryEntry {
+export type CheckInHistoryEntry = {
   date: string; // 'YYYY-MM-DD'
   nausea: number | null;
   energy: number | null;
   water_ml: number | null;
   notes: string | null;
-}
+};
 
 export async function fetchCheckInHistory(
   userId: string,
@@ -100,8 +101,8 @@ export async function fetchCheckInHistory(
     .from('daily_checkins')
     .select('checked_in_at, nausea, energy, water_ml, notes')
     .eq('user_id', userId)
-    .gte('checked_in_at', format(startDate, "yyyy-MM-dd'T'00:00:00"))
-    .lte('checked_in_at', format(today, "yyyy-MM-dd'T'23:59:59"))
+    .gte('checked_in_at', format(startDate, 'yyyy-MM-dd\'T\'00:00:00'))
+    .lte('checked_in_at', format(today, 'yyyy-MM-dd\'T\'23:59:59'))
     .order('checked_in_at', { ascending: false });
 
   if (error) {
@@ -135,7 +136,7 @@ export async function markRedFlagTriggered(
   userId: string,
   date: string, // 'YYYY-MM-DD'
 ): Promise<void> {
-  const localDate = new Date(date + 'T00:00:00');
+  const localDate = new Date(`${date}T00:00:00`);
   const dayStart = startOfDay(localDate).toISOString();
   const dayEnd = startOfDay(addDays(localDate, 1)).toISOString();
 

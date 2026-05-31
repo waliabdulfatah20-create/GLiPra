@@ -1,15 +1,15 @@
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { useTranslation } from 'react-i18next';
-
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
 import type { InjectionPhase } from '@/types';
+import * as React from 'react';
 
-interface PhaseBadgeProps {
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '@/lib/ThemeContext';
+
+type PhaseBadgeProps = {
   phase: InjectionPhase;
   daysSinceInjection: number;
-}
+};
 
 export function PhaseBadge({ phase, daysSinceInjection }: PhaseBadgeProps) {
   const { t } = useTranslation();
@@ -32,20 +32,23 @@ export function PhaseBadge({ phase, daysSinceInjection }: PhaseBadgeProps) {
   const label = t(`medication.${phase}`);
 
   return (
-    <View style={[styles.badge, { backgroundColor: color + '20', borderColor: color }]}>
+    <View style={[styles.badge, { backgroundColor: `${color}20`, borderColor: color }]}>
       <View style={[styles.dot, { backgroundColor: color }]} />
       <Text style={[styles.label, { color }]}>
-        {label} · Day {daysSinceInjection}
+        {label}
+        {' '}
+        · Day
+        {daysSinceInjection}
       </Text>
     </View>
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

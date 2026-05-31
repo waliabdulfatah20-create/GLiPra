@@ -2,13 +2,14 @@
 // The Obytes template version used className props from @/components/ui
 // which silently had no effect after NativeWind was stripped.
 
+import type { GlipraTokens } from '@/theme/tokens';
 import Env from 'env';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { DeleteAccountModal } from '@/features/account/components/delete-account-modal';
 import { useDeleteAccount, useExportData } from '@/features/account/hooks';
 import { useAuthStore } from '@/features/auth/use-auth-store';
@@ -18,7 +19,6 @@ import { haptics } from '@/lib/haptics';
 import { useTheme, useThemeSelector } from '@/lib/ThemeContext';
 import { formatWeight, useWeightUnit } from '@/lib/unit-preference';
 import { useNotificationSettings } from '@/lib/use-notification-settings';
-import type { GlipraTokens } from '@/theme/tokens';
 
 import { SettingsSection } from './components/settings-container';
 import { SettingsRow } from './components/settings-item';
@@ -26,13 +26,13 @@ import { LanguagePicker } from './language-picker';
 
 // ─── Notification toggle row ──────────────────────────────────────────────────
 
-interface NotificationRowProps {
+type NotificationRowProps = {
   label: string;
   subtitle: string;
   value: boolean;
   onToggle: () => void;
   isLast?: boolean;
-}
+};
 
 function NotificationRow({ label, subtitle, value, onToggle, isLast = false }: NotificationRowProps) {
   const { colors, spacing } = useTheme();
@@ -107,8 +107,8 @@ export function SettingsScreen() {
       return;
     }
     try {
-      const Sharing = require('expo-sharing');
       const FileSystem = require('expo-file-system');
+      const Sharing = require('expo-sharing');
       const fileUri = `${FileSystem.cacheDirectory}glipra-data-export.json`;
       await FileSystem.writeAsStringAsync(fileUri, json, {
         encoding: FileSystem.EncodingType.UTF8,
@@ -119,10 +119,12 @@ export function SettingsScreen() {
           mimeType: 'application/json',
           dialogTitle: t('settings.export_data'),
         });
-      } else {
+      }
+      else {
         Alert.alert(t('settings.export_data'), `${json.length} chars exported.`);
       }
-    } catch {
+    }
+    catch {
       Alert.alert(t('account.export_failed'), '');
     }
   };
@@ -138,8 +140,8 @@ export function SettingsScreen() {
     await signOut();
   };
 
-  const goalWeightValue =
-    profile?.goalWeightKg != null
+  const goalWeightValue
+    = profile?.goalWeightKg != null
       ? formatWeight(profile.goalWeightKg, weightUnit)
       : undefined;
 
@@ -287,11 +289,11 @@ export function SettingsScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

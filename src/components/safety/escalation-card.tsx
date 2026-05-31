@@ -3,29 +3,29 @@
 // Rule 9: EscalationCard shows NO medical condition names or pattern types.
 // Locked copy — do not modify without attorney sign-off.
 
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import type { RedFlagDetection } from '@/features/safety/redFlagDetector';
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
+
+import * as React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
+import { useTheme } from '@/lib/ThemeContext';
 
 // ─── Locked attorney-approved copy ───────────────────────────────────────────
 const COPY = {
   label: 'Important',
   // Rule 9: No condition names, no pattern types — locked generic copy only
-  body: "You've logged symptoms that may need medical attention. Please contact your prescriber today.",
+  body: 'You\'ve logged symptoms that may need medical attention. Please contact your prescriber today.',
   callPrescriber: 'Call Prescriber',
   dismiss: 'Dismiss',
   footer: 'This is a symptom pattern alert, not a diagnosis.',
 } as const;
 
 // ─── Props ────────────────────────────────────────────────────────────────────
-interface EscalationCardProps {
+type EscalationCardProps = {
   detection: RedFlagDetection;
   onDismiss?: () => void;
-}
+};
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function EscalationCard({ detection, onDismiss }: EscalationCardProps) {
@@ -88,12 +88,12 @@ export function EscalationCard({ detection, onDismiss }: EscalationCardProps) {
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

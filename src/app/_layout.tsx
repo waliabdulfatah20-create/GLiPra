@@ -1,6 +1,5 @@
-import '@/lib/i18n';
-
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -10,17 +9,18 @@ import { StyleSheet } from 'react-native';
 import FlashMessage from 'react-native-flash-message';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
-
 import { useThemeConfig } from '@/components/ui/use-theme-config';
-import { GlipraThemeProvider } from '@/lib/ThemeContext';
+
 import { hydrateAuth, setSession } from '@/features/auth/use-auth-store';
-import { APIProvider } from '@/lib/api';
 import { analytics } from '@/lib/analytics';
+import { APIProvider } from '@/lib/api';
 import { errorTracking } from '@/lib/error-tracking';
 import { loadSelectedTheme } from '@/lib/hooks/use-selected-theme';
 import { AnalyticsProvider } from '@/lib/posthog-provider';
 import { initializeRevenueCat } from '@/lib/revenue-cat';
 import { supabase } from '@/lib/supabase';
+import { GlipraThemeProvider } from '@/lib/ThemeContext';
+import '@/lib/i18n';
 
 export { ErrorBoundary } from 'expo-router';
 

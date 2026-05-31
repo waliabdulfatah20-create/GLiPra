@@ -8,21 +8,21 @@
 // during incremental migration (D2–D10). useTheme() falls back to lightTokens
 // when called outside the provider, preventing crashes in unmigrated screens.
 
+import type { ColorSchemeType } from '@/lib/hooks/use-selected-theme';
+import type { GlipraTokens } from '@/theme/tokens';
+
 import * as React from 'react';
 import { useColorScheme } from 'react-native';
-
-import type { ColorSchemeType } from '@/lib/hooks/use-selected-theme';
 import { useSelectedTheme } from '@/lib/hooks/use-selected-theme';
-import type { GlipraTokens } from '@/theme/tokens';
 import { darkTokens, lightTokens } from '@/theme/tokens';
 
 // ─── Context ─────────────────────────────────────────────────────────────────
 
-interface ThemeContextValue {
+type ThemeContextValue = {
   tokens: GlipraTokens;
   selectedTheme: ColorSchemeType;
   setSelectedTheme: (t: ColorSchemeType) => void;
-}
+};
 
 const ThemeContext = React.createContext<ThemeContextValue | undefined>(undefined);
 
@@ -32,15 +32,15 @@ export function GlipraThemeProvider({ children }: { children: React.ReactNode })
   const { selectedTheme, setSelectedTheme } = useSelectedTheme();
   const systemScheme = useColorScheme(); // 'light' | 'dark' | null
 
-  const resolvedScheme =
-    selectedTheme === 'system' ? (systemScheme ?? 'light') : selectedTheme;
+  const resolvedScheme
+    = selectedTheme === 'system' ? (systemScheme ?? 'light') : selectedTheme;
 
   const tokens = resolvedScheme === 'dark' ? darkTokens : lightTokens;
 
   return (
-    <ThemeContext.Provider value={{ tokens, selectedTheme, setSelectedTheme }}>
+    <ThemeContext value={{ tokens, selectedTheme, setSelectedTheme }}>
       {children}
-    </ThemeContext.Provider>
+    </ThemeContext>
   );
 }
 
@@ -57,7 +57,7 @@ export function GlipraThemeProvider({ children }: { children: React.ReactNode })
  *   const styles = React.useMemo(() => makeStyles({ colors, spacing }), [colors, spacing]);
  */
 export function useTheme(): GlipraTokens {
-  const ctx = React.useContext(ThemeContext);
+  const ctx = React.use(ThemeContext);
   return ctx?.tokens ?? lightTokens;
 }
 
@@ -69,7 +69,7 @@ export function useThemeSelector(): {
   selectedTheme: ColorSchemeType;
   setSelectedTheme: (t: ColorSchemeType) => void;
 } {
-  const ctx = React.useContext(ThemeContext);
+  const ctx = React.use(ThemeContext);
   if (!ctx) {
     throw new Error('useThemeSelector must be used inside GlipraThemeProvider');
   }

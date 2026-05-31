@@ -1,6 +1,9 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useState } from 'react';
+
 import {
   Pressable,
   ScrollView,
@@ -10,13 +13,10 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { LinearGradient } from 'expo-linear-gradient';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 type Frequency = 'weekly' | 'biweekly' | 'daily';
 
@@ -42,8 +42,10 @@ const DAYS: { label: string; value: number }[] = [
  */
 function formatDateInput(raw: string): string {
   const digits = raw.replace(/\D/g, '');
-  if (digits.length <= 2) return digits;
-  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  if (digits.length <= 2)
+    return digits;
+  if (digits.length <= 4)
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
   return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`;
 }
 
@@ -53,12 +55,15 @@ function formatDateInput(raw: string): string {
  */
 function parseMdyToIso(mdy: string): string | null {
   const parts = mdy.split('/');
-  if (parts.length !== 3) return null;
+  if (parts.length !== 3)
+    return null;
   const [mm, dd, yyyy] = parts;
-  if (!mm || !dd || !yyyy || yyyy.length < 4) return null;
+  if (!mm || !dd || !yyyy || yyyy.length < 4)
+    return null;
   const iso = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
   const date = new Date(iso);
-  if (isNaN(date.getTime())) return null;
+  if (isNaN(date.getTime()))
+    return null;
   return iso;
 }
 
@@ -73,20 +78,21 @@ export default function InjectionDayScreen() {
   const { colors, spacing, radius, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius]
+    [colors, spacing, radius],
   );
 
   const needsDayPicker = frequency === 'weekly' || frequency === 'biweekly';
 
   const isoDate = parseMdyToIso(lastInjectionDate);
 
-  const canProceed =
-    frequency !== null &&
-    (frequency === 'daily' || dayOfWeek !== null) &&
-    isoDate !== null;
+  const canProceed
+    = frequency !== null
+      && (frequency === 'daily' || dayOfWeek !== null)
+      && isoDate !== null;
 
   const handleNext = () => {
-    if (!frequency || !isoDate) return;
+    if (!frequency || !isoDate)
+      return;
     haptics.medium();
     setFormData({
       injectionFrequency: frequency,
@@ -130,7 +136,8 @@ export default function InjectionDayScreen() {
                 style={[styles.frequencyCard, isSelected && styles.frequencyCardSelected]}
                 onPress={() => {
                   setFrequency(f.id);
-                  if (f.id === 'daily') setDayOfWeek(null);
+                  if (f.id === 'daily')
+                    setDayOfWeek(null);
                 }}
                 accessibilityRole="radio"
                 accessibilityState={{ checked: isSelected }}
@@ -187,7 +194,7 @@ export default function InjectionDayScreen() {
             lastInjectionDate.length > 0 && isoDate === null && styles.textInputError,
           ]}
           value={lastInjectionDate}
-          onChangeText={(text) => setLastInjectionDate(formatDateInput(text))}
+          onChangeText={text => setLastInjectionDate(formatDateInput(text))}
           placeholder="MM/DD/YYYY"
           placeholderTextColor={colors.textDisabled}
           keyboardType="numeric"
@@ -217,11 +224,11 @@ export default function InjectionDayScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

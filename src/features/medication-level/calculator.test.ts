@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  FALLBACK_HALF_LIFE,
-  HALF_LIVES,
   estimateLevel,
+  FALLBACK_HALF_LIFE,
   generateLevelCurve,
   generateSteadyStateCurve,
+  HALF_LIVES,
 } from './calculator';
 
 // ---------------------------------------------------------------------------
 // HALF_LIVES constant validation
 // ---------------------------------------------------------------------------
 
-describe('HALF_LIVES', () => {
+describe('hALF_LIVES', () => {
   it('all HALF_LIVES values are positive numbers', () => {
     for (const [key, value] of Object.entries(HALF_LIVES)) {
       expect(typeof value, `${key} should be a number`).toBe('number');
@@ -21,39 +21,39 @@ describe('HALF_LIVES', () => {
   });
 
   it('ozempic half-life is 7 days', () => {
-    expect(HALF_LIVES['semaglutide_ozempic']).toBe(7);
+    expect(HALF_LIVES.semaglutide_ozempic).toBe(7);
   });
 
   it('wegovy half-life is 7 days', () => {
-    expect(HALF_LIVES['semaglutide_wegovy']).toBe(7);
+    expect(HALF_LIVES.semaglutide_wegovy).toBe(7);
   });
 
   it('mounjaro half-life is 5 days', () => {
-    expect(HALF_LIVES['tirzepatide_mounjaro']).toBe(5);
+    expect(HALF_LIVES.tirzepatide_mounjaro).toBe(5);
   });
 
   it('zepbound half-life is 5 days', () => {
-    expect(HALF_LIVES['tirzepatide_zepbound']).toBe(5);
+    expect(HALF_LIVES.tirzepatide_zepbound).toBe(5);
   });
 
   it('saxenda half-life is 0.5 days', () => {
-    expect(HALF_LIVES['liraglutide_saxenda']).toBe(0.5);
+    expect(HALF_LIVES.liraglutide_saxenda).toBe(0.5);
   });
 
   it('victoza half-life is 0.5 days', () => {
-    expect(HALF_LIVES['liraglutide_victoza']).toBe(0.5);
+    expect(HALF_LIVES.liraglutide_victoza).toBe(0.5);
   });
 
   it('trulicity half-life is 4.5 days', () => {
-    expect(HALF_LIVES['dulaglutide_trulicity']).toBe(4.5);
+    expect(HALF_LIVES.dulaglutide_trulicity).toBe(4.5);
   });
 
   it('compounded_semaglutide half-life is 7 days', () => {
-    expect(HALF_LIVES['compounded_semaglutide']).toBe(7);
+    expect(HALF_LIVES.compounded_semaglutide).toBe(7);
   });
 
   it('compounded_tirzepatide half-life is 5 days', () => {
-    expect(HALF_LIVES['compounded_tirzepatide']).toBe(5);
+    expect(HALF_LIVES.compounded_tirzepatide).toBe(5);
   });
 });
 
@@ -61,7 +61,7 @@ describe('HALF_LIVES', () => {
 // FALLBACK_HALF_LIFE
 // ---------------------------------------------------------------------------
 
-describe('FALLBACK_HALF_LIFE', () => {
+describe('fALLBACK_HALF_LIFE', () => {
   it('is exported and equals 7', () => {
     expect(FALLBACK_HALF_LIFE).toBe(7);
   });
@@ -266,7 +266,7 @@ describe('generateSteadyStateCurve', () => {
       7,
       today,
     );
-    const todayPoint = curve.find((p) => p.dayOffset === 0);
+    const todayPoint = curve.find(p => p.dayOffset === 0);
     expect(todayPoint).toBeDefined();
     expect(todayPoint!.date).toBe(today);
   });
@@ -287,7 +287,7 @@ describe('generateSteadyStateCurve', () => {
       todayDate,
     );
 
-    const todayPoint = curve.find((p) => p.dayOffset === 0);
+    const todayPoint = curve.find(p => p.dayOffset === 0);
     expect(todayPoint).toBeDefined();
     // With accumulated doses from prior cycles, level should be higher
     expect(todayPoint!.levelMg).toBeGreaterThan(singleDoseLevel);
@@ -331,7 +331,7 @@ describe('generateSteadyStateCurve', () => {
       14,
     );
     expect(curve.length).toBeGreaterThan(0);
-    const todayPt = curve.find((p) => p.dayOffset === 0);
+    const todayPt = curve.find(p => p.dayOffset === 0);
     expect(todayPt).toBeDefined();
   });
 
@@ -344,7 +344,7 @@ describe('generateSteadyStateCurve', () => {
       today,
       14,
     );
-    const futurePoints = curve.filter((p) => p.dayOffset > 0);
+    const futurePoints = curve.filter(p => p.dayOffset > 0);
     expect(futurePoints.length).toBeGreaterThan(0);
   });
 
@@ -357,7 +357,7 @@ describe('generateSteadyStateCurve', () => {
       today,
       14,
     );
-    const pastPoints = curve.filter((p) => p.dayOffset < 0);
+    const pastPoints = curve.filter(p => p.dayOffset < 0);
     expect(pastPoints.length).toBeGreaterThan(0);
   });
 
@@ -386,7 +386,7 @@ describe('generateSteadyStateCurve', () => {
       '2024-01-29',
       0,
     );
-    const todayPt = curve.find((p) => p.dayOffset === 0);
+    const todayPt = curve.find(p => p.dayOffset === 0);
     expect(todayPt).toBeDefined();
     // With 5 doses at 0, 7, 14, 21, 28 days prior, total is sum of their decay
     // Day 0 dose contributes 1.0 (full), others contribute decayed amounts

@@ -2,18 +2,18 @@
 // Active option: primary background + white text.
 // Inactive option: bordered + secondary text.
 
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
-interface UnitToggleProps {
+type UnitToggleProps = {
   options: [string, string];
   active: string;
   onToggle: () => void;
-}
+};
 
 export function UnitToggle({ options, active, onToggle }: UnitToggleProps) {
   const { colors, spacing, radius } = useTheme();
@@ -45,11 +45,11 @@ export function UnitToggle({ options, active, onToggle }: UnitToggleProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

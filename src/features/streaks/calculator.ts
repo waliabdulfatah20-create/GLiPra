@@ -15,18 +15,18 @@ export const STREAK_THRESHOLD = 0.8;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export interface StreakDayInput {
+export type StreakDayInput = {
   date: string; // 'YYYY-MM-DD'
   proteinConsumedG: number;
   proteinFloorG: number;
-}
+};
 
-export interface StreakResult {
+export type StreakResult = {
   currentStreak: number;
   longestStreak: number;
   lastStreakDate: string | null; // 'YYYY-MM-DD' or null
   todayCountsAsStreak: boolean;
-}
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -35,7 +35,8 @@ export interface StreakResult {
  * A day with proteinFloorG === 0 never counts (avoids divide-by-zero).
  */
 function dayCountsAsStreak(day: StreakDayInput): boolean {
-  if (day.proteinFloorG <= 0) return false;
+  if (day.proteinFloorG <= 0)
+    return false;
   return day.proteinConsumedG / day.proteinFloorG >= STREAK_THRESHOLD;
 }
 
@@ -70,28 +71,30 @@ export function calculateStreaks(
     todayCountsAsStreak: false,
   };
 
-  if (days.length === 0) return empty;
+  if (days.length === 0)
+    return empty;
 
   const todayDate = parseISO(today);
 
   // Filter out future entries, then sort chronologically ascending.
   const sorted = days
-    .filter((d) => differenceInCalendarDays(parseISO(d.date), todayDate) <= 0)
+    .filter(d => differenceInCalendarDays(parseISO(d.date), todayDate) <= 0)
     .sort((a, b) => a.date.localeCompare(b.date));
 
-  if (sorted.length === 0) return empty;
+  if (sorted.length === 0)
+    return empty;
 
   // ── Pass 1: build an array of "qualifying" dates (days that count) ──────────
   const streakDates: string[] = sorted
     .filter(dayCountsAsStreak)
-    .map((d) => d.date);
+    .map(d => d.date);
 
   const lastStreakDate = streakDates.length > 0
     ? streakDates[streakDates.length - 1]!
     : null;
 
   // ── todayCountsAsStreak ───────────────────────────────────────────────────
-  const todayEntry = sorted.find((d) => d.date === today);
+  const todayEntry = sorted.find(d => d.date === today);
   const todayCountsAsStreak = todayEntry !== undefined && dayCountsAsStreak(todayEntry);
 
   if (streakDates.length === 0) {
@@ -109,8 +112,10 @@ export function calculateStreaks(
 
     if (gap === 1) {
       runLength += 1;
-      if (runLength > longestStreak) longestStreak = runLength;
-    } else {
+      if (runLength > longestStreak)
+        longestStreak = runLength;
+    }
+    else {
       runLength = 1;
     }
   }
@@ -131,7 +136,8 @@ export function calculateStreaks(
       const gap = differenceInCalendarDays(laterDate, earlierDate);
       if (gap === 1) {
         currentStreak += 1;
-      } else {
+      }
+      else {
         break;
       }
     }

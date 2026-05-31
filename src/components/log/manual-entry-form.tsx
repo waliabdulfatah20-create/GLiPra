@@ -2,6 +2,9 @@
 // Simple controlled-input form — no third-party form library.
 // All styling uses colors.ts tokens only; no inline colors.
 
+import type { ManualFoodEntry } from '@/features/food-log/types';
+import type { GlipraTokens } from '@/theme/tokens';
+
 import * as React from 'react';
 import {
   ActivityIndicator,
@@ -11,23 +14,20 @@ import {
   TextInput,
   View,
 } from 'react-native';
-
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
-import type { ManualFoodEntry } from '@/features/food-log/types';
 
-export interface ManualEntryFormProps {
+export type ManualEntryFormProps = {
   onSubmit: (entry: ManualFoodEntry) => void;
   isLoading: boolean;
-}
+};
 
-interface FormState {
+type FormState = {
   name: string;
   servingDescription: string;
   proteinG: string;
   fiberG: string;
   caloriesKcal: string;
-}
+};
 
 const INITIAL_STATE: FormState = {
   name: '',
@@ -46,23 +46,24 @@ export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
   const [form, setForm] = React.useState<FormState>(INITIAL_STATE);
   const [focusedField, setFocusedField] = React.useState<string | null>(null);
 
-  const proteinValue = parseFloat(form.proteinG);
+  const proteinValue = Number.parseFloat(form.proteinG);
   const hasProtein = !isNaN(proteinValue) && proteinValue > 0;
   const isValid = form.name.trim().length > 0 && hasProtein;
 
   function handleChange(field: keyof FormState, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm(prev => ({ ...prev, [field]: value }));
   }
 
   function handleSubmit() {
-    if (!isValid || isLoading) return;
+    if (!isValid || isLoading)
+      return;
 
     const entry: ManualFoodEntry = {
       name: form.name.trim(),
       servingDescription: form.servingDescription.trim() || '1 serving',
       proteinG: proteinValue,
-      fiberG: form.fiberG ? parseFloat(form.fiberG) : undefined,
-      caloriesKcal: form.caloriesKcal ? parseFloat(form.caloriesKcal) : undefined,
+      fiberG: form.fiberG ? Number.parseFloat(form.fiberG) : undefined,
+      caloriesKcal: form.caloriesKcal ? Number.parseFloat(form.caloriesKcal) : undefined,
     };
 
     onSubmit(entry);
@@ -86,7 +87,7 @@ export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
           placeholder="e.g. Greek yogurt"
           placeholderTextColor={colors.textDisabled}
           value={form.name}
-          onChangeText={(v) => handleChange('name', v)}
+          onChangeText={v => handleChange('name', v)}
           onFocus={() => setFocusedField('name')}
           onBlur={() => setFocusedField(null)}
           returnKeyType="next"
@@ -103,7 +104,7 @@ export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
           placeholder="e.g. 1 cup, 100g"
           placeholderTextColor={colors.textDisabled}
           value={form.servingDescription}
-          onChangeText={(v) => handleChange('servingDescription', v)}
+          onChangeText={v => handleChange('servingDescription', v)}
           onFocus={() => setFocusedField('servingDescription')}
           onBlur={() => setFocusedField(null)}
           returnKeyType="next"
@@ -121,7 +122,7 @@ export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
             placeholder="0"
             placeholderTextColor={colors.textDisabled}
             value={form.proteinG}
-            onChangeText={(v) => handleChange('proteinG', v)}
+            onChangeText={v => handleChange('proteinG', v)}
             onFocus={() => setFocusedField('proteinG')}
             onBlur={() => setFocusedField(null)}
             keyboardType="decimal-pad"
@@ -137,7 +138,7 @@ export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
             placeholder="-"
             placeholderTextColor={colors.textDisabled}
             value={form.fiberG}
-            onChangeText={(v) => handleChange('fiberG', v)}
+            onChangeText={v => handleChange('fiberG', v)}
             onFocus={() => setFocusedField('fiberG')}
             onBlur={() => setFocusedField(null)}
             keyboardType="decimal-pad"
@@ -153,7 +154,7 @@ export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
             placeholder="-"
             placeholderTextColor={colors.textDisabled}
             value={form.caloriesKcal}
-            onChangeText={(v) => handleChange('caloriesKcal', v)}
+            onChangeText={v => handleChange('caloriesKcal', v)}
             onFocus={() => setFocusedField('caloriesKcal')}
             onBlur={() => setFocusedField(null)}
             keyboardType="decimal-pad"
@@ -177,22 +178,24 @@ export function ManualEntryForm({ onSubmit, isLoading }: ManualEntryFormProps) {
         accessibilityLabel="Add food entry"
         accessibilityState={{ disabled: !isValid || isLoading }}
       >
-        {isLoading ? (
-          <ActivityIndicator size="small" color={colors.white} />
-        ) : (
-          <Text style={styles.submitButtonText}>Add to log</Text>
-        )}
+        {isLoading
+          ? (
+              <ActivityIndicator size="small" color={colors.white} />
+            )
+          : (
+              <Text style={styles.submitButtonText}>Add to log</Text>
+            )}
       </Pressable>
     </View>
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

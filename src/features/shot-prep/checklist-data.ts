@@ -1,12 +1,12 @@
 // Pharmacist-authored shot day prep checklist.
 // Content locked — do not rewrite without pharmacist review (CLAUDE.md liability rules).
 
-export type ChecklistItemId =
-  | 'hydrated'
-  | 'breakfast'
-  | 'rotate_site'
-  | 'anti_nausea'
-  | 'protein_plan';
+export type ChecklistItemId
+  = | 'hydrated'
+    | 'breakfast'
+    | 'rotate_site'
+    | 'anti_nausea'
+    | 'protein_plan';
 
 export const CHECKLIST_ITEM_IDS: readonly ChecklistItemId[] = [
   'hydrated',
@@ -16,12 +16,12 @@ export const CHECKLIST_ITEM_IDS: readonly ChecklistItemId[] = [
   'protein_plan',
 ];
 
-export interface ChecklistItem {
+export type ChecklistItem = {
   id: ChecklistItemId;
   title: string;
   detail: string;
   isPharmacistNote?: boolean;
-}
+};
 
 export const CHECKLIST_ITEMS: ReadonlyArray<ChecklistItem> = [
   {
@@ -39,7 +39,7 @@ export const CHECKLIST_ITEMS: ReadonlyArray<ChecklistItem> = [
   {
     id: 'rotate_site',
     title: 'Rotate your injection site',
-    detail: "Today's recommended site is shown in the Injection Sites tab.",
+    detail: 'Today\'s recommended site is shown in the Injection Sites tab.',
   },
   {
     id: 'anti_nausea',
@@ -54,11 +54,11 @@ export const CHECKLIST_ITEMS: ReadonlyArray<ChecklistItem> = [
   },
 ];
 
-export interface ChecklistStatus {
+export type ChecklistStatus = {
   completedCount: number;
   totalCount: number;
   isDone: boolean;
-}
+};
 
 /**
  * Derives completion status from an array of completed item IDs.
@@ -66,7 +66,7 @@ export interface ChecklistStatus {
  */
 export function getChecklistStatus(completedItemIds: string[]): ChecklistStatus {
   const validIds = new Set<string>(CHECKLIST_ITEM_IDS);
-  const completedCount = new Set(completedItemIds.filter((id) => validIds.has(id))).size;
+  const completedCount = new Set(completedItemIds.filter(id => validIds.has(id))).size;
   const totalCount = CHECKLIST_ITEMS.length;
   return { completedCount, totalCount, isDone: completedCount === totalCount };
 }

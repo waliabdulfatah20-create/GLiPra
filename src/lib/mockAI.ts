@@ -15,8 +15,9 @@ import Env from 'env';
  * Returns true when the EXPO_PUBLIC_USE_MOCK_AI env var is set to 'true'.
  * This is the gate that prevents real OpenAI API calls during development.
  */
-export const isMockAIEnabled = (): boolean =>
-  Env.EXPO_PUBLIC_USE_MOCK_AI === 'true';
+export function isMockAIEnabled(): boolean {
+  return Env.EXPO_PUBLIC_USE_MOCK_AI === 'true';
+}
 
 export const MOCK_MEAL_RECOGNITION = {
   foods: [
@@ -39,9 +40,9 @@ export const MOCK_MEAL_RECOGNITION = {
 
 export const MOCK_DAILY_GUIDANCE = {
   guidance_text:
-    'Today is your adjustment phase. Appetite suppression is near its peak right now. ' +
-    'Focus on high-density protein you can eat in small amounts: Greek yogurt, cottage cheese, or eggs. ' +
-    'Aim for 25-30g per sitting to protect muscle while appetite is low.',
+    'Today is your adjustment phase. Appetite suppression is near its peak right now. '
+    + 'Focus on high-density protein you can eat in small amounts: Greek yogurt, cottage cheese, or eggs. '
+    + 'Aim for 25-30g per sitting to protect muscle while appetite is low.',
   reasoning_text:
     'Adjustment phase suppresses appetite most strongly at days 3-4, making small high-density portions the best strategy.',
 } as const;

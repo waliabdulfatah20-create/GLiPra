@@ -1,3 +1,5 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import { router } from 'expo-router';
 import * as React from 'react';
 import {
   Alert,
@@ -7,14 +9,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { MAINTENANCE_GUIDES } from '@/features/medication-status/maintenance-guidance';
 import { useTodayProfile } from '@/features/today/hooks';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 // MAINTENANCE_MULTIPLIER from CLAUDE.md: 10% reduction during maintenance
 const MAINTENANCE_MULTIPLIER = 0.9;
@@ -28,7 +28,7 @@ export default function MaintenanceModeScreen() {
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows]
+    [colors, spacing, radius, shadows],
   );
 
   function handleSwitchToActive() {
@@ -82,28 +82,33 @@ export default function MaintenanceModeScreen() {
         {/* Adjusted protein floor */}
         <View style={styles.proteinCard}>
           <Text style={styles.proteinLabel}>MAINTENANCE PROTEIN FLOOR</Text>
-          {isLoading ? (
-            <Text style={styles.proteinLoadingText}>Loading…</Text>
-          ) : (
-            <>
-              <View style={styles.proteinRow}>
-                <Text style={styles.proteinValue}>{adjustedProteinFloor}</Text>
-                <Text style={styles.proteinUnit}>g / day</Text>
-              </View>
-              {baseProteinFloor > 0 && (
-                <Text style={styles.proteinNote}>
-                  Adjusted to 90% of your active-phase floor ({baseProteinFloor} g).
-                  This supports lean mass at your current weight while aligning with
-                  a lower maintenance calorie target.
-                </Text>
+          {isLoading
+            ? (
+                <Text style={styles.proteinLoadingText}>Loading…</Text>
+              )
+            : (
+                <>
+                  <View style={styles.proteinRow}>
+                    <Text style={styles.proteinValue}>{adjustedProteinFloor}</Text>
+                    <Text style={styles.proteinUnit}>g / day</Text>
+                  </View>
+                  {baseProteinFloor > 0 && (
+                    <Text style={styles.proteinNote}>
+                      Adjusted to 90% of your active-phase floor (
+                      {baseProteinFloor}
+                      {' '}
+                      g).
+                      This supports lean mass at your current weight while aligning with
+                      a lower maintenance calorie target.
+                    </Text>
+                  )}
+                </>
               )}
-            </>
-          )}
         </View>
 
         {/* Guidance cards */}
         <Text style={styles.sectionTitle}>Pharmacist Guidance</Text>
-        {MAINTENANCE_GUIDES.map((guide) => (
+        {MAINTENANCE_GUIDES.map(guide => (
           <View key={guide.id} style={styles.guideCard}>
             <Text style={styles.guideTitle}>{guide.title}</Text>
             <Text style={styles.guideBody}>{guide.body}</Text>
@@ -125,12 +130,12 @@ export default function MaintenanceModeScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

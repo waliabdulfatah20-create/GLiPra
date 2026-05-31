@@ -1,19 +1,19 @@
+import type { GuidanceContext } from '@/features/daily-guidance/api';
+import type { RedFlagDetection } from '@/features/safety/redFlagDetector';
 import { useQuery } from '@tanstack/react-query';
+
 import { format, subDays } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-
+import { useAuthStore } from '@/features/auth/use-auth-store';
+import { useCheckInHistory, useTodayCheckIn } from '@/features/check-in/hooks';
+import { fetchFoodLogsInRange } from '@/features/food-log/api';
+import { useDailyMacros } from '@/features/food-log/hooks';
 import { calculateInjectionPhase } from '@/features/injection-cycle/calculator';
+import { detectRedFlags } from '@/features/safety/redFlagDetector';
+import { useStreak } from '@/features/streaks/hooks';
 import { fetchTodayProfile } from '@/features/today/api';
 import { calculateReadinessScore } from '@/features/today/readiness-calculator';
 import { buildReadinessCard } from '@/features/today/readiness-display';
-import { useTodayCheckIn, useCheckInHistory } from '@/features/check-in/hooks';
-import { useAuthStore } from '@/features/auth/use-auth-store';
-import { fetchFoodLogsInRange } from '@/features/food-log/api';
-import { useDailyMacros } from '@/features/food-log/hooks';
-import { useStreak } from '@/features/streaks/hooks';
-import { detectRedFlags } from '@/features/safety/redFlagDetector';
-import type { RedFlagDetection } from '@/features/safety/redFlagDetector';
-import type { GuidanceContext } from '@/features/daily-guidance/api';
 
 export function useTodayProfile() {
   const session = useAuthStore.use.session();
@@ -55,8 +55,8 @@ export function useTodayData() {
   const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
   const hourOfDay = new Date().getHours();
 
-  const injectionCycle =
-    profile?.lastInjectionDate
+  const injectionCycle
+    = profile?.lastInjectionDate
       ? calculateInjectionPhase({
           lastInjectionDate: profile.lastInjectionDate,
           today,
@@ -79,17 +79,17 @@ export function useTodayData() {
       }
     : null;
 
-  const prevDayProteinRatio =
-    proteinFloorG > 0 ? yesterdayProteinG / proteinFloorG : undefined;
+  const prevDayProteinRatio
+    = proteinFloorG > 0 ? yesterdayProteinG / proteinFloorG : undefined;
 
-  const streakActive =
-    streakData.streak?.lastStreakDate === today ||
-    streakData.streak?.lastStreakDate === yesterday;
+  const streakActive
+    = streakData.streak?.lastStreakDate === today
+      || streakData.streak?.lastStreakDate === yesterday;
 
   const newDoseWeek = profile?.medicationStatus === 'starting';
 
-  const readinessResult =
-    injectionCycle
+  const readinessResult
+    = injectionCycle
       ? calculateReadinessScore({
           injectionPhase: injectionCycle.phase,
           proteinProgress,
@@ -102,8 +102,8 @@ export function useTodayData() {
         })
       : null;
 
-  const readinessCard =
-    readinessResult && injectionCycle
+  const readinessCard
+    = readinessResult && injectionCycle
       ? buildReadinessCard(readinessResult, injectionCycle.phase, t)
       : null;
 

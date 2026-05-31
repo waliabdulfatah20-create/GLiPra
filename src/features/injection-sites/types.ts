@@ -14,14 +14,14 @@
 
 import type { SiteCode } from '@/types';
 
-export interface InjectionLog {
+export type InjectionLog = {
   id: string;
   user_id: string;
-  injected_at: string;        // ISO 8601 timestamp (UTC)
+  injected_at: string; // ISO 8601 timestamp (UTC)
   site_code: SiteCode;
   medication_name: string;
   dosage_strength: string | null;
-  pain_level: number;          // 0–10
+  pain_level: number; // 0–10
   notes: string | null;
   created_at: string;
-}
+};

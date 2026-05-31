@@ -1,27 +1,27 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import type { GLP1MedicationId } from '@/types';
 import { differenceInCalendarDays, format, parseISO } from 'date-fns';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
+
 import {
   ActivityIndicator,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  View,
   useWindowDimensions,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { LevelChart } from '@/components/medication-level/level-chart';
+import { PhaseBadge } from '@/components/today/phase-badge';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { SegmentedControl } from '@/components/ui/segmented-control';
-import { PhaseBadge } from '@/components/today/phase-badge';
 import { generateSteadyStateCurve } from '@/features/medication-level/calculator';
 import { useMedicationLevelCurve } from '@/features/medication-level/hooks';
 import { useTodayData } from '@/features/today/hooks';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
-import type { GLP1MedicationId } from '@/types';
 
 const MEDICATION_DISPLAY_NAMES: Record<GLP1MedicationId, string> = {
   semaglutide_ozempic: 'Ozempic',
@@ -37,9 +37,12 @@ const MEDICATION_DISPLAY_NAMES: Record<GLP1MedicationId, string> = {
 };
 
 function formatFrequency(days: number): string {
-  if (days === 1) return 'daily';
-  if (days === 7) return 'weekly';
-  if (days === 14) return 'biweekly';
+  if (days === 1)
+    return 'daily';
+  if (days === 7)
+    return 'weekly';
+  if (days === 14)
+    return 'biweekly';
   return `every ${days} days`;
 }
 
@@ -52,7 +55,7 @@ const VIEW_CONFIG: Record<ViewRange, {
   projectDays: number;
   labelIntervalDays: number;
 }> = {
-  '7D':  { pastDays: 3,  projectDays: 7,  labelIntervalDays: 2 },
+  '7D': { pastDays: 3, projectDays: 7, labelIntervalDays: 2 },
   '30D': { pastDays: 30, projectDays: 14, labelIntervalDays: 7 },
 };
 
@@ -79,7 +82,7 @@ export default function MedicationLevelScreen() {
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows]
+    [colors, spacing, radius, shadows],
   );
 
   const chartWidth = width - spacing.lg * 2 - spacing.md * 2;
@@ -91,7 +94,8 @@ export default function MedicationLevelScreen() {
   // lastInjectionDate comes from real injection logs (via useMedicationLevelCurve),
   // not from the profiles table, so it always reflects the actual last shot.
   const displayCurve = React.useMemo(() => {
-    if (!lastInjectionDate) return null;
+    if (!lastInjectionDate)
+      return null;
     const med = (medicationId ?? profile?.medicationId ?? 'semaglutide_ozempic') as GLP1MedicationId;
     const dose = doseMg ?? 1.0;
 
@@ -114,14 +118,14 @@ export default function MedicationLevelScreen() {
       today,
       config.projectDays,
       effectivePastDays,
-      injectionDates,   // actual logged dates; no phantom history
+      injectionDates, // actual logged dates; no phantom history
     );
   }, [lastInjectionDate, medicationId, profile?.medicationId, doseMg, injectionIntervalDays, injectionDates, today, config]);
 
-  const displayTodayOffset = displayCurve?.find((p) => p.date === today)?.dayOffset ?? 0;
+  const displayTodayOffset = displayCurve?.find(p => p.date === today)?.dayOffset ?? 0;
   // Derive current level from displayCurve (which falls back to doseMg ?? 1.0),
   // so the card always renders when the chart renders.
-  const currentLevelMg = displayCurve?.find((p) => p.date === today)?.levelMg ?? null;
+  const currentLevelMg = displayCurve?.find(p => p.date === today)?.levelMg ?? null;
 
   if (isLoading) {
     return (
@@ -151,7 +155,7 @@ export default function MedicationLevelScreen() {
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
-            <Text style={styles.backText}>{'‹ Back'}</Text>
+            <Text style={styles.backText}>‹ Back</Text>
           </Pressable>
           <Text style={styles.title}>Medication Level Estimator</Text>
           <View style={styles.backButton} />
@@ -170,7 +174,12 @@ export default function MedicationLevelScreen() {
             <View style={styles.medicationBadgeRow}>
               <View style={styles.medicationBadge}>
                 <Text style={styles.medicationBadgeText}>
-                  {medName} · {doseLabel} {freqLabel}
+                  {medName}
+                  {' '}
+                  ·
+                  {doseLabel}
+                  {' '}
+                  {freqLabel}
                 </Text>
               </View>
             </View>
@@ -184,23 +193,25 @@ export default function MedicationLevelScreen() {
                 <SegmentedControl
                   options={VIEW_RANGES}
                   active={viewRange}
-                  onSelect={(v) => setViewRange(v as ViewRange)}
+                  onSelect={v => setViewRange(v as ViewRange)}
                 />
               </View>
-              {displayCurve ? (
-                <LevelChart
-                  curve={displayCurve}
-                  todayOffset={displayTodayOffset}
-                  injectionDates={injectionDates}
-                  labelIntervalDays={config.labelIntervalDays}
-                  width={chartWidth}
-                  height={220}
-                />
-              ) : (
-                <View style={[styles.emptyChart, { width: chartWidth, height: 220 }]}>
-                  <Text style={styles.emptyChartText}>Not enough data</Text>
-                </View>
-              )}
+              {displayCurve
+                ? (
+                    <LevelChart
+                      curve={displayCurve}
+                      todayOffset={displayTodayOffset}
+                      injectionDates={injectionDates}
+                      labelIntervalDays={config.labelIntervalDays}
+                      width={chartWidth}
+                      height={220}
+                    />
+                  )
+                : (
+                    <View style={[styles.emptyChart, { width: chartWidth, height: 220 }]}>
+                      <Text style={styles.emptyChartText}>Not enough data</Text>
+                    </View>
+                  )}
             </View>
 
             {/* Current level summary card */}
@@ -208,7 +219,9 @@ export default function MedicationLevelScreen() {
               <View style={styles.summaryCard}>
                 <Text style={styles.summaryLabel}>ESTIMATED IN SYSTEM</Text>
                 <Text style={styles.summaryValue}>
-                  ~{currentLevelMg.toFixed(1)}mg
+                  ~
+                  {currentLevelMg.toFixed(1)}
+                  mg
                 </Text>
               </View>
             )}
@@ -248,12 +261,12 @@ export default function MedicationLevelScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

@@ -6,9 +6,11 @@
 // Rule 2: the comment describes food only — never user identity or health
 // conditions. The 300-char limit guards against prompt injection.
 
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
+
 import {
-  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -19,19 +21,16 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
-
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 const MAX_CHARS = 300;
 
-interface Props {
+type Props = {
   visible: boolean;
   /** Called when user taps Analyze. `comment` is undefined when skipped. */
   onAnalyze: (comment?: string) => void;
   onDismiss: () => void;
-}
+};
 
 export function PhotoCommentSheet({ visible, onAnalyze, onDismiss }: Props) {
   const { t } = useTranslation();
@@ -44,7 +43,8 @@ export function PhotoCommentSheet({ visible, onAnalyze, onDismiss }: Props) {
 
   // Reset comment text whenever the sheet opens for a fresh capture.
   React.useEffect(() => {
-    if (visible) setComment('');
+    if (visible)
+      setComment('');
   }, [visible]);
 
   function handleAnalyze() {
@@ -86,7 +86,7 @@ export function PhotoCommentSheet({ visible, onAnalyze, onDismiss }: Props) {
           <TextInput
             style={styles.input}
             value={comment}
-            onChangeText={(v) => setComment(v.slice(0, MAX_CHARS))}
+            onChangeText={v => setComment(v.slice(0, MAX_CHARS))}
             placeholder={t('log.photo_comment_placeholder')}
             placeholderTextColor={colors.textDisabled}
             multiline
@@ -97,7 +97,9 @@ export function PhotoCommentSheet({ visible, onAnalyze, onDismiss }: Props) {
 
           {/* Char counter */}
           <Text style={styles.charCount}>
-            {comment.length}/{MAX_CHARS}
+            {comment.length}
+            /
+            {MAX_CHARS}
           </Text>
 
           {/* Buttons */}
@@ -118,7 +120,9 @@ export function PhotoCommentSheet({ visible, onAnalyze, onDismiss }: Props) {
               accessibilityLabel={t('log.photo_comment_analyze')}
             >
               <Text style={styles.analyzeText}>
-                {t('log.photo_comment_analyze')} →
+                {t('log.photo_comment_analyze')}
+                {' '}
+                →
               </Text>
             </Pressable>
           </View>
@@ -128,11 +132,11 @@ export function PhotoCommentSheet({ visible, onAnalyze, onDismiss }: Props) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

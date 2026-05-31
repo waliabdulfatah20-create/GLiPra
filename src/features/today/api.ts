@@ -1,11 +1,11 @@
 import { supabase } from '@/lib/supabase';
 
-export type MedicationStatus =
-  | 'starting'
-  | 'active'
-  | 'tapering'
-  | 'maintenance'
-  | 'discontinued';
+export type MedicationStatus
+  = | 'starting'
+    | 'active'
+    | 'tapering'
+    | 'maintenance'
+    | 'discontinued';
 
 export type TodayProfile = {
   medicationId: string;
@@ -30,7 +30,8 @@ export async function fetchTodayProfile(userId: string): Promise<TodayProfile | 
     .eq('user_id', userId)
     .single();
 
-  if (error || !data) return null;
+  if (error || !data)
+    return null;
 
   return {
     medicationId: data.medication_id,

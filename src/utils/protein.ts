@@ -18,7 +18,7 @@ export const MAINTENANCE_MULTIPLIER = 0.9;
 export type ActivityLevel = 'sedentary' | 'moderate' | 'active';
 export type Phase = 'weight_loss' | 'maintenance';
 
-export interface ProteinInput {
+export type ProteinInput = {
   weightKg: number;
   heightCm: number;
   bmi: number;
@@ -26,9 +26,9 @@ export interface ProteinInput {
   isPregnant: boolean;
   phase: Phase;
   activityLevel: ActivityLevel;
-}
+};
 
-export interface ProteinResult {
+export type ProteinResult = {
   /** Final recommended grams, rounded to 1 decimal place. */
   proteinFloorG: number;
   /** The weight (kg) that was used as the base for the calculation. */
@@ -39,7 +39,7 @@ export interface ProteinResult {
   cappedByKidneyDisease: boolean;
   /** True when the pregnancy minimum raised the final value to at least 80 g. */
   flooredByPregnancy: boolean;
-}
+};
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────
 

@@ -19,7 +19,8 @@ export async function signUpWithEmail(
   password: string,
 ): Promise<{ error: string | null; needsEmailConfirmation: boolean; userId?: string }> {
   const { data, error } = await supabase.auth.signUp({ email, password });
-  if (error) return { error: error.message, needsEmailConfirmation: false };
+  if (error)
+    return { error: error.message, needsEmailConfirmation: false };
   const needsEmailConfirmation = data.session === null;
   return { error: null, needsEmailConfirmation, userId: data.user?.id };
 }
@@ -38,9 +39,11 @@ export async function signInWithApple(): Promise<{ error: string | null }> {
       token: credential.identityToken!,
     });
     return { error: error?.message ?? null };
-  } catch (e: any) {
+  }
+  catch (e: any) {
     // User tapped Cancel — not an error
-    if (e.code === 'ERR_REQUEST_CANCELED') return { error: null };
+    if (e.code === 'ERR_REQUEST_CANCELED')
+      return { error: null };
     return { error: (e as Error).message ?? 'Apple Sign In failed' };
   }
 }

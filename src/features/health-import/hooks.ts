@@ -24,10 +24,10 @@ import {
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-export interface HealthImportResult {
+export type HealthImportResult = {
   imported: number;
   skipped: number;
-}
+};
 
 // ─── Hook ──────────────────────────────────────────────────────────────────────
 
@@ -56,7 +56,8 @@ export function useHealthImport(): {
 
         if (available) {
           const steps = await fetchTodaySteps();
-          if (!cancelled) setTodaySteps(steps);
+          if (!cancelled)
+            setTodaySteps(steps);
         }
 
         setIsLoading(false);
@@ -96,8 +97,8 @@ export function useHealthImport(): {
     let skipped = 0;
 
     // Compute the latest EWMA from existing logs as the starting point
-    let latestEwma: number | null =
-      existingLogs.length > 0
+    let latestEwma: number | null
+      = existingLogs.length > 0
         ? (existingLogs[existingLogs.length - 1]?.ewmaWeightKg ?? null)
         : null;
 
@@ -106,7 +107,7 @@ export function useHealthImport(): {
       const readingDate = parseISO(reading.loggedAt);
 
       // 3. Check for duplicate: same calendar day already logged in Supabase
-      const alreadyExists = existingLogs.some((log) =>
+      const alreadyExists = existingLogs.some(log =>
         isSameDay(parseISO(log.loggedAt), readingDate),
       );
 
@@ -126,7 +127,8 @@ export function useHealthImport(): {
           ewmaWeightKg,
         });
         imported++;
-      } catch {
+      }
+      catch {
         // Silently skip failed insertions — don't abort the whole import
         skipped++;
       }

@@ -1,6 +1,8 @@
+import type { GlipraTokens } from '@/theme/tokens';
 import { format } from 'date-fns';
 import { router } from 'expo-router';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   Pressable,
@@ -10,17 +12,15 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { RatingSlider } from '@/components/check-in/rating-slider';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
-import { useUpsertCheckIn, useTodayCheckIn } from '@/features/check-in/hooks';
+import { useTodayCheckIn, useUpsertCheckIn } from '@/features/check-in/hooks';
 import { useInsertWeightLog, useWeightLogs } from '@/features/weight/hooks';
-import { kgToLbs, lbsToKg, useWeightUnit } from '@/lib/unit-preference';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
+import { kgToLbs, lbsToKg, useWeightUnit } from '@/lib/unit-preference';
 
 const WATER_DROPS = 8; // 8 × 250 ml = 2000 ml max (easy UI)
 const WATER_DROP_ML = 250;
@@ -94,7 +94,7 @@ export default function CheckInScreen() {
   function handleSubmit() {
     haptics.medium();
     // Log weight first if a valid value was entered (optional field)
-    const parsedWeight = parseFloat(weightInput);
+    const parsedWeight = Number.parseFloat(weightInput);
     if (!isNaN(parsedWeight) && parsedWeight > 0) {
       // Always store in kg — convert if user entered lbs
       const weightKg = weightUnit === 'lbs' ? lbsToKg(parsedWeight) : parsedWeight;
@@ -189,7 +189,10 @@ export default function CheckInScreen() {
         {/* Morning weight (optional) */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>
-            Morning weight (optional, {weightUnit})
+            Morning weight (optional,
+            {' '}
+            {weightUnit}
+            )
           </Text>
           <View style={styles.weightRow}>
             <TextInput
@@ -214,7 +217,8 @@ export default function CheckInScreen() {
           </View>
           {lastWeightKg != null && !weightInput && (
             <Text style={styles.weightHint}>
-              Last logged:{' '}
+              Last logged:
+              {' '}
               {weightUnit === 'lbs'
                 ? `${kgToLbs(lastWeightKg).toFixed(1)} lbs`
                 : `${lastWeightKg.toFixed(1)} kg`}
@@ -250,13 +254,15 @@ export default function CheckInScreen() {
           accessibilityRole="button"
           accessibilityLabel={isUpdate ? 'Update check-in' : 'Save check-in'}
         >
-          {submitting ? (
-            <ActivityIndicator color={colors.white} />
-          ) : (
-            <Text style={styles.submitButtonText}>
-              {isUpdate ? t('checkin.submit_update') : t('checkin.submit_save')}
-            </Text>
-          )}
+          {submitting
+            ? (
+                <ActivityIndicator color={colors.white} />
+              )
+            : (
+                <Text style={styles.submitButtonText}>
+                  {isUpdate ? t('checkin.submit_update') : t('checkin.submit_save')}
+                </Text>
+              )}
         </Pressable>
 
         {/* Disclaimer */}
@@ -268,12 +274,12 @@ export default function CheckInScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

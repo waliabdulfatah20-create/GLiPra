@@ -42,5 +42,6 @@ export const useAuthStore = createSelectors(_useAuthStore);
 
 // Module-level action exports for use outside components
 export const hydrateAuth = () => _useAuthStore.getState().hydrate();
-export const setSession = (session: Session | null) =>
-  _useAuthStore.getState().setSession(session);
+export function setSession(session: Session | null) {
+  return _useAuthStore.getState().setSession(session);
+}

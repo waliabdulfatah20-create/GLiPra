@@ -10,25 +10,26 @@
  * Callers only need to render a switch and call toggle(type).
  */
 
+import type { NotificationId } from './notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as React from 'react';
-import { Alert } from 'react-native';
 import { addDays, differenceInCalendarDays, parseISO } from 'date-fns';
+import * as React from 'react';
 
+import { Alert } from 'react-native';
 import { useMedicationLevelCurve } from '@/features/medication-level/hooks';
 import { useTodayProfile } from '@/features/today/hooks';
-import { notifications, type NotificationId } from './notifications';
+import { notifications } from './notifications';
 
 const STORAGE_KEYS: Record<NotificationId, string> = {
   'injection-reminder': 'NOTIF_INJECTION_ENABLED',
   'daily-protein-nudge': 'NOTIF_PROTEIN_ENABLED',
 };
 
-export interface NotificationSettingsState {
+export type NotificationSettingsState = {
   injectionEnabled: boolean;
   proteinEnabled: boolean;
   toggle: (type: NotificationId) => Promise<void>;
-}
+};
 
 export function useNotificationSettings(): NotificationSettingsState {
   const [injectionEnabled, setInjectionEnabled] = React.useState(false);
@@ -84,17 +85,20 @@ export function useNotificationSettings(): NotificationSettingsState {
             }
           }
           // Single shot / no shots: reminder fires on next log (hooks.ts handles it).
-        } else {
+        }
+        else {
           await notifications.scheduleDailyProteinNudge(profile?.proteinFloorG ?? 100);
         }
-      } else {
+      }
+      else {
         // Disabling — cancel the notification.
         await notifications.cancel(type);
       }
 
       // Persist preference and update UI.
       await AsyncStorage.setItem(STORAGE_KEYS[type], String(next));
-      if (isInjection) setInjectionEnabled(next);
+      if (isInjection)
+        setInjectionEnabled(next);
       else setProteinEnabled(next);
     },
     [injectionEnabled, proteinEnabled, profile, curve],

@@ -1,4 +1,8 @@
+import type { ContentCard } from '@/features/content-cards/data';
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
+
+import { useTranslation } from 'react-i18next';
 import {
   Modal,
   Pressable,
@@ -7,17 +11,13 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
-
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
-import type { ContentCard } from '@/features/content-cards/data';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
-export interface ContentCardSheetProps {
+export type ContentCardSheetProps = {
   card: ContentCard | null;
   onClose: () => void;
-}
+};
 
 export function ContentCardSheet({ card, onClose }: ContentCardSheetProps) {
   const { t } = useTranslation();
@@ -27,7 +27,8 @@ export function ContentCardSheet({ card, onClose }: ContentCardSheetProps) {
     [colors, spacing, radius],
   );
 
-  if (!card) return null;
+  if (!card)
+    return null;
 
   const accentColor = card.tier === 1 ? colors.warning : colors.primary;
   const badgeBg = card.tier === 1 ? colors.warningLight : colors.primaryLight;
@@ -91,11 +92,11 @@ export function ContentCardSheet({ card, onClose }: ContentCardSheetProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

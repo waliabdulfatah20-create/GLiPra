@@ -1,7 +1,10 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import { useForm } from '@tanstack/react-form';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Pressable,
   StyleSheet,
@@ -9,16 +12,13 @@ import {
   TextInput,
   View,
 } from 'react-native';
+
 import Animated, { FadeInDown, FadeInUp, LinearTransition } from 'react-native-reanimated';
-import { useForm } from '@tanstack/react-form';
+
 import * as z from 'zod';
-
-import { useTranslation } from 'react-i18next';
-
 import { Button } from '@/components/ui';
 import { getFieldError } from '@/components/ui/form-utils';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 const schema = z.object({
   email: z
@@ -39,10 +39,13 @@ export type SignUpFormProps = {
 type PasswordStrength = 'weak' | 'medium' | 'strong';
 
 function getPasswordStrength(password: string): PasswordStrength {
-  if (password.length < 8) return 'weak';
-  const hasMixed = /[a-zA-Z]/.test(password) && /[0-9]/.test(password);
-  if (password.length >= 12 && hasMixed && /[^a-zA-Z0-9]/.test(password)) return 'strong';
-  if (hasMixed) return 'medium';
+  if (password.length < 8)
+    return 'weak';
+  const hasMixed = /[a-z]/i.test(password) && /\d/.test(password);
+  if (password.length >= 12 && hasMixed && /[^a-z0-9]/i.test(password))
+    return 'strong';
+  if (hasMixed)
+    return 'medium';
   return 'weak';
 }
 
@@ -74,10 +77,9 @@ function PasswordStrengthBar({ password }: { password: string }) {
 
   return (
     <View testID="password-strength-bar" style={styles.strengthBarContainer}>
-      {[1, 2, 3].map((n) => (
+      {[1, 2, 3].map(n => (
         <Animated.View
           key={n}
-          // @ts-expect-error layout prop
           layout={LinearTransition}
           style={[
             styles.strengthSegment,
@@ -121,11 +123,13 @@ export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
       <Text style={styles.heading}>{t('auth.sign_up_heading')}</Text>
       <Text style={styles.subheading}>{t('auth.sign_up_subheading')}</Text>
 
-      {apiError ? (
-        <Animated.View entering={FadeInDown.duration(200)} style={styles.apiErrorBox}>
-          <Text style={styles.apiErrorText}>{apiError}</Text>
-        </Animated.View>
-      ) : null}
+      {apiError
+        ? (
+            <Animated.View entering={FadeInDown.duration(200)} style={styles.apiErrorBox}>
+              <Text style={styles.apiErrorText}>{apiError}</Text>
+            </Animated.View>
+          )
+        : null}
 
       <form.Field
         name="email"
@@ -151,11 +155,13 @@ export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
                   error ? styles.inputError : null,
                 ]}
               />
-              {error ? (
-                <Animated.View entering={FadeInDown.duration(200)}>
-                  <Text style={styles.errorText}>{error}</Text>
-                </Animated.View>
-              ) : null}
+              {error
+                ? (
+                    <Animated.View entering={FadeInDown.duration(200)}>
+                      <Text style={styles.errorText}>{error}</Text>
+                    </Animated.View>
+                  )
+                : null}
             </View>
           );
         }}
@@ -187,18 +193,20 @@ export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
                 ]}
               />
               <PasswordStrengthBar password={passwordValue} />
-              {error ? (
-                <Animated.View entering={FadeInDown.duration(200)}>
-                  <Text style={styles.errorText}>{error}</Text>
-                </Animated.View>
-              ) : null}
+              {error
+                ? (
+                    <Animated.View entering={FadeInDown.duration(200)}>
+                      <Text style={styles.errorText}>{error}</Text>
+                    </Animated.View>
+                  )
+                : null}
             </View>
           );
         }}
       />
 
       <form.Subscribe
-        selector={(state) => [state.isSubmitting]}
+        selector={state => [state.isSubmitting]}
         children={([isSubmitting]) => (
           <Button
             testID="sign-up-submit"
@@ -229,9 +237,9 @@ export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
-}
+};
 
 function makeStyles({ colors }: StyleTokens) {
   return StyleSheet.create({
@@ -242,26 +250,27 @@ function makeStyles({ colors }: StyleTokens) {
     apiErrorText: { color: colors.error, fontSize: 14 },
     fieldContainer: { marginBottom: 16 },
     label: {
-      fontSize: 11, fontWeight: '600', color: colors.textSecondary,
-      letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 6,
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.6,
+      textTransform: 'uppercase',
+      marginBottom: 6,
     },
     input: {
       backgroundColor: colors.surface,
       borderWidth: 1.5,
       borderColor: colors.border,
       borderRadius: 12,
-      // @ts-expect-error borderCurve
       borderCurve: 'continuous',
       paddingHorizontal: 14,
       paddingVertical: 13,
       fontSize: 15,
       color: colors.textPrimary,
-      // @ts-expect-error boxShadow string form
       boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
     },
     inputFocused: {
       borderColor: colors.borderFocus,
-      // @ts-expect-error boxShadow string form
       boxShadow: '0 0 0 3px rgba(45,107,228,0.12)',
     },
     inputError: { borderColor: colors.error },

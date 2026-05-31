@@ -1,19 +1,19 @@
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
 import { useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { signInWithEmail } from '@/features/auth/api';
 import { SignInForm } from '@/features/auth/components/sign-in-form';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 export default function SignInScreen() {
   const [apiError, setApiError] = useState<string | null>(null);
   const { colors } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors }),
-    [colors]
+    [colors],
   );
 
   const handleSubmit = async (data: { email: string; password: string }) => {
@@ -38,9 +38,9 @@ export default function SignInScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
-}
+};
 
 function makeStyles({ colors }: StyleTokens) {
   return StyleSheet.create({

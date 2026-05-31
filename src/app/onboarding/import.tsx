@@ -1,13 +1,13 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
+
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { LinearGradient } from 'expo-linear-gradient';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 type ImportOption = {
   id: string;
@@ -90,7 +90,7 @@ export default function ImportScreen() {
           </Text>
         </LinearGradient>
 
-        {IMPORT_OPTIONS.map((option) => (
+        {IMPORT_OPTIONS.map(option => (
           <View key={option.id} style={styles.card}>
             <View style={styles.cardContent}>
               <Text style={styles.cardName}>{option.name}</Text>
@@ -121,12 +121,12 @@ export default function ImportScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

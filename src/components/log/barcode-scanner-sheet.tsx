@@ -1,4 +1,7 @@
+import type { BarcodeProduct } from '@/features/food-log/barcode-lookup';
+import type { GlipraTokens } from '@/theme/tokens';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+
 import * as React from 'react';
 import {
   ActivityIndicator,
@@ -11,16 +14,13 @@ import {
   TextInput,
   View,
 } from 'react-native';
-
 import { lookupBarcode } from '@/features/food-log/barcode-lookup';
-import type { BarcodeProduct } from '@/features/food-log/barcode-lookup';
 import {
   useBarcodeCorrectionLookup,
   useSaveBarcodeCorrection,
 } from '@/features/food-log/hooks';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 // Barcode scanning is ALWAYS free — never gated by subscription (CLAUDE.md).
 
@@ -31,11 +31,11 @@ const AMBER = '#d97706';
 const AMBER_LIGHT = 'rgba(217,119,6,0.10)';
 const MICRO_BG = 'rgba(217,119,6,0.06)';
 
-export interface BarcodeScannerSheetProps {
+export type BarcodeScannerSheetProps = {
   visible: boolean;
   onClose: () => void;
   onProductFound: (product: BarcodeProduct) => void;
-}
+};
 
 type ScanState = 'scanning' | 'loading' | 'result' | 'not_found';
 
@@ -105,14 +105,16 @@ export function BarcodeScannerSheet({
 
   // When correction loads (or product arrives), pre-fill edit fields
   React.useEffect(() => {
-    if (scanState !== 'result') return;
+    if (scanState !== 'result')
+      return;
     const source = correction ?? product;
-    if (!source) return;
+    if (!source)
+      return;
 
     // Scale factor: if OFF reported a specific serving weight, convert _100g values
     // to per-serving amounts. mult=1 means values are left as-is (per 100g).
-    const mult =
-      product?.servingWeightG != null && product.servingWeightG !== 100
+    const mult
+      = product?.servingWeightG != null && product.servingWeightG !== 100
         ? product.servingWeightG / 100
         : 1;
 
@@ -125,7 +127,8 @@ export function BarcodeScannerSheet({
         : '',
     );
     // Macro + micro: always from raw product (corrections don't store these)
-    if (!product) return;
+    if (!product)
+      return;
     setEditedCarbs(product.carbsG != null ? (product.carbsG * mult).toFixed(1) : '');
     setEditedFat(product.fatG != null ? (product.fatG * mult).toFixed(1) : '');
     // Micronutrients: also reported per-100g in OFF — scale by same mult
@@ -144,7 +147,8 @@ export function BarcodeScannerSheet({
   }, [correction, product, scanState]);
 
   async function handleBarcodeScan({ data }: { data: string }) {
-    if (scannedRef.current) return;
+    if (scannedRef.current)
+      return;
     scannedRef.current = true;
     setScannedEan(data);
     setScanState('loading');
@@ -153,24 +157,26 @@ export function BarcodeScannerSheet({
       haptics.success();
       setProduct(result);
       setScanState('result');
-    } else {
+    }
+    else {
       setScanState('not_found');
     }
   }
 
   function handleConfirm() {
     const displayProduct = correction ?? product;
-    if (!displayProduct) return;
+    if (!displayProduct)
+      return;
 
-    const proteinG = parseFloat(editedProtein) || 0;
-    const carbsG = editedCarbs !== '' ? parseFloat(editedCarbs) : null;
-    const fatG = editedFat !== '' ? parseFloat(editedFat) : null;
-    const fiberG = editedFiber !== '' ? parseFloat(editedFiber) : null;
-    const caloriesKcal = editedCalories !== '' ? parseFloat(editedCalories) : null;
-    const magnesiumMg = editedMagnesium !== '' ? parseFloat(editedMagnesium) : null;
-    const zincMg = editedZinc !== '' ? parseFloat(editedZinc) : null;
-    const b12Mcg = editedB12 !== '' ? parseFloat(editedB12) : null;
-    const vitaminDIu = editedVitD !== '' ? parseFloat(editedVitD) : null;
+    const proteinG = Number.parseFloat(editedProtein) || 0;
+    const carbsG = editedCarbs !== '' ? Number.parseFloat(editedCarbs) : null;
+    const fatG = editedFat !== '' ? Number.parseFloat(editedFat) : null;
+    const fiberG = editedFiber !== '' ? Number.parseFloat(editedFiber) : null;
+    const caloriesKcal = editedCalories !== '' ? Number.parseFloat(editedCalories) : null;
+    const magnesiumMg = editedMagnesium !== '' ? Number.parseFloat(editedMagnesium) : null;
+    const zincMg = editedZinc !== '' ? Number.parseFloat(editedZinc) : null;
+    const b12Mcg = editedB12 !== '' ? Number.parseFloat(editedB12) : null;
+    const vitaminDIu = editedVitD !== '' ? Number.parseFloat(editedVitD) : null;
 
     const finalProduct: BarcodeProduct = {
       ...displayProduct,
@@ -188,10 +194,10 @@ export function BarcodeScannerSheet({
 
     // Save correction if user changed protein/fiber/calories vs what was shown
     const original = correction ?? product!;
-    const userEdited =
-      proteinG !== original.proteinG ||
-      fiberG !== original.fiberG ||
-      caloriesKcal !== original.caloriesKcal;
+    const userEdited
+      = proteinG !== original.proteinG
+        || fiberG !== original.fiberG
+        || caloriesKcal !== original.caloriesKcal;
 
     if (userEdited && scannedEan) {
       saveCorrection({
@@ -232,24 +238,24 @@ export function BarcodeScannerSheet({
     : product;
 
   // Show protein warning when no correction and protein is 0
-  const showProteinWarning =
-    scanState === 'result' &&
-    !correction &&
-    displayProduct?.proteinG === 0 &&
-    displayProduct?.dataSource !== 'user_corrected';
+  const showProteinWarning
+    = scanState === 'result'
+      && !correction
+      && displayProduct?.proteinG === 0
+      && displayProduct?.dataSource !== 'user_corrected';
 
   // Dynamic note: show "Per serving (Xg)" when OFF provided a non-100g serving_quantity
-  const servingLabel =
-    product?.servingWeightG != null && product.servingWeightG !== 100
+  const servingLabel
+    = product?.servingWeightG != null && product.servingWeightG !== 100
       ? `Per serving (${product.servingWeightG}g) - edit to match the label`
       : 'Per 100g - edit to match the label';
 
   // GLP-1 Watch section only shows when the API returned at least one micro value
-  const hasMicroData =
-    product?.magnesiumMg != null ||
-    product?.zincMg != null ||
-    product?.b12Mcg != null ||
-    product?.vitaminDIu != null;
+  const hasMicroData
+    = product?.magnesiumMg != null
+      || product?.zincMg != null
+      || product?.b12Mcg != null
+      || product?.vitaminDIu != null;
 
   return (
     <Modal
@@ -278,35 +284,37 @@ export function BarcodeScannerSheet({
             <Text style={styles.permissionText}>
               Camera access is required to scan barcodes.
             </Text>
-            {permission.canAskAgain ? (
-              <Pressable
-                style={({ pressed }) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}
-                onPress={requestPermission}
-                accessibilityRole="button"
-              >
-                <Text style={styles.primaryButtonText}>Allow Camera Access</Text>
-              </Pressable>
-            ) : (
-              <View style={styles.settingsActions}>
-                <Text style={styles.permissionDeniedNote}>
-                  Please enable camera access in your device Settings, then tap below.
-                </Text>
-                <Pressable
-                  style={({ pressed }) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}
-                  onPress={() => void Linking.openSettings()}
-                  accessibilityRole="button"
-                >
-                  <Text style={styles.primaryButtonText}>Open Settings</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.cancelButton}
-                  onPress={() => void getPermission()}
-                  accessibilityRole="button"
-                >
-                  <Text style={styles.cancelButtonText}>I've enabled it - check again</Text>
-                </Pressable>
-              </View>
-            )}
+            {permission.canAskAgain
+              ? (
+                  <Pressable
+                    style={({ pressed }) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}
+                    onPress={requestPermission}
+                    accessibilityRole="button"
+                  >
+                    <Text style={styles.primaryButtonText}>Allow Camera Access</Text>
+                  </Pressable>
+                )
+              : (
+                  <View style={styles.settingsActions}>
+                    <Text style={styles.permissionDeniedNote}>
+                      Please enable camera access in your device Settings, then tap below.
+                    </Text>
+                    <Pressable
+                      style={({ pressed }) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}
+                      onPress={() => void Linking.openSettings()}
+                      accessibilityRole="button"
+                    >
+                      <Text style={styles.primaryButtonText}>Open Settings</Text>
+                    </Pressable>
+                    <Pressable
+                      style={styles.cancelButton}
+                      onPress={() => void getPermission()}
+                      accessibilityRole="button"
+                    >
+                      <Text style={styles.cancelButtonText}>I've enabled it - check again</Text>
+                    </Pressable>
+                  </View>
+                )}
             <Pressable style={styles.cancelButton} onPress={handleClose} accessibilityRole="button">
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </Pressable>
@@ -372,15 +380,20 @@ export function BarcodeScannerSheet({
             {/* Product name + source badge */}
             <Text style={styles.productName}>{displayProduct.name}</Text>
             <View style={styles.sourceRow}>
-              {displayProduct.dataSource === 'user_corrected' ? (
-                <View style={styles.verifiedBadge}>
-                  <Text style={styles.verifiedBadgeText}>✓ Your verified data</Text>
-                </View>
-              ) : (
-                <Text style={styles.sourceLabel}>
-                  {SOURCE_LABEL[displayProduct.dataSource]} · {displayProduct.servingDescription}
-                </Text>
-              )}
+              {displayProduct.dataSource === 'user_corrected'
+                ? (
+                    <View style={styles.verifiedBadge}>
+                      <Text style={styles.verifiedBadgeText}>✓ Your verified data</Text>
+                    </View>
+                  )
+                : (
+                    <Text style={styles.sourceLabel}>
+                      {SOURCE_LABEL[displayProduct.dataSource]}
+                      {' '}
+                      ·
+                      {displayProduct.servingDescription}
+                    </Text>
+                  )}
             </View>
 
             {/* Protein warning when data is likely missing */}
@@ -507,14 +520,14 @@ export function BarcodeScannerSheet({
 
 // ─── Editable nutrition field ────────────────────────────────────────────────
 
-interface EditableFieldProps {
+type EditableFieldProps = {
   label: string;
   unit: string;
   value: string;
   onChangeText: (v: string) => void;
   micro?: boolean;
   styles: ReturnType<typeof makeStyles>;
-}
+};
 
 function EditableField({ label, unit, value, onChangeText, micro, styles }: EditableFieldProps) {
   return (
@@ -537,11 +550,11 @@ function EditableField({ label, unit, value, onChangeText, micro, styles }: Edit
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

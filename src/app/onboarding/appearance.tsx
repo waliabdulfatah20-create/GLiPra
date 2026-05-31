@@ -3,17 +3,17 @@
 // useThemeSelector() writes to AsyncStorage immediately — the user gets
 // live preview as they tap (app re-renders via ThemeContext).
 
-import { router } from 'expo-router';
-import * as React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTranslation } from 'react-i18next';
-
-import { LinearGradient } from 'expo-linear-gradient';
-import { haptics } from '@/lib/haptics';
-import { useTheme, useThemeSelector } from '@/lib/ThemeContext';
 import type { ColorSchemeType } from '@/lib/hooks/use-selected-theme';
 import type { GlipraTokens } from '@/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import * as React from 'react';
+
+import { useTranslation } from 'react-i18next';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { haptics } from '@/lib/haptics';
+import { useTheme, useThemeSelector } from '@/lib/ThemeContext';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -128,12 +128,12 @@ export default function AppearanceScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 // Mirrors language.tsx exactly — same card-picker visual pattern.
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

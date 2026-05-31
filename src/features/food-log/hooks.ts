@@ -1,12 +1,15 @@
 // React Query hooks for the food-log feature.
 
-import { useCallback, useState } from 'react';
+import type { BarcodeProduct } from './barcode-lookup';
+import type { RecognitionResult } from './photo-recognition';
+import type { BarcodeFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 
+import { useCallback, useState } from 'react';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { analytics, EVENTS } from '@/lib/analytics';
-
 import {
   fetchTodayFoodLogs,
   getFoodDefault,
@@ -18,9 +21,7 @@ import {
   upsertFoodDefault,
 } from './api';
 import { fetchBarcodeCorrection, saveBarcodeCorrection } from './barcode-corrections';
-import type { BarcodeProduct } from './barcode-lookup';
-import { usePhotoFoodRecognition, type RecognitionResult } from './photo-recognition';
-import type { BarcodeFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
+import { usePhotoFoodRecognition } from './photo-recognition';
 
 // ---------------------------------------------------------------------------
 // Query key factory
@@ -74,7 +75,8 @@ export function useInsertFoodLog(): {
 
   const { mutate, isPending } = useMutation({
     mutationFn: (entry: ManualFoodEntry) => {
-      if (!userId) throw new Error('Not authenticated');
+      if (!userId)
+        throw new Error('Not authenticated');
       return insertFoodLog(userId, entry, 'manual', null);
     },
     onSuccess: () => {
@@ -109,7 +111,8 @@ export function useInsertBarcodeFoodLog(): {
 
   const { mutate, isPending } = useMutation({
     mutationFn: (entry: BarcodeFoodEntry) => {
-      if (!userId) throw new Error('Not authenticated');
+      if (!userId)
+        throw new Error('Not authenticated');
       return insertBarcodeFoodLog(userId, entry);
     },
     onSuccess: () => {
@@ -200,14 +203,15 @@ export function useConfirmPhotoLog(): {
       entry: PhotoFoodEntry;
       originalAiName: string;
     }) => {
-      if (!userId) throw new Error('Not authenticated');
+      if (!userId)
+        throw new Error('Not authenticated');
 
       // 1. Insert the food log entry
       await insertPhotoFoodLog(userId, entry);
 
       // 2. If the user edited the food name, save a correction for future AI context
-      const nameChanged =
-        originalAiName.toLowerCase().trim() !== entry.name.toLowerCase().trim();
+      const nameChanged
+        = originalAiName.toLowerCase().trim() !== entry.name.toLowerCase().trim();
       if (nameChanged) {
         const correction: FoodCorrection = {
           originalAiName,
@@ -310,7 +314,8 @@ export function useSaveBarcodeCorrection() {
       ean: string;
       product: Pick<BarcodeProduct, 'name' | 'proteinG' | 'fiberG' | 'caloriesKcal'>;
     }) => {
-      if (!userId) throw new Error('Not authenticated');
+      if (!userId)
+        throw new Error('Not authenticated');
       return saveBarcodeCorrection(userId, ean, product);
     },
     onSuccess: (_data, { ean }) => {
@@ -351,11 +356,11 @@ export function useDailyMacros(): {
       magnesiumMg: acc.magnesiumMg + (log.magnesiumMg ?? 0),
       zincMg: acc.zincMg + (log.zincMg ?? 0),
       hasMicronutrients:
-        acc.hasMicronutrients ||
-        log.b12Mcg != null ||
-        log.vitaminDIu != null ||
-        log.magnesiumMg != null ||
-        log.zincMg != null,
+        acc.hasMicronutrients
+        || log.b12Mcg != null
+        || log.vitaminDIu != null
+        || log.magnesiumMg != null
+        || log.zincMg != null,
     }),
     {
       protein: 0,

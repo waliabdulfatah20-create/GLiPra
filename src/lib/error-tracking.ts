@@ -25,12 +25,14 @@ try {
   // Prefer @sentry/react-native (the canonical package)
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   Sentry = require('@sentry/react-native') as SentryModule;
-} catch {
+}
+catch {
   try {
     // Fall back to sentry-expo if present
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     Sentry = require('sentry-expo') as SentryModule;
-  } catch {
+  }
+  catch {
     // Neither installed — all methods will no-op
     Sentry = null;
   }
@@ -40,7 +42,7 @@ try {
 // Email-pattern stripper — applied in beforeSend
 // ---------------------------------------------------------------------------
 
-const EMAIL_RE = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+const EMAIL_RE = /[\w.%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}/gi;
 
 function stripEmail(value: unknown): unknown {
   if (typeof value === 'string') {
@@ -55,7 +57,8 @@ function stripEmail(value: unknown): unknown {
       // Always strip the user.email field regardless of value
       if (k === 'email') {
         out[k] = '[stripped]';
-      } else {
+      }
+      else {
         out[k] = stripEmail(v);
       }
     }
@@ -75,10 +78,12 @@ export const errorTracking = {
    * tracesSampleRate is capped at 0.1 to stay within the free tier.
    */
   init: (): void => {
-    if (!Sentry) return;
+    if (!Sentry)
+      return;
     try {
       const dsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
-      if (!dsn) return; // No DSN configured — skip silently
+      if (!dsn)
+        return; // No DSN configured — skip silently
 
       Sentry.init({
         dsn,
@@ -86,7 +91,8 @@ export const errorTracking = {
         environment: process.env.EXPO_PUBLIC_APP_ENV ?? 'development',
         beforeSend: (event: unknown) => stripEmail(event),
       });
-    } catch {
+    }
+    catch {
       // Init failure must never crash the app
     }
   },
@@ -96,10 +102,12 @@ export const errorTracking = {
    * context must NOT contain PII (no email, name, or identifying data).
    */
   captureException: (error: Error, context?: Record<string, unknown>): void => {
-    if (!Sentry) return;
+    if (!Sentry)
+      return;
     try {
       Sentry.captureException(error, context ? { extra: context } : undefined);
-    } catch {
+    }
+    catch {
       // Silently ignore
     }
   },
@@ -111,10 +119,12 @@ export const errorTracking = {
     message: string,
     level: 'info' | 'warning' | 'error' = 'info',
   ): void => {
-    if (!Sentry) return;
+    if (!Sentry)
+      return;
     try {
       Sentry.captureMessage(message, level);
-    } catch {
+    }
+    catch {
       // Silently ignore
     }
   },
@@ -124,10 +134,12 @@ export const errorTracking = {
    * NEVER pass email, name, or any real identifier.
    */
   setUser: (anonymousId: string): void => {
-    if (!Sentry) return;
+    if (!Sentry)
+      return;
     try {
       Sentry.setUser({ id: anonymousId });
-    } catch {
+    }
+    catch {
       // Silently ignore
     }
   },
@@ -136,10 +148,12 @@ export const errorTracking = {
    * Clear user context on sign-out.
    */
   clearUser: (): void => {
-    if (!Sentry) return;
+    if (!Sentry)
+      return;
     try {
       Sentry.setUser(null);
-    } catch {
+    }
+    catch {
       // Silently ignore
     }
   },

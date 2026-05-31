@@ -92,36 +92,36 @@ const MODEL = 'gpt-4o';
 function buildSystemPrompt(
   recentCorrections?: Array<{ originalName: string; correctedName: string }>,
 ): string {
-  let prompt =
-    'You are a nutrition analysis assistant for a GLP-1 medication companion app. ' +
-    'Analyze the food in the image and return a JSON object with nutritional information ' +
-    'per typical serving. Be concise and accurate. ' +
-    'Return exactly this JSON shape (all nullable fields may be null if unknown): ' +
-    '{ ' +
-    '"name": string, ' +
-    '"servingDescription": string, ' +
-    '"proteinG": number, ' +
-    '"carbsG": number | null, ' +
-    '"fatG": number | null, ' +
-    '"fiberG": number | null, ' +
-    '"caloriesKcal": number | null, ' +
-    '"b12Mcg": number | null, ' +
-    '"vitaminDIu": number | null, ' +
-    '"magnesiumMg": number | null, ' +
-    '"zincMg": number | null, ' +
-    '"confidence": "high" | "medium" | "low" ' +
-    '}. ' +
-    'For GLP-1 patients, micronutrient estimates (B12, vitamin D, magnesium, zinc) are ' +
-    'especially important — provide your best estimate based on the food type, or null if ' +
-    'truly uncertain. Do not include any user-identifying information.';
+  let prompt
+    = 'You are a nutrition analysis assistant for a GLP-1 medication companion app. '
+      + 'Analyze the food in the image and return a JSON object with nutritional information '
+      + 'per typical serving. Be concise and accurate. '
+      + 'Return exactly this JSON shape (all nullable fields may be null if unknown): '
+      + '{ '
+      + '"name": string, '
+      + '"servingDescription": string, '
+      + '"proteinG": number, '
+      + '"carbsG": number | null, '
+      + '"fatG": number | null, '
+    + '"fiberG": number | null, '
+    + '"caloriesKcal": number | null, '
+    + '"b12Mcg": number | null, '
+    + '"vitaminDIu": number | null, '
+    + '"magnesiumMg": number | null, '
+    + '"zincMg": number | null, '
+    + '"confidence": "high" | "medium" | "low" '
+    + '}. '
+    + 'For GLP-1 patients, micronutrient estimates (B12, vitamin D, magnesium, zinc) are '
+    + 'especially important — provide your best estimate based on the food type, or null if '
+    + 'truly uncertain. Do not include any user-identifying information.';
 
   if (recentCorrections && recentCorrections.length > 0) {
     const correctionList = recentCorrections
-      .map((c) => `"${c.originalName}" → "${c.correctedName}"`)
+      .map(c => `"${c.originalName}" → "${c.correctedName}"`)
       .join(', ');
-    prompt +=
-      ` This user has previously corrected these AI identifications: ${correctionList}. ` +
-      'Use this context to improve accuracy for similar foods.';
+    prompt
+      += ` This user has previously corrected these AI identifications: ${correctionList}. `
+        + 'Use this context to improve accuracy for similar foods.';
   }
 
   return prompt;
@@ -174,7 +174,8 @@ serve(async (req: Request) => {
     if (countError) {
       console.error('Rate-limit query failed:', countError.message);
       // Fail open only in this case — do not block the user on a DB error.
-    } else if ((count ?? 0) >= DAILY_LIMIT) {
+    }
+    else if ((count ?? 0) >= DAILY_LIMIT) {
       return new Response(
         JSON.stringify({ error: 'Daily limit reached' }),
         {
@@ -188,7 +189,8 @@ serve(async (req: Request) => {
     let body: unknown;
     try {
       body = await req.json();
-    } catch {
+    }
+    catch {
       return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -240,8 +242,8 @@ serve(async (req: Request) => {
               // Rule 2: userComment contains food context only, never user identity.
               text: userComment
                 ? `The user noted: "${userComment}". Using this context, identify the food and estimate protein, carbs, fat, fiber, calories, and GLP-1 relevant micronutrients (B12, vitamin D, magnesium, zinc) per the described serving.`
-                : 'Identify this food and estimate protein, carbs, fat, fiber, calories, ' +
-                  'and GLP-1 relevant micronutrients (B12, vitamin D, magnesium, zinc) per typical serving.',
+                : 'Identify this food and estimate protein, carbs, fat, fiber, calories, '
+                  + 'and GLP-1 relevant micronutrients (B12, vitamin D, magnesium, zinc) per typical serving.',
             },
           ],
         },
@@ -258,11 +260,13 @@ serve(async (req: Request) => {
       const outputParse = OutputSchema.safeParse(parsed);
       if (outputParse.success) {
         result = outputParse.data;
-      } else {
+      }
+      else {
         console.error('OutputSchema validation failed:', outputParse.error.flatten());
         // result stays as FALLBACK_RESULT
       }
-    } catch (parseError) {
+    }
+    catch (parseError) {
       console.error('JSON.parse of OpenAI content failed:', parseError);
       // result stays as FALLBACK_RESULT
     }
@@ -294,7 +298,8 @@ serve(async (req: Request) => {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (error: unknown) {
+  }
+  catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Internal server error';
     console.error('recognize-food unhandled error:', message);
     return new Response(JSON.stringify({ error: message }), {

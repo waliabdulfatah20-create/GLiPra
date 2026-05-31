@@ -1,8 +1,8 @@
+import type { Database } from '@/types/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
-import Env from 'env';
 
-import type { Database } from '@/types/database';
+import Env from 'env';
 
 function createSupabaseClient() {
   const supabaseUrl = Env.EXPO_PUBLIC_SUPABASE_URL;

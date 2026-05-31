@@ -1,3 +1,6 @@
+import type { WeightUnit } from '@/lib/unit-preference';
+import type { GlipraTokens } from '@/theme/tokens';
+
 import * as React from 'react';
 import {
   ActivityIndicator,
@@ -7,19 +10,17 @@ import {
   TextInput,
   View,
 } from 'react-native';
-
-import { WeightUnit, kgToLbs, lbsToKg } from '@/lib/unit-preference';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
+import { kgToLbs, lbsToKg } from '@/lib/unit-preference';
 
-export interface WeightEntryFormProps {
+export type WeightEntryFormProps = {
   onSubmit: (entry: { weightKg: number; notes?: string }) => void;
   isLoading: boolean;
   lastWeightKg?: number;
   /** Display + input unit. Input is converted to kg before calling onSubmit. */
   weightUnit?: WeightUnit;
-}
+};
 
 /**
  * Simple form for logging a new weight entry.
@@ -39,11 +40,12 @@ export function WeightEntryForm({
   const [weightInput, setWeightInput] = React.useState('');
   const [notes, setNotes] = React.useState('');
 
-  const parsedInput = parseFloat(weightInput);
+  const parsedInput = Number.parseFloat(weightInput);
   const isValid = !isNaN(parsedInput) && parsedInput > 0;
 
   function handleSubmit() {
-    if (!isValid) return;
+    if (!isValid)
+      return;
     haptics.medium();
     // Always store in kg — convert if user entered lbs
     const weightKg = weightUnit === 'lbs' ? lbsToKg(parsedInput) : parsedInput;
@@ -56,8 +58,8 @@ export function WeightEntryForm({
   }
 
   // Show placeholder in the user's preferred unit
-  const placeholder =
-    lastWeightKg != null
+  const placeholder
+    = lastWeightKg != null
       ? weightUnit === 'lbs'
         ? String(kgToLbs(lastWeightKg))
         : String(lastWeightKg)
@@ -95,11 +97,13 @@ export function WeightEntryForm({
           accessibilityRole="button"
           accessibilityLabel="Log weight"
         >
-          {isLoading ? (
-            <ActivityIndicator size="small" color={colors.white} />
-          ) : (
-            <Text style={styles.buttonText}>Log Weight</Text>
-          )}
+          {isLoading
+            ? (
+                <ActivityIndicator size="small" color={colors.white} />
+              )
+            : (
+                <Text style={styles.buttonText}>Log Weight</Text>
+              )}
         </Pressable>
       </View>
 
@@ -116,11 +120,11 @@ export function WeightEntryForm({
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

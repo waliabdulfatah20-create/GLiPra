@@ -1,22 +1,22 @@
 import { addDays, differenceInCalendarDays, format, parseISO } from 'date-fns';
 
-export type InjectionPhase =
-  | 'injection_day'
-  | 'peak_suppression'
-  | 'adjustment'
-  | 'recovery_window'
-  | 'overdue';
+export type InjectionPhase
+  = | 'injection_day'
+    | 'peak_suppression'
+    | 'adjustment'
+    | 'recovery_window'
+    | 'overdue';
 
-export interface InjectionCycleInput {
+export type InjectionCycleInput = {
   /** ISO date string e.g. '2026-05-10' */
   lastInjectionDate: string;
   /** ISO date string */
   today: string;
   /** Default 7 (weekly). Pass 14 for biweekly, etc. */
   injectionIntervalDays?: number;
-}
+};
 
-export interface InjectionCycleResult {
+export type InjectionCycleResult = {
   phase: InjectionPhase;
   daysSinceInjection: number;
   /** null if overdue */
@@ -24,13 +24,17 @@ export interface InjectionCycleResult {
   isOverdue: boolean;
   /** ISO date string, null if overdue */
   nextInjectionDate: string | null;
-}
+};
 
 function mapDaysToPhase(daysSince: number): InjectionPhase {
-  if (daysSince === 0) return 'injection_day';
-  if (daysSince <= 2) return 'peak_suppression';
-  if (daysSince <= 4) return 'adjustment';
-  if (daysSince <= 7) return 'recovery_window';
+  if (daysSince === 0)
+    return 'injection_day';
+  if (daysSince <= 2)
+    return 'peak_suppression';
+  if (daysSince <= 4)
+    return 'adjustment';
+  if (daysSince <= 7)
+    return 'recovery_window';
   return 'overdue';
 }
 

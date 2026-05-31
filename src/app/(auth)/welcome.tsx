@@ -1,13 +1,13 @@
-import { useRouter } from 'expo-router';
-import * as Haptics from 'expo-haptics';
-import * as React from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
+import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
+import * as React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '@/lib/ThemeContext';
 
 export default function WelcomeScreen() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function WelcomeScreen() {
   const { colors } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors }),
-    [colors]
+    [colors],
   );
 
   const handleGetStarted = () => {
@@ -35,14 +35,12 @@ export default function WelcomeScreen() {
   return (
     <View style={styles.container}>
       {/* Radial blue glow overlay — New Architecture only */}
-      {/* @ts-expect-error experimental_backgroundImage */}
       <View style={styles.glow} />
 
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         <View style={styles.content}>
           {/* Logo + tagline — FadeInDown on mount */}
           <Animated.View entering={FadeInDown.duration(600)} style={styles.logoSection}>
-            {/* @ts-expect-error experimental_backgroundImage */}
             <View style={styles.logoBox} />
             <Text style={styles.appName}>Glipra</Text>
             <Text style={styles.tagline}>{t('auth.welcome_tagline')}</Text>
@@ -50,7 +48,6 @@ export default function WelcomeScreen() {
 
           {/* Buttons — FadeInUp with delay */}
           <Animated.View
-            // @ts-expect-error delay() exists on Reanimated entering modifiers
             entering={FadeInUp.delay(200).duration(500)}
             style={styles.buttonSection}
           >
@@ -62,7 +59,6 @@ export default function WelcomeScreen() {
               ]}
               testID="welcome-get-started"
             >
-              {/* @ts-expect-error experimental_backgroundImage */}
               <View style={styles.primaryButtonGradient}>
                 <Text style={styles.primaryButtonText}>{t('auth.get_started')}</Text>
               </View>
@@ -83,7 +79,6 @@ export default function WelcomeScreen() {
 
         {/* Pharmacist badge — bottom */}
         <Animated.View
-          // @ts-expect-error delay() exists on Reanimated entering modifiers
           entering={FadeInUp.delay(400).duration(500)}
           style={styles.badgeContainer}
         >
@@ -94,9 +89,9 @@ export default function WelcomeScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
-}
+};
 
 function makeStyles({ colors }: StyleTokens) {
   return StyleSheet.create({
@@ -110,7 +105,6 @@ function makeStyles({ colors }: StyleTokens) {
       left: 0,
       right: 0,
       bottom: 0,
-      // @ts-expect-error experimental_backgroundImage
       experimental_backgroundImage:
         'radial-gradient(ellipse at 50% 25%, rgba(45,107,228,0.45) 0%, transparent 65%)',
     },
@@ -132,11 +126,8 @@ function makeStyles({ colors }: StyleTokens) {
       width: 56,
       height: 56,
       borderRadius: 16,
-      // @ts-expect-error borderCurve may not be in all TS versions
       borderCurve: 'continuous',
-      // @ts-expect-error experimental_backgroundImage
       experimental_backgroundImage: 'linear-gradient(135deg, #2D6BE4, #1A4FB5)',
-      // @ts-expect-error boxShadow string form is RN 0.76+ / New Arch
       boxShadow: '0 8px 24px rgba(45,107,228,0.4)',
     },
     appName: {
@@ -156,14 +147,11 @@ function makeStyles({ colors }: StyleTokens) {
     },
     primaryButton: {
       borderRadius: 14,
-      // @ts-expect-error borderCurve
       borderCurve: 'continuous',
       overflow: 'hidden',
     },
     primaryButtonGradient: {
-      // @ts-expect-error experimental_backgroundImage
       experimental_backgroundImage: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`,
-      // @ts-expect-error boxShadow string form
       boxShadow: '0 4px 16px rgba(45,107,228,0.5)',
       paddingVertical: 16,
       alignItems: 'center',
@@ -181,7 +169,6 @@ function makeStyles({ colors }: StyleTokens) {
       borderWidth: 1,
       borderColor: 'rgba(255,255,255,0.12)',
       borderRadius: 14,
-      // @ts-expect-error borderCurve
       borderCurve: 'continuous',
       paddingVertical: 16,
       alignItems: 'center',

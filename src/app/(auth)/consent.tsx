@@ -1,13 +1,13 @@
+import type { GlipraTokens } from '@/theme/tokens';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { useConsentStore } from '@/features/consent/use-consent-store';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 export default function ConsentScreen() {
   const router = useRouter();
@@ -16,7 +16,7 @@ export default function ConsentScreen() {
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows]
+    [colors, spacing, radius, shadows],
   );
 
   const handleContinue = () => {
@@ -44,7 +44,8 @@ export default function ConsentScreen() {
             Glipra provides nutrition tracking tools designed to support individuals on
             GLP-1 medications. By using this app, you agree to use it only for its
             intended purpose and to provide accurate information to receive appropriate
-            guidance.{'\n\n'}
+            guidance.
+            {'\n\n'}
             You may not use Glipra for any unlawful purpose. We reserve the right to
             suspend accounts that misuse the service. Your continued use constitutes
             acceptance of any updates to these terms.
@@ -55,8 +56,11 @@ export default function ConsentScreen() {
         <DisclaimerBanner tier={1}>
           <Text style={styles.disclaimerBody}>
             Glipra is designed by a licensed pharmacist to support your nutrition while
-            on GLP-1 medication. It is{' '}
-            <Text style={styles.disclaimerBold}>not a substitute</Text> for professional
+            on GLP-1 medication. It is
+            {' '}
+            <Text style={styles.disclaimerBold}>not a substitute</Text>
+            {' '}
+            for professional
             medical advice, diagnosis, or treatment.
           </Text>
           <Text style={[styles.disclaimerBody, styles.disclaimerBodySpaced]}>
@@ -77,7 +81,8 @@ export default function ConsentScreen() {
           <Text style={styles.sectionBody}>
             Your health data is stored securely and never sold to third parties. We use
             anonymized, non-identifiable data to improve app guidance. You may export or
-            delete all your data at any time from Settings.{'\n\n'}
+            delete all your data at any time from Settings.
+            {'\n\n'}
             We may share aggregated, de-identified usage statistics for research purposes.
             Any AI features use anonymized context only. Your name, email, and identifying
             details are never included in AI prompts.
@@ -91,7 +96,7 @@ export default function ConsentScreen() {
       <View style={styles.footer}>
         <Pressable
           style={styles.checkboxRow}
-          onPress={() => setAgreed((v) => !v)}
+          onPress={() => setAgreed(v => !v)}
           accessibilityRole="checkbox"
           accessibilityState={{ checked: agreed }}
         >
@@ -120,12 +125,12 @@ export default function ConsentScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

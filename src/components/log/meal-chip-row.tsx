@@ -4,19 +4,19 @@
 // Time windows: Breakfast 5–11am | Lunch 11am–3pm | Dinner 3–9pm | Snack = rest
 // Tapping an active chip clears the filter.
 
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 
+import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 export type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
-interface Props {
+type Props = {
   active: MealSlot | null;
   onSelect: (slot: MealSlot | null) => void;
-}
+};
 
 const CHIPS: { slot: MealSlot; label: string }[] = [
   { slot: 'breakfast', label: 'Breakfast' },
@@ -61,11 +61,11 @@ export function MealChipRow({ active, onSelect }: Props) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

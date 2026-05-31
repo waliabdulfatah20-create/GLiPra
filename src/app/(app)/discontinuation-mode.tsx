@@ -1,3 +1,5 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import { format, parseISO } from 'date-fns';
 import * as React from 'react';
 import {
   Alert,
@@ -7,19 +9,17 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { format, parseISO } from 'date-fns';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { DISCONTINUATION_GUIDES } from '@/features/medication-status/discontinuation-guidance';
 import { useTodayProfile } from '@/features/today/hooks';
 import { useWeightLogs } from '@/features/weight/hooks';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 // Escalation copy — Rule 9: locked text, no condition names.
-const ESCALATION_COPY =
-  "You've logged symptoms that may need medical attention. Please contact your prescriber today.";
+const ESCALATION_COPY
+  = 'You\'ve logged symptoms that may need medical attention. Please contact your prescriber today.';
 
 function WeightTrendSection() {
   const { logs, isLoading } = useWeightLogs();
@@ -58,23 +58,29 @@ function WeightTrendSection() {
   const recent = logs.slice(-3);
   const latest = logs[logs.length - 1];
   const earliest = logs[logs.length - 4] ?? logs[0];
-  const trendKg =
-    logs.length >= 2
+  const trendKg
+    = logs.length >= 2
       ? (latest?.weightKg ?? 0) - (earliest?.weightKg ?? 0)
       : null;
 
   return (
     <View style={styles.weightCard}>
       <Text style={styles.weightLabel}>RECENT WEIGHT TREND</Text>
-      {recent.map((entry) => (
+      {recent.map(entry => (
         <View key={entry.id} style={styles.weightRow}>
           <Text style={styles.weightDate}>
             {format(parseISO(entry.loggedAt), 'MMM d')}
           </Text>
-          <Text style={styles.weightValue}>{entry.weightKg.toFixed(1)} kg</Text>
+          <Text style={styles.weightValue}>
+            {entry.weightKg.toFixed(1)}
+            {' '}
+            kg
+          </Text>
           {entry.ewmaWeightKg !== null && (
             <Text style={styles.weightEwma}>
-              smoothed {entry.ewmaWeightKg.toFixed(1)}
+              smoothed
+              {' '}
+              {entry.ewmaWeightKg.toFixed(1)}
             </Text>
           )}
         </View>
@@ -87,7 +93,10 @@ function WeightTrendSection() {
               trendKg > 0 ? styles.trendUp : styles.trendDown,
             ]}
           >
-            {trendKg > 0 ? '+' : ''}{trendKg.toFixed(1)} kg over this period
+            {trendKg > 0 ? '+' : ''}
+            {trendKg.toFixed(1)}
+            {' '}
+            kg over this period
           </Text>
         </View>
       )}
@@ -153,21 +162,23 @@ export default function DiscontinuationModeScreen() {
         {/* Protein floor — full value, no reduction */}
         <View style={styles.proteinCard}>
           <Text style={styles.proteinLabel}>YOUR PROTEIN FLOOR</Text>
-          {isLoading ? (
-            <Text style={styles.proteinLoadingText}>Loading…</Text>
-          ) : (
-            <>
-              <View style={styles.proteinRow}>
-                <Text style={styles.proteinValue}>{proteinFloorG || '-'}</Text>
-                <Text style={styles.proteinUnit}>{proteinFloorG ? 'g / day' : ''}</Text>
-              </View>
-              <Text style={styles.proteinNote}>
-                After discontinuing, your full protein floor applies with no reduction.
-                Protecting lean muscle mass is the highest nutritional priority in
-                the weeks and months following your last dose.
-              </Text>
-            </>
-          )}
+          {isLoading
+            ? (
+                <Text style={styles.proteinLoadingText}>Loading…</Text>
+              )
+            : (
+                <>
+                  <View style={styles.proteinRow}>
+                    <Text style={styles.proteinValue}>{proteinFloorG || '-'}</Text>
+                    <Text style={styles.proteinUnit}>{proteinFloorG ? 'g / day' : ''}</Text>
+                  </View>
+                  <Text style={styles.proteinNote}>
+                    After discontinuing, your full protein floor applies with no reduction.
+                    Protecting lean muscle mass is the highest nutritional priority in
+                    the weeks and months following your last dose.
+                  </Text>
+                </>
+              )}
         </View>
 
         {/* Weight trend section */}
@@ -175,7 +186,7 @@ export default function DiscontinuationModeScreen() {
 
         {/* Guidance cards */}
         <Text style={styles.sectionTitle}>Pharmacist Guidance</Text>
-        {DISCONTINUATION_GUIDES.map((guide) => (
+        {DISCONTINUATION_GUIDES.map(guide => (
           <View key={guide.id} style={styles.guideCard}>
             <Text style={styles.guideTitle}>{guide.title}</Text>
             <Text style={styles.guideBody}>{guide.body}</Text>
@@ -197,12 +208,12 @@ export default function DiscontinuationModeScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

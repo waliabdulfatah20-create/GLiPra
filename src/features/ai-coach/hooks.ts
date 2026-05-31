@@ -11,29 +11,29 @@
 
 import { useCallback, useState } from 'react';
 
+import { useAuthStore } from '@/features/auth/use-auth-store';
+import { unlockMilestone } from '@/features/journey-cards/api';
 import { analytics, EVENTS } from '@/lib/analytics';
 import { isMockAIEnabled, MOCK_DAILY_GUIDANCE } from '@/lib/mockAI';
 import { supabase } from '@/lib/supabase';
-import { useAuthStore } from '@/features/auth/use-auth-store';
-import { unlockMilestone } from '@/features/journey-cards/api';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface CoachMessage {
+export type CoachMessage = {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
-}
+};
 
-export interface CoachContext {
+export type CoachContext = {
   proteinFloorG?: number;
   proteinConsumedG?: number;
   injectionPhase?: string;
   // Rule 2: No PII — no name, email, weight, or identifying fields.
-}
+};
 
 // ---------------------------------------------------------------------------
 // Hook
@@ -50,7 +50,8 @@ export function useAiCoach() {
 
   const sendMessage = useCallback(
     async (userMessage: string, context?: CoachContext) => {
-      if (!userMessage.trim()) return;
+      if (!userMessage.trim())
+        return;
 
       setError(null);
 
@@ -62,7 +63,7 @@ export function useAiCoach() {
         timestamp: new Date(),
       };
 
-      setMessages((prev) => [...prev, userMsg]);
+      setMessages(prev => [...prev, userMsg]);
       setIsLoading(true);
 
       // Track that a message was sent — no message content in properties (Rule 2)
@@ -74,9 +75,10 @@ export function useAiCoach() {
         if (isMockAIEnabled()) {
           // Cost rule: return mock data without calling the edge function.
           // Simulate a realistic network delay so the UI isn't jarring.
-          await new Promise<void>((resolve) => setTimeout(resolve, 800));
+          await new Promise<void>(resolve => setTimeout(resolve, 800));
           replyContent = MOCK_DAILY_GUIDANCE.message;
-        } else {
+        }
+        else {
           // Rule 1: Call the edge function — never OpenAI directly from the client.
           // Rule 2: Only nutrition context is sent — no PII.
           const { data, error: fnError } = await supabase.functions.invoke('ai-coach', {
@@ -104,13 +106,14 @@ export function useAiCoach() {
           timestamp: new Date(),
         };
 
-        setMessages((prev) => [...prev, assistantMsg]);
+        setMessages(prev => [...prev, assistantMsg]);
 
         // Unlock coach_conversation milestone (idempotent — safe every message)
         if (userId) {
           unlockMilestone(userId, 'coach_conversation').catch(() => {});
         }
-      } catch (err: unknown) {
+      }
+      catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Something went wrong';
         setError(message);
 
@@ -118,11 +121,12 @@ export function useAiCoach() {
         const errorMsg: CoachMessage = {
           id: `error-${Date.now()}`,
           role: 'assistant',
-          content: "I'm having trouble right now. Please try again shortly.",
+          content: 'I\'m having trouble right now. Please try again shortly.',
           timestamp: new Date(),
         };
-        setMessages((prev) => [...prev, errorMsg]);
-      } finally {
+        setMessages(prev => [...prev, errorMsg]);
+      }
+      finally {
         setIsLoading(false);
       }
     },

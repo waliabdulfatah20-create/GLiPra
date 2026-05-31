@@ -9,12 +9,12 @@
  * the screen carries a Tier-2 disclaimer for the medical context.
  */
 
-export type PharmacistTipKey =
-  | 'weight'
-  | 'protein'
-  | 'streak'
-  | 'injection'
-  | 'symptoms';
+export type PharmacistTipKey
+  = | 'weight'
+    | 'protein'
+    | 'streak'
+    | 'injection'
+    | 'symptoms';
 
 /** Returns the i18n key for a tip. Use with useTranslation(). */
 export function tipI18nKey(key: PharmacistTipKey): string {

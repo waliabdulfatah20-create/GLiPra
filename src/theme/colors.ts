@@ -4,9 +4,9 @@
 
 export const colors = {
   // Brand — Direction B deep purple
-  primary: '#6d28d9',       // Main CTA, active states
-  primaryDark: '#5b21b6',   // Pressed state
-  primaryLight: 'rgba(109, 40, 217, 0.08)',  // Tinted backgrounds
+  primary: '#6d28d9', // Main CTA, active states
+  primaryDark: '#5b21b6', // Pressed state
+  primaryLight: 'rgba(109, 40, 217, 0.08)', // Tinted backgrounds
 
   // Semantic
   success: '#22C55E',
@@ -17,9 +17,9 @@ export const colors = {
   errorLight: '#FEE2E2',
 
   // Protein / Readiness score arc colors
-  proteinLow: '#EF4444',    // Below 60% of floor
-  proteinMid: '#F59E0B',    // 60-89% of floor
-  proteinGood: '#22C55E',   // 90%+ of floor
+  proteinLow: '#EF4444', // Below 60% of floor
+  proteinMid: '#F59E0B', // 60-89% of floor
+  proteinGood: '#22C55E', // 90%+ of floor
 
   // Injection phase badge colors
   phaseInjectionDay: '#8B5CF6',
@@ -43,7 +43,7 @@ export const colors = {
   gray900: '#111827',
 
   // Backgrounds
-  background: '#FAF8F5',      // warm cream — clinical warmth, not cold gray
+  background: '#FAF8F5', // warm cream — clinical warmth, not cold gray
   surface: '#FFFFFF',
   surfaceElevated: '#FFFFFF',
 
@@ -54,7 +54,7 @@ export const colors = {
   textInverse: '#FFFFFF',
 
   // Borders
-  border: '#E8E4DD',          // warm border — matches cream background
+  border: '#E8E4DD', // warm border — matches cream background
   borderFocus: '#6d28d9',
 
   // Clinical / Safety
@@ -85,9 +85,9 @@ export const radius = {
 
 export const shadows = {
   sm: {
-    shadowColor: '#2A1F0F',    // warm-tinted black for natural shadows
+    shadowColor: '#2A1F0F', // warm-tinted black for natural shadows
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,       // slightly stronger — more definition
+    shadowOpacity: 0.08, // slightly stronger — more definition
     shadowRadius: 3,
     elevation: 2,
   },

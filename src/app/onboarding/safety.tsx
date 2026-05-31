@@ -1,15 +1,15 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useState } from 'react';
+
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { LinearGradient } from 'expo-linear-gradient';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 type YesNo = boolean;
 
@@ -49,18 +49,19 @@ export default function SafetyScreen() {
   const { colors, spacing, radius, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius, gradients]
+    [colors, spacing, radius, gradients],
   );
 
   const setAnswer = (id: keyof Answers, value: YesNo) => {
-    setAnswers((prev) => ({ ...prev, [id]: value }));
+    setAnswers(prev => ({ ...prev, [id]: value }));
   };
 
-  const canProceed =
-    answers.hasKidneyDisease !== undefined && answers.isPregnant !== undefined;
+  const canProceed
+    = answers.hasKidneyDisease !== undefined && answers.isPregnant !== undefined;
 
   const handleNext = () => {
-    if (!canProceed) return;
+    if (!canProceed)
+      return;
     haptics.medium();
     setFormData({
       hasKidneyDisease: answers.hasKidneyDisease,
@@ -159,11 +160,11 @@ export default function SafetyScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

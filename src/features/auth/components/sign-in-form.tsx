@@ -1,7 +1,10 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import { useForm } from '@tanstack/react-form';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Pressable,
   StyleSheet,
@@ -9,16 +12,13 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import Animated, { FadeInDown, FadeInUp, LinearTransition } from 'react-native-reanimated';
-import { useForm } from '@tanstack/react-form';
+
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+
 import * as z from 'zod';
-
-import { useTranslation } from 'react-i18next';
-
 import { Button } from '@/components/ui';
 import { getFieldError } from '@/components/ui/form-utils';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 const schema = z.object({
   email: z
@@ -66,11 +66,13 @@ export function SignInForm({ onSubmit, apiError }: SignInFormProps) {
       <Text style={styles.heading}>{t('auth.sign_in_heading')}</Text>
       <Text style={styles.subheading}>{t('auth.sign_in_subheading')}</Text>
 
-      {apiError ? (
-        <Animated.View entering={FadeInDown.duration(200)} style={styles.apiErrorBox}>
-          <Text style={styles.apiErrorText}>{apiError}</Text>
-        </Animated.View>
-      ) : null}
+      {apiError
+        ? (
+            <Animated.View entering={FadeInDown.duration(200)} style={styles.apiErrorBox}>
+              <Text style={styles.apiErrorText}>{apiError}</Text>
+            </Animated.View>
+          )
+        : null}
 
       {/* Email field */}
       <form.Field
@@ -100,11 +102,13 @@ export function SignInForm({ onSubmit, apiError }: SignInFormProps) {
                   error ? styles.inputError : null,
                 ]}
               />
-              {error ? (
-                <Animated.View entering={FadeInDown.duration(200)}>
-                  <Text style={styles.errorText}>{error}</Text>
-                </Animated.View>
-              ) : null}
+              {error
+                ? (
+                    <Animated.View entering={FadeInDown.duration(200)}>
+                      <Text style={styles.errorText}>{error}</Text>
+                    </Animated.View>
+                  )
+                : null}
             </View>
           );
         }}
@@ -141,11 +145,13 @@ export function SignInForm({ onSubmit, apiError }: SignInFormProps) {
                   error ? styles.inputError : null,
                 ]}
               />
-              {error ? (
-                <Animated.View entering={FadeInDown.duration(200)}>
-                  <Text style={styles.errorText}>{error}</Text>
-                </Animated.View>
-              ) : null}
+              {error
+                ? (
+                    <Animated.View entering={FadeInDown.duration(200)}>
+                      <Text style={styles.errorText}>{error}</Text>
+                    </Animated.View>
+                  )
+                : null}
             </View>
           );
         }}
@@ -153,7 +159,7 @@ export function SignInForm({ onSubmit, apiError }: SignInFormProps) {
 
       {/* Submit */}
       <form.Subscribe
-        selector={(state) => [state.isSubmitting]}
+        selector={state => [state.isSubmitting]}
         children={([isSubmitting]) => (
           <Button
             testID="sign-in-submit"
@@ -186,9 +192,9 @@ export function SignInForm({ onSubmit, apiError }: SignInFormProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
-}
+};
 
 function makeStyles({ colors }: StyleTokens) {
   return StyleSheet.create({
@@ -246,18 +252,15 @@ function makeStyles({ colors }: StyleTokens) {
       borderWidth: 1.5,
       borderColor: colors.border,
       borderRadius: 12,
-      // @ts-expect-error borderCurve
       borderCurve: 'continuous',
       paddingHorizontal: 14,
       paddingVertical: 13,
       fontSize: 15,
       color: colors.textPrimary,
-      // @ts-expect-error boxShadow string form
       boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
     },
     inputFocused: {
       borderColor: colors.borderFocus,
-      // @ts-expect-error boxShadow string form
       boxShadow: '0 0 0 3px rgba(45,107,228,0.12)',
     },
     inputError: {

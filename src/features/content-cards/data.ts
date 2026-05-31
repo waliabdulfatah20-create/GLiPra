@@ -9,7 +9,7 @@ import type { GLP1MedicationId, InjectionPhase } from '@/types';
 
 export type CardType = 'tip' | 'warning' | 'milestone' | 'education';
 
-export interface ContentCard {
+export type ContentCard = {
   id: string;
   title: string;
   body: string;
@@ -19,7 +19,7 @@ export interface ContentCard {
   medicationIds: GLP1MedicationId[];
   tier: 1 | 2;
   sortOrder: number;
-}
+};
 
 export const CONTENT_CARDS: ContentCard[] = [
   {
@@ -321,5 +321,5 @@ export function getActiveCards(): ContentCard[] {
  * Returns a single card by its slug ID, or undefined if not found.
  */
 export function getCardById(id: string): ContentCard | undefined {
-  return CONTENT_CARDS.find((c) => c.id === id);
+  return CONTENT_CARDS.find(c => c.id === id);
 }

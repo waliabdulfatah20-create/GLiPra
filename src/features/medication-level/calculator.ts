@@ -1,6 +1,6 @@
-import { differenceInCalendarDays, format, parseISO, addDays } from 'date-fns';
-
 import type { GLP1MedicationId } from '@/types';
+
+import { addDays, differenceInCalendarDays, format, parseISO } from 'date-fns';
 
 // Half-lives in days — pharmacist-verified values
 export const HALF_LIVES: Record<string, number> = {
@@ -8,10 +8,10 @@ export const HALF_LIVES: Record<string, number> = {
   semaglutide_wegovy: 7,
   tirzepatide_mounjaro: 5,
   tirzepatide_zepbound: 5,
-  liraglutide_saxenda: 0.5,    // daily injection, ~13 hours
+  liraglutide_saxenda: 0.5, // daily injection, ~13 hours
   liraglutide_victoza: 0.5,
   dulaglutide_trulicity: 4.5,
-  rybelsus: 0.04,              // oral, ~1 hour — included for completeness
+  rybelsus: 0.04, // oral, ~1 hour — included for completeness
   compounded_semaglutide: 7,
   compounded_tirzepatide: 5,
   compounded_glp1_gip: 5,
@@ -33,9 +33,10 @@ export function estimateLevel(
   daysSinceInjection: number,
   medicationId: GLP1MedicationId | string,
 ): number {
-  if (doseMg === 0) return 0;
+  if (doseMg === 0)
+    return 0;
   const halfLife = HALF_LIVES[medicationId] ?? FALLBACK_HALF_LIFE;
-  return doseMg * Math.pow(0.5, daysSinceInjection / halfLife);
+  return doseMg * 0.5 ** (daysSinceInjection / halfLife);
 }
 
 /**
@@ -98,11 +99,11 @@ export function generateSteadyStateCurve(
   // Otherwise fall back to synthetic extrapolation for backward compatibility.
   const injectionDates: Date[] = actualInjectionDates
     ? [...actualInjectionDates]
-        .map((d) => parseISO(d))
+        .map(d => parseISO(d))
         .sort((a, b) => a.getTime() - b.getTime())
     : (() => {
-        const numHistoricDoses =
-          Math.max(NUM_PAST_CYCLES, Math.ceil(resolvedPastDays / injectionIntervalDays)) + 1;
+        const numHistoricDoses
+          = Math.max(NUM_PAST_CYCLES, Math.ceil(resolvedPastDays / injectionIntervalDays)) + 1;
         const dates: Date[] = [];
         for (let i = numHistoricDoses - 1; i >= 0; i--) {
           dates.push(addDays(lastInjectionParsed, -i * injectionIntervalDays));

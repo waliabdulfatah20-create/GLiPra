@@ -18,13 +18,13 @@ import { STREAK_THRESHOLD } from '@/features/streaks/calculator';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export interface DayProteinEntry {
+export type DayProteinEntry = {
   /** 'YYYY-MM-DD' local-date string */
   date: string;
   proteinG: number;
-}
+};
 
-export interface DayHit {
+export type DayHit = {
   /** 'YYYY-MM-DD' local-date string */
   date: string;
   proteinG: number;
@@ -32,13 +32,13 @@ export interface DayHit {
   hitFloor: boolean;
   /** True when the user logged any food this day (proteinG > 0 OR explicit entry) */
   hasData: boolean;
-}
+};
 
-export interface SymptomEntry {
+export type SymptomEntry = {
   date: string;
   /** 1-5 scale; null when not recorded */
   score: number | null;
-}
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -76,15 +76,16 @@ export function buildHitHistory(
   // Sum protein per date, excluding entries outside the window.
   const sums = new Map<string, number>();
   for (const e of entries) {
-    if (!windowSet.has(e.date)) continue;
+    if (!windowSet.has(e.date))
+      continue;
     sums.set(e.date, (sums.get(e.date) ?? 0) + e.proteinG);
   }
 
   return window.map((date) => {
     const proteinG = sums.get(date) ?? 0;
     const hasData = sums.has(date);
-    const hitFloor =
-      proteinFloorG > 0 && proteinG / proteinFloorG >= STREAK_THRESHOLD;
+    const hitFloor
+      = proteinFloorG > 0 && proteinG / proteinFloorG >= STREAK_THRESHOLD;
     return { date, proteinG, hitFloor, hasData };
   });
 }
@@ -94,8 +95,9 @@ export function buildHitHistory(
  * Returns 0 for an empty array (no days to compute against).
  */
 export function calculateHitRate(history: DayHit[]): number {
-  if (history.length === 0) return 0;
-  const hits = history.filter((d) => d.hitFloor).length;
+  if (history.length === 0)
+    return 0;
+  const hits = history.filter(d => d.hitFloor).length;
   return hits / history.length;
 }
 
@@ -119,9 +121,11 @@ export function calculateAdherence(
   days: number,
   asOf: Date,
 ): number {
-  if (intervalDays <= 0 || days <= 0) return 0;
+  if (intervalDays <= 0 || days <= 0)
+    return 0;
   const expected = Math.floor(days / intervalDays);
-  if (expected === 0) return 0;
+  if (expected === 0)
+    return 0;
 
   const windowStart = subDays(asOf, days - 1);
   const seen = new Set<string>();
@@ -129,8 +133,10 @@ export function calculateAdherence(
     const d = parseISO(raw);
     const diff = differenceInCalendarDays(asOf, d);
     // Within window: 0 <= diff <= days - 1 (inclusive). Also exclude future dates.
-    if (diff < 0) continue;
-    if (diff > days - 1) continue;
+    if (diff < 0)
+      continue;
+    if (diff > days - 1)
+      continue;
     // Use the same YYYY-MM-DD slice the date string already starts with
     seen.add(raw.slice(0, 10));
   }
@@ -138,7 +144,7 @@ export function calculateAdherence(
   // Belt: also discard dates older than windowStart computed via date-fns
   // (defensive — already covered above, but keeps the intent obvious)
   const inWindow = Array.from(seen).filter(
-    (d) => differenceInCalendarDays(asOf, parseISO(d)) <= days - 1,
+    d => differenceInCalendarDays(asOf, parseISO(d)) <= days - 1,
   );
 
   const actual = inWindow.length;
@@ -158,10 +164,13 @@ export function calculateAverageSymptom(
   const windowSet = new Set(lastNDays(days, asOf));
   const scores: number[] = [];
   for (const e of entries) {
-    if (!windowSet.has(e.date)) continue;
-    if (e.score == null) continue;
+    if (!windowSet.has(e.date))
+      continue;
+    if (e.score == null)
+      continue;
     scores.push(e.score);
   }
-  if (scores.length === 0) return null;
+  if (scores.length === 0)
+    return null;
   return scores.reduce((a, b) => a + b, 0) / scores.length;
 }

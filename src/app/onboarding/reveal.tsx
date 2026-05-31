@@ -1,21 +1,21 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import type { GLP1MedicationId } from '@/types';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
+
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { LinearGradient } from 'expo-linear-gradient';
+import { useAuthStore } from '@/features/auth/use-auth-store';
 import { saveOnboardingProfile } from '@/features/onboarding/api';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
-import { useAuthStore } from '@/features/auth/use-auth-store';
-import { setItem } from '@/lib/storage';
-import { supabase } from '@/lib/supabase';
 import { analytics, EVENTS } from '@/lib/analytics';
 import { haptics } from '@/lib/haptics';
 import { notifications } from '@/lib/notifications';
+import { setItem } from '@/lib/storage';
+import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
-import type { GLP1MedicationId } from '@/types';
 
 // ─── Display maps ────────────────────────────────────────────────────────────
 
@@ -60,16 +60,16 @@ export default function RevealScreen() {
   const { colors, spacing, radius, shadows, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows, gradients]
+    [colors, spacing, radius, shadows, gradients],
   );
 
-  const medicationLabel =
-    formData.medicationId !== undefined
+  const medicationLabel
+    = formData.medicationId !== undefined
       ? MEDICATION_LABELS[formData.medicationId]
       : 'Not specified';
 
-  const goalLabel =
-    formData.goal !== undefined ? (GOAL_LABELS[formData.goal] ?? 'Not specified') : 'Not specified';
+  const goalLabel
+    = formData.goal !== undefined ? (GOAL_LABELS[formData.goal] ?? 'Not specified') : 'Not specified';
 
   const handleStart = async () => {
     haptics.medium();
@@ -81,7 +81,8 @@ export default function RevealScreen() {
       let userId: string | undefined = formData.userId;
 
       // 2. Auth store — set by onAuthStateChange at sign-up, lives in memory.
-      if (!userId) userId = storeSession?.user?.id;
+      if (!userId)
+        userId = storeSession?.user?.id;
 
       // 3. getSession() — reads AsyncStorage (may lag on first launch).
       if (!userId) {
@@ -120,10 +121,12 @@ export default function RevealScreen() {
       notifications.requestPermission().catch(() => {});
 
       router.replace('/(app)/');
-    } catch (err: unknown) {
+    }
+    catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
       setErrorMessage(message);
-    } finally {
+    }
+    finally {
       setLoading(false);
     }
   };
@@ -210,17 +213,17 @@ export default function RevealScreen() {
 
 // ─── Summary card sub-component ──────────────────────────────────────────────
 
-interface SummaryCardProps {
+type SummaryCardProps = {
   label: string;
   value: string;
   accent?: boolean;
-}
+};
 
 function SummaryCard({ label, value, accent = false }: SummaryCardProps) {
   const { colors, spacing, radius, shadows } = useTheme();
   const summaryStyles = React.useMemo(
     () => makeSummaryStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows]
+    [colors, spacing, radius, shadows],
   );
 
   return (
@@ -233,12 +236,12 @@ function SummaryCard({ label, value, accent = false }: SummaryCardProps) {
 
 // ─── Style interfaces ─────────────────────────────────────────────────────────
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeSummaryStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

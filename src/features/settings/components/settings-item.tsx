@@ -1,15 +1,15 @@
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 // ─── SettingsRow ──────────────────────────────────────────────────────────────
 // Replaces the Obytes SettingsItem (which used NativeWind className).
 // A single pressable row inside a SettingsSection card.
 
-interface SettingsRowProps {
+type SettingsRowProps = {
   label: string;
   /** Static value displayed on the right (e.g. version number). */
   value?: string;
@@ -19,7 +19,7 @@ interface SettingsRowProps {
   destructive?: boolean;
   /** Suppresses the bottom separator on the last row in a section. */
   isLast?: boolean;
-}
+};
 
 export function SettingsRow({
   label,
@@ -62,10 +62,10 @@ export function SettingsRow({
 // Keep old name exported for backward compatibility.
 export { SettingsRow as SettingsItem };
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
-}
+};
 
 function makeStyles({ colors, spacing }: StyleTokens) {
   return StyleSheet.create({

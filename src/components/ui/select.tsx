@@ -11,9 +11,9 @@ import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import colors from '@/components/ui/colors';
-import { useTheme } from '@/lib/ThemeContext';
-
 import { CaretDown } from '@/components/ui/icons';
+
+import { useTheme } from '@/lib/ThemeContext';
 import { Modal, useModal } from './modal';
 import { Text } from './text';
 
@@ -93,14 +93,18 @@ export function Options({ ref, options, onSelect, value, testID }: OptionsProps 
             paddingBottom: 8,
             borderBottomWidth: StyleSheet.hairlineWidth,
             borderBottomColor: themeColors.border,
-          }}>
+          }}
+          >
             <Text style={{
               fontSize: 11,
               fontWeight: '700',
               letterSpacing: 1,
               color: themeColors.primary,
               textTransform: 'uppercase',
-            }}>{item.label}</Text>
+            }}
+            >
+              {item.label}
+            </Text>
           </View>
         );
       }
@@ -166,7 +170,8 @@ const Option = React.memo(
         <Text style={[
           { fontSize: 16, color: themeColors.textPrimary },
           selected && { fontWeight: '600', color: themeColors.primary },
-        ]}>
+        ]}
+        >
           {label}
         </Text>
         {selected && <Check stroke={themeColors.primary} />}

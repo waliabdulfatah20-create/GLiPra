@@ -7,6 +7,7 @@
  * Rule 8: DisclaimerBanner tier={2} — educational screen.
  */
 
+import type { GlipraTokens } from '@/theme/tokens';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useState } from 'react';
@@ -19,17 +20,16 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { useHealthImport } from '@/features/health-import/hooks';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 export default function HealthImportScreen() {
   const router = useRouter();
-  const { isAvailable, isLoading, requestPermissions, importWeights, todaySteps } =
-    useHealthImport();
+  const { isAvailable, isLoading, requestPermissions, importWeights, todaySteps }
+    = useHealthImport();
 
   const [permissionsGranted, setPermissionsGranted] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
@@ -52,7 +52,8 @@ export default function HealthImportScreen() {
           'Health access was not granted. You can enable it in your device Settings.',
         );
       }
-    } finally {
+    }
+    finally {
       setIsRequesting(false);
     }
   };
@@ -69,9 +70,11 @@ export default function HealthImportScreen() {
             ? 'All readings already exist in Glipra - nothing new to import.'
             : 'No weight readings found in the last 90 days.',
       );
-    } catch {
+    }
+    catch {
       Alert.alert('Import Failed', 'Something went wrong. Please try again.');
-    } finally {
+    }
+    finally {
       setIsImporting(false);
     }
   };
@@ -90,7 +93,7 @@ export default function HealthImportScreen() {
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
-            <Text style={styles.backText}>{'‹ Back'}</Text>
+            <Text style={styles.backText}>‹ Back</Text>
           </Pressable>
           <Text style={styles.title}>Health Import</Text>
           <View style={styles.backButton} />
@@ -105,26 +108,28 @@ export default function HealthImportScreen() {
         </View>
 
         {/* Availability status card */}
-        {isLoading ? (
-          <View style={styles.statusCard}>
-            <ActivityIndicator color={colors.primary} />
-            <Text style={styles.statusText}>Checking health platform…</Text>
-          </View>
-        ) : (
-          <View style={[styles.statusCard, isAvailable ? styles.statusAvailable : styles.statusUnavailable]}>
-            <View style={[styles.statusDot, { backgroundColor: isAvailable ? colors.success : colors.gray300 }]} />
-            <View style={styles.statusTextGroup}>
-              <Text style={styles.statusHeading}>
-                {isAvailable ? 'Health Platform Available' : 'Health Platform Unavailable'}
-              </Text>
-              <Text style={styles.statusSubtext}>
-                {isAvailable
-                  ? 'Apple Health / Google Fit is accessible on this device.'
-                  : 'Apple Health / Google Fit could not be found. Make sure you are using a full app build.'}
-              </Text>
-            </View>
-          </View>
-        )}
+        {isLoading
+          ? (
+              <View style={styles.statusCard}>
+                <ActivityIndicator color={colors.primary} />
+                <Text style={styles.statusText}>Checking health platform…</Text>
+              </View>
+            )
+          : (
+              <View style={[styles.statusCard, isAvailable ? styles.statusAvailable : styles.statusUnavailable]}>
+                <View style={[styles.statusDot, { backgroundColor: isAvailable ? colors.success : colors.gray300 }]} />
+                <View style={styles.statusTextGroup}>
+                  <Text style={styles.statusHeading}>
+                    {isAvailable ? 'Health Platform Available' : 'Health Platform Unavailable'}
+                  </Text>
+                  <Text style={styles.statusSubtext}>
+                    {isAvailable
+                      ? 'Apple Health / Google Fit is accessible on this device.'
+                      : 'Apple Health / Google Fit could not be found. Make sure you are using a full app build.'}
+                  </Text>
+                </View>
+              </View>
+            )}
 
         {/* Connect / Import actions — only shown when available */}
         {isAvailable && !isLoading && (
@@ -141,11 +146,13 @@ export default function HealthImportScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Connect to health platform"
               >
-                {isRequesting ? (
-                  <ActivityIndicator color={colors.white} />
-                ) : (
-                  <Text style={styles.primaryButtonText}>Connect</Text>
-                )}
+                {isRequesting
+                  ? (
+                      <ActivityIndicator color={colors.white} />
+                    )
+                  : (
+                      <Text style={styles.primaryButtonText}>Connect</Text>
+                    )}
               </Pressable>
             )}
 
@@ -167,11 +174,13 @@ export default function HealthImportScreen() {
                   accessibilityRole="button"
                   accessibilityLabel="Import weight history from health platform"
                 >
-                  {isImporting ? (
-                    <ActivityIndicator color={colors.white} />
-                  ) : (
-                    <Text style={styles.primaryButtonText}>Import Weight History</Text>
-                  )}
+                  {isImporting
+                    ? (
+                        <ActivityIndicator color={colors.white} />
+                      )
+                    : (
+                        <Text style={styles.primaryButtonText}>Import Weight History</Text>
+                      )}
                 </Pressable>
 
                 <Text style={styles.importHint}>
@@ -185,16 +194,20 @@ export default function HealthImportScreen() {
         {/* Step count card */}
         <View style={styles.stepsCard}>
           <Text style={styles.stepsLabel}>STEPS TODAY</Text>
-          {isLoading ? (
-            <ActivityIndicator color={colors.primary} />
-          ) : todaySteps !== null ? (
-            <Text style={styles.stepsValue}>
-              {todaySteps.toLocaleString()}
-              <Text style={styles.stepsUnit}> steps</Text>
-            </Text>
-          ) : (
-            <Text style={styles.stepsUnavailable}>Steps unavailable</Text>
-          )}
+          {isLoading
+            ? (
+                <ActivityIndicator color={colors.primary} />
+              )
+            : todaySteps !== null
+              ? (
+                  <Text style={styles.stepsValue}>
+                    {todaySteps.toLocaleString()}
+                    <Text style={styles.stepsUnit}> steps</Text>
+                  </Text>
+                )
+              : (
+                  <Text style={styles.stepsUnavailable}>Steps unavailable</Text>
+                )}
           <Text style={styles.stepsNote}>
             Step count is used for activity-level context, not displayed on the main screen.
           </Text>
@@ -212,12 +225,12 @@ export default function HealthImportScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

@@ -1,12 +1,12 @@
+import type { CheckInEntry, CheckInHistoryEntry, CheckInRecord } from '@/features/check-in/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
 
-import { fetchTodayCheckIn, upsertCheckIn, fetchCheckInHistory } from '@/features/check-in/api';
+import { format } from 'date-fns';
 import { useAuthStore } from '@/features/auth/use-auth-store';
-import { analytics, EVENTS } from '@/lib/analytics';
+import { fetchCheckInHistory, fetchTodayCheckIn, upsertCheckIn } from '@/features/check-in/api';
 import { unlockMilestone } from '@/features/journey-cards/api';
 
-import type { CheckInEntry, CheckInRecord, CheckInHistoryEntry } from '@/features/check-in/api';
+import { analytics, EVENTS } from '@/lib/analytics';
 
 const CHECK_IN_QUERY_KEY = 'today-check-in';
 
@@ -45,7 +45,8 @@ export function useUpsertCheckIn(): {
 
   const { mutate, isPending, isSuccess } = useMutation({
     mutationFn: (entry: CheckInEntry) => {
-      if (!userId) throw new Error('Not authenticated');
+      if (!userId)
+        throw new Error('Not authenticated');
       return upsertCheckIn(userId, entry);
     },
     onSuccess: () => {

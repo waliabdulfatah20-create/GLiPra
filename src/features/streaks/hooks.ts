@@ -8,11 +8,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { fetchStreak } from '@/features/streaks/api';
 
-export interface StreakData {
+export type StreakData = {
   currentStreak: number;
   longestStreak: number;
   lastStreakDate: string | null;
-}
+};
 
 /**
  * Fetch the persisted streak row for the current user.

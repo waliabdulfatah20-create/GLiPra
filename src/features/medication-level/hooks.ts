@@ -1,12 +1,12 @@
-import { differenceInCalendarDays, format, parseISO } from 'date-fns';
-import { useQuery } from '@tanstack/react-query';
+import type { InjectionLog } from '@/features/injection-sites/types';
+import type { GLP1MedicationId } from '@/types';
 
+import { useQuery } from '@tanstack/react-query';
+import { differenceInCalendarDays, format, parseISO } from 'date-fns';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { fetchRecentInjectionLogs } from '@/features/injection-sites/api';
-import type { InjectionLog } from '@/features/injection-sites/types';
-import { fetchTodayProfile } from '@/features/today/api';
 import { generateSteadyStateCurve } from '@/features/medication-level/calculator';
-import type { GLP1MedicationId } from '@/types';
+import { fetchTodayProfile } from '@/features/today/api';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -17,9 +17,10 @@ import type { GLP1MedicationId } from '@/types';
  * Returns null if the string is absent or in an unrecognised format.
  */
 function parseDoseMg(dosageStrength: string | null | undefined): number | null {
-  if (!dosageStrength) return null;
+  if (!dosageStrength)
+    return null;
   const match = dosageStrength.match(/^([\d.]+)\s*mg/i);
-  return match ? parseFloat(match[1]) : null;
+  return match ? Number.parseFloat(match[1]) : null;
 }
 
 /**
@@ -40,20 +41,23 @@ function deriveIntervalDays(logs: InjectionLog[]): number {
     if (!seen.has(d)) { seen.add(d); uniqueDates.push(d); }
   }
 
-  if (uniqueDates.length < 2) return 7;
+  if (uniqueDates.length < 2)
+    return 7;
   const gap = Math.abs(
     differenceInCalendarDays(parseISO(uniqueDates[0]), parseISO(uniqueDates[1])),
   );
-  if (gap <= 2) return 1;   // daily (liraglutide pattern)
-  if (gap <= 10) return 7;  // weekly
-  return 14;                // biweekly
+  if (gap <= 2)
+    return 1; // daily (liraglutide pattern)
+  if (gap <= 10)
+    return 7; // weekly
+  return 14; // biweekly
 }
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface MedicationLevelCurveResult {
+export type MedicationLevelCurveResult = {
   curve: Array<{ date: string; dayOffset: number; levelMg: number }> | null;
   todayOffset: number;
   isLoading: boolean;
@@ -64,7 +68,7 @@ export interface MedicationLevelCurveResult {
   lastInjectionDate: string | null;
   /** Deduplicated YYYY-MM-DD strings for all logged injection dates, most-recent-first */
   injectionDates: string[];
-}
+};
 
 // ---------------------------------------------------------------------------
 // Hook
@@ -141,12 +145,12 @@ export function useMedicationLevelCurve(): MedicationLevelCurveResult {
     lastInjectionDate,
     injectionIntervalDays,
     today,
-    14,              // projectDays default
-    undefined,       // pastDays — use calculator default
-    injectionDates,  // actual logged dates; no phantom history
+    14, // projectDays default
+    undefined, // pastDays — use calculator default
+    injectionDates, // actual logged dates; no phantom history
   );
 
-  const todayIndex = curve.findIndex((p) => p.date === today);
+  const todayIndex = curve.findIndex(p => p.date === today);
   const todayOffset = todayIndex !== -1 ? curve[todayIndex].dayOffset : 0;
 
   return {

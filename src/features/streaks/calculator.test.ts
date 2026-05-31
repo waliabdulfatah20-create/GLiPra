@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  STREAK_THRESHOLD,
   calculateStreaks,
+  STREAK_THRESHOLD,
 } from '@/features/streaks/calculator';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -89,7 +89,7 @@ describe('calculateStreaks — gap in streak', () => {
     const days = [
       passing('2024-01-06'),
       passing('2024-01-07'),
-      failing('2024-01-08'),  // gap — breaks the run
+      failing('2024-01-08'), // gap — breaks the run
       passing('2024-01-09'),
       passing('2024-01-10'),
     ];
@@ -254,7 +254,7 @@ describe('calculateStreaks — longestStreak', () => {
 
 // ─── STREAK_THRESHOLD constant ────────────────────────────────────────────────
 
-describe('STREAK_THRESHOLD', () => {
+describe('sTREAK_THRESHOLD', () => {
   it('is exported and equals 0.80', () => {
     expect(STREAK_THRESHOLD).toBe(0.8);
   });

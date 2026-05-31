@@ -16,7 +16,14 @@
 // AI Photo Recognition is Pro-only (gated via PhotoCaptureButton internally).
 // DisclaimerBanner tier={2} required per Rule 8 (clinical screen).
 
+import type { MealSlot } from '@/components/log/meal-chip-row';
+import type { BarcodeProduct } from '@/features/food-log/barcode-lookup';
+import type { RecognitionResult } from '@/features/food-log/photo-recognition';
+
+import type { FoodLogEntry, ManualFoodEntry } from '@/features/food-log/types';
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   FlatList,
   Pressable,
@@ -25,37 +32,33 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
-
 import { BarcodeScannerSheet } from '@/components/log/barcode-scanner-sheet';
 import { ManualEntryForm } from '@/components/log/manual-entry-form';
 import { MealChipRow } from '@/components/log/meal-chip-row';
-import type { MealSlot } from '@/components/log/meal-chip-row';
 import { NutritionHeaderRing } from '@/components/log/nutrition-header-ring';
 import { PhotoCaptureButton } from '@/components/log/photo-capture-button';
 import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
 import { VoiceCaptureButton } from '@/components/log/voice-capture-button';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
-import type { BarcodeProduct } from '@/features/food-log/barcode-lookup';
-import { DailyMacroCard } from '@/features/food-log/daily-macro-card';
-import { MicronutrientWatchCard } from '@/features/food-log/micronutrient-watch-card';
-import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useTodayFoodLogs } from '@/features/food-log/hooks';
 import { AIReviewSheet } from '@/features/food-log/ai-review-sheet';
+import { DailyMacroCard } from '@/features/food-log/daily-macro-card';
+import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useTodayFoodLogs } from '@/features/food-log/hooks';
+import { MicronutrientWatchCard } from '@/features/food-log/micronutrient-watch-card';
 import { transcribeVoice } from '@/features/food-log/voice-recognition';
-import type { RecognitionResult } from '@/features/food-log/photo-recognition';
-import type { FoodLogEntry, ManualFoodEntry } from '@/features/food-log/types';
 import { useTodayData } from '@/features/today/hooks';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 // ---------------------------------------------------------------------------
 // Meal slot helper — client-side time-based filter, no DB column needed.
 // ---------------------------------------------------------------------------
 function getMealSlot(loggedAt: string): MealSlot {
   const hour = new Date(loggedAt).getHours(); // local time
-  if (hour >= 5 && hour < 11) return 'breakfast';
-  if (hour >= 11 && hour < 15) return 'lunch';
-  if (hour >= 15 && hour < 21) return 'dinner';
+  if (hour >= 5 && hour < 11)
+    return 'breakfast';
+  if (hour >= 11 && hour < 15)
+    return 'lunch';
+  if (hour >= 15 && hour < 21)
+    return 'dinner';
   return 'snack';
 }
 
@@ -85,7 +88,7 @@ export default function LogScreen() {
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows]
+    [colors, spacing, radius, shadows],
   );
 
   // ---------------------------------------------------------------------------
@@ -129,7 +132,8 @@ export default function LogScreen() {
   }
 
   function handleAnalyze(comment?: string) {
-    if (!pendingCapture) return;
+    if (!pendingCapture)
+      return;
     recognize(pendingCapture.base64, pendingCapture.mimeType, comment);
     setPendingCapture(null);
   }
@@ -158,7 +162,7 @@ export default function LogScreen() {
   const totalProteinToday = logs.reduce((sum, entry) => sum + entry.proteinG, 0);
 
   const filteredLogs = selectedMeal
-    ? logs.filter((log) => getMealSlot(log.loggedAt) === selectedMeal)
+    ? logs.filter(log => getMealSlot(log.loggedAt) === selectedMeal)
     : logs;
 
   const sectionLabel = selectedMeal
@@ -173,8 +177,8 @@ export default function LogScreen() {
     <SafeAreaView style={styles.safeArea}>
       <FlatList
         data={filteredLogs}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={
+        keyExtractor={item => item.id}
+        ListHeaderComponent={(
           <>
             {/* 1. Header — title + compact protein ring */}
             <View style={styles.header}>
@@ -202,8 +206,7 @@ export default function LogScreen() {
             <View style={styles.aiRow}>
               <PhotoCaptureButton
                 onImageSelected={(base64, mimeType) =>
-                  setPendingCapture({ base64, mimeType })
-                }
+                  setPendingCapture({ base64, mimeType })}
                 isLoading={recognizing}
               />
               <VoiceCaptureButton
@@ -279,21 +282,25 @@ export default function LogScreen() {
             {!logsLoading && filteredLogs.length === 0 && logs.length > 0 && (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyStateBody}>
-                  No entries for {selectedMeal} yet
+                  No entries for
+                  {' '}
+                  {selectedMeal}
+                  {' '}
+                  yet
                 </Text>
               </View>
             )}
           </>
-        }
+        )}
         renderItem={({ item }) => <FoodLogRow entry={item} />}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
-        ListFooterComponent={
+        ListFooterComponent={(
           <View style={styles.footer}>
             <DisclaimerBanner tier={2}>
               <Text style={styles.disclaimerText}>{t('log.disclaimer')}</Text>
             </DisclaimerBanner>
           </View>
-        }
+        )}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
@@ -331,26 +338,26 @@ export default function LogScreen() {
 // ---------------------------------------------------------------------------
 // Sub-component: FoodLogRow
 // ---------------------------------------------------------------------------
-interface FoodLogRowProps {
+type FoodLogRowProps = {
   entry: FoodLogEntry;
-}
+};
 
 function FoodLogRow({ entry }: FoodLogRowProps) {
   const { t } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const rowStyles = React.useMemo(
     () => makeFoodLogRowStyles({ colors, spacing, radius }),
-    [colors, spacing, radius]
+    [colors, spacing, radius],
   );
 
-  const sourceBadgeStyle =
-    entry.source === 'barcode'
+  const sourceBadgeStyle
+    = entry.source === 'barcode'
       ? rowStyles.sourceBadgeBarcode
       : entry.source === 'photo'
         ? rowStyles.sourceBadgePhoto
         : rowStyles.sourceBadgeManual;
-  const sourceBadgeTextStyle =
-    entry.source === 'barcode'
+  const sourceBadgeTextStyle
+    = entry.source === 'barcode'
       ? rowStyles.sourceBadgeTextBarcode
       : entry.source === 'photo'
         ? rowStyles.sourceBadgeTextPhoto
@@ -386,10 +393,17 @@ function FoodLogRow({ entry }: FoodLogRowProps) {
       </View>
 
       <View style={rowStyles.logRowRight}>
-        <Text style={rowStyles.logRowProtein}>{entry.proteinG.toFixed(1)}g</Text>
+        <Text style={rowStyles.logRowProtein}>
+          {entry.proteinG.toFixed(1)}
+          g
+        </Text>
         <Text style={rowStyles.logRowProteinLabel}>protein</Text>
         {entry.caloriesKcal != null && (
-          <Text style={rowStyles.logRowCalories}>{entry.caloriesKcal.toFixed(0)} kcal</Text>
+          <Text style={rowStyles.logRowCalories}>
+            {entry.caloriesKcal.toFixed(0)}
+            {' '}
+            kcal
+          </Text>
         )}
       </View>
     </View>
@@ -400,12 +414,12 @@ function FoodLogRow({ entry }: FoodLogRowProps) {
 // Styles
 // ---------------------------------------------------------------------------
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
@@ -565,9 +579,9 @@ function makeFoodLogRowStyles({ colors, spacing, radius }: Pick<GlipraTokens, 'c
       backgroundColor: colors.primaryLight,
     },
     sourceBadgePhoto: {
-      backgroundColor: colors.primary + '18',
+      backgroundColor: `${colors.primary}18`,
       borderWidth: 1,
-      borderColor: colors.primary + '40',
+      borderColor: `${colors.primary}40`,
     },
     sourceBadgeText: {
       fontSize: 10,

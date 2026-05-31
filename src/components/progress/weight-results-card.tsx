@@ -6,33 +6,33 @@
  * Requires at least 2 weight entries to compute meaningful stats.
  */
 
-import { differenceInCalendarDays, parseISO } from 'date-fns';
-import { useTranslation } from 'react-i18next';
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-
-import { CardShell } from './card-shell';
 import type { WeightLogEntry } from '@/features/weight/api';
-import { useWeightUnit, kgToLbs } from '@/lib/unit-preference';
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
+import { differenceInCalendarDays, parseISO } from 'date-fns';
+import * as React from 'react';
 
-interface WeightResultsCardProps {
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '@/lib/ThemeContext';
+import { kgToLbs, useWeightUnit } from '@/lib/unit-preference';
+import { CardShell } from './card-shell';
+
+type WeightResultsCardProps = {
   /** All weight logs for the current range (or all-time). */
   logs: WeightLogEntry[];
   /** User's goal weight in kg, or null if not set. */
   goalWeightKg: number | null;
   /** User's height in cm, used to compute BMI. */
   heightCm: number | null;
-}
+};
 
-interface MetricCellProps {
+type MetricCellProps = {
   label: string;
   value: string;
   unit?: string;
   dimmed?: boolean;
   valueColor?: string;
-}
+};
 
 function MetricCell({ label, value, unit, dimmed = false, valueColor }: MetricCellProps) {
   const { colors, spacing } = useTheme();
@@ -73,8 +73,8 @@ export function WeightResultsCard({ logs, goalWeightKg, heightCm }: WeightResult
 
   // ── Total lost ─────────────────────────────────────────────────────────────
   const totalLostKg = first.weightKg - latest.weightKg;
-  const totalLostDisplay =
-    weightUnit === 'lbs'
+  const totalLostDisplay
+    = weightUnit === 'lbs'
       ? kgToLbs(Math.abs(totalLostKg)).toFixed(1)
       : Math.abs(totalLostKg).toFixed(1);
   const isGain = totalLostKg < 0;
@@ -87,8 +87,8 @@ export function WeightResultsCard({ logs, goalWeightKg, heightCm }: WeightResult
   const totalDays = differenceInCalendarDays(parseISO(latest.loggedAt), parseISO(first.loggedAt));
   const weeks = Math.max(1, Math.floor(totalDays / 7));
   const weeklyAvgKg = Math.abs(totalLostKg) / weeks;
-  const weeklyAvgDisplay =
-    weightUnit === 'lbs'
+  const weeklyAvgDisplay
+    = weightUnit === 'lbs'
       ? kgToLbs(weeklyAvgKg).toFixed(1)
       : weeklyAvgKg.toFixed(1);
 
@@ -109,7 +109,8 @@ export function WeightResultsCard({ logs, goalWeightKg, heightCm }: WeightResult
     if (weightUnit === 'lbs') {
       toGoalDisplay = Math.abs(kgToLbs(diffKg)).toFixed(1);
       toGoalUnit = diffKg <= 0 ? 'lbs done' : 'lbs to go';
-    } else {
+    }
+    else {
       toGoalDisplay = Math.abs(diffKg).toFixed(1);
       toGoalUnit = diffKg <= 0 ? 'kg done' : 'kg to go';
     }
@@ -145,10 +146,10 @@ export function WeightResultsCard({ logs, goalWeightKg, heightCm }: WeightResult
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
-}
+};
 
 function makeStyles({ colors, spacing }: StyleTokens) {
   return StyleSheet.create({

@@ -27,7 +27,7 @@ import { supabase } from '@/lib/supabase';
 // Public types
 // ---------------------------------------------------------------------------
 
-export interface RecognitionResult {
+export type RecognitionResult = {
   transcript?: string;
   name: string;
   servingDescription: string;
@@ -42,7 +42,7 @@ export interface RecognitionResult {
   magnesiumMg: number | null;
   zincMg: number | null;
   confidence: 'high' | 'medium' | 'low';
-}
+};
 
 // ---------------------------------------------------------------------------
 // Mock adapter
@@ -56,8 +56,8 @@ function adaptMockToResult(): RecognitionResult {
   const firstFood = mock.foods[0];
 
   // Derive a human-readable confidence from the numeric confidence value.
-  const confidence: RecognitionResult['confidence'] =
-    mock.confidence >= 0.8 ? 'high' : mock.confidence >= 0.5 ? 'medium' : 'low';
+  const confidence: RecognitionResult['confidence']
+    = mock.confidence >= 0.8 ? 'high' : mock.confidence >= 0.5 ? 'medium' : 'low';
 
   return {
     name: firstFood.name,
@@ -121,12 +121,14 @@ export function usePhotoFoodRecognition() {
         }
 
         return data as RecognitionResult;
-      } catch (e) {
-        const message =
-          e instanceof Error ? e.message : 'Recognition failed';
+      }
+      catch (e) {
+        const message
+          = e instanceof Error ? e.message : 'Recognition failed';
         setError(message);
         return null;
-      } finally {
+      }
+      finally {
         setIsLoading(false);
       }
     },

@@ -3,10 +3,10 @@ import { formatISO } from 'date-fns';
 import { supabase } from '@/lib/supabase';
 import { getChecklistStatus } from './checklist-data';
 
-export interface ShotPrepLog {
+export type ShotPrepLog = {
   completedItems: string[];
   fullyCompleted: boolean;
-}
+};
 
 /** Returns null when no log exists yet for this injection date. */
 export async function fetchShotPrepLog(
@@ -20,8 +20,10 @@ export async function fetchShotPrepLog(
     .eq('injection_date', injectionDate)
     .maybeSingle();
 
-  if (error) throw new Error(error.message); // real failure — propagate
-  if (!data) return null; // no row yet — valid first-use
+  if (error)
+    throw new Error(error.message); // real failure — propagate
+  if (!data)
+    return null; // no row yet — valid first-use
 
   return {
     completedItems: (data.completed_items as string[]) ?? [],
@@ -48,5 +50,6 @@ export async function upsertShotPrepLog(
     { onConflict: 'user_id,injection_date' },
   );
 
-  if (error) throw new Error(error.message);
+  if (error)
+    throw new Error(error.message);
 }

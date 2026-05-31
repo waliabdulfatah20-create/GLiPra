@@ -1,18 +1,18 @@
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
-interface RatingSliderProps {
+type RatingSliderProps = {
   label: string;
   value: number; // 1-5
   onChange: (value: number) => void;
   lowLabel: string;
   highLabel: string;
   emojis: [string, string, string, string, string];
-}
+};
 
 export function RatingSlider({
   label,
@@ -63,11 +63,11 @@ export function RatingSlider({
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

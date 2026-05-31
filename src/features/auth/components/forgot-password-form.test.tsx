@@ -5,7 +5,7 @@ import { ForgotPasswordForm } from './forgot-password-form';
 
 afterEach(cleanup);
 
-describe('ForgotPasswordForm', () => {
+describe('forgotPasswordForm', () => {
   it('renders email field and submit button', async () => {
     setup(<ForgotPasswordForm onSubmit={jest.fn()} />);
     expect(await screen.findByTestId('forgot-email')).toBeOnTheScreen();

@@ -1,8 +1,11 @@
-import DateTimePicker, {
-  type DateTimePickerEvent,
-} from '@react-native-community/datetimepicker';
+import type { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import type { SiteCode } from '@/features/injection-sites/constants';
+import type { GlipraTokens } from '@/theme/tokens';
+import type { GLP1MedicationId } from '@/types';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { format, setHours, setMinutes, setSeconds } from 'date-fns';
 import { useRouter } from 'expo-router';
+
 import * as React from 'react';
 import {
   Alert,
@@ -14,13 +17,12 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { PainLevelSlider } from '@/components/injection-sites/pain-level-slider';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { Select } from '@/components/ui/select';
 import {
   SITE_OPTIONS,
-  type SiteCode,
+
 } from '@/features/injection-sites/constants';
 import {
   useInjectionSiteRecommendation,
@@ -29,8 +31,6 @@ import {
 import { useTodayData } from '@/features/today/hooks';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
-import type { GLP1MedicationId } from '@/types';
 
 // Medication display names
 const MEDICATION_DISPLAY_NAMES: Record<GLP1MedicationId, string> = {
@@ -47,21 +47,21 @@ const MEDICATION_DISPLAY_NAMES: Record<GLP1MedicationId, string> = {
 };
 
 const MEDICATION_OPTIONS = Object.values(MEDICATION_DISPLAY_NAMES).map(
-  (name) => ({ label: name, value: name }),
+  name => ({ label: name, value: name }),
 );
 
 // Dosage options per medication (branded FDA-approved doses + common compounded ranges)
 const DOSAGE_OPTIONS_BY_MEDICATION: Record<string, string[]> = {
-  'Ozempic':                ['0.25 mg', '0.5 mg', '1 mg', '2 mg'],
-  'Wegovy':                 ['0.25 mg', '0.5 mg', '1 mg', '1.7 mg', '2.4 mg'],
-  'Mounjaro':               ['2.5 mg', '5 mg', '7.5 mg', '10 mg', '12.5 mg', '15 mg'],
-  'Zepbound':               ['2.5 mg', '5 mg', '7.5 mg', '10 mg', '12.5 mg', '15 mg'],
-  'Saxenda':                ['0.6 mg', '1.2 mg', '1.8 mg', '2.4 mg', '3 mg'],
-  'Victoza':                ['0.6 mg', '1.2 mg', '1.8 mg'],
-  'Trulicity':              ['0.75 mg', '1.5 mg', '3 mg', '4.5 mg'],
+  'Ozempic': ['0.25 mg', '0.5 mg', '1 mg', '2 mg'],
+  'Wegovy': ['0.25 mg', '0.5 mg', '1 mg', '1.7 mg', '2.4 mg'],
+  'Mounjaro': ['2.5 mg', '5 mg', '7.5 mg', '10 mg', '12.5 mg', '15 mg'],
+  'Zepbound': ['2.5 mg', '5 mg', '7.5 mg', '10 mg', '12.5 mg', '15 mg'],
+  'Saxenda': ['0.6 mg', '1.2 mg', '1.8 mg', '2.4 mg', '3 mg'],
+  'Victoza': ['0.6 mg', '1.2 mg', '1.8 mg'],
+  'Trulicity': ['0.75 mg', '1.5 mg', '3 mg', '4.5 mg'],
   'Compounded Semaglutide': ['0.25 mg', '0.5 mg', '1 mg', '1.5 mg', '2 mg', '2.5 mg'],
   'Compounded Tirzepatide': ['2.5 mg', '5 mg', '7.5 mg', '10 mg', '12.5 mg', '15 mg'],
-  'Compounded GLP-1/GIP':   ['2.5 mg', '5 mg', '7.5 mg', '10 mg'],
+  'Compounded GLP-1/GIP': ['2.5 mg', '5 mg', '7.5 mg', '10 mg'],
 };
 
 /**
@@ -103,12 +103,14 @@ export default function AddShotScreen() {
   // Default site = rotation recommendation
   const [siteCode, setSiteCode] = React.useState<SiteCode | ''>('');
   React.useEffect(() => {
-    if (!siteCode && !recLoading) setSiteCode(recommendation);
+    if (!siteCode && !recLoading)
+      setSiteCode(recommendation);
   }, [recommendation, recLoading, siteCode]);
 
   // Fill medication once profile loads
   React.useEffect(() => {
-    if (!medication && defaultMedicationLabel) setMedication(defaultMedicationLabel);
+    if (!medication && defaultMedicationLabel)
+      setMedication(defaultMedicationLabel);
   }, [defaultMedicationLabel, medication]);
 
   // Reset dosage whenever medication changes
@@ -121,24 +123,27 @@ export default function AddShotScreen() {
 
   // Dosage options for the currently selected medication
   const dosageOptions = React.useMemo(
-    () => (DOSAGE_OPTIONS_BY_MEDICATION[medication] ?? []).map((d) => ({ label: d, value: d })),
+    () => (DOSAGE_OPTIONS_BY_MEDICATION[medication] ?? []).map(d => ({ label: d, value: d })),
     [medication],
   );
 
   function onDateChange(_event: DateTimePickerEvent, selected?: Date) {
     setShowDatePicker(false);
-    if (selected) setDate(selected);
+    if (selected)
+      setDate(selected);
   }
 
   function onTimeChange(_event: DateTimePickerEvent, selected?: Date) {
     setShowTimePicker(false);
-    if (selected) setTime(selected);
+    if (selected)
+      setTime(selected);
   }
 
   const canSave = !!medication && !!siteCode && !isPending;
 
   function handleSave() {
-    if (!canSave || !siteCode) return;
+    if (!canSave || !siteCode)
+      return;
     haptics.medium();
     const injectedAt = combineDateAndTime(date, time).toISOString();
     logShot(
@@ -161,7 +166,8 @@ export default function AddShotScreen() {
 
   // Site options — "Active Rotation" header at top of dropdown
   const siteOptions = React.useMemo(() => {
-    if (!recommendation) return SITE_OPTIONS;
+    if (!recommendation)
+      return SITE_OPTIONS;
     return [
       { label: 'Active Rotation', value: '__active_rotation_header__', disabled: true as const },
       ...SITE_OPTIONS,
@@ -254,7 +260,7 @@ export default function AddShotScreen() {
           label="Medication Name"
           value={medication}
           options={MEDICATION_OPTIONS}
-          onSelect={(v) => setMedication(String(v))}
+          onSelect={v => setMedication(String(v))}
           placeholder="Select medication"
           testID="add-shot-medication"
         />
@@ -263,7 +269,7 @@ export default function AddShotScreen() {
           label="Dosage Strength"
           value={dosageStrength}
           options={dosageOptions}
-          onSelect={(v) => setDosageStrength(String(v))}
+          onSelect={v => setDosageStrength(String(v))}
           placeholder={medication ? 'Select dose' : 'Select medication first'}
           disabled={!medication || dosageOptions.length === 0}
           testID="add-shot-dosage"
@@ -273,7 +279,7 @@ export default function AddShotScreen() {
           label="Injection Site"
           value={siteCode}
           options={siteOptions}
-          onSelect={(v) => setSiteCode(v as SiteCode)}
+          onSelect={v => setSiteCode(v as SiteCode)}
           placeholder="Select injection site"
           testID="add-shot-site"
         />
@@ -308,12 +314,12 @@ export default function AddShotScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

@@ -1,5 +1,5 @@
-import * as React from 'react';
 import type { SvgProps } from 'react-native-svg';
+import * as React from 'react';
 import Svg, { Path, Polyline } from 'react-native-svg';
 
 /**

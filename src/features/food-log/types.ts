@@ -2,39 +2,39 @@
 // Source: 'manual' | 'barcode' — both free per subscription rules.
 // Photo and voice are Pro-only but typed here for completeness.
 
-export interface FoodLogEntry {
+export type FoodLogEntry = {
   id: string;
   userId: string;
   loggedAt: string; // ISO 8601
   name: string;
   servingDescription: string; // e.g. "1 cup", "100g"
   proteinG: number;
-  carbsG: number | null;     // added in migration 012
-  fatG: number | null;       // added in migration 012
+  carbsG: number | null; // added in migration 012
+  fatG: number | null; // added in migration 012
   fiberG: number | null;
   caloriesKcal: number | null;
-  b12Mcg: number | null;     // added in migration 012 (GLP-1 watch)
+  b12Mcg: number | null; // added in migration 012 (GLP-1 watch)
   vitaminDIu: number | null; // added in migration 012 (GLP-1 watch)
   magnesiumMg: number | null;// added in migration 012 (GLP-1 watch)
-  zincMg: number | null;     // added in migration 012 (GLP-1 watch)
+  zincMg: number | null; // added in migration 012 (GLP-1 watch)
   barcodeEan: string | null;
   source: 'manual' | 'barcode' | 'photo' | 'voice';
   createdAt: string; // ISO 8601
-}
+};
 
-export interface ManualFoodEntry {
+export type ManualFoodEntry = {
   name: string;
   servingDescription: string;
   proteinG: number;
   fiberG?: number;
   caloriesKcal?: number;
-}
+};
 
 // ---------------------------------------------------------------------------
 // BarcodeFoodEntry — full macro + micronutrient entry for barcode-sourced logs.
 // Mirrors PhotoFoodEntry but includes barcodeEan.
 // ---------------------------------------------------------------------------
-export interface BarcodeFoodEntry {
+export type BarcodeFoodEntry = {
   name: string;
   servingDescription: string;
   barcodeEan: string;
@@ -47,13 +47,13 @@ export interface BarcodeFoodEntry {
   zincMg: number | null;
   b12Mcg: number | null;
   vitaminDIu: number | null;
-}
+};
 
 // ---------------------------------------------------------------------------
 // PhotoFoodEntry — full macro + micronutrient entry for photo-sourced logs.
 // All nullable fields are truly optional (AI may not estimate all values).
 // ---------------------------------------------------------------------------
-export interface PhotoFoodEntry {
+export type PhotoFoodEntry = {
   name: string;
   servingDescription: string;
   proteinG: number;
@@ -65,13 +65,13 @@ export interface PhotoFoodEntry {
   vitaminDIu: number | null;
   magnesiumMg: number | null;
   zincMg: number | null;
-}
+};
 
 // ---------------------------------------------------------------------------
 // FoodCorrection — stored when the user edits an AI-identified food name.
 // Only food metadata — never user email or PII (Rule 2).
 // ---------------------------------------------------------------------------
-export interface FoodCorrection {
+export type FoodCorrection = {
   originalAiName: string;
   correctedName: string;
   servingDescription: string;
@@ -80,4 +80,4 @@ export interface FoodCorrection {
   fatG: number | null;
   caloriesKcal: number | null;
   fiberG: number | null;
-}
+};

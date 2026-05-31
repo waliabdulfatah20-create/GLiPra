@@ -2,10 +2,13 @@
 // Shot Day Prep Checklist — pharmacist-authored injection day checklist.
 // Route registered in _layout.tsx as href:null (do NOT add it again).
 
+import type { GlipraTokens } from '@/theme/tokens';
+import { format } from 'date-fns';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { format } from 'date-fns';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
+
 import {
   Pressable,
   ScrollView,
@@ -13,17 +16,14 @@ import {
   Text,
   View,
 } from 'react-native';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { useTranslation } from 'react-i18next';
-
-import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { ChecklistItemRow } from '@/components/shot-prep/checklist-item-row';
+import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
+import { CHECKLIST_ITEMS } from '@/features/shot-prep/checklist-data';
 import { useShotDayPrep } from '@/features/shot-prep/hooks';
-import { CHECKLIST_ITEMS, type ChecklistItemId } from '@/features/shot-prep/checklist-data';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 export default function ShotPrepScreen() {
   const { colors, spacing, radius, shadows, gradients } = useTheme();
@@ -34,8 +34,8 @@ export default function ShotPrepScreen() {
   );
 
   const today = format(new Date(), 'yyyy-MM-dd');
-  const { completedItems, completedCount, totalCount, isDone, isLoading, toggleItem } =
-    useShotDayPrep(today);
+  const { completedItems, completedCount, totalCount, isDone, isLoading, toggleItem }
+    = useShotDayPrep(today);
 
   const progressPct = totalCount > 0 ? completedCount / totalCount : 0;
 
@@ -84,7 +84,11 @@ export default function ShotPrepScreen() {
                 ? t('shotPrep.progressAllDone')
                 : t('shotPrep.progressInProgress', { completed: completedCount, total: totalCount })}
             </Text>
-            <Text style={styles.progressFraction}>{completedCount}/{totalCount}</Text>
+            <Text style={styles.progressFraction}>
+              {completedCount}
+              /
+              {totalCount}
+            </Text>
           </View>
           <View style={styles.progressTrack}>
             <View
@@ -112,7 +116,7 @@ export default function ShotPrepScreen() {
 
         {/* Checklist card */}
         <View style={styles.checklistCard}>
-          {CHECKLIST_ITEMS.map((item) => (
+          {CHECKLIST_ITEMS.map(item => (
             <ChecklistItemRow
               key={item.id}
               item={item}
@@ -138,12 +142,12 @@ export default function ShotPrepScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

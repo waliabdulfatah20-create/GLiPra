@@ -1,15 +1,15 @@
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { useTranslation } from 'react-i18next';
-
-import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import type { ContentCard } from '@/features/content-cards/data';
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
+import * as React from 'react';
 
-export interface ContentCardViewProps {
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, View } from 'react-native';
+import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
+import { useTheme } from '@/lib/ThemeContext';
+
+export type ContentCardViewProps = {
   card: ContentCard;
-}
+};
 
 export function ContentCardView({ card }: ContentCardViewProps) {
   const { t } = useTranslation();
@@ -48,11 +48,11 @@ export function ContentCardView({ card }: ContentCardViewProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

@@ -6,24 +6,24 @@
  * header and onboarding screens). Locked cards: muted gray placeholder.
  */
 
+import type { Milestone } from '@/features/journey-cards/milestones';
+import type { GlipraTokens } from '@/theme/tokens';
+import { format } from 'date-fns';
+import { LinearGradient } from 'expo-linear-gradient';
+
 import * as React from 'react';
 import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { format } from 'date-fns';
-
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
-import type { Milestone } from '@/features/journey-cards/milestones';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-interface MilestoneCardProps {
+type MilestoneCardProps = {
   milestone: Milestone;
   unlockedAt: Date;
   isNew?: boolean;
-}
+};
 
 // ---------------------------------------------------------------------------
 // Unlocked card
@@ -62,7 +62,10 @@ export function MilestoneCard({ milestone, unlockedAt, isNew = false }: Mileston
         <Text style={styles.subtitle}>{milestone.subtitle}</Text>
 
         {/* Footer */}
-        <Text style={styles.unlockedDate}>Unlocked on {unlockedDateStr}</Text>
+        <Text style={styles.unlockedDate}>
+          Unlocked on
+          {unlockedDateStr}
+        </Text>
 
         {/* Share button */}
         <Pressable
@@ -82,9 +85,9 @@ export function MilestoneCard({ milestone, unlockedAt, isNew = false }: Mileston
 // Locked placeholder card (teaser for milestones not yet earned)
 // ---------------------------------------------------------------------------
 
-interface LockedMilestoneCardProps {
+type LockedMilestoneCardProps = {
   title: string;
-}
+};
 
 export function LockedMilestoneCard({ title }: LockedMilestoneCardProps) {
   const { colors, spacing, radius, shadows } = useTheme();
@@ -105,12 +108,12 @@ export function LockedMilestoneCard({ title }: LockedMilestoneCardProps) {
 // Styles
 // ---------------------------------------------------------------------------
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

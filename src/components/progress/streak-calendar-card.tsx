@@ -11,15 +11,15 @@
  * - Today gets a purple outline
  */
 
+import type { GlipraTokens } from '@/theme/tokens';
 import { addDays, format, startOfWeek, subWeeks } from 'date-fns';
-import { useTranslation } from 'react-i18next';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
+import { StyleSheet, Text, View } from 'react-native';
 import { useProteinHistoryPerDay } from '@/features/progress/hooks';
 import { tipI18nKey } from '@/features/progress/pharmacist-tips';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 import { CardShell } from './card-shell';
 import { PharmacistTip } from './pharmacist-tip';
@@ -31,11 +31,11 @@ const TOTAL_DAYS = COLS * WEEKS;
 const GAP = 4;
 const DAY_HEADERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-interface StreakCalendarCardProps {
+type StreakCalendarCardProps = {
   /** Passed by parent for the time-range selector — ignored here, we always show 4 weeks. */
   days: number;
   width: number;
-}
+};
 
 export function StreakCalendarCard({ width }: StreakCalendarCardProps) {
   const { t } = useTranslation();
@@ -103,8 +103,10 @@ export function StreakCalendarCard({ width }: StreakCalendarCardProps) {
               {slots.slice(week * COLS, week * COLS + COLS).map((d) => {
                 const isFuture = d.date > today;
                 let bg: string;
-                if (isFuture || !d.hasData) bg = colors.gray200;
-                else if (d.hitFloor) bg = colors.success;
+                if (isFuture || !d.hasData)
+                  bg = colors.gray200;
+                else if (d.hitFloor)
+                  bg = colors.success;
                 else bg = colors.warning;
 
                 return (
@@ -124,10 +126,10 @@ export function StreakCalendarCard({ width }: StreakCalendarCardProps) {
                       isFuture
                         ? 'future'
                         : d.hitFloor
-                        ? 'hit'
-                        : d.hasData
-                        ? 'missed'
-                        : 'no log'
+                          ? 'hit'
+                          : d.hasData
+                            ? 'missed'
+                            : 'no log'
                     }`}
                   >
                     <Text
@@ -190,11 +192,11 @@ function LegendDot({
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

@@ -1,13 +1,13 @@
+import type { GlipraTokens } from '@/theme/tokens';
 import { format, parseISO } from 'date-fns';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Circle, Line, Polyline, Svg, Text as SvgText } from 'react-native-svg';
 
+import { Circle, Line, Polyline, Svg, Text as SvgText } from 'react-native-svg';
 import { useTheme } from '@/lib/ThemeContext';
 import { kgToLbs } from '@/lib/unit-preference';
-import type { GlipraTokens } from '@/theme/tokens';
 
-export interface EwmaChartProps {
+export type EwmaChartProps = {
   logs: Array<{
     weightKg: number;
     ewmaWeightKg: number | null;
@@ -19,7 +19,7 @@ export interface EwmaChartProps {
   injectionDates?: string[];
   /** Display unit for y-axis labels. Defaults to 'kg'. */
   unit?: 'kg' | 'lbs';
-}
+};
 
 const PADDING = { top: 16, right: 8, bottom: 36, left: 40 };
 
@@ -43,7 +43,7 @@ export function EwmaChart({ logs, width, height, injectionDates, unit = 'kg' }: 
   }
 
   // ── Compute value range — raw weights only (excludes stale DB EWMA) ───────
-  const allValues: number[] = logs.map((l) => l.weightKg);
+  const allValues: number[] = logs.map(l => l.weightKg);
   const rawMin = Math.min(...allValues);
   const rawMax = Math.max(...allValues);
   const pad = (rawMax - rawMin) * 0.05 || 1; // 5% padding; fallback 1 kg if flat
@@ -51,7 +51,7 @@ export function EwmaChart({ logs, width, height, injectionDates, unit = 'kg' }: 
   const maxVal = rawMax + pad;
 
   // ── Compute time range ────────────────────────────────────────────────────
-  const timestamps = logs.map((l) => parseISO(l.loggedAt).getTime());
+  const timestamps = logs.map(l => parseISO(l.loggedAt).getTime());
   const minTime = Math.min(...timestamps);
   const maxTime = Math.max(...timestamps);
   const timeRange = maxTime - minTime || 1;
@@ -173,7 +173,8 @@ export function EwmaChart({ logs, width, height, injectionDates, unit = 'kg' }: 
         {/* Dose marker lines — faint dashed verticals at each injection date */}
         {injectionDates?.map((isoDate) => {
           const ts = parseISO(isoDate).getTime();
-          if (ts < minTime || ts > maxTime) return null;
+          if (ts < minTime || ts > maxTime)
+            return null;
           const x = toX(ts);
           return (
             <Line
@@ -208,10 +209,10 @@ export function EwmaChart({ logs, width, height, injectionDates, unit = 'kg' }: 
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
-}
+};
 
 function makeStyles({ colors, spacing }: StyleTokens) {
   return StyleSheet.create({

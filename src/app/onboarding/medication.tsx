@@ -1,16 +1,16 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import type { GLP1MedicationId } from '@/types';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
+
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { LinearGradient } from 'expo-linear-gradient';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
-import type { GLP1MedicationId } from '@/types';
 
 type MedicationOption = {
   id: GLP1MedicationId;
@@ -40,13 +40,14 @@ export default function MedicationScreen() {
   const { colors, spacing, radius, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius]
+    [colors, spacing, radius],
   );
 
   const canProceed = selectedId !== null;
 
   const handleNext = () => {
-    if (!selectedId) return;
+    if (!selectedId)
+      return;
     haptics.medium();
     setFormData({
       medicationId: selectedId,
@@ -113,11 +114,11 @@ export default function MedicationScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

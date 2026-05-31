@@ -4,16 +4,17 @@
  * Not a visible tab — navigated to from the Today screen.
  */
 
-import * as React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { MilestoneCard, LockedMilestoneCard } from '@/components/journey/milestone-card';
-import { useJourneyCards } from '@/features/journey-cards/hooks';
-import { MILESTONES, type MilestoneId } from '@/features/journey-cards/milestones';
-import { useTheme } from '@/lib/ThemeContext';
+import type { MilestoneId } from '@/features/journey-cards/milestones';
 import type { GlipraTokens } from '@/theme/tokens';
+import { router } from 'expo-router';
+import * as React from 'react';
+
+import { ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LockedMilestoneCard, MilestoneCard } from '@/components/journey/milestone-card';
+import { useJourneyCards } from '@/features/journey-cards/hooks';
+import { MILESTONES } from '@/features/journey-cards/milestones';
+import { useTheme } from '@/lib/ThemeContext';
 
 // All milestone IDs in display order
 const ALL_MILESTONE_IDS: MilestoneId[] = [
@@ -41,14 +42,14 @@ export default function JourneyScreen() {
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows]
+    [colors, spacing, radius, shadows],
   );
 
   const unlockedSet = new Set(unlockedIds);
 
   const unlockedEntries = entries; // already sorted by unlocked_at ASC from API
 
-  const lockedMilestones = ALL_MILESTONE_IDS.filter((id) => !unlockedSet.has(id));
+  const lockedMilestones = ALL_MILESTONE_IDS.filter(id => !unlockedSet.has(id));
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -88,7 +89,8 @@ export default function JourneyScreen() {
             <View style={[styles.grid, useTwoColumns && styles.gridTwoCol]}>
               {unlockedEntries.map((entry) => {
                 const milestone = MILESTONES[entry.milestoneId];
-                if (!milestone) return null;
+                if (!milestone)
+                  return null;
                 const isNew = now - entry.unlockedAt.getTime() < NEW_THRESHOLD_MS;
                 return (
                   <View
@@ -116,7 +118,8 @@ export default function JourneyScreen() {
             <View style={[styles.grid, useTwoColumns && styles.gridTwoCol]}>
               {lockedMilestones.map((id) => {
                 const milestone = MILESTONES[id];
-                if (!milestone) return null;
+                if (!milestone)
+                  return null;
                 return (
                   <View
                     key={id}
@@ -134,12 +137,12 @@ export default function JourneyScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

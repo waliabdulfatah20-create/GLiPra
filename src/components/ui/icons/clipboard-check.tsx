@@ -1,6 +1,6 @@
+import type { SvgProps } from 'react-native-svg';
 import * as React from 'react';
 import Svg, { Path, Rect } from 'react-native-svg';
-import type { SvgProps } from 'react-native-svg';
 
 export function ClipboardCheck({ color = '#000', ...props }: SvgProps) {
   return (

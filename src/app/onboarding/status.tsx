@@ -1,15 +1,15 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useState } from 'react';
+
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { LinearGradient } from 'expo-linear-gradient';
 import { StepProgress } from '@/features/onboarding/components/step-progress';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 type MedicationStatus = 'starting' | 'active' | 'tapering' | 'maintenance' | 'discontinued';
 type ActivityLevel = 'sedentary' | 'moderate' | 'active';
@@ -18,12 +18,12 @@ const MEDICATION_OPTIONS: { value: MedicationStatus; title: string; description:
   {
     value: 'starting',
     title: 'Just starting out',
-    description: "I'm new to GLP-1 or just got my prescription",
+    description: 'I\'m new to GLP-1 or just got my prescription',
   },
   {
     value: 'active',
     title: 'Active & doing well',
-    description: "I've been on it a few weeks or months",
+    description: 'I\'ve been on it a few weeks or months',
   },
   {
     value: 'tapering',
@@ -33,12 +33,12 @@ const MEDICATION_OPTIONS: { value: MedicationStatus; title: string; description:
   {
     value: 'maintenance',
     title: 'Maintenance / stable',
-    description: "I'm at my goal dose and in steady state",
+    description: 'I\'m at my goal dose and in steady state',
   },
   {
     value: 'discontinued',
     title: 'Recently stopped',
-    description: "I've discontinued and am in maintenance mode",
+    description: 'I\'ve discontinued and am in maintenance mode',
   },
 ];
 
@@ -63,13 +63,14 @@ export default function StatusScreen() {
   const { colors, spacing, radius, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius, gradients]
+    [colors, spacing, radius, gradients],
   );
 
   const canProceed = medicationStatus !== undefined && activityLevel !== undefined;
 
   const handleNext = () => {
-    if (!canProceed) return;
+    if (!canProceed)
+      return;
     haptics.medium();
     setFormData({ medicationStatus, activityLevel });
     router.push('/onboarding/protein-target');
@@ -172,11 +173,11 @@ export default function StatusScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

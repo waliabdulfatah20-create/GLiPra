@@ -2,9 +2,10 @@
 // Tests for the daily-guidance feature.
 // Covers: mock path return shape, null context guard, GuidanceContext field types.
 
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import type { GuidanceContext } from '../features/daily-guidance/api';
+import { describe, expect, it, vi } from 'vitest';
+import { generateDailyGuidance } from '../features/daily-guidance/api';
 import { MOCK_DAILY_GUIDANCE } from '../lib/mockAI';
-import { generateDailyGuidance, type GuidanceContext } from '../features/daily-guidance/api';
 
 // Mock the env module so isMockAIEnabled() returns true in all tests
 vi.mock('env', () => ({ default: { EXPO_PUBLIC_USE_MOCK_AI: 'true' } }));
@@ -32,7 +33,7 @@ describe('generateDailyGuidance (mock path)', () => {
     expect(result.reasoning_text.length).toBeGreaterThan(0);
   });
 
-  it('MOCK_DAILY_GUIDANCE matches required schema shape', () => {
+  it('mOCK_DAILY_GUIDANCE matches required schema shape', () => {
     expect(MOCK_DAILY_GUIDANCE).toHaveProperty('guidance_text');
     expect(MOCK_DAILY_GUIDANCE).toHaveProperty('reasoning_text');
     expect(typeof MOCK_DAILY_GUIDANCE.guidance_text).toBe('string');

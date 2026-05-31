@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   estimateLevel,
+  FALLBACK_HALF_LIFE,
   generateLevelCurve,
   generateSteadyStateCurve,
   HALF_LIVES,
-  FALLBACK_HALF_LIFE,
 } from '@/features/medication-level/calculator';
 
 describe('estimateLevel', () => {
@@ -37,9 +37,9 @@ describe('estimateLevel', () => {
   });
 
   it('compounded medications use correct half-lives', () => {
-    expect(HALF_LIVES['compounded_semaglutide']).toBe(7);
-    expect(HALF_LIVES['compounded_tirzepatide']).toBe(5);
-    expect(HALF_LIVES['compounded_glp1_gip']).toBe(5);
+    expect(HALF_LIVES.compounded_semaglutide).toBe(7);
+    expect(HALF_LIVES.compounded_tirzepatide).toBe(5);
+    expect(HALF_LIVES.compounded_glp1_gip).toBe(5);
   });
 });
 
@@ -66,7 +66,7 @@ describe('generateLevelCurve', () => {
 
   it('day field equals index', () => {
     const curve = generateLevelCurve(1.0, 'semaglutide_ozempic', 5);
-    expect(curve.map((p) => p.day)).toEqual([0, 1, 2, 3, 4, 5]);
+    expect(curve.map(p => p.day)).toEqual([0, 1, 2, 3, 4, 5]);
   });
 });
 
@@ -85,7 +85,7 @@ describe('generateSteadyStateCurve', () => {
 
   it('today point (dayOffset=0) exists with positive level', () => {
     const curve = generateSteadyStateCurve(2.0, 'semaglutide_ozempic', LAST_INJ, 7, TODAY);
-    const today = curve.find((p) => p.dayOffset === 0);
+    const today = curve.find(p => p.dayOffset === 0);
     expect(today).toBeDefined();
     expect(today!.levelMg).toBeGreaterThan(0);
   });
@@ -93,25 +93,25 @@ describe('generateSteadyStateCurve', () => {
   it('steady-state (multi-dose) level is higher than single dose at injection time', () => {
     const dose = 1.0;
     const curve = generateSteadyStateCurve(dose, 'semaglutide_ozempic', LAST_INJ, 7, TODAY);
-    const today = curve.find((p) => p.dayOffset === 0);
+    const today = curve.find(p => p.dayOffset === 0);
     expect(today!.levelMg).toBeGreaterThan(dose);
   });
 
   it('projects the requested future days', () => {
     const curve = generateSteadyStateCurve(1.0, 'semaglutide_ozempic', LAST_INJ, 7, TODAY, 14);
-    const maxOffset = Math.max(...curve.map((p) => p.dayOffset));
+    const maxOffset = Math.max(...curve.map(p => p.dayOffset));
     expect(maxOffset).toBe(14);
   });
 
   it('covers past window', () => {
     const curve = generateSteadyStateCurve(1.0, 'semaglutide_ozempic', LAST_INJ, 7, TODAY, 7, 10);
-    const minOffset = Math.min(...curve.map((p) => p.dayOffset));
+    const minOffset = Math.min(...curve.map(p => p.dayOffset));
     expect(minOffset).toBeLessThanOrEqual(-9);
   });
 
   it('works for daily injection (liraglutide)', () => {
     const curve = generateSteadyStateCurve(1.8, 'liraglutide_saxenda', LAST_INJ, 1, TODAY);
-    const today = curve.find((p) => p.dayOffset === 0);
+    const today = curve.find(p => p.dayOffset === 0);
     expect(today).toBeDefined();
     expect(today!.levelMg).toBeGreaterThan(0);
   });
@@ -132,22 +132,22 @@ describe('generateSteadyStateCurve', () => {
 });
 
 describe('constants', () => {
-  it('FALLBACK_HALF_LIFE is 7', () => {
+  it('fALLBACK_HALF_LIFE is 7', () => {
     expect(FALLBACK_HALF_LIFE).toBe(7);
   });
 
   it('semaglutide half-life is 7', () => {
-    expect(HALF_LIVES['semaglutide_ozempic']).toBe(7);
-    expect(HALF_LIVES['semaglutide_wegovy']).toBe(7);
+    expect(HALF_LIVES.semaglutide_ozempic).toBe(7);
+    expect(HALF_LIVES.semaglutide_wegovy).toBe(7);
   });
 
   it('tirzepatide half-life is 5', () => {
-    expect(HALF_LIVES['tirzepatide_mounjaro']).toBe(5);
-    expect(HALF_LIVES['tirzepatide_zepbound']).toBe(5);
+    expect(HALF_LIVES.tirzepatide_mounjaro).toBe(5);
+    expect(HALF_LIVES.tirzepatide_zepbound).toBe(5);
   });
 
   it('dulaglutide half-life is 4.5', () => {
-    expect(HALF_LIVES['dulaglutide_trulicity']).toBe(4.5);
+    expect(HALF_LIVES.dulaglutide_trulicity).toBe(4.5);
   });
 });
 
@@ -157,34 +157,62 @@ describe('generateSteadyStateCurve — actualInjectionDates', () => {
   it('no phantom peaks before first injection', () => {
     const actual = ['2026-05-23', '2026-05-16', '2026-05-09'];
     const curve = generateSteadyStateCurve(
-      1.0, 'semaglutide_ozempic', '2026-05-23', 7, TODAY, 14, 26, actual,
+      1.0,
+      'semaglutide_ozempic',
+      '2026-05-23',
+      7,
+      TODAY,
+      14,
+      26,
+      actual,
     );
     // May 8 is one day before first shot — must be 0
-    const before = curve.find((p) => p.date === '2026-05-08');
+    const before = curve.find(p => p.date === '2026-05-08');
     expect(before?.levelMg).toBe(0);
   });
 
   it('single injection: today level equals doseMg', () => {
     const curve = generateSteadyStateCurve(
-      2.0, 'semaglutide_ozempic', TODAY, 7, TODAY, 7, 7, [TODAY],
+      2.0,
+      'semaglutide_ozempic',
+      TODAY,
+      7,
+      TODAY,
+      7,
+      7,
+      [TODAY],
     );
-    const today = curve.find((p) => p.dayOffset === 0);
+    const today = curve.find(p => p.dayOffset === 0);
     expect(today?.levelMg).toBeCloseTo(2.0, 5);
   });
 
   it('accumulates level across multiple actual injections', () => {
     const actual = ['2026-05-23', '2026-05-16', '2026-05-09'];
     const curve = generateSteadyStateCurve(
-      1.0, 'semaglutide_ozempic', '2026-05-23', 7, TODAY, 14, 28, actual,
+      1.0,
+      'semaglutide_ozempic',
+      '2026-05-23',
+      7,
+      TODAY,
+      14,
+      28,
+      actual,
     );
-    const today = curve.find((p) => p.dayOffset === 0);
+    const today = curve.find(p => p.dayOffset === 0);
     expect(today?.levelMg).toBeGreaterThan(0);
     expect(today?.levelMg).toBeLessThan(3);
   });
 
   it('empty actualInjectionDates produces all-zero levels', () => {
     const curve = generateSteadyStateCurve(
-      1.0, 'semaglutide_ozempic', TODAY, 7, TODAY, 7, 7, [],
+      1.0,
+      'semaglutide_ozempic',
+      TODAY,
+      7,
+      TODAY,
+      7,
+      7,
+      [],
     );
     for (const p of curve) {
       expect(p.levelMg).toBe(0);

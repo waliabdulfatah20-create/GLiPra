@@ -6,13 +6,13 @@
  * blank-screen ActivityIndicator.
  */
 
-import * as React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as React from 'react';
+
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SkeletonBox } from '@/components/ui/skeleton-box';
+import { useTheme } from '@/lib/ThemeContext';
 
 export function TodaySkeleton() {
   const { colors, spacing, radius, gradients } = useTheme();
@@ -65,11 +65,11 @@ export function TodaySkeleton() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

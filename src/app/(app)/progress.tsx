@@ -5,17 +5,18 @@
 //
 // Rule 8: clinical screen — Tier-2 DisclaimerBanner is rendered at the bottom.
 
-import { useTranslation } from 'react-i18next';
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
   useWindowDimensions,
+  View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { CheckInSymptomCard } from '@/components/progress/check-in-symptom-card';
 import { InjectionAdherenceCard } from '@/components/progress/injection-adherence-card';
 import { ProteinHitRateCard } from '@/components/progress/protein-hit-rate-card';
@@ -27,7 +28,6 @@ import { SegmentedControl } from '@/components/ui/segmented-control';
 import { useTodayProfile } from '@/features/today/hooks';
 import { useWeightLogs } from '@/features/weight/hooks';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 type Range = '7D' | '30D' | '90D' | 'All';
 const RANGES: Range[] = ['7D', '30D', '90D', 'All'];
@@ -66,7 +66,7 @@ export default function ProgressScreen() {
           <SegmentedControl
             options={RANGES}
             active={range}
-            onSelect={(v) => setRange(v as Range)}
+            onSelect={v => setRange(v as Range)}
           />
         </View>
 
@@ -93,10 +93,10 @@ export default function ProgressScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
-}
+};
 
 function makeStyles({ colors, spacing }: StyleTokens) {
   return StyleSheet.create({

@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 export type BarcodeDataSource = 'open_food_facts' | 'usda' | 'user_corrected';
 
-export interface BarcodeProduct {
+export type BarcodeProduct = {
   name: string;
   servingDescription: string;
   proteinG: number;
@@ -19,10 +19,10 @@ export interface BarcodeProduct {
   zincMg: number | null;
   b12Mcg: number | null;
   vitaminDIu: number | null;
-  servingWeightG: number | null;  // grams per serving from OFF serving_quantity; null for USDA
+  servingWeightG: number | null; // grams per serving from OFF serving_quantity; null for USDA
   ean: string;
   dataSource: BarcodeDataSource;
-}
+};
 
 // ─── Open Food Facts ────────────────────────────────────────────────────────
 
@@ -30,13 +30,13 @@ export interface BarcodeProduct {
 // vitamins in g/100g (×1e6 for mcg; vit-D additionally ×40 for IU).
 const offNutrimentsSchema = z
   .object({
-    proteins_100g: z.number().optional(),
-    carbohydrates_100g: z.number().optional(),
-    fat_100g: z.number().optional(),
-    fiber_100g: z.number().optional(),
+    'proteins_100g': z.number().optional(),
+    'carbohydrates_100g': z.number().optional(),
+    'fat_100g': z.number().optional(),
+    'fiber_100g': z.number().optional(),
     'energy-kcal_100g': z.number().optional(),
-    magnesium_100g: z.number().optional(),
-    zinc_100g: z.number().optional(),
+    'magnesium_100g': z.number().optional(),
+    'zinc_100g': z.number().optional(),
     'vitamin-b12_100g': z.number().optional(),
     'vitamin-d_100g': z.number().optional(),
   })
@@ -62,16 +62,18 @@ async function lookupBarcodeOFF(ean: string): Promise<BarcodeProduct | null> {
     const response = await fetch(url, {
       headers: { 'User-Agent': 'Glipra/1.0 (contact@glipra.com)' },
     });
-    if (!response.ok) return null;
+    if (!response.ok)
+      return null;
 
     const json: unknown = await response.json();
     const parsed = offResponseSchema.safeParse(json);
-    if (!parsed.success || parsed.data.status !== 1 || !parsed.data.product) return null;
+    if (!parsed.success || parsed.data.status !== 1 || !parsed.data.product)
+      return null;
 
     const product = parsed.data.product;
     const nutriments = product.nutriments ?? {};
-    const servingWeightG =
-      product.serving_quantity != null && product.serving_quantity > 0
+    const servingWeightG
+      = product.serving_quantity != null && product.serving_quantity > 0
         ? product.serving_quantity
         : null;
 
@@ -86,15 +88,16 @@ async function lookupBarcodeOFF(ean: string): Promise<BarcodeProduct | null> {
       caloriesKcal: n['energy-kcal_100g'] ?? null,
       // Minerals: OFF stores in g/100g → convert to mg
       magnesiumMg: n.magnesium_100g != null ? Math.round(n.magnesium_100g * 1000 * 10) / 10 : null,
-      zincMg:      n.zinc_100g != null      ? Math.round(n.zinc_100g * 1000 * 100) / 100 : null,
+      zincMg: n.zinc_100g != null ? Math.round(n.zinc_100g * 1000 * 100) / 100 : null,
       // Vitamins: OFF stores in g/100g → B12: ×1e6 for mcg; D: ×1e6×40 for IU
-      b12Mcg:     n['vitamin-b12_100g'] != null ? Math.round(n['vitamin-b12_100g'] * 1_000_000 * 100) / 100 : null,
-      vitaminDIu: n['vitamin-d_100g']   != null ? Math.round(n['vitamin-d_100g'] * 1_000_000 * 40) : null,
+      b12Mcg: n['vitamin-b12_100g'] != null ? Math.round(n['vitamin-b12_100g'] * 1_000_000 * 100) / 100 : null,
+      vitaminDIu: n['vitamin-d_100g'] != null ? Math.round(n['vitamin-d_100g'] * 1_000_000 * 40) : null,
       servingWeightG,
       ean,
       dataSource: 'open_food_facts',
     };
-  } catch {
+  }
+  catch {
     return null;
   }
 }
@@ -120,39 +123,43 @@ const usdaResponseSchema = z.object({
 
 async function lookupBarcodeUSDA(ean: string): Promise<BarcodeProduct | null> {
   // Only attempt for EAN-13 codes that begin with 0 (US products)
-  if (!ean.startsWith('0')) return null;
+  if (!ean.startsWith('0'))
+    return null;
 
   try {
     const apiKey = process.env.EXPO_PUBLIC_USDA_API_KEY ?? 'DEMO_KEY';
-    const url =
-      `https://api.nal.usda.gov/fdc/v1/foods/search` +
-      `?query=${encodeURIComponent(ean)}&dataType=Branded&pageSize=1&api_key=${apiKey}`;
+    const url
+      = `https://api.nal.usda.gov/fdc/v1/foods/search`
+        + `?query=${encodeURIComponent(ean)}&dataType=Branded&pageSize=1&api_key=${apiKey}`;
 
     const response = await fetch(url);
-    if (!response.ok) return null;
+    if (!response.ok)
+      return null;
 
     const json: unknown = await response.json();
     const parsed = usdaResponseSchema.safeParse(json);
-    if (!parsed.success) return null;
+    if (!parsed.success)
+      return null;
 
     const food = parsed.data.foods?.[0];
-    if (!food) return null;
+    if (!food)
+      return null;
 
-    const nutrientMap = new Map(food.foodNutrients.map((n) => [n.nutrientId, n.value]));
+    const nutrientMap = new Map(food.foodNutrients.map(n => [n.nutrientId, n.value]));
     // USDA nutrient IDs: protein=1003, fat=1004, carbs=1005, calories=1008, fiber=1079
     // Minerals (mg): magnesium=1090, zinc=1095
     // Vitamins (µg): B12=1178, D(D2+D3)=1114 — multiply by 40 to get IU
     const get = (id: number): number | null => nutrientMap.has(id) ? (nutrientMap.get(id) ?? null) : null;
     const proteinG = nutrientMap.get(1003) ?? 0;
-    const carbsG      = get(1005);
-    const fatG        = get(1004);
-    const fiberG      = get(1079);
+    const carbsG = get(1005);
+    const fatG = get(1004);
+    const fiberG = get(1079);
     const caloriesKcal = get(1008);
-    const magnesiumMg  = get(1090);
-    const zincMg       = get(1095);
-    const b12Mcg       = get(1178);
-    const vitaminDRaw  = get(1114);
-    const vitaminDIu   = vitaminDRaw != null ? Math.round(vitaminDRaw * 40) : null;
+    const magnesiumMg = get(1090);
+    const zincMg = get(1095);
+    const b12Mcg = get(1178);
+    const vitaminDRaw = get(1114);
+    const vitaminDIu = vitaminDRaw != null ? Math.round(vitaminDRaw * 40) : null;
 
     return {
       name: food.description,
@@ -170,7 +177,8 @@ async function lookupBarcodeUSDA(ean: string): Promise<BarcodeProduct | null> {
       ean,
       dataSource: 'usda',
     };
-  } catch {
+  }
+  catch {
     return null;
   }
 }
@@ -195,7 +203,8 @@ export async function lookupBarcode(ean: string): Promise<BarcodeProduct | null>
 
   // OFF returned incomplete data or not found — try USDA for US products
   const usda = await lookupBarcodeUSDA(ean);
-  if (usda) return usda;
+  if (usda)
+    return usda;
 
   // Return whatever OFF found (possibly incomplete), or null if completely not found
   return off;

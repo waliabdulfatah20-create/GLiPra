@@ -1,3 +1,4 @@
+import type { GlipraTokens } from '@/theme/tokens';
 import { format, parseISO } from 'date-fns';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
@@ -7,20 +8,19 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
   useWindowDimensions,
+  View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { EwmaChart } from '@/components/weight/ewma-chart';
-import { WeightEntryForm } from '@/components/weight/weight-entry-form';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { SkeletonBox } from '@/components/ui/skeleton-box';
-import { useInsertWeightLog, useDeleteWeightLog, useWeightLogs } from '@/features/weight/hooks';
 import { UnitToggle } from '@/components/ui/unit-toggle';
-import { formatWeight, useWeightUnit } from '@/lib/unit-preference';
+import { EwmaChart } from '@/components/weight/ewma-chart';
+import { WeightEntryForm } from '@/components/weight/weight-entry-form';
+import { useDeleteWeightLog, useInsertWeightLog, useWeightLogs } from '@/features/weight/hooks';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
+import { formatWeight, useWeightUnit } from '@/lib/unit-preference';
 
 export default function WeightScreen() {
   const router = useRouter();
@@ -75,7 +75,7 @@ export default function WeightScreen() {
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
-            <Text style={styles.backText}>{'‹ Back'}</Text>
+            <Text style={styles.backText}>‹ Back</Text>
           </Pressable>
           <Text style={styles.title}>Weight</Text>
           <UnitToggle
@@ -87,33 +87,42 @@ export default function WeightScreen() {
 
         {/* Latest weight summary card */}
         <View style={styles.summaryCard}>
-          {isLoading ? (
-            <>
-              <SkeletonBox style={{ height: 12, width: '30%', marginBottom: spacing.sm }} />
-              <SkeletonBox style={{ height: 56, width: '55%', marginBottom: spacing.xs }} />
-              <SkeletonBox style={{ height: 12, width: '40%' }} />
-            </>
-          ) : latestLog ? (
-            <>
-              <Text style={styles.summaryLabel}>LATEST</Text>
-              <Text style={styles.summaryValue}>
-                {weightUnit === 'lbs'
-                  ? `${(latestLog.weightKg * 2.20462).toFixed(1)}`
-                  : latestLog.weightKg.toFixed(1)}
-                <Text style={styles.summaryUnit}> {weightUnit}</Text>
-              </Text>
-              {latestLog.ewmaWeightKg != null && (
-                <Text style={styles.trendText}>
-                  Trend: {formatWeight(latestLog.ewmaWeightKg, weightUnit)}
-                </Text>
-              )}
-              <Text style={styles.summaryDate}>
-                {format(parseISO(latestLog.loggedAt), 'MMM d, yyyy')}
-              </Text>
-            </>
-          ) : (
-            <Text style={styles.noDataText}>No weight logged yet</Text>
-          )}
+          {isLoading
+            ? (
+                <>
+                  <SkeletonBox style={{ height: 12, width: '30%', marginBottom: spacing.sm }} />
+                  <SkeletonBox style={{ height: 56, width: '55%', marginBottom: spacing.xs }} />
+                  <SkeletonBox style={{ height: 12, width: '40%' }} />
+                </>
+              )
+            : latestLog
+              ? (
+                  <>
+                    <Text style={styles.summaryLabel}>LATEST</Text>
+                    <Text style={styles.summaryValue}>
+                      {weightUnit === 'lbs'
+                        ? `${(latestLog.weightKg * 2.20462).toFixed(1)}`
+                        : latestLog.weightKg.toFixed(1)}
+                      <Text style={styles.summaryUnit}>
+                        {' '}
+                        {weightUnit}
+                      </Text>
+                    </Text>
+                    {latestLog.ewmaWeightKg != null && (
+                      <Text style={styles.trendText}>
+                        Trend:
+                        {' '}
+                        {formatWeight(latestLog.ewmaWeightKg, weightUnit)}
+                      </Text>
+                    )}
+                    <Text style={styles.summaryDate}>
+                      {format(parseISO(latestLog.loggedAt), 'MMM d, yyyy')}
+                    </Text>
+                  </>
+                )
+              : (
+                  <Text style={styles.noDataText}>No weight logged yet</Text>
+                )}
         </View>
 
         {/* Log new weight */}
@@ -158,7 +167,9 @@ export default function WeightScreen() {
                   <Text style={styles.historyWeight}>{displayWeight}</Text>
                   {log.ewmaWeightKg != null && (
                     <Text style={styles.historyEwma}>
-                      Trend: {formatWeight(log.ewmaWeightKg, weightUnit)}
+                      Trend:
+                      {' '}
+                      {formatWeight(log.ewmaWeightKg, weightUnit)}
                     </Text>
                   )}
                   <Pressable
@@ -188,12 +199,12 @@ export default function WeightScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

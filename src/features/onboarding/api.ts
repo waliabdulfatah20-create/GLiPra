@@ -1,13 +1,13 @@
-import { supabase } from '@/lib/supabase';
 import type { OnboardingFormData } from '@/features/onboarding/use-onboarding-store';
+import { supabase } from '@/lib/supabase';
 
 export async function saveOnboardingProfile(
   userId: string,
   data: OnboardingFormData,
 ): Promise<{ error: string | null }> {
-  const bmi =
-    data.weightKg && data.heightCm
-      ? parseFloat(
+  const bmi
+    = data.weightKg && data.heightCm
+      ? Number.parseFloat(
           (data.weightKg / ((data.heightCm / 100) * (data.heightCm / 100))).toFixed(1),
         )
       : null;
@@ -33,6 +33,7 @@ export async function saveOnboardingProfile(
     onboarding_completed: true,
   }, { onConflict: 'user_id' });
 
-  if (error) return { error: error.message };
+  if (error)
+    return { error: error.message };
   return { error: null };
 }

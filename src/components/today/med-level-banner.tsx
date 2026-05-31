@@ -1,15 +1,15 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import type { InjectionPhase } from '@/types';
 import { router } from 'expo-router';
 import * as React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Circle, Line, Polyline, Svg } from 'react-native-svg';
 
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Circle, Line, Polyline, Svg } from 'react-native-svg';
 import { Activity } from '@/components/ui/icons';
 import { useMedicationLevelCurve } from '@/features/medication-level/hooks';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
-import type { InjectionPhase } from '@/types';
 
 // Brand tokens for Clean Clinical design
 const BRAND = '#5b21b6';
@@ -18,25 +18,25 @@ const MED_BLUE = '#60a5fa';
 const MED_BLUE_BG = 'rgba(37,99,235,0.12)';
 
 const PHASE_HEADLINE: Record<InjectionPhase, string> = {
-  injection_day:     'Injection day: dose administered',
-  peak_suppression:  'Peak suppression: appetite well-controlled',
-  adjustment:        'Adjustment phase: monitor for GI symptoms',
-  recovery_window:   'Recovery window: appetite may return',
-  overdue:           'Injection overdue: contact prescriber',
+  injection_day: 'Injection day: dose administered',
+  peak_suppression: 'Peak suppression: appetite well-controlled',
+  adjustment: 'Adjustment phase: monitor for GI symptoms',
+  recovery_window: 'Recovery window: appetite may return',
+  overdue: 'Injection overdue: contact prescriber',
 };
 
 const PHASE_PILL: Record<InjectionPhase, string> = {
-  injection_day:     'Log your injection site',
-  peak_suppression:  'High protein priority',
-  adjustment:        'Stay hydrated',
-  recovery_window:   'Increase meal frequency if needed',
-  overdue:           'Contact prescriber',
+  injection_day: 'Log your injection site',
+  peak_suppression: 'High protein priority',
+  adjustment: 'Stay hydrated',
+  recovery_window: 'Increase meal frequency if needed',
+  overdue: 'Contact prescriber',
 };
 
-interface MedLevelBannerProps {
+type MedLevelBannerProps = {
   /** Current injection cycle phase — from useTodayData() */
   phase: InjectionPhase | null;
-}
+};
 
 const SPARKLINE_W = 200;
 const SPARKLINE_H = 36;
@@ -52,24 +52,26 @@ function CurveSparkline({
   injectionIntervalDays: number;
 }) {
   const windowEnd = injectionIntervalDays * 2;
-  const visible = curve.filter((p) => p.dayOffset <= windowEnd);
-  if (visible.length < 2) return null;
+  const visible = curve.filter(p => p.dayOffset <= windowEnd);
+  if (visible.length < 2)
+    return null;
 
   const minOffset = visible[0].dayOffset;
   const maxOffset = visible[visible.length - 1].dayOffset;
-  const maxLevel = Math.max(...visible.map((p) => p.levelMg));
+  const maxLevel = Math.max(...visible.map(p => p.levelMg));
 
   function toX(offset: number): number {
-    if (maxOffset === minOffset) return 0;
+    if (maxOffset === minOffset)
+      return 0;
     return ((offset - minOffset) / (maxOffset - minOffset)) * SPARKLINE_W;
   }
   function toY(level: number): number {
     return maxLevel > 0 ? SPARKLINE_H - (level / maxLevel) * SPARKLINE_H : SPARKLINE_H;
   }
 
-  const points = visible.map((p) => `${toX(p.dayOffset)},${toY(p.levelMg)}`).join(' ');
+  const points = visible.map(p => `${toX(p.dayOffset)},${toY(p.levelMg)}`).join(' ');
   const todayX = toX(todayOffset);
-  const todayY = toY(visible.find((p) => p.dayOffset === todayOffset)?.levelMg ?? maxLevel * 0.5);
+  const todayY = toY(visible.find(p => p.dayOffset === todayOffset)?.levelMg ?? maxLevel * 0.5);
 
   return (
     <Svg width={SPARKLINE_W} height={SPARKLINE_H} viewBox={`0 0 ${SPARKLINE_W} ${SPARKLINE_H}`}>
@@ -85,8 +87,10 @@ function CurveSparkline({
       />
       {/* Today marker */}
       <Line
-        x1={todayX} y1={0}
-        x2={todayX} y2={SPARKLINE_H}
+        x1={todayX}
+        y1={0}
+        x2={todayX}
+        y2={SPARKLINE_H}
         stroke={AMBER}
         strokeWidth={1}
         strokeDasharray="2 2"
@@ -107,7 +111,8 @@ export function MedLevelBanner({ phase }: MedLevelBannerProps) {
   const { curve, todayOffset, injectionIntervalDays, isLoading } = useMedicationLevelCurve();
 
   // Still loading — don't flash a card yet
-  if (isLoading) return null;
+  if (isLoading)
+    return null;
 
   // No injection data yet — show a persistent setup CTA
   if (!curve || !phase) {
@@ -174,12 +179,12 @@ export function MedLevelBanner({ phase }: MedLevelBannerProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

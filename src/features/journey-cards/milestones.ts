@@ -3,27 +3,27 @@
  * Each milestone is a shareable artifact that unlocks as the user progresses.
  */
 
-export type MilestoneId =
-  | 'week_1_complete'
-  | 'protein_streak_7'
-  | 'protein_streak_30'
-  | 'first_checkin'
-  | 'weight_logged_10x'
-  | 'injection_day_warrior'
-  | '3_months_strong'
-  | 'coach_conversation';
+export type MilestoneId
+  = | 'week_1_complete'
+    | 'protein_streak_7'
+    | 'protein_streak_30'
+    | 'first_checkin'
+    | 'weight_logged_10x'
+    | 'injection_day_warrior'
+    | '3_months_strong'
+    | 'coach_conversation';
 
-export interface Milestone {
+export type Milestone = {
   id: MilestoneId;
   title: string;
   subtitle: string;
   emoji: string;
   accentColor: string;
   shareText: string;
-}
+};
 
 export const MILESTONES: Record<MilestoneId, Milestone> = {
-  week_1_complete: {
+  'week_1_complete': {
     id: 'week_1_complete',
     title: 'Week 1 Complete',
     subtitle: 'First 7 days on your GLP-1 journey',
@@ -33,7 +33,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
       'Week 1 on my GLP-1 journey complete! Tracking with Glipra to protect my muscle. 💪',
   },
 
-  protein_streak_7: {
+  'protein_streak_7': {
     id: 'protein_streak_7',
     title: 'Protein Streak: 7 Days',
     subtitle: 'Hit your protein goal 7 days in a row',
@@ -43,7 +43,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
       '7-day protein streak on Glipra! Staying consistent so GLP-1 works without stealing my muscle. 💪🥩',
   },
 
-  protein_streak_30: {
+  'protein_streak_30': {
     id: 'protein_streak_30',
     title: 'Protein Streak: 30 Days',
     subtitle: 'Hit your protein goal 30 days in a row',
@@ -53,7 +53,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
       '30-day protein streak: a full month of protecting my muscle while on GLP-1! Glipra keeps me honest. 💪⚡',
   },
 
-  first_checkin: {
+  'first_checkin': {
     id: 'first_checkin',
     title: 'First Check-in',
     subtitle: 'Logged your first daily check-in',
@@ -63,7 +63,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
       'Logged my first daily check-in on Glipra. Designed by a licensed pharmacist to keep GLP-1 journeys safe. ✅',
   },
 
-  weight_logged_10x: {
+  'weight_logged_10x': {
     id: 'weight_logged_10x',
     title: 'Tracking Champion',
     subtitle: 'Logged your weight 10 times',
@@ -73,7 +73,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
       '10 weight logs in: watching the trend, not the number. Glipra helps me track what matters on GLP-1. 📊',
   },
 
-  injection_day_warrior: {
+  'injection_day_warrior': {
     id: 'injection_day_warrior',
     title: 'Injection Day Warrior',
     subtitle: 'Logged on your injection day',
@@ -93,7 +93,7 @@ export const MILESTONES: Record<MilestoneId, Milestone> = {
       '3 months on my GLP-1 journey! Still going strong with Glipra keeping my nutrition dialed in. 🏆',
   },
 
-  coach_conversation: {
+  'coach_conversation': {
     id: 'coach_conversation',
     title: 'First Coaching Session',
     subtitle: 'Had your first AI Nutrition Coach conversation',

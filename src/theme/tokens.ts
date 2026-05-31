@@ -7,7 +7,7 @@ import { radius, spacing } from './colors';
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 
-export interface GlipraColorTokens {
+export type GlipraColorTokens = {
   // Brand
   primary: string;
   primaryDark: string;
@@ -61,9 +61,9 @@ export interface GlipraColorTokens {
   disclaimerBg: string;
   disclaimerBorder: string;
   disclaimerText: string;
-}
+};
 
-export interface GlipraShadowTokens {
+export type GlipraShadowTokens = {
   sm: {
     shadowColor: string;
     shadowOffset: { width: number; height: number };
@@ -85,21 +85,21 @@ export interface GlipraShadowTokens {
     shadowRadius: number;
     elevation: number;
   };
-}
+};
 
-export interface GlipraGradients {
+export type GlipraGradients = {
   /** Hero header gradient — purple → blue → teal. Always dark; text on top should be white. */
   hero: readonly [string, string, string];
-}
+};
 
-export interface GlipraTokens {
+export type GlipraTokens = {
   colors: GlipraColorTokens;
   gradients: GlipraGradients;
   spacing: typeof spacing;
   radius: typeof radius;
   shadows: GlipraShadowTokens;
   isDark: boolean;
-}
+};
 
 // ─── Light (Direction B) ──────────────────────────────────────────────────────
 

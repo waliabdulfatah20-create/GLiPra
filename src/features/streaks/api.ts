@@ -8,11 +8,11 @@
 
 import { supabase } from '@/lib/supabase';
 
-export interface StreakRow {
+export type StreakRow = {
   currentStreak: number;
   longestStreak: number;
   lastStreakDate: string | null;
-}
+};
 
 /**
  * Fetch the current user's streak row.
@@ -29,7 +29,8 @@ export async function fetchStreak(userId: string): Promise<StreakRow | null> {
     throw new Error(`fetchStreak: ${error.message}`);
   }
 
-  if (!data) return null;
+  if (!data)
+    return null;
 
   return {
     currentStreak: data.current_streak,

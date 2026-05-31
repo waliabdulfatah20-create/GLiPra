@@ -19,7 +19,7 @@ export async function exportUserData(): Promise<string> {
 
   const json = (data as { json?: string })?.json;
   if (typeof json !== 'string') {
-    throw new Error('Unexpected response from export function');
+    throw new TypeError('Unexpected response from export function');
   }
 
   return json;

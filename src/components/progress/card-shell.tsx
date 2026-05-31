@@ -7,17 +7,17 @@
  * the card.
  */
 
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
+import * as React from 'react';
 
-interface CardShellProps {
+import { StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '@/lib/ThemeContext';
+
+type CardShellProps = {
   label: string;
   accentColor: string;
   children: React.ReactNode;
-}
+};
 
 export function CardShell({ label, accentColor, children }: CardShellProps) {
   const { colors, spacing, radius, shadows } = useTheme();
@@ -34,12 +34,12 @@ export function CardShell({ label, accentColor, children }: CardShellProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

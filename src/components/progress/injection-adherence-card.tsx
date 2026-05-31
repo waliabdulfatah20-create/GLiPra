@@ -6,24 +6,24 @@
  * during onboarding before they have any data).
  */
 
+import type { GlipraTokens } from '@/theme/tokens';
 import { differenceInCalendarDays, format, parseISO, subDays } from 'date-fns';
-import { useTranslation } from 'react-i18next';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
-import { Circle, Line, Svg } from 'react-native-svg';
 
+import { Circle, Line, Svg } from 'react-native-svg';
 import { useInjectionAdherence } from '@/features/progress/hooks';
 import { tipI18nKey } from '@/features/progress/pharmacist-tips';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 import { CardShell } from './card-shell';
 import { PharmacistTip } from './pharmacist-tip';
 
-interface InjectionAdherenceCardProps {
+type InjectionAdherenceCardProps = {
   days: number;
   width: number;
-}
+};
 
 const TIMELINE_H = 36;
 
@@ -37,8 +37,8 @@ export function InjectionAdherenceCard({
     () => makeStyles({ colors, spacing }),
     [colors, spacing],
   );
-  const { rate, windowDates, intervalDays, hasData, isLoading } =
-    useInjectionAdherence(days);
+  const { rate, windowDates, intervalDays, hasData, isLoading }
+    = useInjectionAdherence(days);
 
   const today = new Date();
   const startDate = subDays(today, days - 1);
@@ -50,7 +50,7 @@ export function InjectionAdherenceCard({
       const xRatio = 1 - offset / (days - 1);
       return { date: d, x: xRatio * width };
     })
-    .filter((d) => d.x >= 0 && d.x <= width);
+    .filter(d => d.x >= 0 && d.x <= width);
 
   return (
     <CardShell
@@ -64,7 +64,10 @@ export function InjectionAdherenceCard({
       ) : (
         <>
           <View style={styles.headlineRow}>
-            <Text style={styles.bigValue}>{Math.round(rate * 100)}%</Text>
+            <Text style={styles.bigValue}>
+              {Math.round(rate * 100)}
+              %
+            </Text>
             <Text style={styles.bigCaption}>
               {t('progress.adherence_card.subtitle', {
                 count: windowDates.length,
@@ -84,7 +87,7 @@ export function InjectionAdherenceCard({
               strokeWidth={1}
             />
             {/* Injection dots */}
-            {dots.map((d) => (
+            {dots.map(d => (
               <Circle
                 key={d.date}
                 cx={d.x}
@@ -107,16 +110,19 @@ export function InjectionAdherenceCard({
 }
 
 function intervalLabel(intervalDays: number, t: (k: string) => string): string {
-  if (intervalDays === 1) return t('progress.adherence_card.daily');
-  if (intervalDays === 7) return t('progress.adherence_card.weekly');
-  if (intervalDays === 14) return t('progress.adherence_card.biweekly');
+  if (intervalDays === 1)
+    return t('progress.adherence_card.daily');
+  if (intervalDays === 7)
+    return t('progress.adherence_card.weekly');
+  if (intervalDays === 14)
+    return t('progress.adherence_card.biweekly');
   return t('progress.adherence_card.custom');
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
-}
+};
 
 function makeStyles({ colors, spacing }: StyleTokens) {
   return StyleSheet.create({

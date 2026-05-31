@@ -1,3 +1,4 @@
+import type { GlipraTokens } from '@/theme/tokens';
 /**
  * LegalDocScreen — reusable full-screen component for displaying legal documents.
  * Used by /legal/privacy-policy and /legal/terms-of-service routes.
@@ -11,22 +12,21 @@ import {
   Text,
   View,
 } from 'react-native';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
-export interface LegalSection {
+export type LegalSection = {
   heading: string;
   body: string;
-}
+};
 
-interface LegalDocScreenProps {
+type LegalDocScreenProps = {
   title: string;
   effectiveDate: string;
   intro?: string;
   sections: LegalSection[];
-}
+};
 
 export function LegalDocScreen({ title, effectiveDate, intro, sections }: LegalDocScreenProps) {
   const router = useRouter();
@@ -47,7 +47,7 @@ export function LegalDocScreen({ title, effectiveDate, intro, sections }: LegalD
           accessibilityLabel="Go back"
           hitSlop={12}
         >
-          <Text style={styles.backText}>{'‹ Back'}</Text>
+          <Text style={styles.backText}>‹ Back</Text>
         </Pressable>
         <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
         <View style={styles.backButton} />
@@ -83,11 +83,11 @@ export function LegalDocScreen({ title, effectiveDate, intro, sections }: LegalD
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

@@ -1,14 +1,14 @@
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
+import * as React from 'react';
 
-interface StepProgressProps {
+import { StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '@/lib/ThemeContext';
+
+type StepProgressProps = {
   current: number; // 1-based
   total: number;
   onDark?: boolean; // true when rendered on a dark/gradient background
-}
+};
 
 export function StepProgress({ current, total, onDark }: StepProgressProps) {
   const { colors, spacing } = useTheme();
@@ -22,7 +22,13 @@ export function StepProgress({ current, total, onDark }: StepProgressProps) {
     <View style={styles.container}>
       <View style={styles.row}>
         <Text style={styles.label}>
-          Step {current} of {total}
+          Step
+          {' '}
+          {current}
+          {' '}
+          of
+          {' '}
+          {total}
         </Text>
       </View>
       <View style={styles.track}>
@@ -32,11 +38,11 @@ export function StepProgress({ current, total, onDark }: StepProgressProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   onDark?: boolean;
-}
+};
 
 function makeStyles({ colors, spacing, onDark }: StyleTokens) {
   return StyleSheet.create({

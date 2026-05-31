@@ -1,13 +1,13 @@
+import type { DayProteinEntry, SymptomEntry } from '../calculator';
 import { parseISO } from 'date-fns';
-import { describe, expect, it } from 'vitest';
 
+import { describe, expect, it } from 'vitest';
 import {
   buildHitHistory,
   calculateAdherence,
   calculateAverageSymptom,
   calculateHitRate,
-  type DayProteinEntry,
-  type SymptomEntry,
+
 } from '../calculator';
 
 const ASOF = parseISO('2026-05-24'); // fixed reference date for determinism
@@ -24,9 +24,9 @@ describe('buildHitHistory', () => {
 
   it('fills missing days with zero protein, hasData=false', () => {
     const out = buildHitHistory([], 3, 100, ASOF);
-    expect(out.every((d) => d.proteinG === 0)).toBe(true);
-    expect(out.every((d) => d.hasData === false)).toBe(true);
-    expect(out.every((d) => d.hitFloor === false)).toBe(true);
+    expect(out.every(d => d.proteinG === 0)).toBe(true);
+    expect(out.every(d => d.hasData === false)).toBe(true);
+    expect(out.every(d => d.hitFloor === false)).toBe(true);
   });
 
   it('marks hitFloor when proteinG >= 80% of floor', () => {
@@ -36,7 +36,7 @@ describe('buildHitHistory', () => {
       { date: '2026-05-22', proteinG: 120 }, // >100% → hit
     ];
     const out = buildHitHistory(entries, 100, 3, ASOF);
-    const byDate = Object.fromEntries(out.map((d) => [d.date, d]));
+    const byDate = Object.fromEntries(out.map(d => [d.date, d]));
     expect(byDate['2026-05-24'].hitFloor).toBe(true);
     expect(byDate['2026-05-23'].hitFloor).toBe(false);
     expect(byDate['2026-05-22'].hitFloor).toBe(true);

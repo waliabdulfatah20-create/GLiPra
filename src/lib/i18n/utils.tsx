@@ -4,7 +4,6 @@ import type { RecursiveKeyOf } from './types';
 import i18n from 'i18next';
 import memoize from 'lodash.memoize';
 import { useCallback, useEffect, useState } from 'react';
-import { I18nManager } from 'react-native';
 
 import { getItem, setItem } from '@/lib/storage';
 
@@ -24,11 +23,6 @@ export const translate = memoize(
 
 export function changeLanguage(lang: Language) {
   i18n.changeLanguage(lang);
-  if (lang === 'ar') {
-    I18nManager.forceRTL(true);
-  } else {
-    I18nManager.forceRTL(false);
-  }
   // Clear memoize cache so translate() calls outside hooks return updated strings.
   // No restart needed — i18n.changeLanguage() triggers re-renders on all
   // useTranslation() consumers automatically via react-i18next.

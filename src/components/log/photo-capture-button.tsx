@@ -6,8 +6,10 @@
 // Visual: deep violet→indigo gradient card with AI + PRO badges, camera icon
 // with sparkle dots, and a white CTA pill.
 
+import type { GlipraTokens } from '@/theme/tokens';
 import * as ImagePicker from 'expo-image-picker';
-import React from 'react';
+import * as React from 'react';
+
 import {
   ActivityIndicator,
   Alert,
@@ -16,19 +18,17 @@ import {
   Text,
   View,
 } from 'react-native';
-
 import { useSubscription } from '@/features/subscription/use-subscription';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
-export interface PhotoCaptureButtonProps {
+export type PhotoCaptureButtonProps = {
   onImageSelected: (
     base64: string,
     mimeType: 'image/jpeg' | 'image/png',
   ) => void;
   isLoading: boolean;
-}
+};
 
 export function PhotoCaptureButton({
   onImageSelected,
@@ -58,19 +58,22 @@ export function PhotoCaptureButton({
       allowsEditing: false,
     });
 
-    if (result.canceled || !result.assets[0]) return;
+    if (result.canceled || !result.assets[0])
+      return;
 
     const asset = result.assets[0];
-    if (!asset.base64) return;
+    if (!asset.base64)
+      return;
 
-    const mimeType: 'image/jpeg' | 'image/png' =
-      asset.uri.endsWith('.png') ? 'image/png' : 'image/jpeg';
+    const mimeType: 'image/jpeg' | 'image/png'
+      = asset.uri.endsWith('.png') ? 'image/png' : 'image/jpeg';
 
     onImageSelected(asset.base64, mimeType);
   }
 
   function handleCardPress() {
-    if (isLoading) return;
+    if (isLoading)
+      return;
 
     haptics.medium();
     if (!isPro) {
@@ -81,7 +84,8 @@ export function PhotoCaptureButton({
         RevenueCatUI.presentPaywallIfNeeded({
           requiredEntitlementIdentifier: 'GLiPra Pro',
         });
-      } catch {
+      }
+      catch {
         // Native module not available in Expo Go — silent no-op
       }
       return;
@@ -125,27 +129,29 @@ export function PhotoCaptureButton({
         <Text style={styles.subtitle}>AI estimates macros instantly</Text>
 
         {/* CTA — loading spinner while recognition is in flight */}
-        {isLoading ? (
-          <View style={styles.loadingRow}>
-            <ActivityIndicator color={colors.white} size="small" />
-            <Text style={styles.analyzingText}>Analyzing…</Text>
-          </View>
-        ) : (
-          <View style={styles.ctaPill}>
-            <Text style={styles.ctaText}>Open Camera →</Text>
-          </View>
-        )}
+        {isLoading
+          ? (
+              <View style={styles.loadingRow}>
+                <ActivityIndicator color={colors.white} size="small" />
+                <Text style={styles.analyzingText}>Analyzing…</Text>
+              </View>
+            )
+          : (
+              <View style={styles.ctaPill}>
+                <Text style={styles.ctaText}>Open Camera →</Text>
+              </View>
+            )}
       </View>
     </Pressable>
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

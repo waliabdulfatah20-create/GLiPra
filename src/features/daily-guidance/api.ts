@@ -5,25 +5,25 @@
 import { isMockAIEnabled, MOCK_DAILY_GUIDANCE } from '@/lib/mockAI';
 import { supabase } from '@/lib/supabase';
 
-export interface GuidanceContext {
+export type GuidanceContext = {
   injectionPhase: string | null;
   nauseaScore: number | null;
   energyScore: number | null;
   proteinProgressPct: number | null;
   medicationStatus: string | null;
   language: 'en' | 'es';
-}
+};
 
-export interface DailyGuidanceResult {
+export type DailyGuidanceResult = {
   guidance_text: string;
   reasoning_text: string;
-}
+};
 
 export async function generateDailyGuidance(
   context: GuidanceContext,
 ): Promise<DailyGuidanceResult> {
   if (isMockAIEnabled()) {
-    await new Promise((r) => setTimeout(r, 400));
+    await new Promise(r => setTimeout(r, 400));
     return MOCK_DAILY_GUIDANCE;
   }
 

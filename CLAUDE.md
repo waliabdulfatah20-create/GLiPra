@@ -222,7 +222,8 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 
 serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method === 'OPTIONS')
+    return new Response('ok', { headers: corsHeaders });
 
   try {
     const supabase = createClient(
@@ -231,7 +232,8 @@ serve(async (req: Request) => {
       { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     );
     const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) throw new Error('Unauthorized');
+    if (error || !user)
+      throw new Error('Unauthorized');
 
     // 3. Rate limit (check ai_invocations table)
     // 4. Zod validate input
@@ -239,10 +241,9 @@ serve(async (req: Request) => {
     // 6. Zod validate output
     // 7. Log to ai_invocations
     // 8. Return result
-
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }),
-      { status: 400, headers: corsHeaders });
+  }
+  catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 400, headers: corsHeaders });
   }
 });
 ```

@@ -1,16 +1,16 @@
-import * as React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
 import type { DisclaimerTier } from '@/types';
 
-interface DisclaimerBannerProps {
+import * as React from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '@/lib/ThemeContext';
+
+type DisclaimerBannerProps = {
   tier: DisclaimerTier;
   children: React.ReactNode;
   onAcknowledge?: () => void;
   acknowledged?: boolean;
-}
+};
 
 export function DisclaimerBanner({
   tier,
@@ -61,11 +61,11 @@ export function DisclaimerBanner({
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

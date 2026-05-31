@@ -64,7 +64,8 @@ serve(async (req: Request) => {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (error: unknown) {
+  }
+  catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Internal server error';
     console.error('delete-user-account unhandled error:', message);
     return new Response(JSON.stringify({ error: message }), {

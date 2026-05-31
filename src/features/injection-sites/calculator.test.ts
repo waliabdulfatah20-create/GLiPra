@@ -1,9 +1,10 @@
+import type { SiteCode } from './constants';
+import type { InjectionLog } from './types';
+
 import { formatISO, subDays, subHours } from 'date-fns';
 import { describe, expect, it } from 'vitest';
-
 import { computeNextSite } from './calculator';
-import { REST_DAYS, SITE_ROTATION_ORDER, type SiteCode } from './constants';
-import type { InjectionLog } from './types';
+import { REST_DAYS, SITE_ROTATION_ORDER } from './constants';
 
 // Fixed "now" anchor so all relative timestamps are deterministic.
 const NOW = '2026-05-20T12:00:00.000Z';

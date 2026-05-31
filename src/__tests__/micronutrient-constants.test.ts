@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
-  MICRONUTRIENT_RDAS,
   getGapBannerText,
   getGapCount,
   getNutrientPct,
   getNutrientStatus,
+  MICRONUTRIENT_RDAS,
 } from '@/features/food-log/micronutrient-constants';
 
 describe('getNutrientPct', () => {
@@ -87,7 +87,7 @@ describe('getGapBannerText', () => {
   });
 });
 
-describe('MICRONUTRIENT_RDAS', () => {
+describe('mICRONUTRIENT_RDAS', () => {
   it('has correct US RDA values', () => {
     expect(MICRONUTRIENT_RDAS.magnesiumMg).toBe(420);
     expect(MICRONUTRIENT_RDAS.zincMg).toBe(11);

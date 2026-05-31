@@ -7,23 +7,23 @@
  * neutral gray.
  */
 
-import { useTranslation } from 'react-i18next';
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
-import { Rect, Svg } from 'react-native-svg';
 
+import { Rect, Svg } from 'react-native-svg';
 import { useProteinHistoryPerDay } from '@/features/progress/hooks';
 import { tipI18nKey } from '@/features/progress/pharmacist-tips';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 import { CardShell } from './card-shell';
 import { PharmacistTip } from './pharmacist-tip';
 
-interface ProteinHitRateCardProps {
+type ProteinHitRateCardProps = {
   days: number;
   width: number;
-}
+};
 
 const CHART_HEIGHT = 56;
 const GAP = 2;
@@ -35,8 +35,8 @@ export function ProteinHitRateCard({ days, width }: ProteinHitRateCardProps) {
     () => makeStyles({ colors, spacing }),
     [colors, spacing],
   );
-  const { history, hitRate, proteinFloorG, isLoading } =
-    useProteinHistoryPerDay(days);
+  const { history, hitRate, proteinFloorG, isLoading }
+    = useProteinHistoryPerDay(days);
 
   // Available width inside the card (already padded by CardShell)
   const chartW = width;
@@ -59,7 +59,10 @@ export function ProteinHitRateCard({ days, width }: ProteinHitRateCardProps) {
       ) : (
         <>
           <View style={styles.headlineRow}>
-            <Text style={styles.bigValue}>{Math.round(hitRate * 100)}%</Text>
+            <Text style={styles.bigValue}>
+              {Math.round(hitRate * 100)}
+              %
+            </Text>
             <Text style={styles.bigCaption}>
               {t('progress.protein_card.subtitle', { days })}
             </Text>
@@ -71,8 +74,10 @@ export function ProteinHitRateCard({ days, width }: ProteinHitRateCardProps) {
               const x = i * (barW + GAP);
               const y = CHART_HEIGHT - h;
               let fill: string;
-              if (!d.hasData) fill = colors.gray200;
-              else if (d.hitFloor) fill = colors.success;
+              if (!d.hasData)
+                fill = colors.gray200;
+              else if (d.hitFloor)
+                fill = colors.success;
               else fill = colors.warning;
               return (
                 <Rect
@@ -94,10 +99,10 @@ export function ProteinHitRateCard({ days, width }: ProteinHitRateCardProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
-}
+};
 
 function makeStyles({ colors, spacing }: StyleTokens) {
   return StyleSheet.create({

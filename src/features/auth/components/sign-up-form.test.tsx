@@ -5,7 +5,7 @@ import { SignUpForm } from './sign-up-form';
 
 afterEach(cleanup);
 
-describe('SignUpForm', () => {
+describe('signUpForm', () => {
   it('renders email and password fields', async () => {
     setup(<SignUpForm onSubmit={jest.fn()} />);
     expect(await screen.findByTestId('sign-up-email')).toBeOnTheScreen();

@@ -1,17 +1,17 @@
+import type { GlipraTokens } from '@/theme/tokens';
+import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { useForm } from '@tanstack/react-form';
-import * as z from 'zod';
-
 import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+
+import * as z from 'zod';
 import { Button } from '@/components/ui';
 import { getFieldError } from '@/components/ui/form-utils';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 const schema = z.object({
   email: z
@@ -61,11 +61,13 @@ export function ForgotPasswordForm({ onSubmit, showSuccess, apiError }: ForgotPa
       <Text style={styles.heading}>{t('auth.forgot_heading')}</Text>
       <Text style={styles.subheading}>{t('auth.forgot_subheading')}</Text>
 
-      {apiError ? (
-        <Animated.View entering={FadeInDown.duration(200)} style={styles.apiErrorBox}>
-          <Text style={styles.apiErrorText}>{apiError}</Text>
-        </Animated.View>
-      ) : null}
+      {apiError
+        ? (
+            <Animated.View entering={FadeInDown.duration(200)} style={styles.apiErrorBox}>
+              <Text style={styles.apiErrorText}>{apiError}</Text>
+            </Animated.View>
+          )
+        : null}
 
       <form.Field
         name="email"
@@ -91,18 +93,20 @@ export function ForgotPasswordForm({ onSubmit, showSuccess, apiError }: ForgotPa
                   error ? styles.inputError : null,
                 ]}
               />
-              {error ? (
-                <Animated.View entering={FadeInDown.duration(200)}>
-                  <Text style={styles.errorText}>{error}</Text>
-                </Animated.View>
-              ) : null}
+              {error
+                ? (
+                    <Animated.View entering={FadeInDown.duration(200)}>
+                      <Text style={styles.errorText}>{error}</Text>
+                    </Animated.View>
+                  )
+                : null}
             </View>
           );
         }}
       />
 
       <form.Subscribe
-        selector={(state) => [state.isSubmitting]}
+        selector={state => [state.isSubmitting]}
         children={([isSubmitting]) => (
           <Button
             testID="forgot-submit"
@@ -120,9 +124,9 @@ export function ForgotPasswordForm({ onSubmit, showSuccess, apiError }: ForgotPa
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
-}
+};
 
 function makeStyles({ colors }: StyleTokens) {
   return StyleSheet.create({
@@ -133,26 +137,27 @@ function makeStyles({ colors }: StyleTokens) {
     apiErrorText: { color: colors.error, fontSize: 14 },
     fieldContainer: { marginBottom: 16 },
     label: {
-      fontSize: 11, fontWeight: '600', color: colors.textSecondary,
-      letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 6,
+      fontSize: 11,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      letterSpacing: 0.6,
+      textTransform: 'uppercase',
+      marginBottom: 6,
     },
     input: {
       backgroundColor: colors.surface,
       borderWidth: 1.5,
       borderColor: colors.border,
       borderRadius: 12,
-      // @ts-expect-error borderCurve
       borderCurve: 'continuous',
       paddingHorizontal: 14,
       paddingVertical: 13,
       fontSize: 15,
       color: colors.textPrimary,
-      // @ts-expect-error boxShadow string form
       boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
     },
     inputFocused: {
       borderColor: colors.borderFocus,
-      // @ts-expect-error boxShadow string form
       boxShadow: '0 0 0 3px rgba(45,107,228,0.12)',
     },
     inputError: { borderColor: colors.error },

@@ -6,27 +6,28 @@
  *                          newly-earned milestones based on current app state
  */
 
-import { useEffect } from 'react';
+import type { UnlockedMilestone } from '@/features/journey-cards/api';
+import type { MilestoneId } from '@/features/journey-cards/milestones';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { differenceInCalendarDays, parseISO } from 'date-fns';
 
+import { differenceInCalendarDays, parseISO } from 'date-fns';
+import { useEffect } from 'react';
 import { useAuthStore } from '@/features/auth/use-auth-store';
-import { useStreak } from '@/features/streaks/hooks';
 import {
   fetchUnlockedMilestonesWithDates,
+
   unlockMilestone,
-  type UnlockedMilestone,
 } from '@/features/journey-cards/api';
-import type { MilestoneId } from '@/features/journey-cards/milestones';
+import { useStreak } from '@/features/streaks/hooks';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface JourneyCardEntry {
+export type JourneyCardEntry = {
   milestoneId: MilestoneId;
   unlockedAt: Date;
-}
+};
 
 // ---------------------------------------------------------------------------
 // useJourneyCards
@@ -52,12 +53,12 @@ export function useJourneyCards(): {
     staleTime: 60 * 1000, // 1 minute
   });
 
-  const entries: JourneyCardEntry[] = (data ?? []).map((m) => ({
+  const entries: JourneyCardEntry[] = (data ?? []).map(m => ({
     milestoneId: m.milestoneId,
     unlockedAt: parseISO(m.unlockedAt),
   }));
 
-  const unlockedIds = entries.map((e) => e.milestoneId);
+  const unlockedIds = entries.map(e => e.milestoneId);
 
   return { unlockedIds, entries, isLoading, refetch };
 }
@@ -88,7 +89,8 @@ export function useCheckAndUnlockMilestones(
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!userId || !profileCreatedAt) return;
+    if (!userId || !profileCreatedAt)
+      return;
 
     const today = new Date();
     const createdAt = parseISO(profileCreatedAt);
@@ -110,11 +112,12 @@ export function useCheckAndUnlockMilestones(
       toUnlock.push('protein_streak_30');
     }
 
-    if (toUnlock.length === 0) return;
+    if (toUnlock.length === 0)
+      return;
 
     // Fire-and-forget unlock calls — invalidate the cache when done so the
     // journey screen re-renders with the new cards.
-    Promise.all(toUnlock.map((id) => unlockMilestone(userId, id)))
+    Promise.all(toUnlock.map(id => unlockMilestone(userId, id)))
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ['journey-cards', userId] });
         onUnlock?.(toUnlock);

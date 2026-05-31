@@ -2,16 +2,16 @@
 // When a user edits barcode nutrition values and confirms, we persist the correction.
 // Future scans of the same EAN will load from here first, bypassing Open Food Facts.
 
-import { supabase } from '@/lib/supabase';
 import type { BarcodeProduct } from './barcode-lookup';
+import { supabase } from '@/lib/supabase';
 
-interface CorrectionRow {
+type CorrectionRow = {
   barcode_ean: string;
   product_name: string;
   protein_g: number;
   fiber_g: number | null;
   calories_kcal: number | null;
-}
+};
 
 /**
  * Fetch the user's stored correction for a given EAN.
@@ -28,7 +28,8 @@ export async function fetchBarcodeCorrection(
     .eq('barcode_ean', ean)
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (error || !data)
+    return null;
 
   const row = data as CorrectionRow;
   return {

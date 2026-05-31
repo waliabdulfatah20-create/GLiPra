@@ -1,5 +1,9 @@
+import type { SiteCode } from '@/features/injection-sites/constants';
+import type { InjectionLog } from '@/features/injection-sites/types';
+import type { GlipraTokens } from '@/theme/tokens';
 import { format, parseISO } from 'date-fns';
 import { useRouter } from 'expo-router';
+
 import * as React from 'react';
 import {
   Pressable,
@@ -9,17 +13,14 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { SkeletonBox } from '@/components/ui/skeleton-box';
-import { SITE_LABELS, type SiteCode } from '@/features/injection-sites/constants';
+import { SITE_LABELS } from '@/features/injection-sites/constants';
 import {
   useInjectionLogs,
   useInjectionSiteRecommendation,
 } from '@/features/injection-sites/hooks';
-import type { InjectionLog } from '@/features/injection-sites/types';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 // Pharmacist-authored rotation tips (no condition names — Rule 9 compliant)
 const INJECTION_TIPS = [
@@ -52,7 +53,7 @@ export default function InjectionSitesScreen() {
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows]
+    [colors, spacing, radius, shadows],
   );
 
   const isLoading = logsLoading || recLoading;
@@ -79,55 +80,59 @@ export default function InjectionSitesScreen() {
         </DisclaimerBanner>
 
         {/* Active Rotation card */}
-        {isLoading ? (
-          <View style={styles.loadingCard}>
-            <SkeletonBox style={{ height: 9, width: '40%', marginBottom: spacing.sm }} />
-            <SkeletonBox style={{ height: 17, width: '60%', marginBottom: spacing.sm }} />
-            <SkeletonBox style={{ height: 34, width: 88, borderRadius: radius.md, alignSelf: 'flex-end' }} />
-          </View>
-        ) : (
-          <View style={styles.rotationCard}>
-            <View style={styles.rotationLeft}>
-              <Text style={styles.rotationLabel}>ACTIVE ROTATION</Text>
-              <Text style={styles.rotationValue}>
-                {SITE_LABELS[recommendation]}
-              </Text>
-              {allResting && (
-                <Text style={styles.restingWarning}>
-                  ⚠ All sites used within 7 days - rotate with care
-                </Text>
-              )}
-            </View>
-            <Pressable
-              style={({ pressed }) => [
-                styles.addBtn,
-                pressed && styles.addBtnPressed,
-              ]}
-              onPress={() => router.push('/add-shot')}
-              accessibilityRole="button"
-              accessibilityLabel="Add a new shot"
-            >
-              <Text style={styles.addBtnText}>+ Add Shot</Text>
-            </Pressable>
-          </View>
-        )}
+        {isLoading
+          ? (
+              <View style={styles.loadingCard}>
+                <SkeletonBox style={{ height: 9, width: '40%', marginBottom: spacing.sm }} />
+                <SkeletonBox style={{ height: 17, width: '60%', marginBottom: spacing.sm }} />
+                <SkeletonBox style={{ height: 34, width: 88, borderRadius: radius.md, alignSelf: 'flex-end' }} />
+              </View>
+            )
+          : (
+              <View style={styles.rotationCard}>
+                <View style={styles.rotationLeft}>
+                  <Text style={styles.rotationLabel}>ACTIVE ROTATION</Text>
+                  <Text style={styles.rotationValue}>
+                    {SITE_LABELS[recommendation]}
+                  </Text>
+                  {allResting && (
+                    <Text style={styles.restingWarning}>
+                      ⚠ All sites used within 7 days - rotate with care
+                    </Text>
+                  )}
+                </View>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.addBtn,
+                    pressed && styles.addBtnPressed,
+                  ]}
+                  onPress={() => router.push('/add-shot')}
+                  accessibilityRole="button"
+                  accessibilityLabel="Add a new shot"
+                >
+                  <Text style={styles.addBtnText}>+ Add Shot</Text>
+                </Pressable>
+              </View>
+            )}
 
         {/* Recent shots */}
         <View style={styles.recentCard}>
           <Text style={styles.cardLabel}>RECENT SHOTS</Text>
-          {logs.length === 0 ? (
-            <Text style={styles.empty}>No shots logged yet. Tap "+ Add Shot" to log your first one.</Text>
-          ) : (
-            <View style={styles.shotList}>
-              {logs.slice(0, 10).map((log, idx) => (
-                <ShotRow
-                  key={log.id}
-                  log={log}
-                  isLast={idx === Math.min(logs.length, 10) - 1}
-                />
-              ))}
-            </View>
-          )}
+          {logs.length === 0
+            ? (
+                <Text style={styles.empty}>No shots logged yet. Tap "+ Add Shot" to log your first one.</Text>
+              )
+            : (
+                <View style={styles.shotList}>
+                  {logs.slice(0, 10).map((log, idx) => (
+                    <ShotRow
+                      key={log.id}
+                      log={log}
+                      isLast={idx === Math.min(logs.length, 10) - 1}
+                    />
+                  ))}
+                </View>
+              )}
         </View>
 
         {/* Rotation tips (pharmacist-authored) */}
@@ -155,7 +160,7 @@ function ShotRow({ log, isLast }: { log: InjectionLog; isLast: boolean }) {
   const { colors, spacing, radius } = useTheme();
   const shotStyles = React.useMemo(
     () => makeShotRowStyles({ colors, spacing, radius }),
-    [colors, spacing, radius]
+    [colors, spacing, radius],
   );
 
   return (
@@ -174,14 +179,19 @@ function ShotRow({ log, isLast }: { log: InjectionLog; isLast: boolean }) {
           {SITE_LABELS[log.site_code as SiteCode] ?? log.site_code}
         </Text>
         <Text style={shotStyles.shotMeta}>
-          {format(parseISO(log.injected_at), 'MMM d, yyyy · h:mm a')} ·{' '}
+          {format(parseISO(log.injected_at), 'MMM d, yyyy · h:mm a')}
+          {' '}
+          ·
+          {' '}
           {log.medication_name}
         </Text>
-        {log.notes ? (
-          <Text style={shotStyles.shotNotes} numberOfLines={2}>
-            {log.notes}
-          </Text>
-        ) : null}
+        {log.notes
+          ? (
+              <Text style={shotStyles.shotNotes} numberOfLines={2}>
+                {log.notes}
+              </Text>
+            )
+          : null}
       </View>
       <View style={shotStyles.painBadge}>
         <Text style={shotStyles.painBadgeLabel}>PAIN</Text>
@@ -196,12 +206,12 @@ function ShotRow({ log, isLast }: { log: InjectionLog; isLast: boolean }) {
 // Styles
 // ---------------------------------------------------------------------------
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

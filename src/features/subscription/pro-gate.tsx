@@ -1,16 +1,16 @@
-import * as React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
+import * as React from 'react';
+
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '@/lib/ThemeContext';
 
 import { useSubscription } from './use-subscription';
 
-interface ProGateProps {
+type ProGateProps = {
   children: React.ReactNode;
   featureName: string;
   fallback?: React.ReactNode;
-}
+};
 
 export function ProGate({ children, featureName, fallback }: ProGateProps) {
   const { colors, spacing, radius } = useTheme();
@@ -21,20 +21,25 @@ export function ProGate({ children, featureName, fallback }: ProGateProps) {
   const { isPro, isLoading } = useSubscription();
 
   // Still loading — render children optimistically to avoid flash
-  if (isLoading) return <>{children}</>;
+  if (isLoading)
+    return <>{children}</>;
 
   // Pro or mock dev mode — render feature as normal
-  if (isPro) return <>{children}</>;
+  if (isPro)
+    return <>{children}</>;
 
   // Non-Pro — show custom fallback or default paywall card
-  if (fallback) return <>{fallback}</>;
+  if (fallback)
+    return <>{fallback}</>;
 
   return (
     <View style={styles.card}>
       <Text style={styles.lock}>🔒</Text>
       <Text style={styles.title}>Pro Feature</Text>
       <Text style={styles.body}>
-        {featureName} is available on Glipra Pro
+        {featureName}
+        {' '}
+        is available on Glipra Pro
       </Text>
       <Text style={styles.price}>$9.99/month · $79.99/year</Text>
       <TouchableOpacity
@@ -46,7 +51,8 @@ export function ProGate({ children, featureName, fallback }: ProGateProps) {
             RevenueCatUI.presentPaywallIfNeeded({
               requiredEntitlementIdentifier: 'GLiPra Pro',
             });
-          } catch {
+          }
+          catch {
             // Native module not available in Expo Go — silent no-op
           }
         }}
@@ -59,11 +65,11 @@ export function ProGate({ children, featureName, fallback }: ProGateProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

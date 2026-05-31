@@ -1,17 +1,17 @@
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
+import * as React from 'react';
+
+import { StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '@/lib/ThemeContext';
 
 // ─── SettingsSection ─────────────────────────────────────────────────────────
 // Replaces the Obytes SettingsContainer (which used NativeWind className).
 // Renders a labelled card group matching the app's StyleSheet-only design system.
 
-interface SettingsSectionProps {
+type SettingsSectionProps = {
   title?: string;
   children: React.ReactNode;
-}
+};
 
 export function SettingsSection({ title, children }: SettingsSectionProps) {
   const { colors, spacing, radius, shadows } = useTheme();
@@ -34,12 +34,12 @@ export function SettingsSection({ title, children }: SettingsSectionProps) {
 // don't break immediately.
 export { SettingsSection as SettingsContainer };
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

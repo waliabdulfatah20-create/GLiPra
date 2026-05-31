@@ -1,7 +1,7 @@
 import type { ConfigContext, ExpoConfig } from '@expo/config';
-import { withGradleProperties } from '@expo/config-plugins';
-
 import type { AppIconBadgeConfig } from 'app-icon-badge/types';
+
+import { withGradleProperties } from '@expo/config-plugins';
 
 import 'tsx/cjs';
 
@@ -141,12 +141,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   // directly via a config plugin, which is the authoritative source Gradle reads.
   return withGradleProperties(appConfig, (c) => {
     const idx = c.modResults.findIndex(
-      (item) => item.type === 'property' && item.key === 'android.minSdkVersion',
+      item => item.type === 'property' && item.key === 'android.minSdkVersion',
     );
     if (idx !== -1) {
       // Overwrite existing value
       (c.modResults[idx] as { type: 'property'; key: string; value: string }).value = '26';
-    } else {
+    }
+    else {
       // Not present — add it
       c.modResults.push({ type: 'property', key: 'android.minSdkVersion', value: '26' });
     }

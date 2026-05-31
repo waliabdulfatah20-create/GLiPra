@@ -1,10 +1,11 @@
 // src/features/daily-guidance/hooks.ts
 
+import type { GuidanceContext } from './api';
 import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
 
+import { format } from 'date-fns';
 import { useAuthStore } from '@/features/auth/use-auth-store';
-import { generateDailyGuidance, type GuidanceContext } from './api';
+import { generateDailyGuidance } from './api';
 
 export const DAILY_GUIDANCE_KEY = 'daily-guidance';
 

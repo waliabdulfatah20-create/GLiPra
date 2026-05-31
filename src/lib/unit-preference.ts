@@ -25,14 +25,15 @@ export const kgToLbs = (kg: number): number => +(kg * 2.20462).toFixed(1);
 export const lbsToKg = (lbs: number): number => +(lbs / 2.20462).toFixed(2);
 
 /** Convert cm → { ft, inches } */
-export const cmToFtIn = (cm: number): { ft: number; inches: number } => {
+export function cmToFtIn(cm: number): { ft: number; inches: number } {
   const totalIn = cm / 2.54;
   return { ft: Math.floor(totalIn / 12), inches: Math.round(totalIn % 12) };
-};
+}
 
 /** Convert ft + inches → cm, 1 decimal place */
-export const ftInToCm = (ft: number, inches: number): number =>
-  +((ft * 12 + inches) * 2.54).toFixed(1);
+export function ftInToCm(ft: number, inches: number): number {
+  return +((ft * 12 + inches) * 2.54).toFixed(1);
+}
 
 /** Format a weight value stored in kg for display in the user's preferred unit */
 export function formatWeight(kg: number, unit: WeightUnit): string {
@@ -47,7 +48,8 @@ export function useWeightUnit(): { unit: WeightUnit; toggle: () => void } {
 
   React.useEffect(() => {
     AsyncStorage.getItem(WEIGHT_UNIT_KEY).then((v) => {
-      if (v === 'kg' || v === 'lbs') setUnit(v);
+      if (v === 'kg' || v === 'lbs')
+        setUnit(v);
     });
   }, []);
 
@@ -68,7 +70,8 @@ export function useHeightUnit(): { unit: HeightUnit; toggle: () => void } {
 
   React.useEffect(() => {
     AsyncStorage.getItem(HEIGHT_UNIT_KEY).then((v) => {
-      if (v === 'metric' || v === 'imperial') setUnit(v);
+      if (v === 'metric' || v === 'imperial')
+        setUnit(v);
     });
   }, []);
 

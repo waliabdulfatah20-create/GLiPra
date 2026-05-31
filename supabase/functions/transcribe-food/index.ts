@@ -77,28 +77,28 @@ const EXTRACTION_MODEL = 'gpt-4o-mini';
 // Helpers
 // ---------------------------------------------------------------------------
 
-const EXTRACTION_SYSTEM_PROMPT =
-  'You are a nutrition analysis assistant for a GLP-1 medication companion app. ' +
-  'The user will provide a voice transcript describing their meal. ' +
-  'Analyze the described food and return a single JSON object representing the ' +
-  'complete meal as one consolidated entry. Use this exact shape: ' +
-  '{ ' +
-  '"name": string (concise meal name, e.g. "Scrambled eggs + protein shake"), ' +
-  '"servingDescription": string (e.g. "1 serving as described"), ' +
-  '"proteinG": number, ' +
-  '"carbsG": number | null, ' +
-  '"fatG": number | null, ' +
-  '"fiberG": number | null, ' +
-  '"caloriesKcal": number | null, ' +
-  '"b12Mcg": number | null, ' +
-  '"vitaminDIu": number | null, ' +
-  '"magnesiumMg": number | null, ' +
-  '"zincMg": number | null, ' +
-  '"confidence": "high" | "medium" | "low" ' +
-  '}. ' +
-  'For GLP-1 patients, micronutrient estimates are especially important -- provide ' +
-  'best estimates for B12, vitamin D, magnesium, zinc, or null if unknown. ' +
-  'Do not include any user-identifying information.';
+const EXTRACTION_SYSTEM_PROMPT
+  = 'You are a nutrition analysis assistant for a GLP-1 medication companion app. '
+    + 'The user will provide a voice transcript describing their meal. '
+    + 'Analyze the described food and return a single JSON object representing the '
+    + 'complete meal as one consolidated entry. Use this exact shape: '
+    + '{ '
+    + '"name": string (concise meal name, e.g. "Scrambled eggs + protein shake"), '
+    + '"servingDescription": string (e.g. "1 serving as described"), '
+    + '"proteinG": number, '
+    + '"carbsG": number | null, '
+    + '"fatG": number | null, '
+  + '"fiberG": number | null, '
+  + '"caloriesKcal": number | null, '
+  + '"b12Mcg": number | null, '
+  + '"vitaminDIu": number | null, '
+  + '"magnesiumMg": number | null, '
+  + '"zincMg": number | null, '
+  + '"confidence": "high" | "medium" | "low" '
+  + '}. '
+  + 'For GLP-1 patients, micronutrient estimates are especially important -- provide '
+  + 'best estimates for B12, vitamin D, magnesium, zinc, or null if unknown. '
+  + 'Do not include any user-identifying information.';
 
 // ---------------------------------------------------------------------------
 // Handler
@@ -136,7 +136,8 @@ serve(async (req: Request) => {
 
     if (countError) {
       console.error('Failed to query ai_invocations for rate limit:', countError.message);
-    } else if ((count ?? 0) >= DAILY_LIMIT) {
+    }
+    else if ((count ?? 0) >= DAILY_LIMIT) {
       return new Response(JSON.stringify({ error: 'Daily limit reached' }), {
         status: 429,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -166,7 +167,7 @@ serve(async (req: Request) => {
     const openai = new OpenAI({ apiKey: Deno.env.get('OPENAI_API_KEY')! });
 
     // 4. Step 1 — Whisper transcription
-    const audioBytes = Uint8Array.from(atob(audioBase64), (c) => c.charCodeAt(0));
+    const audioBytes = Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0));
     const audioFile = new File([audioBytes], 'audio.m4a', { type: mimeType });
 
     const transcriptionResponse = await openai.audio.transcriptions.create({
@@ -197,7 +198,8 @@ serve(async (req: Request) => {
         tokens_used: null,
         created_at: new Date().toISOString(),
       });
-      if (emptyLogError) console.error('Failed to log empty-transcript invocation:', emptyLogError.message);
+      if (emptyLogError)
+        console.error('Failed to log empty-transcript invocation:', emptyLogError.message);
 
       return new Response(JSON.stringify({ ...FALLBACK_RESULT, transcript: '' }), {
         status: 200,
@@ -224,10 +226,12 @@ serve(async (req: Request) => {
       const outputParse = OutputSchema.omit({ transcript: true }).safeParse(parsed);
       if (outputParse.success) {
         result = { ...outputParse.data, transcript };
-      } else {
+      }
+      else {
         console.error('OutputSchema validation failed:', outputParse.error.flatten());
       }
-    } catch (parseError) {
+    }
+    catch (parseError) {
       console.error('JSON.parse of OpenAI content failed:', parseError);
     }
 
@@ -245,15 +249,16 @@ serve(async (req: Request) => {
       created_at: new Date().toISOString(),
     });
 
-    if (logError) console.error('Failed to log ai_invocation:', logError.message);
+    if (logError)
+      console.error('Failed to log ai_invocation:', logError.message);
 
     // 8. Return result
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-
-  } catch (error: unknown) {
+  }
+  catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Internal server error';
     console.error('transcribe-food unhandled error:', message);
     return new Response(JSON.stringify({ error: message }), {

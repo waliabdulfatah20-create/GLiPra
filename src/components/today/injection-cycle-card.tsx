@@ -1,31 +1,34 @@
-import { addDays, format, parseISO } from 'date-fns';
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { useTranslation } from 'react-i18next';
-
 import type { InjectionCycleResult } from '@/features/injection-cycle/calculator';
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
 import type { InjectionPhase } from '@/types';
+import { addDays, format, parseISO } from 'date-fns';
 
-interface InjectionCycleCardProps {
+import * as React from 'react';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '@/lib/ThemeContext';
+
+type InjectionCycleCardProps = {
   lastInjectionDate: string;
   injectionCycle: InjectionCycleResult;
-}
+};
 
 function getPhaseForDay(dayIndex: number): InjectionPhase {
-  if (dayIndex === 0) return 'injection_day';
-  if (dayIndex <= 2) return 'peak_suppression';
-  if (dayIndex <= 4) return 'adjustment';
+  if (dayIndex === 0)
+    return 'injection_day';
+  if (dayIndex <= 2)
+    return 'peak_suppression';
+  if (dayIndex <= 4)
+    return 'adjustment';
   return 'recovery_window';
 }
 
 const PHASE_LABELS: Record<InjectionPhase, string> = {
-  injection_day:    '💉',
+  injection_day: '💉',
   peak_suppression: 'PEAK',
-  adjustment:       'ADJ',
-  recovery_window:  'REC',
-  overdue:          'OD',
+  adjustment: 'ADJ',
+  recovery_window: 'REC',
+  overdue: 'OD',
 };
 
 export function InjectionCycleCard({ lastInjectionDate, injectionCycle }: InjectionCycleCardProps) {
@@ -63,10 +66,10 @@ export function InjectionCycleCard({ lastInjectionDate, injectionCycle }: Inject
   const footerText = injectionCycle.isOverdue
     ? t('today.cycle_overdue_label')
     : injectionCycle.nextInjectionDate
-    ? t('today.cycle_next_dose', {
-        date: format(parseISO(injectionCycle.nextInjectionDate), 'EEE, MMM d'),
-      })
-    : null;
+      ? t('today.cycle_next_dose', {
+          date: format(parseISO(injectionCycle.nextInjectionDate), 'EEE, MMM d'),
+        })
+      : null;
 
   return (
     <View style={styles.outer}>
@@ -120,12 +123,12 @@ export function InjectionCycleCard({ lastInjectionDate, injectionCycle }: Inject
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

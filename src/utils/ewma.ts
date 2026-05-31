@@ -40,7 +40,8 @@ export function applyEwma(
  * - Otherwise applies `applyEwma` iteratively from the first reading.
  */
 export function computeEwmaSeries(readings: number[]): number {
-  if (readings.length === 0) return 0;
+  if (readings.length === 0)
+    return 0;
 
   let ewma: number | null = null;
   for (const reading of readings) {

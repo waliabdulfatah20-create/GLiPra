@@ -24,7 +24,7 @@ export function useRedFlagSnooze(): {
 
   useEffect(() => {
     AsyncStorage.getItem(SNOOZE_KEY)
-      .then((value) => setSnoozedUntil(value !== null ? parseInt(value, 10) : null))
+      .then(value => setSnoozedUntil(value !== null ? Number.parseInt(value, 10) : null))
       .catch(() => setSnoozedUntil(null))
       .finally(() => setIsLoading(false));
   }, []);

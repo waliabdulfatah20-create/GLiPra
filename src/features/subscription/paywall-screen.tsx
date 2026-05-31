@@ -9,7 +9,9 @@
 // When react-native-purchases is NOT installed (Expo Go / pre-native build),
 // all purchase buttons are disabled and show an explanatory label.
 
-import React, { useCallback, useState } from 'react';
+import type { GlipraTokens } from '@/theme/tokens';
+import * as React from 'react';
+import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -19,11 +21,10 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { analytics, EVENTS } from '@/lib/analytics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 // ---------------------------------------------------------------------------
 // RevenueCat availability guard (same pattern as use-subscription)
@@ -37,7 +38,8 @@ function getPurchasesModule(): typeof import('react-native-purchases') | null {
       return mod.default;
     }
     return null;
-  } catch {
+  }
+  catch {
     return null;
   }
 }
@@ -70,11 +72,11 @@ const PRO_BENEFITS = [
 // Props
 // ---------------------------------------------------------------------------
 
-export interface PaywallScreenProps {
+export type PaywallScreenProps = {
   /** Human-readable name of the feature that triggered the paywall */
   featureName: string;
   onDismiss: () => void;
-}
+};
 
 // ---------------------------------------------------------------------------
 // Component
@@ -96,7 +98,8 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
   const handlePurchase = useCallback(
     async (productId: string) => {
       const Purchases = getPurchasesModule();
-      if (!Purchases) return;
+      if (!Purchases)
+        return;
 
       setPurchasingId(productId);
       analytics.capture(EVENTS.PURCHASE_STARTED, { product_id: productId });
@@ -104,7 +107,8 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
         await Purchases.purchaseProduct(productId);
         analytics.capture(EVENTS.PURCHASE_COMPLETED, { product_id: productId });
         onDismiss();
-      } catch (e) {
+      }
+      catch (e) {
         // PurchasesError with code PURCHASE_CANCELLED (2) is a user action —
         // do not show an error alert.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -115,7 +119,8 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
             'Something went wrong. Please try again or restore your purchases.',
           );
         }
-      } finally {
+      }
+      finally {
         setPurchasingId(null);
       }
     },
@@ -124,7 +129,8 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
 
   const handleRestore = useCallback(async () => {
     const Purchases = getPurchasesModule();
-    if (!Purchases) return;
+    if (!Purchases)
+      return;
 
     try {
       await Purchases.restorePurchases();
@@ -133,7 +139,8 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
         'Your subscription status has been updated.',
         [{ text: 'OK', onPress: onDismiss }],
       );
-    } catch {
+    }
+    catch {
       Alert.alert(
         'Restore failed',
         'Could not restore purchases. Please try again.',
@@ -166,7 +173,11 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
         {/* Value prop */}
         <View style={styles.valueCard}>
           <Text style={styles.featureHighlight}>
-            Unlock {featureName} and all Pro features
+            Unlock
+            {' '}
+            {featureName}
+            {' '}
+            and all Pro features
           </Text>
           <Text style={styles.pharmacistBadge}>
             Designed by a licensed pharmacist
@@ -176,7 +187,7 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
         {/* Benefits list */}
         <View style={styles.benefitsCard}>
           <Text style={styles.benefitsTitle}>What you get with Pro</Text>
-          {PRO_BENEFITS.map((benefit) => (
+          {PRO_BENEFITS.map(benefit => (
             <View key={benefit} style={styles.benefitRow}>
               <Text style={styles.benefitCheck}>✓</Text>
               <Text style={styles.benefitText}>{benefit}</Text>
@@ -269,7 +280,7 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
 // PurchaseButton sub-component
 // ---------------------------------------------------------------------------
 
-interface PurchaseButtonProps {
+type PurchaseButtonProps = {
   label: string;
   sublabel: string | null;
   productId: string;
@@ -277,7 +288,7 @@ interface PurchaseButtonProps {
   isLoading: boolean;
   onPress: (productId: string) => void;
   style: 'primary' | 'secondary';
-}
+};
 
 function PurchaseButton({
   label,
@@ -310,36 +321,38 @@ function PurchaseButton({
         isDisabled ? `${label}: available in full app build` : label
       }
     >
-      {isLoading ? (
-        <ActivityIndicator
-          size="small"
-          color={isPrimary ? colors.white : colors.primary}
-        />
-      ) : (
-        <View style={styles.purchaseButtonContent}>
-          <Text
-            style={[
-              styles.purchaseButtonLabel,
-              isPrimary
-                ? styles.purchaseButtonLabelPrimary
-                : styles.purchaseButtonLabelSecondary,
-              isDisabled && styles.purchaseButtonLabelDisabled,
-            ]}
-          >
-            {isDisabled ? `${label}: available in full app` : label}
-          </Text>
-          {sublabel && (
-            <Text
-              style={[
-                styles.purchaseButtonSublabel,
-                isDisabled && styles.purchaseButtonLabelDisabled,
-              ]}
-            >
-              {sublabel}
-            </Text>
+      {isLoading
+        ? (
+            <ActivityIndicator
+              size="small"
+              color={isPrimary ? colors.white : colors.primary}
+            />
+          )
+        : (
+            <View style={styles.purchaseButtonContent}>
+              <Text
+                style={[
+                  styles.purchaseButtonLabel,
+                  isPrimary
+                    ? styles.purchaseButtonLabelPrimary
+                    : styles.purchaseButtonLabelSecondary,
+                  isDisabled && styles.purchaseButtonLabelDisabled,
+                ]}
+              >
+                {isDisabled ? `${label}: available in full app` : label}
+              </Text>
+              {sublabel && (
+                <Text
+                  style={[
+                    styles.purchaseButtonSublabel,
+                    isDisabled && styles.purchaseButtonLabelDisabled,
+                  ]}
+                >
+                  {sublabel}
+                </Text>
+              )}
+            </View>
           )}
-        </View>
-      )}
     </Pressable>
   );
 }
@@ -348,12 +361,12 @@ function PurchaseButton({
 // Styles
 // ---------------------------------------------------------------------------
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
@@ -404,7 +417,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       borderRadius: radius.lg,
       padding: spacing.lg,
       borderWidth: 1,
-      borderColor: colors.primary + '40',
+      borderColor: `${colors.primary}40`,
       gap: spacing.sm,
       alignItems: 'center',
     },
@@ -514,7 +527,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       borderRadius: radius.md,
       padding: spacing.md,
       borderWidth: 1,
-      borderColor: colors.warning + '60',
+      borderColor: `${colors.warning}60`,
     },
     stubNoticeText: {
       fontSize: 13,

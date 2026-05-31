@@ -4,9 +4,12 @@
 // Flow: tap → Pro check → mic permission → recording state →
 //       tap to stop → base64 encode → onAudioCaptured callback
 
+import type { GlipraTokens } from '@/theme/tokens';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
+
 import {
   ActivityIndicator,
   Alert,
@@ -15,24 +18,21 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
-
-import { haptics } from '@/lib/haptics';
-import { useTheme } from '@/lib/ThemeContext';
-import { useSubscription } from '@/features/subscription/use-subscription';
-import type { GlipraTokens } from '@/theme/tokens';
-
 // RevenueCat paywall — same import as photo-capture-button.tsx
 import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
+import { useSubscription } from '@/features/subscription/use-subscription';
+import { haptics } from '@/lib/haptics';
+
+import { useTheme } from '@/lib/ThemeContext';
 
 // ---------------------------------------------------------------------------
 // Props
 // ---------------------------------------------------------------------------
 
-interface VoiceCaptureButtonProps {
+type VoiceCaptureButtonProps = {
   onAudioCaptured: (base64: string, mimeType: string) => void;
   isLoading: boolean;
-}
+};
 
 // ---------------------------------------------------------------------------
 // Component
@@ -57,7 +57,7 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
       setElapsedSeconds(0);
       return;
     }
-    const interval = setInterval(() => setElapsedSeconds((s) => s + 1), 1000);
+    const interval = setInterval(() => setElapsedSeconds(s => s + 1), 1000);
     return () => clearInterval(interval);
   }, [isRecording]);
 
@@ -92,10 +92,12 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
       });
       // Only PURCHASED and RESTORED are valid fall-throughs — all other outcomes exit.
       if (
-        result === PAYWALL_RESULT.NOT_PRESENTED ||
-        result === PAYWALL_RESULT.CANCELLED ||
-        result === PAYWALL_RESULT.ERROR
-      ) return;
+        result === PAYWALL_RESULT.NOT_PRESENTED
+        || result === PAYWALL_RESULT.CANCELLED
+        || result === PAYWALL_RESULT.ERROR
+      ) {
+        return;
+      }
     }
 
     // Mic permission
@@ -125,7 +127,8 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
 
       setRecording(newRecording);
       setIsRecording(true);
-    } catch (err) {
+    }
+    catch (err) {
       console.error('[VoiceCaptureButton] startRecording error:', err);
       Alert.alert('Recording failed', 'Could not start recording. Please try again.');
     }
@@ -138,7 +141,8 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
       await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
 
       const uri = rec.getURI();
-      if (!uri) throw new Error('No recording URI');
+      if (!uri)
+        throw new Error('No recording URI');
 
       const base64 = await FileSystem.readAsStringAsync(uri, {
         encoding: FileSystem.EncodingType.Base64,
@@ -146,7 +150,8 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
 
       setRecording(null);
       onAudioCaptured(base64, 'audio/m4a');
-    } catch (err) {
+    }
+    catch (err) {
       console.error('[VoiceCaptureButton] stopRecording error:', err);
       setRecording(null);
     }
@@ -201,11 +206,11 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
 // Styles
 // ---------------------------------------------------------------------------
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

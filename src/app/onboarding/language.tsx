@@ -1,15 +1,15 @@
+import type { Language } from '@/lib/i18n/resources';
+import type { GlipraTokens } from '@/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+
 import * as React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { LinearGradient } from 'expo-linear-gradient';
-import { LOCAL, changeLanguage } from '@/lib/i18n/utils';
-import { setItem } from '@/lib/storage';
 import { haptics } from '@/lib/haptics';
+import { changeLanguage, LOCAL } from '@/lib/i18n/utils';
+import { setItem } from '@/lib/storage';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
-import type { Language } from '@/lib/i18n/resources';
 
 type LangOption = { code: Language; label: string; sublabel: string };
 
@@ -24,7 +24,7 @@ export default function LanguageScreen() {
   const { colors, spacing, radius, shadows, gradients } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows]
+    [colors, spacing, radius, shadows],
   );
 
   const handleContinue = () => {
@@ -54,7 +54,7 @@ export default function LanguageScreen() {
         </LinearGradient>
 
         <View style={styles.options}>
-          {LANGS.map(lang => {
+          {LANGS.map((lang) => {
             const isSelected = selected === lang.code;
             return (
               <Pressable
@@ -92,12 +92,12 @@ export default function LanguageScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

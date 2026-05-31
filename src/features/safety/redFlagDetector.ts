@@ -7,15 +7,15 @@ import { differenceInCalendarDays, parseISO } from 'date-fns';
 /**
  * Single check-in entry from user's daily symptom log
  */
-interface CheckIn {
+type CheckIn = {
   date: string; // 'YYYY-MM-DD'
   nausea: number | null; // 1-5 or null
   energy: number | null; // 1-5 or null
   water_ml: number | null;
   notes: string | null;
-}
+};
 
-export interface RedFlagInput {
+export type RedFlagInput = {
   checkIns: Array<{
     date: string; // 'YYYY-MM-DD'
     nausea: number | null; // 1-5 or null
@@ -24,20 +24,20 @@ export interface RedFlagInput {
     notes: string | null;
   }>;
   today: string; // 'YYYY-MM-DD'
-}
+};
 
-export interface RedFlagPattern {
+export type RedFlagPattern = {
   type: 'dehydration_risk' | 'pain_pattern' | 'vomiting_pattern' | 'energy_pattern';
   severity: 'low' | 'medium' | 'high';
   description: string; // for internal logging, never shown to user
   daysSinceOnset: number;
-}
+};
 
-export interface RedFlagDetection {
+export type RedFlagDetection = {
   triggered: boolean;
   patterns: RedFlagPattern[];
   shouldEscalate: boolean; // true if any severity = 'high'
-}
+};
 
 // Keywords for pattern detection
 const PAIN_KEYWORDS = ['pain', 'ache', 'cramp', 'sharp', 'stabbing', 'severe', 'hurt'];
@@ -49,7 +49,7 @@ const LOOKBACK_WINDOW = 30; // days
  * Helper: filter check-ins to valid date range (on or before today)
  */
 function filterToValidDates(checkIns: CheckIn[], today: string): CheckIn[] {
-  return checkIns.filter((c) => c.date <= today);
+  return checkIns.filter(c => c.date <= today);
 }
 
 /**
@@ -64,9 +64,10 @@ function daysSince(date: string, today: string): number {
  * Helper: check if text contains any of the keywords (case-insensitive)
  */
 function containsKeywords(text: string | null, keywords: string[]): boolean {
-  if (!text) return false;
+  if (!text)
+    return false;
   const lower = text.toLowerCase();
-  return keywords.some((kw) => lower.includes(kw.toLowerCase()));
+  return keywords.some(kw => lower.includes(kw.toLowerCase()));
 }
 
 /**
@@ -80,16 +81,17 @@ function detectDehydrationRisk(
 ): RedFlagPattern | null {
   const consecutive = getConsecutiveDays(
     checkIns,
-    (c) => c.nausea === 5 && c.water_ml !== null && c.water_ml < DEHYDRATION_WATER_THRESHOLD,
+    c => c.nausea === 5 && c.water_ml !== null && c.water_ml < DEHYDRATION_WATER_THRESHOLD,
     3,
     14,
     today,
   );
 
-  if (consecutive === 0) return null;
+  if (consecutive === 0)
+    return null;
 
-  const severity: 'low' | 'medium' | 'high' =
-    consecutive === 2 ? 'low' : consecutive === 3 ? 'medium' : 'high';
+  const severity: 'low' | 'medium' | 'high'
+    = consecutive === 2 ? 'low' : consecutive === 3 ? 'medium' : 'high';
 
   return {
     type: 'dehydration_risk',
@@ -111,10 +113,11 @@ function detectPainPattern(checkIns: CheckIn[], today: string): RedFlagPattern |
   });
 
   const match = last7Days.find(
-    (c) => c.nausea === 5 && containsKeywords(c.notes, PAIN_KEYWORDS),
+    c => c.nausea === 5 && containsKeywords(c.notes, PAIN_KEYWORDS),
   );
 
-  if (!match) return null;
+  if (!match)
+    return null;
 
   const daysSinceOnset = daysSince(match.date, today);
 
@@ -137,13 +140,14 @@ function detectVomitingPattern(
 ): RedFlagPattern | null {
   const consecutive = getConsecutiveDays(
     checkIns,
-    (c) => containsKeywords(c.notes, VOMIT_KEYWORDS),
+    c => containsKeywords(c.notes, VOMIT_KEYWORDS),
     2,
     14,
     today,
   );
 
-  if (consecutive === 0) return null;
+  if (consecutive === 0)
+    return null;
 
   const severity: 'medium' | 'high' = consecutive === 2 ? 'medium' : 'high';
 
@@ -163,13 +167,14 @@ function detectVomitingPattern(
 function detectEnergyPattern(checkIns: CheckIn[], today: string): RedFlagPattern | null {
   const consecutive = getConsecutiveDays(
     checkIns,
-    (c) => c.energy === 1,
+    c => c.energy === 1,
     5,
     30,
     today,
   );
 
-  if (consecutive === 0) return null;
+  if (consecutive === 0)
+    return null;
 
   const severity: 'medium' | 'high' = consecutive < 7 ? 'medium' : 'high';
 
@@ -202,17 +207,19 @@ export function getConsecutiveDays(
 ): number {
   // Sort by date descending (most recent first)
   const sorted = checkIns
-    .filter((c) => c.date <= today && daysSince(c.date, today) <= lookbackDays)
+    .filter(c => c.date <= today && daysSince(c.date, today) <= lookbackDays)
     .sort((a, b) => b.date.localeCompare(a.date));
 
-  if (sorted.length === 0) return 0;
+  if (sorted.length === 0)
+    return 0;
 
   // Count consecutive matches from the most recent date backwards
   let count = 0;
   for (const checkIn of sorted) {
     if (predicate(checkIn)) {
       count++;
-    } else {
+    }
+    else {
       // Break on first non-match
       break;
     }
@@ -235,19 +242,23 @@ export function detectRedFlags(input: RedFlagInput): RedFlagDetection {
   const patterns: RedFlagPattern[] = [];
 
   const dehydration = detectDehydrationRisk(validCheckIns, today);
-  if (dehydration) patterns.push(dehydration);
+  if (dehydration)
+    patterns.push(dehydration);
 
   const pain = detectPainPattern(validCheckIns, today);
-  if (pain) patterns.push(pain);
+  if (pain)
+    patterns.push(pain);
 
   const vomiting = detectVomitingPattern(validCheckIns, today);
-  if (vomiting) patterns.push(vomiting);
+  if (vomiting)
+    patterns.push(vomiting);
 
   const energy = detectEnergyPattern(validCheckIns, today);
-  if (energy) patterns.push(energy);
+  if (energy)
+    patterns.push(energy);
 
   // Determine escalation threshold
-  const shouldEscalate = patterns.some((p) => p.severity === 'high');
+  const shouldEscalate = patterns.some(p => p.severity === 'high');
 
   return {
     triggered: patterns.length > 0,

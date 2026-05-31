@@ -3,6 +3,8 @@
 // Shows a 4-week data summary and pharmacist-authored questions list.
 // Rule 8: DisclaimerBanner tier={1} — this is a clinical screen.
 
+import type { GlipraTokens } from '@/theme/tokens';
+import { useRouter } from 'expo-router';
 import * as React from 'react';
 import {
   ActivityIndicator,
@@ -13,19 +15,17 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { ProGate, useSubscription } from '@/features/subscription';
 import {
-  useVisitPrepData,
-  useVisitPrep,
   useGeneratePdf,
+  useVisitPrep,
+  useVisitPrepData,
 } from '@/features/visit-prep/hooks';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
 
 // Static fallback questions shown before AI generation runs.
 const STATIC_QUESTIONS = [
@@ -98,8 +98,8 @@ export default function VisitPrepScreen() {
   );
 
   // Active question list — AI-generated when available, static fallback otherwise.
-  const activeQuestions: readonly string[] =
-    aiQuestions !== null ? aiQuestions : STATIC_QUESTIONS;
+  const activeQuestions: readonly string[]
+    = aiQuestions !== null ? aiQuestions : STATIC_QUESTIONS;
 
   const handleGenerateQuestions = React.useCallback(async () => {
     haptics.medium();
@@ -108,7 +108,8 @@ export default function VisitPrepScreen() {
 
   const handleExport = React.useCallback(async () => {
     haptics.medium();
-    if (!isPro) return;
+    if (!isPro)
+      return;
 
     const pdfBase64 = await generate(data);
 
@@ -124,9 +125,9 @@ export default function VisitPrepScreen() {
     // expo-sharing is a native-only package — we require it lazily so the
     // module doesn't crash in environments where it isn't installed.
     try {
+      const FileSystem = require('expo-file-system');
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const Sharing = require('expo-sharing');
-      const FileSystem = require('expo-file-system');
       if (await Sharing.isAvailableAsync()) {
         const fileUri = `${FileSystem.cacheDirectory}visit-prep.pdf`;
         await FileSystem.writeAsStringAsync(fileUri, pdfBase64, {
@@ -138,7 +139,8 @@ export default function VisitPrepScreen() {
         });
         return;
       }
-    } catch {
+    }
+    catch {
       // Sharing unavailable on this device/simulator — fall through to stub
     }
 
@@ -175,7 +177,7 @@ export default function VisitPrepScreen() {
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
-            <Text style={styles.backText}>{'‹ Back'}</Text>
+            <Text style={styles.backText}>‹ Back</Text>
           </Pressable>
           <Text style={styles.title}>Visit Prep</Text>
           <View style={styles.backButton} />
@@ -250,20 +252,22 @@ export default function VisitPrepScreen() {
 
         {/* Symptoms card */}
         <SectionCard label="RECENT SYMPTOMS (last 7 check-ins)">
-          {data.avgNausea !== null && data.avgEnergy !== null ? (
-            <>
-              <DataRow
-                name="Avg nausea (1–5)"
-                value={data.avgNausea.toFixed(1)}
-              />
-              <DataRow
-                name="Avg energy (1–5)"
-                value={data.avgEnergy.toFixed(1)}
-              />
-            </>
-          ) : (
-            <Text style={styles.emptyText}>No check-ins yet</Text>
-          )}
+          {data.avgNausea !== null && data.avgEnergy !== null
+            ? (
+                <>
+                  <DataRow
+                    name="Avg nausea (1–5)"
+                    value={data.avgNausea.toFixed(1)}
+                  />
+                  <DataRow
+                    name="Avg energy (1–5)"
+                    value={data.avgEnergy.toFixed(1)}
+                  />
+                </>
+              )
+            : (
+                <Text style={styles.emptyText}>No check-ins yet</Text>
+              )}
         </SectionCard>
 
         {/* Questions to ask prescriber */}
@@ -292,15 +296,17 @@ export default function VisitPrepScreen() {
             accessibilityRole="button"
             accessibilityLabel="Generate personalized questions with AI"
           >
-            {isQuestionsLoading ? (
-              <ActivityIndicator size="small" color={colors.primary} />
-            ) : (
-              <Text style={styles.generateButtonText}>
-                {aiQuestions !== null
-                  ? 'Regenerate Questions'
-                  : 'Generate Personalized Questions'}
-              </Text>
-            )}
+            {isQuestionsLoading
+              ? (
+                  <ActivityIndicator size="small" color={colors.primary} />
+                )
+              : (
+                  <Text style={styles.generateButtonText}>
+                    {aiQuestions !== null
+                      ? 'Regenerate Questions'
+                      : 'Generate Personalized Questions'}
+                  </Text>
+                )}
           </Pressable>
 
           {isQuestionsLoading && (
@@ -326,11 +332,13 @@ export default function VisitPrepScreen() {
             accessibilityRole="button"
             accessibilityLabel="Export visit prep PDF"
           >
-            {isPdfLoading ? (
-              <ActivityIndicator size="small" color={colors.white} />
-            ) : (
-              <Text style={styles.exportButtonText}>Export PDF</Text>
-            )}
+            {isPdfLoading
+              ? (
+                  <ActivityIndicator size="small" color={colors.white} />
+                )
+              : (
+                  <Text style={styles.exportButtonText}>Export PDF</Text>
+                )}
           </Pressable>
         </ProGate>
       </ScrollView>
@@ -342,12 +350,12 @@ export default function VisitPrepScreen() {
 // Styles
 // ---------------------------------------------------------------------------
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

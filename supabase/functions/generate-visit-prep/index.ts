@@ -110,7 +110,8 @@ serve(async (req: Request) => {
     if (countError) {
       console.error('Rate-limit query failed:', countError.message);
       // Fail open only in this case — do not block the user on a DB error.
-    } else if ((count ?? 0) >= DAILY_LIMIT) {
+    }
+    else if ((count ?? 0) >= DAILY_LIMIT) {
       return new Response(
         JSON.stringify({ error: 'Daily limit reached (5/day for visit prep)' }),
         {
@@ -124,7 +125,8 @@ serve(async (req: Request) => {
     let body: unknown;
     try {
       body = await req.json();
-    } catch {
+    }
+    catch {
       return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -203,13 +205,13 @@ serve(async (req: Request) => {
           role: 'system',
           // ATTORNEY REVIEW REQUIRED — see comment above.
           content:
-            'You are a clinical assistant helping a patient prepare questions for their prescriber appointment. ' +
-            'Generate 3-5 specific, relevant questions based on the patient\'s recent GLP-1 medication data. ' +
-            'Questions should be about medication efficacy, dosing, and management — never about nutrition. ' +
-            'Be specific and data-driven. Use the provided metrics directly in the questions. ' +
-            'Do not include any identifying information in the questions. ' +
-            'Format: return a JSON object with a "questions" key containing an array of question strings. ' +
-            'Example: { "questions": ["My nausea has been high. Should we adjust my dose?"] }',
+            'You are a clinical assistant helping a patient prepare questions for their prescriber appointment. '
+            + 'Generate 3-5 specific, relevant questions based on the patient\'s recent GLP-1 medication data. '
+            + 'Questions should be about medication efficacy, dosing, and management — never about nutrition. '
+            + 'Be specific and data-driven. Use the provided metrics directly in the questions. '
+            + 'Do not include any identifying information in the questions. '
+            + 'Format: return a JSON object with a "questions" key containing an array of question strings. '
+            + 'Example: { "questions": ["My nausea has been high. Should we adjust my dose?"] }',
         },
         {
           role: 'user',
@@ -228,14 +230,16 @@ serve(async (req: Request) => {
       const outputParse = OutputSchema.safeParse(parsed);
       if (outputParse.success) {
         result = outputParse.data;
-      } else {
+      }
+      else {
         console.error(
           'OutputSchema validation failed:',
           outputParse.error.flatten(),
         );
         // result stays as FALLBACK_RESULT
       }
-    } catch (parseError) {
+    }
+    catch (parseError) {
       console.error('JSON.parse of OpenAI content failed:', parseError);
       // result stays as FALLBACK_RESULT
     }
@@ -267,9 +271,10 @@ serve(async (req: Request) => {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : 'Internal server error';
+  }
+  catch (error: unknown) {
+    const message
+      = error instanceof Error ? error.message : 'Internal server error';
     console.error('generate-visit-prep unhandled error:', message);
     return new Response(JSON.stringify({ error: message }), {
       status: 400,

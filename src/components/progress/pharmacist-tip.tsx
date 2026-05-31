@@ -11,15 +11,15 @@
  * screen.
  */
 
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-
-import { useTheme } from '@/lib/ThemeContext';
 import type { GlipraTokens } from '@/theme/tokens';
+import * as React from 'react';
 
-interface PharmacistTipProps {
+import { StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '@/lib/ThemeContext';
+
+type PharmacistTipProps = {
   children: React.ReactNode;
-}
+};
 
 export function PharmacistTip({ children }: PharmacistTipProps) {
   const { colors, spacing, radius } = useTheme();
@@ -38,11 +38,11 @@ export function PharmacistTip({ children }: PharmacistTipProps) {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

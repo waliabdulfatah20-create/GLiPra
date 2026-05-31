@@ -1,7 +1,8 @@
+import type { InjectionCycleResult } from './calculator';
 import { describe, expect, it } from 'vitest';
 import {
   calculateInjectionPhase,
-  type InjectionCycleResult,
+
 } from './calculator';
 
 // Helper: build an ISO date string offset by N days from a base date
@@ -14,7 +15,7 @@ function offsetDate(base: string, days: number): string {
 const BASE = '2026-05-10'; // lastInjectionDate anchor for all tests
 
 describe('calculateInjectionPhase — phase mapping', () => {
-  it('Day 0 → injection_day', () => {
+  it('day 0 → injection_day', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 0),
@@ -24,7 +25,7 @@ describe('calculateInjectionPhase — phase mapping', () => {
     expect(result.isOverdue).toBe(false);
   });
 
-  it('Day 1 → peak_suppression', () => {
+  it('day 1 → peak_suppression', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 1),
@@ -34,7 +35,7 @@ describe('calculateInjectionPhase — phase mapping', () => {
     expect(result.isOverdue).toBe(false);
   });
 
-  it('Day 2 → peak_suppression', () => {
+  it('day 2 → peak_suppression', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 2),
@@ -43,7 +44,7 @@ describe('calculateInjectionPhase — phase mapping', () => {
     expect(result.daysSinceInjection).toBe(2);
   });
 
-  it('Day 3 → adjustment', () => {
+  it('day 3 → adjustment', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 3),
@@ -52,7 +53,7 @@ describe('calculateInjectionPhase — phase mapping', () => {
     expect(result.daysSinceInjection).toBe(3);
   });
 
-  it('Day 4 → adjustment', () => {
+  it('day 4 → adjustment', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 4),
@@ -61,7 +62,7 @@ describe('calculateInjectionPhase — phase mapping', () => {
     expect(result.daysSinceInjection).toBe(4);
   });
 
-  it('Day 5 → recovery_window', () => {
+  it('day 5 → recovery_window', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 5),
@@ -70,7 +71,7 @@ describe('calculateInjectionPhase — phase mapping', () => {
     expect(result.daysSinceInjection).toBe(5);
   });
 
-  it('Day 6 → recovery_window', () => {
+  it('day 6 → recovery_window', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 6),
@@ -79,7 +80,7 @@ describe('calculateInjectionPhase — phase mapping', () => {
     expect(result.daysSinceInjection).toBe(6);
   });
 
-  it('Day 7 → recovery_window', () => {
+  it('day 7 → recovery_window', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 7),
@@ -88,7 +89,7 @@ describe('calculateInjectionPhase — phase mapping', () => {
     expect(result.daysSinceInjection).toBe(7);
   });
 
-  it('Day 8 → overdue (isOverdue: true, nulls for next injection fields)', () => {
+  it('day 8 → overdue (isOverdue: true, nulls for next injection fields)', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 8),
@@ -100,7 +101,7 @@ describe('calculateInjectionPhase — phase mapping', () => {
     expect(result.nextInjectionDate).toBeNull();
   });
 
-  it('Day 15 → overdue', () => {
+  it('day 15 → overdue', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 15),
@@ -114,7 +115,7 @@ describe('calculateInjectionPhase — phase mapping', () => {
 });
 
 describe('calculateInjectionPhase — nextInjectionDate correctness (default 7-day interval)', () => {
-  it('Day 0: nextInjectionDate is 7 days after lastInjectionDate', () => {
+  it('day 0: nextInjectionDate is 7 days after lastInjectionDate', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 0),
@@ -123,7 +124,7 @@ describe('calculateInjectionPhase — nextInjectionDate correctness (default 7-d
     expect(result.daysUntilNextInjection).toBe(7);
   });
 
-  it('Day 3: nextInjectionDate is still 7 days after lastInjectionDate, 4 days away', () => {
+  it('day 3: nextInjectionDate is still 7 days after lastInjectionDate, 4 days away', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 3),
@@ -132,7 +133,7 @@ describe('calculateInjectionPhase — nextInjectionDate correctness (default 7-d
     expect(result.daysUntilNextInjection).toBe(4);
   });
 
-  it('Day 7: nextInjectionDate is same day as today (0 days away)', () => {
+  it('day 7: nextInjectionDate is same day as today (0 days away)', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 7),
@@ -143,7 +144,7 @@ describe('calculateInjectionPhase — nextInjectionDate correctness (default 7-d
 });
 
 describe('calculateInjectionPhase — custom interval (14-day biweekly)', () => {
-  it('Day 7 with 14-day interval → recovery_window, nextInjectionDate 14 days after last', () => {
+  it('day 7 with 14-day interval → recovery_window, nextInjectionDate 14 days after last', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 7),
@@ -156,7 +157,7 @@ describe('calculateInjectionPhase — custom interval (14-day biweekly)', () => 
     expect(result.isOverdue).toBe(false);
   });
 
-  it('Day 0 with 14-day interval → injection_day, nextInjectionDate 14 days out', () => {
+  it('day 0 with 14-day interval → injection_day, nextInjectionDate 14 days out', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 0),
@@ -167,7 +168,7 @@ describe('calculateInjectionPhase — custom interval (14-day biweekly)', () => 
     expect(result.daysUntilNextInjection).toBe(14);
   });
 
-  it('Day 8 with 14-day interval → overdue (phase boundary unchanged), next is null', () => {
+  it('day 8 with 14-day interval → overdue (phase boundary unchanged), next is null', () => {
     const result = calculateInjectionPhase({
       lastInjectionDate: BASE,
       today: offsetDate(BASE, 8),

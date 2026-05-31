@@ -83,7 +83,8 @@ serve(async (req: Request) => {
     if (countError) {
       console.error('Rate-limit query failed:', countError.message);
       // Fail open on DB error — do not block the user.
-    } else if ((count ?? 0) >= DAILY_LIMIT) {
+    }
+    else if ((count ?? 0) >= DAILY_LIMIT) {
       return new Response(
         JSON.stringify({ error: 'Daily export limit reached (1/day)' }),
         {
@@ -147,7 +148,8 @@ serve(async (req: Request) => {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (error: unknown) {
+  }
+  catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Internal server error';
     console.error('export-user-data unhandled error:', message);
     return new Response(JSON.stringify({ error: message }), {

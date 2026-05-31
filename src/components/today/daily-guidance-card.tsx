@@ -4,9 +4,13 @@
 // Rule 9: No condition names in copy.
 // Rule 10: AI scope is nutrition only -- enforced server-side; card is display-only.
 
+import type { DailyGuidanceResult } from '@/features/daily-guidance/api';
+import type { GlipraTokens } from '@/theme/tokens';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as React from 'react';
+
+import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   Pressable,
@@ -14,22 +18,18 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
-
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { ProGate } from '@/features/subscription/pro-gate';
 import { analytics, EVENTS } from '@/lib/analytics';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
-import type { DailyGuidanceResult } from '@/features/daily-guidance/api';
 
 const DISCLAIMER_SEEN_KEY = 'glipra_daily_guidance_disclaimer_seen';
 
-interface DailyGuidanceCardProps {
+type DailyGuidanceCardProps = {
   guidance: DailyGuidanceResult | undefined;
   isLoading: boolean;
   isError: boolean;
-}
+};
 
 export function DailyGuidanceCard({ guidance, isLoading, isError }: DailyGuidanceCardProps) {
   const { colors, gradients, spacing, radius, shadows } = useTheme();
@@ -45,7 +45,7 @@ export function DailyGuidanceCard({ guidance, isLoading, isError }: DailyGuidanc
 
   React.useEffect(() => {
     AsyncStorage.getItem(DISCLAIMER_SEEN_KEY)
-      .then((value) => setDisclaimerAcknowledged(value === 'true'))
+      .then(value => setDisclaimerAcknowledged(value === 'true'))
       .catch(() => setDisclaimerAcknowledged(false));
   }, []);
 
@@ -62,7 +62,7 @@ export function DailyGuidanceCard({ guidance, isLoading, isError }: DailyGuidanc
   }, []);
 
   const handleWhyPress = React.useCallback(() => {
-    setShowWhy((prev) => !prev);
+    setShowWhy(prev => !prev);
     if (!showWhy) {
       analytics.capture(EVENTS.DAILY_GUIDANCE_WHY_TAPPED);
     }
@@ -137,12 +137,12 @@ export function DailyGuidanceCard({ guidance, isLoading, isError }: DailyGuidanc
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
   shadows: GlipraTokens['shadows'];
-}
+};
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({

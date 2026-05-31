@@ -1,6 +1,7 @@
 // Goal Weight edit screen — accessible from Settings > Body Metrics.
 // Saves goal_weight_kg to the profiles table. Optional field.
 
+import type { GlipraTokens } from '@/theme/tokens';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import * as React from 'react';
@@ -13,20 +14,20 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { UnitToggle } from '@/components/ui/unit-toggle';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { useTodayProfile } from '@/features/today/hooks';
-import { supabase } from '@/lib/supabase';
-import { formatWeight, kgToLbs, lbsToKg, useWeightUnit } from '@/lib/unit-preference';
-import { UnitToggle } from '@/components/ui/unit-toggle';
 import { haptics } from '@/lib/haptics';
+import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/lib/ThemeContext';
-import type { GlipraTokens } from '@/theme/tokens';
+import { formatWeight, kgToLbs, lbsToKg, useWeightUnit } from '@/lib/unit-preference';
 
 function parsePositiveNumber(value: string): number | null {
-  const num = parseFloat(value);
-  if (isNaN(num) || num <= 0) return null;
+  const num = Number.parseFloat(value);
+  if (isNaN(num) || num <= 0)
+    return null;
   return num;
 }
 
@@ -39,7 +40,8 @@ export default function GoalWeightScreen() {
   // Pre-populate from existing profile value
   const [goalText, setGoalText] = React.useState(() => {
     const kg = profile?.goalWeightKg;
-    if (!kg) return '';
+    if (!kg)
+      return '';
     const displayed = weightUnit === 'lbs' ? kgToLbs(kg) : kg;
     return String(displayed);
   });
@@ -48,7 +50,7 @@ export default function GoalWeightScreen() {
   const { colors, spacing, radius } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius]
+    [colors, spacing, radius],
   );
 
   const goalRaw = parsePositiveNumber(goalText);
@@ -56,11 +58,12 @@ export default function GoalWeightScreen() {
 
   async function handleSave() {
     haptics.medium();
-    if (!session?.user.id) return;
+    if (!session?.user.id)
+      return;
     setIsSaving(true);
 
-    const goalWeightKg =
-      goalRaw !== null
+    const goalWeightKg
+      = goalRaw !== null
         ? weightUnit === 'lbs'
           ? lbsToKg(goalRaw)
           : goalRaw
@@ -78,7 +81,8 @@ export default function GoalWeightScreen() {
 
   async function handleClear() {
     haptics.warning();
-    if (!session?.user.id) return;
+    if (!session?.user.id)
+      return;
     setIsSaving(true);
     setGoalText('');
 
@@ -101,7 +105,7 @@ export default function GoalWeightScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Go back">
-            <Text style={styles.backText}>{'‹ Back'}</Text>
+            <Text style={styles.backText}>‹ Back</Text>
           </Pressable>
           <Text style={styles.title}>Goal Weight</Text>
           <View style={styles.headerSpacer} />
@@ -110,7 +114,9 @@ export default function GoalWeightScreen() {
         <View style={styles.body}>
           {profile?.goalWeightKg != null && (
             <Text style={styles.currentValue}>
-              Current: {formatWeight(profile.goalWeightKg, weightUnit)}
+              Current:
+              {' '}
+              {formatWeight(profile.goalWeightKg, weightUnit)}
             </Text>
           )}
 
@@ -171,11 +177,11 @@ export default function GoalWeightScreen() {
   );
 }
 
-interface StyleTokens {
+type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-}
+};
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({

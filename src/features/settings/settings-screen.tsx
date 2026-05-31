@@ -5,12 +5,15 @@
 import Env from 'env';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { DeleteAccountModal } from '@/features/account/components/delete-account-modal';
+import { useDeleteAccount, useExportData } from '@/features/account/hooks';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { useTodayProfile } from '@/features/today/hooks';
+import { analytics, EVENTS } from '@/lib/analytics';
 import { haptics } from '@/lib/haptics';
 import { useTheme, useThemeSelector } from '@/lib/ThemeContext';
 import { formatWeight, useWeightUnit } from '@/lib/unit-preference';
@@ -92,6 +95,48 @@ export function SettingsScreen() {
     () => makeStyles({ colors, spacing, radius }),
     [colors, spacing, radius],
   );
+
+  const exportData = useExportData();
+  const deleteAccount = useDeleteAccount();
+  const [deleteVisible, setDeleteVisible] = React.useState(false);
+
+  const handleExport = async () => {
+    const json = await exportData.run();
+    if (!json) {
+      Alert.alert(t('account.export_failed'), exportData.error ?? '');
+      return;
+    }
+    try {
+      const Sharing = require('expo-sharing');
+      const FileSystem = require('expo-file-system');
+      const fileUri = `${FileSystem.cacheDirectory}glipra-data-export.json`;
+      await FileSystem.writeAsStringAsync(fileUri, json, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+      analytics.capture(EVENTS.ACCOUNT_DATA_EXPORTED);
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(fileUri, {
+          mimeType: 'application/json',
+          dialogTitle: t('settings.export_data'),
+        });
+      } else {
+        Alert.alert(t('settings.export_data'), `${json.length} chars exported.`);
+      }
+    } catch {
+      Alert.alert(t('account.export_failed'), '');
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    const ok = await deleteAccount.run();
+    if (!ok) {
+      Alert.alert(t('account.delete_failed'), deleteAccount.error ?? '');
+      return;
+    }
+    analytics.capture(EVENTS.ACCOUNT_DELETED);
+    setDeleteVisible(false);
+    await signOut();
+  };
 
   const goalWeightValue =
     profile?.goalWeightKg != null
@@ -213,11 +258,29 @@ export function SettingsScreen() {
 
         {/* ── Account ───────────────────────────────────────────────── */}
         <SettingsSection title={t('settings.account')}>
-          <SettingsRow label={t('settings.logout')} onPress={signOut} destructive isLast />
+          <SettingsRow
+            label={t('settings.export_data')}
+            value={exportData.isLoading ? '…' : undefined}
+            onPress={exportData.isLoading ? undefined : handleExport}
+          />
+          <SettingsRow label={t('settings.logout')} onPress={signOut} />
+          <SettingsRow
+            label={t('settings.delete_account')}
+            onPress={() => setDeleteVisible(true)}
+            destructive
+            isLast
+          />
         </SettingsSection>
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
+
+      <DeleteAccountModal
+        visible={deleteVisible}
+        isLoading={deleteAccount.isLoading}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteVisible(false)}
+      />
     </SafeAreaView>
   );
 }

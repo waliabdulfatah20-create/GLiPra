@@ -239,12 +239,8 @@
     "voice_transcript_label": "Dijiste",
     "voice_permission_denied_title": "Se requiere acceso al micrófono",
     "voice_permission_denied_body": "Activa el acceso al micrófono en Configuración para usar el registro por voz.",
-    "voice_hero_title": "Habla tu comida",
-    "voice_hero_subtitle": "La IA de voz extrae los macros al instante",
-    "voice_cta": "Toca para grabar →",
     "photo_row_title": "Escaneo fotográfico",
-    "photo_row_subtitle": "La IA estima desde la imagen",
-    "free_logging_note": "✓ El registro manual y por código de barras siempre es gratis"
+    "photo_row_subtitle": "La IA estima desde la imagen"
   },
   "checkin": {
     "title": "Check-in diario",
@@ -306,12 +302,24 @@
     "privacy": "Política de privacidad",
     "terms": "Términos de servicio",
     "logout": "Cerrar sesión",
+    "export_data": "Exportar mis datos",
+    "delete_account": "Eliminar cuenta",
     "notifications": "Notificaciones",
     "notif_injection": "Recordatorio de inyección",
     "notif_injection_subtitle": "8 AM en tu día de dosis",
     "notif_protein": "Recordatorio diario de proteína",
     "notif_protein_subtitle": "7 PM si no has alcanzado tu meta",
     "appearance_title": "APARIENCIA"
+  },
+  "account": {
+    "delete_title": "¿Eliminar tu cuenta?",
+    "delete_warning": "Esto elimina permanentemente tu cuenta y todos tus datos. No se puede deshacer.",
+    "delete_confirm_word": "ELIMINAR",
+    "delete_confirm_prompt": "Escribe {{word}} para confirmar",
+    "delete_button": "Eliminar cuenta",
+    "cancel": "Cancelar",
+    "export_failed": "La exportación falló. Inténtalo de nuevo.",
+    "delete_failed": "No se pudo eliminar tu cuenta. Inténtalo de nuevo."
   },
   "medication": {
     "title": "Nivel de medicamento",

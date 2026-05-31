@@ -239,12 +239,8 @@
     "voice_transcript_label": "You said",
     "voice_permission_denied_title": "Microphone Access Required",
     "voice_permission_denied_body": "Enable microphone access in Settings to use voice logging.",
-    "voice_hero_title": "Speak your meal",
-    "voice_hero_subtitle": "Voice AI extracts macros instantly",
-    "voice_cta": "Tap to record →",
     "photo_row_title": "Photo scan",
-    "photo_row_subtitle": "AI estimates from image",
-    "free_logging_note": "✓ Manual and barcode logging are always free"
+    "photo_row_subtitle": "AI estimates from image"
   },
   "checkin": {
     "title": "Daily Check-in",
@@ -306,12 +302,24 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "logout": "Sign Out",
+    "export_data": "Export my data",
+    "delete_account": "Delete account",
     "notifications": "Notifications",
     "notif_injection": "Injection day reminder",
     "notif_injection_subtitle": "8 AM on your dose day",
     "notif_protein": "Daily protein nudge",
     "notif_protein_subtitle": "7 PM reminder to hit your goal",
     "appearance_title": "APPEARANCE"
+  },
+  "account": {
+    "delete_title": "Delete your account?",
+    "delete_warning": "This permanently deletes your account and all of your data. This cannot be undone.",
+    "delete_confirm_word": "DELETE",
+    "delete_confirm_prompt": "Type {{word}} to confirm",
+    "delete_button": "Delete account",
+    "cancel": "Cancel",
+    "export_failed": "Export failed. Please try again.",
+    "delete_failed": "Could not delete your account. Please try again."
   },
   "medication": {
     "title": "Medication Level",

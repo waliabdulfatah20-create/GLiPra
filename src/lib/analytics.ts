@@ -53,6 +53,10 @@ export const EVENTS = {
   // Daily guidance
   DAILY_GUIDANCE_VIEWED: 'daily_guidance_viewed',
   DAILY_GUIDANCE_WHY_TAPPED: 'daily_guidance_why_tapped',
+
+  // Account (GDPR)
+  ACCOUNT_DATA_EXPORTED: 'account_data_exported',
+  ACCOUNT_DELETED: 'account_deleted',
 } as const;
 
 // ---------------------------------------------------------------------------

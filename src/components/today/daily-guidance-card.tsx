@@ -171,7 +171,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     },
     proBadge: {
       backgroundColor: 'rgba(255,255,255,0.2)',
-      borderRadius: radius.xs ?? 4,
+      borderRadius: 4,
       paddingHorizontal: spacing.xs + 2,
       paddingVertical: 2,
     },

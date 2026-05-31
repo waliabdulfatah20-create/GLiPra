@@ -19,13 +19,14 @@ export type TodayProfile = {
   medicationStatus: MedicationStatus;
   hasKidneyDisease: boolean;
   isPregnant: boolean;
+  createdAt: string | null;
 };
 
 export async function fetchTodayProfile(userId: string): Promise<TodayProfile | null> {
   const { data, error } = await supabase
     .from('profiles')
     .select(
-      'medication_id, protein_floor_g, last_injection_date, injection_day_of_week, weight_kg, height_cm, goal_weight_kg, phase, medication_status, has_kidney_disease, is_pregnant',
+      'medication_id, protein_floor_g, last_injection_date, injection_day_of_week, weight_kg, height_cm, goal_weight_kg, phase, medication_status, has_kidney_disease, is_pregnant, created_at',
     )
     .eq('user_id', userId)
     .single();
@@ -45,5 +46,6 @@ export async function fetchTodayProfile(userId: string): Promise<TodayProfile | 
     medicationStatus: (data.medication_status as MedicationStatus) ?? 'active',
     hasKidneyDisease: data.has_kidney_disease ?? false,
     isPregnant: data.is_pregnant ?? false,
+    createdAt: data.created_at ?? null,
   };
 }

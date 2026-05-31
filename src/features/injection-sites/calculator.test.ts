@@ -23,6 +23,7 @@ function makeLog(
     medication_name: 'Ozempic',
     pain_level: 2,
     notes: null,
+    dosage_strength: null,
     created_at: injectedAt,
   };
 }

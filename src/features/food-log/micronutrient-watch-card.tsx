@@ -2,7 +2,7 @@
 // Pro-gated card. Direction C design: gradient header, gaps chip, 2x2 tile grid, gap banner.
 // Rule 8: DisclaimerBanner tier={2}. Rule 9/10: food-strategy copy only, no condition names.
 
-import type { TFunction } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import type { NutrientKey, NutrientStatus } from './micronutrient-constants';
 import type { GlipraTokens } from '@/theme/tokens';
 import { LinearGradient } from 'expo-linear-gradient';

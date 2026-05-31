@@ -3,7 +3,7 @@
 // Non-negotiable rules enforced here:
 //   Rule 1  — Client calls supabase.functions.invoke('ai-coach'), never OpenAI directly.
 //   Rule 2  — No PII is included in the context payload sent to the edge function.
-//   Cost rule — When EXPO_PUBLIC_USE_MOCK_AI=true, return MOCK_DAILY_GUIDANCE.message
+//   Cost rule — When EXPO_PUBLIC_USE_MOCK_AI=true, return MOCK_COACH_REPLY
 //               without calling the edge function (simulates an 800ms delay).
 //
 // Messages are intentionally NOT persisted to Supabase — privacy + cost reasons.
@@ -14,7 +14,7 @@ import { useCallback, useState } from 'react';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { unlockMilestone } from '@/features/journey-cards/api';
 import { analytics, EVENTS } from '@/lib/analytics';
-import { isMockAIEnabled, MOCK_DAILY_GUIDANCE } from '@/lib/mockAI';
+import { isMockAIEnabled, MOCK_COACH_REPLY } from '@/lib/mockAI';
 import { supabase } from '@/lib/supabase';
 
 // ---------------------------------------------------------------------------
@@ -76,7 +76,7 @@ export function useAiCoach() {
           // Cost rule: return mock data without calling the edge function.
           // Simulate a realistic network delay so the UI isn't jarring.
           await new Promise<void>(resolve => setTimeout(resolve, 800));
-          replyContent = MOCK_DAILY_GUIDANCE.message;
+          replyContent = MOCK_COACH_REPLY;
         }
         else {
           // Rule 1: Call the edge function — never OpenAI directly from the client.

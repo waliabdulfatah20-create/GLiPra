@@ -47,6 +47,11 @@ export const MOCK_DAILY_GUIDANCE = {
     'Adjustment phase suppresses appetite most strongly at days 3-4, making small high-density portions the best strategy.',
 } as const;
 
+export const MOCK_COACH_REPLY
+  = 'Great question. To hit your protein goal on a small appetite, lean on high-density '
+  + 'options: Greek yogurt, cottage cheese, eggs, or a whey shake. Aim for 25-30g per '
+  + 'sitting across 3-4 small meals, and pair protein with fluids to stay hydrated.';
+
 export const MOCK_MEAL_TEXT_PARSE = {
   foods: [
     { name: 'Scrambled eggs', protein_g: 18, calories: 210, serving_description: '3 large eggs' },

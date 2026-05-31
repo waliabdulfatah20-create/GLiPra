@@ -27,7 +27,7 @@ function createSupabaseClient() {
 let _supabase: ReturnType<typeof createSupabaseClient> | null = null;
 
 export const supabase = new Proxy<ReturnType<typeof createSupabaseClient>>(
-  {},
+  {} as ReturnType<typeof createSupabaseClient>,
   {
     get: (_, prop) => {
       if (!_supabase) {

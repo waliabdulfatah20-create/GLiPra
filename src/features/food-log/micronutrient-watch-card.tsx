@@ -342,21 +342,6 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     body: {
       backgroundColor: colors.surface,
     },
-    emptyState: {
-      alignItems: 'center',
-      paddingVertical: spacing.md,
-      paddingHorizontal: spacing.md,
-      gap: spacing.xs,
-    },
-    emptyIcon: {
-      fontSize: 24,
-    },
-    emptyText: {
-      fontSize: 13,
-      color: colors.textSecondary,
-      textAlign: 'center',
-      lineHeight: 18,
-    },
     grid: {
       flexDirection: 'row',
       flexWrap: 'wrap',

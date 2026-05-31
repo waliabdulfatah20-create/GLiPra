@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Glipra — The GLP-1 nutrition companion designed by a licensed pharmacist. Protect your muscle, track protein, and get injection-cycle-aware guidance." />
+  <title>Glipra — GLP-1 Nutrition Companion</title>
+  <style>
+    /* ── Reset & Base ───────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:        #2563EB;
+      --blue-dark:   #1D4ED8;
+      --blue-light:  #DBEAFE;
+      --navy:        #0F172A;
+      --navy-mid:    #1E293B;
+      --slate:       #334155;
+      --slate-light: #64748B;
+      --border:      #E2E8F0;
+      --white:       #FFFFFF;
+      --off-white:   #F8FAFC;
+      --green:       #16A34A;
+      --radius-sm:   8px;
+      --radius:      12px;
+      --radius-lg:   20px;
+      --max-w:       1100px;
+      --font:        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      color: var(--navy-mid);
+      background: var(--white);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img { display: block; max-width: 100%; }
+
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ── Utilities ──────────────────────────────────────── */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+
+    .badge {
+      display: inline-block;
+      border: 2px solid var(--blue);
+      color: var(--blue);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 999px;
+    }
+
+    .section-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 12px;
+    }
+
+    /* ── Buttons ────────────────────────────────────────── */
+    .btn {
+      display: inline-block;
+      padding: 14px 28px;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: var(--blue);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+    .btn-primary:hover {
+      background: var(--blue-dark);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--blue);
+      border: 2px solid var(--blue);
+    }
+    .btn-outline:hover {
+      background: var(--blue-light);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #D97706, #F59E0B);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+      font-size: 1.05rem;
+    }
+    .btn-gold:hover {
+      background: linear-gradient(135deg, #B45309, #D97706);
+      box-shadow: 0 6px 20px rgba(217, 119, 6, 0.45);
+    }
+
+    .btn-full { width: 100%; display: block; }
+
+    /* ── Navigation ─────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .nav-logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+    .nav-logo span { color: var(--blue); }
+
+    .nav-cta {
+      font-size: 0.875rem;
+      padding: 8px 18px;
+    }
+
+    /* ── Hero ───────────────────────────────────────────── */
+    #hero {
+      background: var(--navy);
+      color: var(--white);
+      padding: 80px 0 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle background grid */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(37,99,235,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,0.07) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    /* Glow orb */
+    #hero::after {
+      content: '';
+      position: absolute;
+      top: -80px;
+      right: -80px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      color: #93C5FD;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: #60A5FA;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero-headline {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .hero-headline .accent { color: #60A5FA; }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: #94A3B8;
+      line-height: 1.7;
+      max-width: 560px;
+      margin-bottom: 36px;
+    }
+
+    /* Email form */
+    .email-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      max-width: 480px;
+    }
+
+    .email-form input[type="email"] {
+      flex: 1;
+      min-width: 220px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: var(--white);
+      font-size: 0.95rem;
+      font-family: var(--font);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .email-form input[type="email"]::placeholder { color: #64748B; }
+    .email-form input[type="email"]:focus { border-color: var(--blue); }
+
+    .form-trust {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: #475569;
+    }
+
+    .form-success {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: rgba(22, 163, 74, 0.15);
+      border: 1px solid rgba(22, 163, 74, 0.4);
+      color: #86EFAC;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 500;
+      max-width: 480px;
+      margin-top: 4px;
+    }
+    .form-success.visible { display: flex; }
+
+    /* Phone mockup */
+    .phone-mockup {
+      display: flex;
+      justify-content: center;
+    }
+
+    .phone-frame {
+      width: 200px;
+      height: 360px;
+      background: rgba(255,255,255,0.04);
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      width: 60px;
+      height: 5px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 999px;
+    }
+
+    .phone-frame .phone-logo {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+    .phone-frame .phone-logo span { color: #60A5FA; }
+
+    .phone-bar {
+      width: 120px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(37,99,235,0.4);
+    }
+
+    .phone-bar-sm {
+      width: 80px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .phone-ring {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 8px solid rgba(37,99,235,0.3);
+      border-top-color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #60A5FA;
+      margin: 4px 0;
+    }
+
+    /* ── Sections shared ────────────────────────────────── */
+    section { padding: 80px 0; }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+
+    .section-header h2 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      color: var(--navy);
+      margin-bottom: 12px;
+    }
+
+    .section-header p {
+      font-size: 1.05rem;
+      color: var(--slate-light);
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ── Problem ────────────────────────────────────────── */
+    #problem {
+      background: var(--off-white);
+    }
+
+    #problem .section-header h2 {
+      max-width: 680px;
+      margin: 0 auto 12px;
+    }
+
+    .cards-3 {
+      display: grid;
+      gap: 20px;
+    }
+
+    .problem-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 28px 28px 24px;
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      transition: box-shadow 0.15s, border-color 0.15s;
+    }
+    .problem-card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      border-color: #CBD5E1;
+    }
+
+    .problem-icon {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      background: #FEF3C7;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .problem-card p {
+      color: var(--slate);
+      font-size: 0.975rem;
+      line-height: 1.65;
+      padding-top: 10px;
+    }
+
+    /* ── Solution ───────────────────────────────────────── */
+    #solution {
+      background: var(--white);
+    }
+
+    .cards-4 {
+      display: grid;
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--off-white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: box-shadow 0.15s, border-color 0.15s, transform 0.15s;
+    }
+    .feature-card:hover {
+      box-shadow: 0 8px 28px rgba(37,99,235,0.1);
+      border-color: #BFDBFE;
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 0.925rem;
+      color: var(--slate);
+      line-height: 1.6;
+    }
+
+    /* ── Also-included feature grid ─────────────────────── */
+    .also-heading {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--slate-light);
+      margin: 48px 0 20px;
+    }
+    .cards-also {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .also-card {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .also-icon {
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      background: #DBEAFE;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .also-card h4 {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin: 0 0 4px;
+      line-height: 1.3;
+    }
+    .also-card p {
+      font-size: 0.8rem;
+      color: var(--slate-light);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .pro-chip {
+      display: inline-block;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 4px;
+      padding: 1px 5px;
+      margin-left: 5px;
+      vertical-align: middle;
+      position: relative;
+      top: -1px;
+    }
+
+    /* ── Founder Offer ──────────────────────────────────── */
+    #founder {
+      background: var(--navy);
+      color: var(--white);
+    }
+
+    #founder .section-header h2 { color: var(--white); }
+    #founder .section-header p  { color: #94A3B8; }
+
+    .founder-card {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+    }
+
+    .founder-price {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .founder-price .amount {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #F59E0B;
+      letter-spacing: -0.03em;
+    }
+    .founder-price .period {
+      font-size: 1rem;
+      color: #94A3B8;
+    }
+    .founder-price .was {
+      font-size: 0.9rem;
+      color: #475569;
+      text-decoration: line-through;
+    }
+
+    .founder-tagline {
+      font-size: 0.875rem;
+      color: #F59E0B;
+      font-weight: 600;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .founder-features {
+      list-style: none;
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .founder-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.95rem;
+      color: #CBD5E1;
+    }
+
+    .founder-features li::before {
+      content: '✓';
+      color: #34D399;
+      font-weight: 700;
+      flex-shrink: 0;
+      line-height: 1.5;
+    }
+
+    .founder-note {
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: #475569;
+      text-align: center;
+    }
+
+    .spots-bar {
+      margin-bottom: 28px;
+    }
+    .spots-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: #94A3B8;
+      margin-bottom: 6px;
+    }
+    .spots-track {
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .spots-fill {
+      height: 100%;
+      width: 37%;
+      background: linear-gradient(90deg, #F59E0B, #FBBF24);
+      border-radius: 999px;
+    }
+
+    /* ── Credibility ────────────────────────────────────── */
+    #credibility {
+      background: var(--blue);
+      color: var(--white);
+    }
+
+    #credibility .section-header h2 {
+      color: var(--white);
+      max-width: 600px;
+      margin: 0 auto 12px;
+    }
+
+    #credibility .section-header p {
+      color: rgba(255,255,255,0.75);
+      max-width: 580px;
+      font-size: 1.05rem;
+    }
+
+    .cred-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.12);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      color: var(--white);
+      font-size: 0.875rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 10px 22px;
+      border-radius: 999px;
+      margin-top: 28px;
+    }
+
+    .cred-badge::before {
+      content: '🏥';
+      font-size: 1rem;
+    }
+
+    .cred-stats {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 48px;
+      padding-top: 48px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .cred-stat { text-align: center; }
+    .cred-stat .num {
+      font-size: 2rem;
+      font-weight: 800;
+      display: block;
+      letter-spacing: -0.03em;
+    }
+    .cred-stat .lbl {
+      font-size: 0.825rem;
+      color: rgba(255,255,255,0.65);
+      margin-top: 2px;
+    }
+
+    /* ── FAQ ────────────────────────────────────────────── */
+    #faq {
+      background: var(--off-white);
+    }
+
+    .faq-list {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .faq-item {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: left;
+      padding: 20px 24px;
+      font-size: 0.975rem;
+      font-weight: 700;
+      color: var(--navy);
+      font-family: var(--font);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      transition: background 0.1s;
+    }
+    .faq-q:hover { background: var(--off-white); }
+
+    .faq-chevron {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      background: var(--blue-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: var(--blue);
+      font-weight: 700;
+      transition: transform 0.2s;
+    }
+
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+
+    .faq-a {
+      display: none;
+      padding: 0 24px 20px;
+      font-size: 0.925rem;
+      color: var(--slate);
+      line-height: 1.7;
+      border-top: 1px solid var(--border);
+    }
+    .faq-item.open .faq-a { display: block; }
+
+    /* ── Final CTA ──────────────────────────────────────── */
+    #final-cta {
+      background: var(--white);
+      text-align: center;
+    }
+
+    #final-cta h2 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--navy);
+      margin-bottom: 12px;
+    }
+
+    #final-cta p {
+      color: var(--slate-light);
+      font-size: 1.05rem;
+      margin-bottom: 32px;
+    }
+
+    .final-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      max-width: 480px;
+      margin: 0 auto;
+      justify-content: center;
+    }
+
+    .final-form input[type="email"] {
+      flex: 1;
+      min-width: 220px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--off-white);
+      color: var(--navy);
+      font-size: 0.95rem;
+      font-family: var(--font);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .final-form input[type="email"]:focus { border-color: var(--blue); }
+    .final-form input[type="email"]::placeholder { color: #94A3B8; }
+
+    .final-success {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      color: var(--green);
+      padding: 14px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 500;
+      max-width: 480px;
+      margin: 8px auto 0;
+    }
+    .final-success.visible { display: flex; }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    footer {
+      background: var(--navy);
+      color: #475569;
+      padding: 36px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+    .footer-logo span { color: #60A5FA; }
+
+    .footer-disclaimer {
+      font-size: 0.78rem;
+      color: #334155;
+      max-width: 520px;
+      line-height: 1.5;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      font-size: 0.825rem;
+    }
+    .footer-links a {
+      color: #475569;
+      transition: color 0.15s;
+    }
+    .footer-links a:hover { color: #94A3B8; text-decoration: none; }
+
+    .footer-copy {
+      font-size: 0.78rem;
+    }
+
+    /* ── Responsive ─────────────────────────────────────── */
+    @media (max-width: 479px) {
+      .cards-also { grid-template-columns: 1fr; }
+    }
+
+    @media (min-width: 480px) and (max-width: 767px) {
+      .cards-also { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 640px) {
+      .cards-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .cards-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 900px) {
+      .hero-inner {
+        grid-template-columns: 1fr auto;
+      }
+      .phone-frame {
+        width: 220px;
+        height: 400px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .cards-4 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    /* ── Logo SVG ───────────────────────────────────── */
+    .logo-lockup {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-icon {
+      width: 28px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+    .logo-wordmark {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+    .logo-wordmark .accent { color: #60A5FA; }
+
+    /* ── Hero stat card ─────────────────────────────── */
+    .hero-stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(239, 68, 68, 0.10);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+    }
+    .stat-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .stat-num {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #F87171;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .stat-desc {
+      font-size: 0.75rem;
+      color: #FCA5A5;
+      font-weight: 500;
+      line-height: 1.35;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .hero-link {
+      font-size: 0.875rem;
+      color: #60A5FA;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .hero-link:hover { color: #93C5FD; text-decoration: none; }
+
+    /* ── How it works ───────────────────────────────── */
+    #how-it-works {
+      background: var(--white);
+    }
+    .steps {
+      display: grid;
+      gap: 24px;
+      counter-reset: steps;
+    }
+    .step {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: var(--white);
+      font-size: 1rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .step-body h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .step-body p {
+      font-size: 0.925rem;
+      color: var(--slate);
+      line-height: 1.65;
+    }
+    @media (min-width: 768px) {
+      .steps { grid-template-columns: repeat(3, 1fr); }
+      .step { flex-direction: column; }
+    }
+
+    /* ── Injection cycle callout ────────────────────── */
+    #cycle {
+      background: var(--navy);
+      color: var(--white);
+    }
+    #cycle .section-header h2 { color: var(--white); }
+    #cycle .section-header p  { color: #94A3B8; }
+
+    .cycle-exclusive {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(96, 165, 250, 0.15);
+      border: 1px solid rgba(96, 165, 250, 0.4);
+      color: #93C5FD;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+
+    .cycle-phases {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 40px;
+    }
+    .cycle-phase {
+      flex: 1;
+      min-width: 120px;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: 20px 16px;
+      text-align: center;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .cycle-phase:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(96,165,250,0.35);
+    }
+    .cycle-phase.active {
+      border-color: #60A5FA;
+      background: rgba(37,99,235,0.12);
+    }
+    .cycle-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+    }
+    .cycle-phase .day-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #64748B;
+      margin-bottom: 4px;
+    }
+    .cycle-phase .phase-name {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+    .cycle-phase .phase-desc {
+      font-size: 0.75rem;
+      color: #94A3B8;
+      line-height: 1.5;
+    }
+
+    /* ── Founder bio ────────────────────────────────── */
+    .founder-bio {
+      max-width: 680px;
+      margin: 40px auto 0;
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+    }
+    .founder-avatar {
+      flex-shrink: 0;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+    .founder-bio-text h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+    .founder-bio-text .title {
+      font-size: 0.8rem;
+      color: #60A5FA;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+    .founder-bio-text p {
+      font-size: 0.925rem;
+      color: #94A3B8;
+      line-height: 1.7;
+    }
+    @media (max-width: 600px) {
+      .founder-bio { flex-direction: column; }
+    }
+
+    /* ── Medical banner ─────────────────────────────── */
+    .medical-banner {
+      background: #F0F9FF;
+      border-bottom: 1px solid #BAE6FD;
+      text-align: center;
+      padding: 8px 20px;
+      font-size: 0.78rem;
+      color: #0369A1;
+      line-height: 1.5;
+    }
+
+    /* ── Legal note (testimonials disclaimer) ───────── */
+    .legal-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--slate-light);
+      margin: 24px auto 0;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+
+    /* ── Footnotes ──────────────────────────────────── */
+    .footnotes {
+      background: var(--off-white);
+      border-top: 1px solid var(--border);
+      padding: 20px 0;
+    }
+    .footnotes p {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 20px;
+      font-size: 0.73rem;
+      color: var(--slate-light);
+      line-height: 1.6;
+    }
+
+    /* ── Testimonials ───────────────────────────────── */
+    #testimonials {
+      background: var(--white);
+    }
+    .testimonial-grid {
+      display: grid;
+      gap: 20px;
+    }
+    @media (min-width: 768px) {
+      .testimonial-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .testimonial-card {
+      background: var(--off-white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .testimonial-stars {
+      color: #F59E0B;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+    }
+    .testimonial-quote {
+      font-size: 0.95rem;
+      color: var(--slate);
+      line-height: 1.7;
+      flex: 1;
+    }
+    .testimonial-author {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .author-name {
+      font-weight: 700;
+      font-size: 0.875rem;
+      color: var(--navy);
+    }
+    .author-context {
+      font-size: 0.8rem;
+      color: var(--slate-light);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ──────────────────────────────── -->
+  <nav role="banner">
+    <div class="container nav-inner">
+      <div class="nav-logo logo-lockup">
+        <svg class="logo-icon" viewBox="0 0 32 16" fill="none" aria-hidden="true">
+          <rect width="32" height="16" rx="8" fill="rgba(255,255,255,0.06)" stroke="#2563EB" stroke-width="1.5"/>
+          <path d="M16,0 H8 Q0,0 0,8 Q0,16 8,16 H16 Z" fill="#2563EB"/>
+          <line x1="16" y1="1.5" x2="16" y2="14.5" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+        </svg>
+        <span class="logo-wordmark"><span class="accent">G</span>lipra</span>
+      </div>
+      <a href="#waitlist" class="btn btn-primary nav-cta">Join Waitlist</a>
+    </div>
+  </nav>
+
+  <!-- ── Medical disclaimer banner ───────────────── -->
+  <div class="medical-banner" role="note">
+    For informational purposes only. Not medical advice. Consult your prescriber before making any health decisions.
+  </div>
+
+  <!-- ── Hero ────────────────────────────────────── -->
+  <section id="hero">
+    <div class="container hero-inner">
+      <div>
+        <div class="hero-stat-pill">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" flex-shrink="0">
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+            <path d="M12 9v4M12 17h.01"/>
+          </svg>
+          <div class="stat-content">
+            <span class="stat-num">Up to 40%<sup style="font-size:0.55rem;vertical-align:super">1</sup></span>
+            <span class="stat-desc">of weight lost on GLP-1s can be lean muscle</span>
+          </div>
+        </div>
+        <div class="hero-eyebrow">Now accepting waitlist signups</div>
+        <h1 class="hero-headline">
+          Protect your <span class="accent">muscle</span> while<br />
+          GLP-1 does its job.
+        </h1>
+        <p class="hero-sub">
+          The only GLP-1 nutrition companion designed by a licensed pharmacist.
+          Protein tracking, injection-cycle-aware guidance, and clinical safety.
+          All in one app.
+        </p>
+
+        <form class="email-form" id="hero-form" novalidate>
+          <label for="hero-email" class="sr-only">Email address</label>
+          <input
+            type="email"
+            id="hero-email"
+            name="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          />
+          <button type="submit" class="btn btn-primary">Join the waitlist</button>
+        </form>
+
+        <div class="form-success" id="hero-success" role="status" aria-live="polite">
+          ✅ You're on the list! We'll email you when Glipra launches.
+        </div>
+
+        <div class="hero-cta-row">
+          <p class="form-trust">Free to join. No spam. Unsubscribe anytime.</p>
+          <a href="#how-it-works" class="hero-link">See how it works ↓</a>
+        </div>
+      </div>
+
+      <div class="phone-mockup" aria-hidden="true">
+        <div class="phone-frame">
+          <p class="phone-logo"><span>G</span>lipra</p>
+          <div class="phone-ring">127g</div>
+          <div class="phone-bar"></div>
+          <div class="phone-bar-sm"></div>
+          <div class="phone-bar-sm" style="width:96px"></div>
+          <div class="phone-bar" style="width:100px"></div>
+          <div class="phone-bar-sm" style="width:60px"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Problem ──────────────────────────────────── -->
+  <section id="problem">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label">The problem</p>
+        <h2>Every GLP-1 app tracks calories.<br />None of them protect your muscle.</h2>
+      </div>
+
+      <div class="cards-3">
+        <div class="problem-card">
+          <div class="problem-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="12" x2="16" y2="12"/>
+              <rect x="3" y="9" width="5" height="6" rx="1.5"/>
+              <rect x="16" y="9" width="5" height="6" rx="1.5"/>
+            </svg>
+          </div>
+          <p>GLP-1s may cause muscle loss, not just fat loss. No app tells you how much protein you actually need.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/>
+              <path d="M16 2v4M8 2v4M3 10h5"/>
+              <circle cx="18" cy="18" r="4"/>
+              <path d="M18 16v2l1 1"/>
+            </svg>
+          </div>
+          <p>Your appetite changes week by week based on your injection cycle. Generic meal plans miss this entirely.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              <path d="M9 9l6 6M15 9l-6 6"/>
+            </svg>
+          </div>
+          <p>When side effects hit, you need clinical guidance. Not a chatbot that just says "consult your doctor."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Solution ─────────────────────────────────── -->
+  <section id="solution">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label">The solution</p>
+        <h2>Glipra is built differently.</h2>
+        <p>Every feature is grounded in clinical reality. No generic wellness advice.</p>
+      </div>
+
+      <div class="cards-4">
+        <div class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="12" cy="12" r="6"/>
+              <circle cx="12" cy="12" r="2"/>
+            </svg>
+          </div>
+          <h3>Personalized Protein Floor</h3>
+          <p>Calculated to your body, activity level, and medication phase. Updated as you change.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m18 2 4 4"/>
+              <path d="m17 7 3-3"/>
+              <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/>
+              <path d="m9 11 4 4"/>
+              <path d="m5 19-3 3"/>
+              <path d="m14 4 6 6"/>
+            </svg>
+          </div>
+          <h3>Injection-Cycle Aware</h3>
+          <p>Guidance that adapts to where you are in your weekly or biweekly injection cycle.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+          <h3>Clinical Safety Built In</h3>
+          <p>Red-flag detection, pharmacist-authored content, and real escalation when you need it.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+              <polyline points="16 7 22 7 22 13"/>
+            </svg>
+          </div>
+          <h3>Track What Matters</h3>
+          <p>Weight trend (EWMA-smoothed), protein streaks, daily check-ins, and a readiness score.</p>
+        </div>
+      </div>
+
+      <!-- ── Also included ─────────────────────────── -->
+      <p class="also-heading">Also included</p>
+      <div class="cards-also">
+
+        <div class="also-card">
+          <div class="also-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Manual Macro Entry</h4>
+            <p>Log any meal by typing in protein, carbs, and fat directly. Always free.</p>
+          </div>
+        </div>
+
+        <div class="also-card">
+          <div class="also-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 5v14"/><path d="M7 5v14"/><path d="M11 5v14"/><path d="M15 5v14"/><path d="M19 5v14"/><rect x="1" y="3" width="22" height="18" rx="2" ry="2"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Barcode Scanner</h4>
+            <p>Scan any packaged food and log nutrition instantly — no typing required.</p>
+          </div>
+        </div>
+
+        <div class="also-card">
+          <div class="also-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+            </svg>
+          </div>
+          <div>
+            <h4>AI Photo Recognition<span class="pro-chip">Pro</span></h4>
+            <p>Snap a meal photo. AI estimates protein, carbs, and fat in seconds.</p>
+          </div>
+        </div>
+
+        <div class="also-card">
+          <div class="also-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Shot Day Prep</h4>
+            <p>A pharmacist's 5-step checklist for every injection day. Nothing missed.</p>
+          </div>
+        </div>
+
+        <div class="also-card">
+          <div class="also-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Medication Level Estimator</h4>
+            <p>Visualize your estimated GLP-1 concentration curve across the injection cycle.</p>
+          </div>
+        </div>
+
+        <div class="also-card">
+          <div class="also-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Progress Dashboard</h4>
+            <p>Weight trend chart, injection adherence, symptom trends — all in one view.</p>
+          </div>
+        </div>
+
+        <div class="also-card">
+          <div class="also-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Prescriber Visit PDF<span class="pro-chip">Pro</span></h4>
+            <p>Auto-generate a 28-day summary to share with your doctor.</p>
+          </div>
+        </div>
+
+        <div class="also-card">
+          <div class="also-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Micronutrient Watch<span class="pro-chip">Pro</span></h4>
+            <p>Daily gaps for zinc, B12, magnesium, and vitamin D — nutrients GLP-1 users deplete fastest.</p>
+          </div>
+        </div>
+
+      </div><!-- end .cards-also -->
+    </div>
+  </section>
+
+  <!-- ── How It Works ────────────────────────────────── -->
+  <section id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label">How it works</p>
+        <h2>Up and running in three steps.</h2>
+        <p>No complicated setup. Glipra meets you where you are in your GLP-1 journey.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>Log your injection day</h3>
+            <p>Tell Glipra which medication you're on and when your last injection was. Takes 30 seconds.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>Get your protein floor</h3>
+            <p>A pharmacist-designed calculator sets your daily protein minimum based on your body, activity, and medication phase.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>Track, log &amp; stay ahead</h3>
+            <p>Scan barcodes, use AI photo recognition, or log manually. Glipra adjusts your guidance as your cycle progresses.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Injection Cycle Callout ───────────────────────── -->
+  <section id="cycle">
+    <div class="container">
+      <div class="section-header">
+        <div class="cycle-exclusive">Glipra-exclusive feature</div>
+        <h2>Your appetite isn't constant.<br />Your guidance shouldn't be either.</h2>
+        <p>Every GLP-1 injection follows a predictable 7-day cycle. Glipra is the only app that adapts your protein targets and guidance to exactly where you are in that cycle.</p>
+      </div>
+
+      <div class="cycle-phases">
+        <div class="cycle-phase active">
+          <div class="cycle-dot" style="background:#60A5FA"></div>
+          <div class="day-label">Day 0</div>
+          <div class="phase-name">Injection Day</div>
+          <div class="phase-desc">Nausea often peaks. Lighter protein sources recommended.</div>
+        </div>
+        <div class="cycle-phase">
+          <div class="cycle-dot" style="background:#818CF8"></div>
+          <div class="day-label">Days 1–2</div>
+          <div class="phase-name">Peak Suppression</div>
+          <div class="phase-desc">Appetite at its lowest. Strategic protein timing matters most.</div>
+        </div>
+        <div class="cycle-phase">
+          <div class="cycle-dot" style="background:#34D399"></div>
+          <div class="day-label">Days 3–4</div>
+          <div class="phase-name">Adjustment</div>
+          <div class="phase-desc">Appetite stabilizing. Good window to rebuild protein habit.</div>
+        </div>
+        <div class="cycle-phase">
+          <div class="cycle-dot" style="background:#FBBF24"></div>
+          <div class="day-label">Days 5–7</div>
+          <div class="phase-name">Recovery Window</div>
+          <div class="phase-desc">Appetite returning. Prioritize hitting your protein floor.</div>
+        </div>
+        <div class="cycle-phase">
+          <div class="cycle-dot" style="background:#F87171"></div>
+          <div class="day-label">Day 8+</div>
+          <div class="phase-name">Overdue</div>
+          <div class="phase-desc">Medication wearing off. Hunger spikes. Glipra flags this.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Founder Offer ─────────────────────────────── -->
+  <section id="founder">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label" style="color:#F59E0B">Limited offer</p>
+        <h2>Founder Lifetime Access</h2>
+        <p>First 500 users only. Full Pro access, forever. No subscription ever.</p>
+      </div>
+
+      <div class="founder-card">
+        <div class="founder-price">
+          <span class="amount">$149</span>
+          <span class="period">one-time</span>
+          <span class="was">vs $9.99/mo</span>
+        </div>
+
+        <div class="founder-tagline">
+          🔥 Limited to 500 founder spots
+        </div>
+
+        <ul class="founder-features">
+          <li>AI photo food recognition (50 scans/day)</li>
+          <li>Voice logging, unlimited entries</li>
+          <li>Daily AI nutrition guidance</li>
+          <li>Micronutrient watch &amp; tracking</li>
+          <li>Unlimited protein history</li>
+          <li>Prescriber visit prep + PDF export</li>
+        </ul>
+
+        <button
+          type="button"
+          class="btn btn-gold btn-full"
+          onclick="handleFounderCTA()"
+        >
+          Reserve My Founder Spot
+        </button>
+
+        <p class="founder-note">
+          No payment collected now. Founder pricing secured at launch only.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Credibility ───────────────────────────────── -->
+  <section id="credibility">
+    <div class="container">
+      <div class="section-header">
+        <h2>Built by a PharmD. Not a nutritionist.</h2>
+        <p>
+          A pharmacist understands how the drug works in your body, not just what is on your plate.
+          Every feature in Glipra reflects real clinical questions from real GLP-1 patients.
+        </p>
+        <div class="cred-badge">Licensed Pharmacist</div>
+      </div>
+
+      <div class="founder-bio">
+        <div class="founder-avatar" aria-hidden="true">WA</div>
+        <div class="founder-bio-text">
+          <h3>Wali Abdul, PharmD</h3>
+          <div class="title">Licensed Pharmacist &amp; Founder</div>
+          <p>I dispensed GLP-1s daily, watched patients struggle with muscle loss, and couldn't find a single app that addressed it. So I built one. Every safety threshold, every content card, every feature in Glipra is grounded in what I've seen in practice.</p>
+        </div>
+      </div>
+
+      <div class="cred-stats">
+        <div class="cred-stat">
+          <span class="num">7+</span>
+          <span class="lbl">GLP-1 medications supported</span>
+        </div>
+        <div class="cred-stat">
+          <span class="num">400+</span>
+          <span class="lbl">people on the waitlist and counting</span>
+        </div>
+        <div class="cred-stat">
+          <span class="num">5</span>
+          <span class="lbl">Injection-cycle phases tracked. No other app does this.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Testimonials ─────────────────────────────── -->
+  <section id="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label">Early users</p>
+        <h2>From people protecting their muscle.</h2>
+      </div>
+
+      <div class="testimonial-grid">
+
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-quote">"Finally hitting my protein goal on injection weeks. I used to give up by day two. Seeing which phase I was in made me realize I needed a different strategy depending on the day."</p>
+          <div class="testimonial-author">
+            <span class="author-name">Sarah M.</span>
+            <span class="author-context">On Wegovy, 5 months</span>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-quote">"I tried MyFitnessPal, Cronometer, even a nutritionist. None of them understood that my hunger was completely different at day 1 versus day 6. Glipra does."</p>
+          <div class="testimonial-author">
+            <span class="author-name">James T.</span>
+            <span class="author-context">On Mounjaro, 3 months</span>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-quote">"I was nervous about muscle loss the whole time. Having a pharmacist-designed protein floor gave me confidence I was actually doing it right."</p>
+          <div class="testimonial-author">
+            <span class="author-name">Maria K.</span>
+            <span class="author-context">On Ozempic, 6 months</span>
+          </div>
+        </div>
+
+      </div>
+      <p class="legal-note">Testimonials are illustrative examples based on the type of results members may experience. Individual results vary. These are not verified user reviews.</p>
+    </div>
+  </section>
+
+  <!-- ── FAQ ──────────────────────────────────────── -->
+  <section id="faq">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label">FAQ</p>
+        <h2>Common questions</h2>
+      </div>
+
+      <div class="faq-list" role="list">
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false" onclick="toggleFaq(this)">
+            Is Glipra free?
+            <span class="faq-chevron" aria-hidden="true">▾</span>
+          </button>
+          <div class="faq-a">
+            Core features are always free: barcode scanning, manual food logging, and
+            safety monitoring. Pro features ($9.99/mo or $79.99/yr) include AI photo
+            recognition, AI coach, and prescriber visit prep.
+          </div>
+        </div>
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false" onclick="toggleFaq(this)">
+            Does Glipra replace my doctor or pharmacist?
+            <span class="faq-chevron" aria-hidden="true">▾</span>
+          </button>
+          <div class="faq-a">
+            No. Glipra helps you track and understand your nutrition. All clinical
+            decisions should involve your prescriber.
+          </div>
+        </div>
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false" onclick="toggleFaq(this)">
+            Which medications does Glipra support?
+            <span class="faq-chevron" aria-hidden="true">▾</span>
+          </button>
+          <div class="faq-a">
+            Ozempic, Wegovy, Mounjaro, Zepbound, Saxenda, Trulicity, Victoza, Rybelsus,
+            and compounded GLP-1s.
+          </div>
+        </div>
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false" onclick="toggleFaq(this)">
+            When will the app launch?
+            <span class="faq-chevron" aria-hidden="true">▾</span>
+          </button>
+          <div class="faq-a">
+            We're in final testing. Join the waitlist to get early access and be
+            notified the moment we launch.
+          </div>
+        </div>
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false" onclick="toggleFaq(this)">
+            What makes Glipra different from MyFitnessPal or Cronometer?
+            <span class="faq-chevron" aria-hidden="true">▾</span>
+          </button>
+          <div class="faq-a">
+            General nutrition apps track calories and macros. They don't know you're on a GLP-1.
+            Glipra is built specifically for GLP-1 users: it sets a pharmacist-calculated protein
+            floor, adapts guidance to your injection cycle, and includes clinical safety features
+            that no general-purpose tracker offers.
+          </div>
+        </div>
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false" onclick="toggleFaq(this)">
+            How does injection-cycle-aware guidance work?
+            <span class="faq-chevron" aria-hidden="true">▾</span>
+          </button>
+          <div class="faq-a">
+            Log your injection day once per week (or biweekly, depending on your medication).
+            Glipra maps where you are across five phases (injection day, peak suppression,
+            adjustment, recovery window, and overdue) and adjusts your protein targets,
+            meal suggestions, and coaching accordingly. No other app tracks this.
+          </div>
+        </div>
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false" onclick="toggleFaq(this)">
+            Will Glipra be available on iPhone and Android?
+            <span class="faq-chevron" aria-hidden="true">▾</span>
+          </button>
+          <div class="faq-a">
+            Yes. Glipra launches simultaneously on iOS (App Store) and Android (Google Play).
+            Join the waitlist and we'll notify you the moment it's available for your device.
+          </div>
+        </div>
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false" onclick="toggleFaq(this)">
+            Is my health data private?
+            <span class="faq-chevron" aria-hidden="true">▾</span>
+          </button>
+          <div class="faq-a">
+            Yes. Your nutrition and health data is encrypted in transit and at rest.
+            We never sell your data to third parties, and you can export or delete
+            your account at any time. No questions asked.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Final CTA ─────────────────────────────────── -->
+  <section id="final-cta">
+    <div class="container">
+      <p class="section-label" style="text-align:center">Get early access</p>
+      <h2>Ready to protect your progress?</h2>
+      <p>Join the waitlist and be first to know when Glipra launches.</p>
+
+      <form class="final-form" id="footer-form" novalidate>
+        <label for="footer-email" class="sr-only">Email address</label>
+        <input
+          type="email"
+          id="footer-email"
+          name="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        />
+        <button type="submit" class="btn btn-primary">Join the waitlist</button>
+      </form>
+
+      <div class="final-success" id="footer-success" role="status" aria-live="polite">
+        ✅ You're on the list! We'll email you when Glipra launches.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footnotes ───────────────────────────────── -->
+  <div class="footnotes">
+    <p><sup>1</sup> Based on body composition data from the STEP 1 trial (Wilding et al., <em>NEJM</em> 2021) and SURMOUNT-1 trial (Jastreboff et al., <em>NEJM</em> 2022). Lean mass loss proportion varies by individual, medication, dose, diet, and exercise. Glipra does not guarantee any specific body composition outcome.</p>
+  </div>
+
+  <!-- ── Footer ────────────────────────────────────── -->
+  <footer id="waitlist">
+    <div class="container footer-inner">
+      <div class="footer-logo logo-lockup">
+        <svg class="logo-icon" viewBox="0 0 32 16" fill="none" aria-hidden="true">
+          <rect width="32" height="16" rx="8" fill="rgba(255,255,255,0.06)" stroke="#2563EB" stroke-width="1.5"/>
+          <path d="M16,0 H8 Q0,0 0,8 Q0,16 8,16 H16 Z" fill="#2563EB"/>
+          <line x1="16" y1="1.5" x2="16" y2="14.5" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+        </svg>
+        <span class="logo-wordmark"><span class="accent">G</span>lipra</span>
+      </div>
+      <p class="footer-disclaimer">
+        This app is for informational purposes only and does not constitute
+        medical advice. Always consult your prescriber for medical decisions.
+      </p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/terms.html">Terms of Service</a>
+      </nav>
+      <p class="footer-copy">
+        &copy; 2026 Glipra. Designed by a licensed pharmacist.
+      </p>
+    </div>
+  </footer>
+
+  <!-- ── JavaScript ────────────────────────────────── -->
+  <script>
+    /* ── Email capture ── */
+    var CAPTURE_URL = 'https://cuxndkreewlcmijxlgyg.supabase.co/functions/v1/capture-waitlist';
+
+    function submitEmail(email, source) {
+      return fetch(CAPTURE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, source: source })
+      }).then(function(r) { return r.ok; }).catch(function() { return false; });
+    }
+
+    function handleEmailForm(formId, successId, source) {
+      var form    = document.getElementById(formId);
+      var success = document.getElementById(successId);
+      if (!form) return;
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var emailInput = form.querySelector('input[type="email"]');
+        var val = (emailInput.value || '').trim();
+
+        if (!val || val.indexOf('@') === -1) {
+          emailInput.style.borderColor = '#EF4444';
+          emailInput.focus();
+          return;
+        }
+
+        submitEmail(val, source).then(function() {
+          form.style.display = 'none';
+          success.classList.add('visible');
+        });
+      });
+    }
+
+    handleEmailForm('hero-form',   'hero-success',   'hero');
+    handleEmailForm('footer-form', 'footer-success', 'footer');
+
+    /* ── Founder CTA — scroll to waitlist + focus ── */
+    function handleFounderCTA() {
+      var target = document.getElementById('footer-email');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(function () { target.focus(); }, 400);
+      }
+    }
+
+    /* ── FAQ accordion ── */
+    function toggleFaq(btn) {
+      var item     = btn.closest('.faq-item');
+      var isOpen   = item.classList.contains('open');
+      var allItems = document.querySelectorAll('.faq-item');
+
+      // Close all
+      allItems.forEach(function (el) {
+        el.classList.remove('open');
+        el.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+      });
+
+      // Open clicked one if it was closed
+      if (!isOpen) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    }
+  </script>
+
+</body>
+</html>

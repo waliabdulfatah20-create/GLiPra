@@ -6,8 +6,9 @@
 //   2. DailyMacroCard (when entries exist)
 //   2b. MicronutrientWatchCard — Pro-gated, always rendered
 //   3. MealChipRow — Breakfast / Lunch / Dinner / Snack time-based filter
-//   4. PhotoCaptureButton — always-visible AI hero card (Pro-gated internally)
-//   5. 2-tab toggle — Manual | Barcode (Photo removed; lives in the AI card)
+//   4. VoiceCaptureButton — full-width navy AI hero card (Pro-gated internally)
+//      + PhotoCaptureButton — compact AI action row (Pro-gated internally)
+//   5. 2-tab toggle — Manual | Barcode, with a "free" caption underneath
 //   6. ManualEntryForm (when mode === 'manual')
 //   7. Today's log / filtered section header
 //   8. FoodLogRow list (filtered by selectedMeal)
@@ -202,18 +203,16 @@ export default function LogScreen() {
             {/* 3. Meal context chips */}
             <MealChipRow active={selectedMeal} onSelect={setSelectedMeal} />
 
-            {/* 4. AI logging row — Photo + Voice */}
-            <View style={styles.aiRow}>
-              <PhotoCaptureButton
-                onImageSelected={(base64, mimeType) =>
-                  setPendingCapture({ base64, mimeType })}
-                isLoading={recognizing}
-              />
-              <VoiceCaptureButton
-                onAudioCaptured={handleAudioCaptured}
-                isLoading={isVoiceLoading}
-              />
-            </View>
+            {/* 4. AI logging — voice hero card, then compact photo row (each full-width) */}
+            <VoiceCaptureButton
+              onAudioCaptured={handleAudioCaptured}
+              isLoading={isVoiceLoading}
+            />
+            <PhotoCaptureButton
+              onImageSelected={(base64, mimeType) =>
+                setPendingCapture({ base64, mimeType })}
+              isLoading={recognizing}
+            />
 
             {/* 5. 2-tab toggle — Manual | Barcode */}
             <View style={styles.modeToggleRow}>
@@ -251,6 +250,9 @@ export default function LogScreen() {
                 </Text>
               </Pressable>
             </View>
+
+            {/* 5b. Free-logging caption — barcode + manual are never paywalled */}
+            <Text style={styles.freeNote}>{t('log.free_logging_note')}</Text>
 
             {/* 6. Manual entry form (mode === 'manual') */}
             {mode === 'manual' && (
@@ -453,9 +455,11 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       fontWeight: '600',
       marginTop: spacing.xs,
     },
-    aiRow: {
-      flexDirection: 'row',
-      gap: spacing.sm,
+    freeNote: {
+      fontSize: 12,
+      color: colors.success,
+      fontWeight: '600',
+      textAlign: 'center',
       marginHorizontal: spacing.md,
       marginBottom: spacing.sm,
     },

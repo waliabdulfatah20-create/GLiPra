@@ -193,11 +193,31 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
       style={styles.button}
       onPress={handlePress}
       accessibilityRole="button"
-      accessibilityLabel={t('log.voice_button_label')}
+      accessibilityLabel={t('log.voice_hero_title')}
     >
+      {/* PRO crown badge */}
+      <View style={styles.proPill}>
+        <Text style={styles.proPillText}>👑 PRO</Text>
+      </View>
+
       <Text style={styles.icon}>🎙</Text>
-      <Text style={styles.label}>{t('log.voice_button_label')}</Text>
-      <Text style={styles.subtitle}>{t('log.voice_button_subtitle')}</Text>
+
+      {/* Static waveform — visual affordance */}
+      <View style={styles.heroWaveform}>
+        {[8, 16, 10, 22, 14, 26, 14, 22, 10, 16, 8].map((h, i) => (
+          <View key={i} style={[styles.heroWaveBar, { height: h }]} />
+        ))}
+      </View>
+
+      <Text style={styles.label}>{t('log.voice_hero_title')}</Text>
+      <Text style={styles.subtitle}>{t('log.voice_hero_subtitle')}</Text>
+
+      <View style={styles.ctaPill}>
+        <Text style={styles.ctaText}>
+          {t('log.voice_cta')}
+          {' →'}
+        </Text>
+      </View>
     </Pressable>
   );
 }
@@ -215,14 +235,16 @@ type StyleTokens = {
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({
     button: {
-      flex: 1,
-      backgroundColor: '#0F172A',
-      borderRadius: radius.md,
-      paddingVertical: spacing.md,
+      backgroundColor: '#1E1B4B',
+      borderRadius: radius.lg,
+      marginHorizontal: spacing.md,
+      marginBottom: spacing.sm,
+      paddingVertical: spacing.lg,
+      paddingHorizontal: spacing.md,
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 4,
-      minHeight: 80,
+      gap: spacing.xs,
+      minHeight: 180,
     },
     loadingState: {
       opacity: 0.8,
@@ -230,17 +252,55 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
     recordingState: {
       backgroundColor: '#7f1d1d',
     },
+    proPill: {
+      backgroundColor: 'rgba(124,58,237,0.25)',
+      borderColor: 'rgba(167,139,250,0.5)',
+      borderWidth: 1,
+      borderRadius: radius.full,
+      paddingHorizontal: 10,
+      paddingVertical: 3,
+      marginBottom: spacing.xs,
+    },
+    proPillText: {
+      color: colors.white,
+      fontSize: 11,
+      fontWeight: '800',
+      letterSpacing: 0.5,
+    },
     icon: {
-      fontSize: 22,
+      fontSize: 30,
+    },
+    heroWaveform: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 3,
+      marginVertical: 4,
+    },
+    heroWaveBar: {
+      width: 3,
+      backgroundColor: '#A78BFA',
+      borderRadius: 2,
     },
     label: {
-      fontSize: 13,
-      fontWeight: '700',
+      fontSize: 20,
+      fontWeight: '800',
       color: colors.white,
     },
     subtitle: {
-      fontSize: 11,
+      fontSize: 13,
       color: 'rgba(255,255,255,0.65)',
+    },
+    ctaPill: {
+      backgroundColor: 'rgba(124,58,237,0.35)',
+      borderRadius: radius.full,
+      paddingHorizontal: 22,
+      paddingVertical: 11,
+      marginTop: spacing.sm,
+    },
+    ctaText: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.white,
     },
     loadingText: {
       fontSize: 11,

@@ -9,6 +9,7 @@
 import type { GlipraTokens } from '@/theme/tokens';
 import * as ImagePicker from 'expo-image-picker';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   ActivityIndicator,
@@ -34,6 +35,7 @@ export function PhotoCaptureButton({
   onImageSelected,
   isLoading,
 }: PhotoCaptureButtonProps) {
+  const { t } = useTranslation();
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
@@ -96,7 +98,7 @@ export function PhotoCaptureButton({
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.cardWrapper, pressed && { opacity: 0.93 }]}
+      style={({ pressed }) => [styles.row, pressed && { opacity: 0.93 }]}
       onPress={handleCardPress}
       disabled={isLoading}
       accessibilityRole="button"
@@ -104,44 +106,36 @@ export function PhotoCaptureButton({
         isPro ? 'Snap your meal with AI camera' : 'Upgrade to Pro for AI photo recognition'
       }
     >
-      <View style={styles.card}>
-        {/* Top row: AI POWERED pill + PRO chip */}
-        <View style={styles.topRow}>
-          <View style={styles.aiPill}>
-            <Text style={styles.aiPillText}>✦ AI POWERED</Text>
-          </View>
-          <View style={styles.proPill}>
-            <Text style={styles.proPillText}>👑 PRO</Text>
-          </View>
-        </View>
-
-        {/* Camera icon with 4 sparkle dots */}
-        <View style={styles.iconContainer}>
-          <Text style={styles.cameraIcon}>📷</Text>
-          <Text style={[styles.sparkle, styles.sparkleNE]}>✦</Text>
-          <Text style={[styles.sparkle, styles.sparkleSE]}>✦</Text>
-          <Text style={[styles.sparkle, styles.sparkleNW]}>✦</Text>
-          <Text style={[styles.sparkle, styles.sparkleSW]}>✦</Text>
-        </View>
-
-        {/* Title + subtitle */}
-        <Text style={styles.title}>Snap your meal</Text>
-        <Text style={styles.subtitle}>AI estimates macros instantly</Text>
-
-        {/* CTA — loading spinner while recognition is in flight */}
-        {isLoading
-          ? (
-              <View style={styles.loadingRow}>
-                <ActivityIndicator color={colors.white} size="small" />
-                <Text style={styles.analyzingText}>Analyzing…</Text>
-              </View>
-            )
-          : (
-              <View style={styles.ctaPill}>
-                <Text style={styles.ctaText}>Open Camera →</Text>
-              </View>
-            )}
+      {/* Leading icon circle */}
+      <View style={styles.iconCircle}>
+        <Text style={styles.cameraIcon}>📷</Text>
       </View>
+
+      {/* Title + subtitle */}
+      <View style={styles.textBlock}>
+        <Text style={styles.title}>{t('log.photo_row_title')}</Text>
+        <Text style={styles.subtitle}>{t('log.photo_row_subtitle')}</Text>
+      </View>
+
+      {/* Trailing: AI + PRO pills + chevron, or spinner while analyzing */}
+      {isLoading
+        ? (
+            <View style={styles.loadingRow}>
+              <ActivityIndicator color={colors.primary} size="small" />
+              <Text style={styles.analyzingText}>{t('log.voice_processing')}</Text>
+            </View>
+          )
+        : (
+            <View style={styles.trailing}>
+              <View style={styles.aiPill}>
+                <Text style={styles.aiPillText}>AI</Text>
+              </View>
+              <View style={styles.proPill}>
+                <Text style={styles.proPillText}>PRO</Text>
+              </View>
+              <Text style={styles.chevron}>›</Text>
+            </View>
+          )}
     </Pressable>
   );
 }
@@ -155,106 +149,89 @@ type StyleTokens = {
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
-    cardWrapper: {
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
       marginHorizontal: spacing.md,
-      borderRadius: radius.lg,
-      ...shadows.lg,
-    },
-    card: {
-      borderRadius: radius.lg,
-      backgroundColor: '#4C1D95',
+      marginBottom: spacing.sm,
       paddingHorizontal: spacing.md,
-      paddingTop: spacing.md,
-      paddingBottom: spacing.md,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      ...shadows.sm,
+    },
+    iconCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.primaryLight,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    cameraIcon: {
+      fontSize: 20,
+    },
+    textBlock: {
+      flex: 1,
+      gap: 2,
+    },
+    title: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    subtitle: {
+      fontSize: 13,
+      color: colors.textSecondary,
+    },
+    trailing: {
+      flexDirection: 'row',
       alignItems: 'center',
       gap: spacing.xs,
     },
-    topRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignSelf: 'stretch',
-      marginBottom: spacing.xs,
-    },
     aiPill: {
-      backgroundColor: 'rgba(245,158,11,0.2)',
+      backgroundColor: 'rgba(245,158,11,0.12)',
       borderColor: '#F59E0B',
       borderWidth: 1,
       borderRadius: radius.full,
       paddingHorizontal: 8,
-      paddingVertical: 3,
+      paddingVertical: 2,
     },
     aiPillText: {
       color: '#F59E0B',
       fontSize: 10,
       fontWeight: '800',
-      letterSpacing: 1,
+      letterSpacing: 0.5,
     },
     proPill: {
-      backgroundColor: 'rgba(255,255,255,0.12)',
-      borderColor: 'rgba(255,255,255,0.25)',
+      backgroundColor: colors.primaryLight,
+      borderColor: colors.primary,
       borderWidth: 1,
       borderRadius: radius.full,
       paddingHorizontal: 8,
-      paddingVertical: 3,
+      paddingVertical: 2,
     },
     proPillText: {
-      color: colors.white,
+      color: colors.primary,
       fontSize: 10,
       fontWeight: '800',
+      letterSpacing: 0.5,
     },
-    iconContainer: {
-      width: 56,
-      height: 56,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    cameraIcon: {
-      fontSize: 32,
-    },
-    sparkle: {
-      position: 'absolute',
-      fontSize: 8,
-      color: 'rgba(255,255,255,0.7)',
-    },
-    sparkleNE: { top: 4, right: 4 },
-    sparkleSE: { bottom: 4, right: 4 },
-    sparkleNW: { top: 4, left: 4 },
-    sparkleSW: { bottom: 4, left: 4 },
-    title: {
-      fontSize: 17,
-      fontWeight: '700',
-      color: colors.white,
-      marginTop: spacing.xs,
-    },
-    subtitle: {
-      fontSize: 13,
-      color: 'rgba(255,255,255,0.65)',
-      marginBottom: spacing.xs,
-    },
-    ctaPill: {
-      backgroundColor: colors.white,
-      borderRadius: radius.full,
-      paddingHorizontal: 20,
-      paddingVertical: 10,
-      alignSelf: 'stretch',
-      alignItems: 'center',
-      marginTop: spacing.xs,
-    },
-    ctaText: {
-      fontSize: 15,
-      fontWeight: '700',
-      color: colors.primary,
+    chevron: {
+      fontSize: 22,
+      color: colors.textSecondary,
+      marginLeft: 2,
     },
     loadingRow: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: spacing.sm,
-      paddingVertical: 10,
     },
     analyzingText: {
-      fontSize: 15,
+      fontSize: 13,
       fontWeight: '600',
-      color: colors.white,
+      color: colors.primary,
     },
   });
 }

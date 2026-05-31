@@ -235,7 +235,7 @@ type StyleTokens = {
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({
     button: {
-      backgroundColor: '#1E1B4B',
+      backgroundColor: colors.voiceHeroBg,
       borderRadius: radius.lg,
       marginHorizontal: spacing.md,
       marginBottom: spacing.sm,
@@ -250,11 +250,11 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       opacity: 0.8,
     },
     recordingState: {
-      backgroundColor: '#7f1d1d',
+      backgroundColor: colors.recordingBg,
     },
     proPill: {
-      backgroundColor: 'rgba(124,58,237,0.25)',
-      borderColor: 'rgba(167,139,250,0.5)',
+      backgroundColor: colors.voiceHeroBadgeBg,
+      borderColor: colors.voiceHeroBadgeBorder,
       borderWidth: 1,
       borderRadius: radius.full,
       paddingHorizontal: 10,
@@ -278,7 +278,7 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
     },
     heroWaveBar: {
       width: 3,
-      backgroundColor: '#A78BFA',
+      backgroundColor: colors.voiceHeroWave,
       borderRadius: 2,
     },
     label: {
@@ -288,10 +288,10 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
     },
     subtitle: {
       fontSize: 13,
-      color: 'rgba(255,255,255,0.65)',
+      color: colors.voiceHeroTextMuted,
     },
     ctaPill: {
-      backgroundColor: 'rgba(124,58,237,0.35)',
+      backgroundColor: colors.voiceHeroCtaBg,
       borderRadius: radius.full,
       paddingHorizontal: 22,
       paddingVertical: 11,
@@ -315,7 +315,7 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
     },
     waveBar: {
       width: 3,
-      backgroundColor: '#fca5a5',
+      backgroundColor: colors.recordingWave,
       borderRadius: 2,
     },
     recordingTimer: {
@@ -325,7 +325,7 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
     },
     recordingHint: {
       fontSize: 10,
-      color: 'rgba(255,255,255,0.7)',
+      color: colors.voiceHeroTextMuted,
     },
   });
 }

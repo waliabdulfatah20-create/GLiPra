@@ -61,6 +61,15 @@ export type GlipraColorTokens = {
   disclaimerBg: string;
   disclaimerBorder: string;
   disclaimerText: string;
+  // Voice capture hero (always-dark surface, same in light + dark like the hero gradient)
+  voiceHeroBg: string;
+  voiceHeroBadgeBg: string;
+  voiceHeroBadgeBorder: string;
+  voiceHeroCtaBg: string;
+  voiceHeroWave: string;
+  voiceHeroTextMuted: string;
+  recordingBg: string;
+  recordingWave: string;
 };
 
 export type GlipraShadowTokens = {
@@ -178,6 +187,14 @@ export const lightTokens: GlipraTokens = {
     disclaimerBg: '#fff7ed',
     disclaimerBorder: '#fed7aa',
     disclaimerText: '#9a3412',
+    voiceHeroBg: '#1e1b4b',
+    voiceHeroBadgeBg: 'rgba(124,58,237,0.25)',
+    voiceHeroBadgeBorder: 'rgba(167,139,250,0.5)',
+    voiceHeroCtaBg: 'rgba(124,58,237,0.35)',
+    voiceHeroWave: '#a78bfa',
+    voiceHeroTextMuted: 'rgba(255,255,255,0.65)',
+    recordingBg: '#7f1d1d',
+    recordingWave: '#fca5a5',
   },
 };
 
@@ -259,5 +276,14 @@ export const darkTokens: GlipraTokens = {
     disclaimerBg: 'rgba(251, 191, 36, 0.12)',
     disclaimerBorder: '#fbbf24',
     disclaimerText: '#fdba74',
+    // Always-dark voice hero — identical to light so the card stays navy in both modes
+    voiceHeroBg: '#1e1b4b',
+    voiceHeroBadgeBg: 'rgba(124,58,237,0.25)',
+    voiceHeroBadgeBorder: 'rgba(167,139,250,0.5)',
+    voiceHeroCtaBg: 'rgba(124,58,237,0.35)',
+    voiceHeroWave: '#a78bfa',
+    voiceHeroTextMuted: 'rgba(255,255,255,0.65)',
+    recordingBg: '#7f1d1d',
+    recordingWave: '#fca5a5',
   },
 };

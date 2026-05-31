@@ -1,6 +1,9 @@
 import type { PressableProps, View } from 'react-native';
+import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
+
+import { useTheme } from '@/lib/ThemeContext';
 
 type ButtonVariant = 'default' | 'secondary' | 'outline' | 'destructive' | 'ghost' | 'link';
 type ButtonSize = 'default' | 'lg' | 'sm' | 'icon';
@@ -21,41 +24,69 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
+    borderRadius: 12,
     paddingHorizontal: 16,
     marginVertical: 8,
   },
   baseLabel: {
     fontSize: 16,
-    fontWeight: '600',
-  },
-  indicator: {
-    height: 24,
+    fontWeight: '700',
   },
   // Sizes
   sizeDefault: {
-    height: 40,
+    height: 48,
     paddingHorizontal: 16,
   },
   sizeLg: {
-    height: 48,
+    height: 52,
     paddingHorizontal: 32,
   },
   sizeSm: {
-    height: 32,
+    height: 36,
     paddingHorizontal: 12,
   },
   sizeIcon: {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
   },
 });
+
+type VariantStyle = {
+  bg: string;
+  label: string;
+  indicator: string;
+  borderWidth: number;
+  border: string;
+  underline: boolean;
+};
+
+function variantStyle(
+  colors: GlipraTokens['colors'],
+  variant: ButtonVariant,
+): VariantStyle {
+  const base = { borderWidth: 0, border: 'transparent', underline: false };
+  switch (variant) {
+    case 'destructive':
+      return { ...base, bg: colors.error, label: colors.white, indicator: colors.white };
+    case 'secondary':
+      return { ...base, bg: colors.surfaceElevated, label: colors.textPrimary, indicator: colors.textPrimary, borderWidth: 1, border: colors.border };
+    case 'outline':
+      return { ...base, bg: 'transparent', label: colors.primary, indicator: colors.primary, borderWidth: 1, border: colors.primary };
+    case 'ghost':
+      return { ...base, bg: 'transparent', label: colors.primary, indicator: colors.primary };
+    case 'link':
+      return { ...base, bg: 'transparent', label: colors.primary, indicator: colors.primary, underline: true };
+    case 'default':
+    default:
+      return { ...base, bg: colors.primary, label: colors.white, indicator: colors.white };
+  }
+}
 
 export function Button({
   ref,
   label: text,
   loading = false,
-  variant: _variant = 'default',
+  variant = 'default',
   disabled = false,
   size = 'default',
   className: _className = '',
@@ -63,10 +94,21 @@ export function Button({
   textClassName: _textClassName = '',
   ...props
 }: Props & { ref?: React.RefObject<View | null> }) {
+  const { colors } = useTheme();
+  const v = variantStyle(colors, variant);
+
   return (
     <Pressable
       disabled={disabled || loading}
-      style={[styles.baseContainer, size === 'default' && styles.sizeDefault, size === 'lg' && styles.sizeLg, size === 'sm' && styles.sizeSm, size === 'icon' && styles.sizeIcon]}
+      style={[
+        styles.baseContainer,
+        size === 'default' && styles.sizeDefault,
+        size === 'lg' && styles.sizeLg,
+        size === 'sm' && styles.sizeSm,
+        size === 'icon' && styles.sizeIcon,
+        { backgroundColor: v.bg, borderWidth: v.borderWidth, borderColor: v.border },
+        (disabled || loading) && { opacity: 0.5 },
+      ]}
       {...props}
       ref={ref}
       testID={testID}
@@ -81,13 +123,14 @@ export function Button({
                 ? (
                     <ActivityIndicator
                       size="small"
+                      color={v.indicator}
                       testID={testID ? `${testID}-activity-indicator` : undefined}
                     />
                   )
                 : (
                     <Text
                       testID={testID ? `${testID}-label` : undefined}
-                      style={styles.baseLabel}
+                      style={[styles.baseLabel, { color: v.label }, v.underline && { textDecorationLine: 'underline' }]}
                     >
                       {text}
                     </Text>

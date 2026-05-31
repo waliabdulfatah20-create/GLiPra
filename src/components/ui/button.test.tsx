@@ -77,9 +77,11 @@ describe('button component ', () => {
 
     expect(onClick).toHaveBeenCalledTimes(0);
   });
-  // NOTE: The original Obytes template included three className-assertion
-  // tests here (size styling, secondary variant styling, disabled styling).
-  // They were removed when NativeWind/Tailwind was stripped per CLAUDE.md.
-  // When the Button is rebuilt against the colors.ts design tokens, write
-  // fresh style tests using `toHaveStyle()` matchers instead of className strings.
+  it('renders the default variant with a visible brand background (not invisible)', () => {
+    // Regression: the Button stub had no backgroundColor, so on dark screens it
+    // rendered black-on-dark and looked broken. The default variant must fill.
+    render(<Button testID="button" label="Sign In" />);
+    // lightTokens.primary is the fallback when no ThemeProvider wraps the test.
+    expect(screen.getByTestId('button')).toHaveStyle({ backgroundColor: '#6d28d9' });
+  });
 });

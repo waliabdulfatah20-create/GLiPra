@@ -27,9 +27,6 @@ export default function AuthLayout() {
     }
   }, [status, hasAgreed]);
 
-  // TEMP DIAGNOSTIC (remove after auth flow confirmed)
-  console.log('[GLIPRA auth-layout] status:', status, 'hasAgreed:', hasAgreed);
-
   // Still loading consent state from AsyncStorage — hold until resolved.
   if (status === 'signIn' && hasAgreed === undefined)
     return null;

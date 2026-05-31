@@ -5,7 +5,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import * as React from 'react';
 import { useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import { AppState, StyleSheet, useColorScheme } from 'react-native';
 import FlashMessage from 'react-native-flash-message';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -20,6 +20,7 @@ import { AnalyticsProvider } from '@/lib/posthog-provider';
 import { initializeRevenueCat } from '@/lib/revenue-cat';
 import { supabase } from '@/lib/supabase';
 import { GlipraThemeProvider } from '@/lib/ThemeContext';
+import { darkTokens, lightTokens } from '@/theme/tokens';
 import '@/lib/i18n';
 
 export { ErrorBoundary } from 'expo-router';
@@ -65,7 +66,25 @@ export default function RootLayout() {
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Supabase auto-refresh MUST be tied to AppState in React Native. Without
+    // this, the refresh timer can run concurrently with sign-in / a stale
+    // persisted session and reuse a rotated refresh token ("Invalid Refresh
+    // Token: Already Used"), which churns the session signIn<->signOut and
+    // loops the auth router. Start while foregrounded, stop when backgrounded.
+    supabase.auth.startAutoRefresh();
+    const appStateSub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        supabase.auth.startAutoRefresh();
+      }
+      else {
+        supabase.auth.stopAutoRefresh();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+      appStateSub.remove();
+    };
   }, []);
 
   return (
@@ -82,8 +101,14 @@ export default function RootLayout() {
 // GlipraThemeProvider must be the outermost wrapper so ConnectedProviders
 // can call useTheme() via useThemeConfig() without a context violation.
 function Providers({ children }: { children: React.ReactNode }) {
+  // GestureHandlerRootView sits OUTSIDE GlipraThemeProvider, so it cannot use
+  // useTheme(). Read the device scheme directly so the root frame matches the
+  // app (dark on dark devices) instead of flashing light during transitions.
+  const scheme = useColorScheme();
+  const backgroundColor
+    = scheme === 'dark' ? darkTokens.colors.background : lightTokens.colors.background;
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <GestureHandlerRootView style={[styles.container, { backgroundColor }]}>
       <GlipraThemeProvider>
         <ConnectedProviders>{children}</ConnectedProviders>
       </GlipraThemeProvider>
@@ -113,9 +138,7 @@ function ConnectedProviders({ children }: { children: React.ReactNode }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // GestureHandlerRootView sits outside GlipraThemeProvider — cannot use
-    // useTheme(). Hardcode the light-mode background token (#f7f9fc) so
-    // Android never flashes a bare white frame on back-press transitions.
-    backgroundColor: '#f7f9fc',
+    // backgroundColor is applied in Providers based on the device color scheme
+    // (dark on dark devices) so the root frame never flashes light on dark.
   },
 });

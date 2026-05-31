@@ -17,17 +17,24 @@ export default function AuthLayout() {
     }
   }, [status]);
 
-  if (status === 'signIn') {
-    // Still loading consent state from AsyncStorage — hold until resolved
-    if (hasAgreed === undefined)
-      return null;
-    if (!hasAgreed)
-      return <Redirect href="/(auth)/consent" />;
-    return <Redirect href="/(app)/" />;
-  }
+  // Still loading consent state from AsyncStorage — hold until resolved.
+  if (status === 'signIn' && hasAgreed === undefined)
+    return null;
 
+  // Signed in AND consented -> enter the app.
+  if (status === 'signIn' && hasAgreed)
+    return <Redirect href="/(app)/" />;
+
+  // Otherwise render the auth Stack so its screens can actually mount:
+  //  - signed out -> welcome / sign-in / sign-up / forgot-password
+  //  - signed in but NOT consented -> force the consent screen. (Previously this
+  //    case returned <Redirect href="/(auth)/consent" /> WITHOUT ever rendering
+  //    <Stack>, so the consent screen could never mount -> stable blank screen.)
+  const needsConsent = status === 'signIn' && !hasAgreed;
   return (
     <Stack
+      key={needsConsent ? 'auth-consent' : 'auth'}
+      initialRouteName={needsConsent ? 'consent' : undefined}
       screenOptions={{
         headerShown: false,
         animation: 'slide_from_right',

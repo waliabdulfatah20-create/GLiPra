@@ -5,10 +5,12 @@
 //
 // Behaviour matrix:
 //   - react-native-purchases NOT installed  → stub (see STUB path below)
-//   - react-native-purchases installed,
-//     EXPO_PUBLIC_USE_MOCK_AI=true           → mock Pro (dev override)
-//   - react-native-purchases installed,
-//     EXPO_PUBLIC_USE_MOCK_AI=false          → live RevenueCat entitlement check
+//   - EXPO_PUBLIC_APP_ENV=development        → force Pro (dev override, so Pro-gated
+//                                              features are testable without a purchase).
+//                                              NOTE: keyed on APP_ENV, NOT the AI mock flag,
+//                                              so real AI can be enabled in dev (mock=false)
+//                                              while Pro stays unlocked for testing.
+//   - APP_ENV ≠ development (preview/prod)   → live RevenueCat entitlement check
 //
 // When adding real RevenueCat support:
 //   1. pnpm expo install react-native-purchases react-native-purchases-ui
@@ -41,8 +43,13 @@ export type SubscriptionState = {
 /** RevenueCat entitlement identifier — must match the dashboard setting */
 const ENTITLEMENT_ID = 'GLiPra Pro';
 
-/** True when running a dev build with mock AI enabled */
-const IS_MOCK_DEV = process.env.EXPO_PUBLIC_USE_MOCK_AI === 'true';
+/**
+ * Force Pro in development builds so Pro-gated features (photo, voice, etc.) are
+ * testable without a real purchase. Keyed on the app environment, NOT the AI mock
+ * flag — this lets us enable real AI in dev (EXPO_PUBLIC_USE_MOCK_AI=false) while
+ * Pro stays unlocked. Never true in preview/production (real entitlement check runs).
+ */
+const IS_DEV_FORCE_PRO = process.env.EXPO_PUBLIC_APP_ENV === 'development';
 
 // ---------------------------------------------------------------------------
 // react-native-purchases availability guard
@@ -106,14 +113,14 @@ export function useSubscription(): SubscriptionState {
   // STUB — react-native-purchases not installed
   // -------------------------------------------------------------------------
   // In this branch the module isn't available (Expo Go / no native build).
-  // Dev override: when EXPO_PUBLIC_USE_MOCK_AI=true we return isPro=true so
-  // developers can test every Pro-gated UI without a real purchase.
+  // Dev override: in development builds we return isPro=true so developers can
+  // test every Pro-gated UI without a real purchase.
   if (Purchases === null) {
-    const stubTier: SubscriptionTier = IS_MOCK_DEV ? 'pro' : 'free';
+    const stubTier: SubscriptionTier = IS_DEV_FORCE_PRO ? 'pro' : 'free';
     return {
       tier: stubTier,
       isLoading: false,
-      isPro: IS_MOCK_DEV,
+      isPro: IS_DEV_FORCE_PRO,
       isFounderLifetime: false,
       restore: async () => {},
     };
@@ -155,8 +162,8 @@ export function useSubscription(): SubscriptionState {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    // Dev override — treat mock mode as Pro even with a real native build
-    if (IS_MOCK_DEV) {
+    // Dev override — force Pro in development builds even with a real native build
+    if (IS_DEV_FORCE_PRO) {
       setState({
         tier: 'pro',
         isLoading: false,

@@ -27,7 +27,7 @@ export const ENTITLEMENT_ID = 'GLiPra Pro';
 // Module guard — same pattern as use-subscription.ts
 // ---------------------------------------------------------------------------
 
-function getPurchasesModule(): typeof import('react-native-purchases') | null {
+function getPurchasesModule(): typeof import('react-native-purchases').default | null {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const mod = require('react-native-purchases');

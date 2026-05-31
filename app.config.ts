@@ -65,8 +65,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         backgroundColor: '#2E3C4B',
       },
       package: Env.EXPO_PUBLIC_PACKAGE,
-      // 26 required by react-native-health-link (Health Connect API).
-      minSdkVersion: 26,
+      // minSdkVersion 26 (required by react-native-health-link / Health Connect)
+      // is applied via the withGradleProperties plugin at the end of this file —
+      // the inline android.minSdkVersion field is not reliably honored by Expo.
     },
     web: {
       favicon: './assets/favicon.png',

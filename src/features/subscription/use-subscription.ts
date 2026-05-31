@@ -51,7 +51,7 @@ const IS_MOCK_DEV = process.env.EXPO_PUBLIC_USE_MOCK_AI === 'true';
 // Expo Go (which does not have the native module compiled in). On failure we
 // fall back to the stub state.
 
-function getPurchasesModule(): typeof import('react-native-purchases') | null {
+function getPurchasesModule(): typeof import('react-native-purchases').default | null {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const mod = require('react-native-purchases');

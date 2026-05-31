@@ -50,6 +50,8 @@ export default function RootLayout() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
+      // TEMP DIAGNOSTIC (remove after auth flow confirmed)
+      console.log('[GLIPRA auth-event]', event, 'session:', session ? 'yes' : 'no');
       setSession(session);
       // Initialize RevenueCat as soon as the user is authenticated.
       // Passing the Supabase user ID links the RevenueCat customer record.

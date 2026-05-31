@@ -44,6 +44,9 @@ export default function TabLayout() {
     return () => subscription.remove();
   }, [pathname]);
 
+  // TEMP DIAGNOSTIC (remove after auth flow confirmed)
+  console.log('[GLIPRA app-layout] status:', status, 'isFirstTime:', isFirstTime);
+
   if (isFirstTime === undefined) {
     return null;
   }

@@ -1,7 +1,7 @@
 # Glipra — Build Progress
 # Full history of what has been built. Not needed by Claude during coding.
 # Update this file at the end of each session.
-# Last updated: 2026-05-31 (session 38 — GDPR, tooling/check-all green, Pages + Button fixes)
+# Last updated: 2026-05-31 (session 39 — voice-hero/photo-row Nutrition redesign + Micronutrient Watch relocation/upsell, both shipped via OTA)
 
 ---
 
@@ -64,6 +64,8 @@
 | 50 | Sign In button invisible fix. The shared `Button` (`src/components/ui/button.tsx`, Obytes stub) had no `backgroundColor` and a default-black label, so the default-variant button (sign-in, sign-up, forgot-password, onboarding, feed) rendered black-on-dark = invisible (looked "not working" but onPress was wired). Re-styled against colors.ts tokens via `useTheme()`: default = `colors.primary` fill + `colors.white` label; all variants styled; disabled/loading dim. Regression test added. 63 jest + 363 Vitest, type-check 0, lint 0. Shipped to the installed dev build via EAS Update (OTA) on `development` channel (update group `61ad727c`), no rebuild needed. Commit `a3a95e9`. | ✅ |
 | 51 | Post-sign-in flicker loop + white flash fixed. After the button became tappable, live sign-in caused a continuous white-flicker loop (cold reopen was fine). Root cause: Supabase client had `autoRefreshToken: true` but no AppState management, so on sign-in the refresh timer raced the stale persisted session and reused a rotated refresh token (`Invalid Refresh Token: Already Used`), churning the session signIn<->signOut and ping-ponging the `(auth)<->(app)` router. Fix (`5717bf5`): tie auto-refresh to AppState in root `_layout.tsx` (startAutoRefresh on active, stopAutoRefresh on background — the Supabase RN-documented remedy); the churn is now a single transient settle, not a loop. Also made the root `GestureHandlerRootView` background follow the device color scheme (dark on dark devices) instead of a hardcoded light `#f7f9fc`, killing the white flash. OTA to `development`. | ✅ |
 | 52 | Post-sign-in blank/stranded-on-sign-in fixed (the real blocker, found via live Metro logs). Logs showed `status: signIn` but `hasAgreed: false` (consent never recorded on this build) — and `(auth)/_layout` returned `<Redirect href="/(auth)/consent">` WITHOUT rendering `<Stack>`, so the consent screen (which lives in that Stack) could never mount → blank/stuck on sign-in. Fix (`02c0000`): navigate to consent IMPERATIVELY via `router.replace('/(auth)/consent')` in a `[status, hasAgreed]` effect while rendering a plain `<Stack>`, so the consent screen mounts. Flow now: sign in → consent → agree (`setHasAgreed(true)`) → `(app)` → Today. Confirmed working on device. Temp `[GLIPRA]` diagnostic logs removed afterward. 63 jest + 363 Vitest, type-check 0, lint 0. | ✅ |
+| 53 | Nutrition Log voice-hero / photo-row redesign — ACTUALLY SHIPPED this time (the session 44/45 redesign that was logged-but-never-committed; the 4 "dead" keys are now live). `voice-capture-button.tsx`: idle state restyled into a full-width navy hero card (`#1E1B4B`, 👑 PRO badge, mic, brand-purple waveform, "Speak your meal" / "Voice AI extracts macros instantly" / "Tap to record →" pill); recording/loading/Pro-gate logic untouched. `photo-capture-button.tsx`: the big violet gradient card became a compact white action row (camera circle + "Photo scan" / "AI estimates from image" + amber AI pill + brand PRO pill + chevron); camera/Pro-gate logic untouched (added `useTranslation`). `log.tsx`: the two stack vertically (voice hero, then photo row) instead of side-by-side; emerald "Barcode and manual entry are always free." caption added under the Manual/Barcode toggle. Re-added the 4 i18n keys (`voice_hero_title`, `voice_hero_subtitle`, `voice_cta`, `free_logging_note`) en/es; `photo_row_title/subtitle` already existed. Presentation only. 63 jest + 363 Vitest, type-check 0 (touched files), lint:translations parity. Commit `bd7eb76`, OTA to `development` (update group `d768cfd3`). | ✅ |
+| 54 | Micronutrient Watch relocation + frosted "Unlock with Pro" upsell. (a) Logging-first reorder in `log.tsx`: `DailyMacroCard` + `MicronutrientWatchCard` moved from the top into a results cluster BELOW the logging actions (above "Today's log"), so the empty micronutrient state no longer pushes the CTAs below the fold. (b) `micronutrient-watch-card.tsx` turned the Pro gate into a conversion surface — Pro users see the real card only when micros are logged (else `null`, removing the empty microscope state); free users get a new `MicronutrientUpsell` fallback: sample nutrient tiles dimmed to 45% behind a frosted scrim (`colors.surface` @ 0.82, two-layer so text stays crisp; no `expo-blur` → OTA-shippable), 🔒 + "See what your meals are missing" + B12/D/Mg/Zn subtitle + "Unlock with Pro" pill (opens paywall, entitlement `glipra_pro`), labelled "Sample preview". 4 i18n keys (`micronutrient_upsell_title/subtitle/cta/sample`) en/es. 63 jest + 363 Vitest, type-check 0 (touched), parity ok. Commit `059fe5c`, OTA to `development` (update group `8818b5d0`). NOTE: dev build auto-unlocks Pro, so the free teaser path is not visible on-device without forcing `isPro=false`. Pre-existing entitlement-id inconsistency flagged (`pro-gate.tsx` + `photo-capture-button.tsx` use `'GLiPra Pro'`; canonical is `'glipra_pro'`). | ✅ |
 
 ### Correction note (2026-05-30 audit)
 
@@ -77,6 +79,13 @@ The build currently under on-device test (`81b2433`) ships the **session-41 voic
 (side-by-side Photo/Voice buttons, compact mic button) and the **session-46 Daily AI
 Guidance** feature only. Sessions 41 and 46 are verified accurate. The voice-hero redesign
 and token cleanup remain to be built (see Direction B backlog below if re-prioritized).
+
+**Resolved (session 39 / entry 53):** the voice-hero redesign and the "always free" note
+were finally implemented and committed (`bd7eb76`). The previously-dead keys
+(`voice_hero_title`, `voice_hero_subtitle`, `voice_cta`, `free_logging_note`) are now live
+and rendered. The remaining un-done item from that era is the **VoiceCaptureButton hardcoded-hex
+→ semantic-token cleanup** (entry 42): `voice-capture-button.tsx` still uses literal hex
+(`#1E1B4B`, `#0F172A`, `#7f1d1d`, `#A78BFA`, `#fca5a5`) rather than `tokens.ts` colors.
 
 ### Upcoming — Visual Redesign (Direction B)
 

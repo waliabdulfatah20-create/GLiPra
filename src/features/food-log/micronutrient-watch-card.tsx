@@ -137,7 +137,7 @@ function openPaywall() {
     // eslint-disable-next-line ts/no-require-imports
     const { RevenueCatUI } = require('react-native-purchases-ui');
     RevenueCatUI.presentPaywallIfNeeded({
-      requiredEntitlementIdentifier: 'glipra_pro',
+      requiredEntitlementIdentifier: 'GLiPra Pro',
     });
   }
   catch {

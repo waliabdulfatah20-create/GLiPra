@@ -88,7 +88,7 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
     // Pro gate — show paywall for non-Pro users
     if (!isPro) {
       const result = await RevenueCatUI.presentPaywallIfNeeded({
-        requiredEntitlementIdentifier: 'glipra_pro',
+        requiredEntitlementIdentifier: 'GLiPra Pro',
       });
       // Only PURCHASED and RESTORED are valid fall-throughs — all other outcomes exit.
       if (

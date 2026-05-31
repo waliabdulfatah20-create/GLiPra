@@ -107,7 +107,7 @@ export function SettingsScreen() {
       return;
     }
     try {
-      const FileSystem = require('expo-file-system');
+      const FileSystem = require('expo-file-system/legacy');
       const Sharing = require('expo-sharing');
       const fileUri = `${FileSystem.cacheDirectory}glipra-data-export.json`;
       await FileSystem.writeAsStringAsync(fileUri, json, {

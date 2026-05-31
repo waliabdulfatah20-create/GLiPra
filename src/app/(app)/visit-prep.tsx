@@ -125,7 +125,7 @@ export default function VisitPrepScreen() {
     // expo-sharing is a native-only package — we require it lazily so the
     // module doesn't crash in environments where it isn't installed.
     try {
-      const FileSystem = require('expo-file-system');
+      const FileSystem = require('expo-file-system/legacy');
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const Sharing = require('expo-sharing');
       if (await Sharing.isAvailableAsync()) {

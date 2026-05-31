@@ -6,7 +6,7 @@
 
 import type { GlipraTokens } from '@/theme/tokens';
 import { Audio } from 'expo-av';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 

@@ -5,7 +5,12 @@
 //       tap to stop → base64 encode → onAudioCaptured callback
 
 import type { GlipraTokens } from '@/theme/tokens';
-import { Audio } from 'expo-av';
+import {
+  RecordingPresets,
+  requestRecordingPermissionsAsync,
+  setAudioModeAsync,
+  useAudioRecorder,
+} from 'expo-audio';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,9 +47,11 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
   const { t } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const { isPro } = useSubscription();
-  const [recording, setRecording] = React.useState<Audio.Recording | null>(null);
+  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const [isRecording, setIsRecording] = React.useState(false);
   const [elapsedSeconds, setElapsedSeconds] = React.useState(0);
+  // Mirror of isRecording for the unmount cleanup (avoids stale-closure on the recorder).
+  const isRecordingRef = React.useRef(false);
 
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
@@ -64,11 +71,11 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
   // Release audio session if component unmounts while recording is active
   React.useEffect(() => {
     return () => {
-      if (recording) {
-        recording.stopAndUnloadAsync().catch(() => {});
+      if (isRecordingRef.current) {
+        audioRecorder.stop().catch(() => {});
       }
     };
-  }, [recording]);
+  }, [audioRecorder]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -80,8 +87,8 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
     haptics.tap();
 
     // Already recording — stop
-    if (isRecording && recording) {
-      await stopRecording(recording);
+    if (isRecording) {
+      await stopRecording();
       return;
     }
 
@@ -101,8 +108,8 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
     }
 
     // Mic permission
-    const { status } = await Audio.requestPermissionsAsync();
-    if (status !== 'granted') {
+    const permission = await requestRecordingPermissionsAsync();
+    if (!permission.granted) {
       Alert.alert(
         t('log.voice_permission_denied_title'),
         t('log.voice_permission_denied_body'),
@@ -116,16 +123,15 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
 
   const startRecording = async () => {
     try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
       });
 
-      const { recording: newRecording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY,
-      );
+      await audioRecorder.prepareToRecordAsync();
+      audioRecorder.record();
 
-      setRecording(newRecording);
+      isRecordingRef.current = true;
       setIsRecording(true);
     }
     catch (err) {
@@ -134,13 +140,14 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
     }
   };
 
-  const stopRecording = async (rec: Audio.Recording) => {
+  const stopRecording = async () => {
     try {
       setIsRecording(false);
-      await rec.stopAndUnloadAsync();
-      await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+      isRecordingRef.current = false;
+      await audioRecorder.stop();
+      await setAudioModeAsync({ allowsRecording: false });
 
-      const uri = rec.getURI();
+      const uri = audioRecorder.uri;
       if (!uri)
         throw new Error('No recording URI');
 
@@ -148,12 +155,11 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
         encoding: FileSystem.EncodingType.Base64,
       });
 
-      setRecording(null);
       onAudioCaptured(base64, 'audio/m4a');
     }
     catch (err) {
       console.error('[VoiceCaptureButton] stopRecording error:', err);
-      setRecording(null);
+      isRecordingRef.current = false;
     }
   };
 

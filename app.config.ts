@@ -128,6 +128,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       '@sentry/react-native',
       '@react-native-community/datetimepicker',
       'expo-notifications',
+      [
+        'expo-audio',
+        {
+          microphonePermission:
+            'Glipra uses the microphone so you can log meals by voice.',
+        },
+      ],
     ],
     extra: {
       eas: {

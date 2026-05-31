@@ -1,15 +1,15 @@
 // Nutrition Log Screen — food logging entry point.
 // Route: /(app)/log
 //
-// Layout (top to bottom):
+// Layout (top to bottom) — logging-first, results below:
 //   1. Header — "Nutrition Log" title + compact protein ring
-//   2. DailyMacroCard (when entries exist)
-//   2b. MicronutrientWatchCard — Pro-gated, always rendered
-//   3. MealChipRow — Breakfast / Lunch / Dinner / Snack time-based filter
-//   4. VoiceCaptureButton — full-width navy AI hero card (Pro-gated internally)
+//   2. MealChipRow — Breakfast / Lunch / Dinner / Snack time-based filter
+//   3. VoiceCaptureButton — full-width navy AI hero card (Pro-gated internally)
 //      + PhotoCaptureButton — compact AI action row (Pro-gated internally)
-//   5. 2-tab toggle — Manual | Barcode, with a "free" caption underneath
-//   6. ManualEntryForm (when mode === 'manual')
+//   4. 2-tab toggle — Manual | Barcode, with a "free" caption underneath
+//   5. ManualEntryForm (when mode === 'manual')
+//   6. Results cluster — DailyMacroCard (when entries exist) + MicronutrientWatchCard
+//      (Pro+data -> grid, Pro+empty -> null, free -> frosted "Unlock with Pro" upsell)
 //   7. Today's log / filtered section header
 //   8. FoodLogRow list (filtered by selectedMeal)
 //
@@ -194,13 +194,7 @@ export default function LogScreen() {
               <NutritionHeaderRing consumed={totalProteinToday} floor={proteinFloorG} />
             </View>
 
-            {/* 2. Daily macro summary card — shown when there are entries today */}
-            {logs.length > 0 && <DailyMacroCard />}
-
-            {/* 2b. Micronutrient Watch — Pro-gated, always rendered (handles empty state internally) */}
-            <MicronutrientWatchCard />
-
-            {/* 3. Meal context chips */}
+            {/* 2. Meal context chips */}
             <MealChipRow active={selectedMeal} onSelect={setSelectedMeal} />
 
             {/* 4. AI logging — voice hero card, then compact photo row (each full-width) */}
@@ -261,6 +255,12 @@ export default function LogScreen() {
                 isLoading={insertingManual || insertingBarcode}
               />
             )}
+
+            {/* 6b. Results cluster — daily macro summary + Micronutrient Watch.
+                DailyMacroCard shows only when entries exist; MicronutrientWatchCard
+                self-manages (Pro+data -> grid, Pro+empty -> null, free -> upsell teaser). */}
+            {logs.length > 0 && <DailyMacroCard />}
+            <MicronutrientWatchCard />
 
             {/* 7. Today's log section header — label reflects active meal chip */}
             {logs.length > 0 && (

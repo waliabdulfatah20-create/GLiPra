@@ -48,7 +48,7 @@ export function PhotoCaptureButton({
     if (!permission.granted) {
       Alert.alert(
         'Camera permission required',
-        'Glipra needs camera access to recognise food from photos.',
+        'GLiPra needs camera access to recognise food from photos.',
       );
       return;
     }

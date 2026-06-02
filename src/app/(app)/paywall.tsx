@@ -21,7 +21,7 @@ export default function PaywallRoute() {
 
   return (
     <PaywallScreen
-      featureName="Glipra Pro"
+      featureName="GLiPra Pro"
       onDismiss={handleDismiss}
     />
   );

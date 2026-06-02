@@ -61,7 +61,7 @@ export function useNotificationSettings(): NotificationSettingsState {
         if (status !== 'granted') {
           Alert.alert(
             'Notifications disabled',
-            'To receive reminders, go to device Settings and allow notifications for Glipra.',
+            'To receive reminders, go to device Settings and allow notifications for GLiPra.',
             [{ text: 'OK' }],
           );
           return; // Don't persist — user hasn't actually enabled it.

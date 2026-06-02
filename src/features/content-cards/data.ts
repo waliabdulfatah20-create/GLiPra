@@ -27,7 +27,7 @@ export const CONTENT_CARDS: ContentCard[] = [
     title: 'Why Protein Matters More on GLP-1s',
     keyTakeaway: 'Protein is the only thing standing between GLP-1 and your muscle.',
     body:
-      'GLP-1 medications reduce appetite significantly, which means the weight you lose can come from both fat and muscle, and muscle loss is the outcome we work hardest to prevent. Research shows that meeting your daily protein target, combined with resistance training, preserves lean mass during caloric restriction. Pharmacist note: The protein floor Glipra calculates for you is built specifically around this evidence, not a generic RDA.',
+      'GLP-1 medications reduce appetite significantly, which means the weight you lose can come from both fat and muscle, and muscle loss is the outcome we work hardest to prevent. Research shows that meeting your daily protein target, combined with resistance training, preserves lean mass during caloric restriction. Pharmacist note: The protein floor GLiPra calculates for you is built specifically around this evidence, not a generic RDA.',
     cardType: 'education',
     medicationIds: [],
     tier: 2,
@@ -96,7 +96,7 @@ export const CONTENT_CARDS: ContentCard[] = [
     title: 'Muscle Preservation: Beyond the Scale',
     keyTakeaway: 'The scale cannot tell you if you are losing fat or muscle. Body composition can.',
     body:
-      'The number on the scale does not tell you whether you are losing fat or muscle. Body composition is what matters. Research consistently shows that losing weight at a pace of around 0.5-1 lb per week, paired with sufficient protein and resistance training, preserves significantly more lean mass than rapid loss. Pharmacist note: Glipra\'s protein floor is calibrated to support this pace of muscle-protective weight loss, not simply to hit a generic macro target.',
+      'The number on the scale does not tell you whether you are losing fat or muscle. Body composition is what matters. Research consistently shows that losing weight at a pace of around 0.5-1 lb per week, paired with sufficient protein and resistance training, preserves significantly more lean mass than rapid loss. Pharmacist note: GLiPra\'s protein floor is calibrated to support this pace of muscle-protective weight loss, not simply to hit a generic macro target.',
     cardType: 'milestone',
     medicationIds: [],
     tier: 2,
@@ -107,7 +107,7 @@ export const CONTENT_CARDS: ContentCard[] = [
     title: 'Signs You May Need More Protein',
     keyTakeaway: 'Fatigue, hair thinning, and slow wound healing are signs of protein shortfall.',
     body:
-      'Persistent fatigue that is not explained by poor sleep, noticeable hair thinning starting around the three-month mark, slow wound healing, and feeling cold more than usual can all be signs that protein intake is inadequate. These symptoms are frequently mistaken for medication side effects, but they are also classic markers of insufficient dietary protein. Logging your protein consistently in Glipra is the most reliable way to rule out a shortfall.',
+      'Persistent fatigue that is not explained by poor sleep, noticeable hair thinning starting around the three-month mark, slow wound healing, and feeling cold more than usual can all be signs that protein intake is inadequate. These symptoms are frequently mistaken for medication side effects, but they are also classic markers of insufficient dietary protein. Logging your protein consistently in GLiPra is the most reliable way to rule out a shortfall.',
     cardType: 'warning',
     medicationIds: [],
     tier: 2,
@@ -301,7 +301,7 @@ export const CONTENT_CARDS: ContentCard[] = [
     title: 'Nutrition When You Reach Your Goal',
     keyTakeaway: 'Goal weight is a transition, not a finish line: your protein floor stays high.',
     body:
-      'Reaching your goal weight does not mean stopping the habits that got you there: it means recalibrating them. Protein remains just as important in maintenance because muscle mass still requires regular stimulus and amino acid supply to stay in place. Glipra\'s maintenance mode adjusts your protein floor by 10% to reflect reduced caloric needs, while keeping the floor high enough to protect the muscle you worked to preserve. This transition is a success, not an endpoint.',
+      'Reaching your goal weight does not mean stopping the habits that got you there: it means recalibrating them. Protein remains just as important in maintenance because muscle mass still requires regular stimulus and amino acid supply to stay in place. GLiPra\'s maintenance mode adjusts your protein floor by 10% to reflect reduced caloric needs, while keeping the floor high enough to protect the muscle you worked to preserve. This transition is a success, not an endpoint.',
     cardType: 'education',
     medicationIds: [],
     tier: 2,

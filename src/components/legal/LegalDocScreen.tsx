@@ -75,7 +75,7 @@ export function LegalDocScreen({ title, effectiveDate, intro, sections }: LegalD
         {/* Footer note */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Glipra is a product of Leonava. For questions, contact legal@glipra.com
+            GLiPra is a product of Leonava. For questions, contact legal@glipra.com
           </Text>
         </View>
       </ScrollView>

@@ -1,6 +1,6 @@
 # Subprocessor List
 
-**Glipra** — a product of **Leonava** (a Texas company)
+**GLiPra** — a product of **Leonava** (a Texas company)
 **Effective date:** [DATE]
 **Last updated:** [DATE]
 
@@ -8,7 +8,7 @@
 
 ---
 
-Leonava uses the following third-party subprocessors ("subprocessors") to operate Glipra. Each subprocessor processes personal information on our behalf, subject to written data processing agreements that restrict their use of your data to performing services for us.
+Leonava uses the following third-party subprocessors ("subprocessors") to operate GLiPra. Each subprocessor processes personal information on our behalf, subject to written data processing agreements that restrict their use of your data to performing services for us.
 
 This list is updated whenever we add, change, or remove a subprocessor. Material changes are announced via in-app notification at least **30 days** before the change takes effect.
 

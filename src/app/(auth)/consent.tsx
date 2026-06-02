@@ -33,7 +33,7 @@ export default function ConsentScreen() {
         <View style={styles.header}>
           <Text style={styles.heading}>Before we begin</Text>
           <Text style={styles.subheading}>
-            Please read and agree to the following before using Glipra.
+            Please read and agree to the following before using GLiPra.
           </Text>
         </View>
 
@@ -41,12 +41,12 @@ export default function ConsentScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Terms of Service</Text>
           <Text style={styles.sectionBody}>
-            Glipra provides nutrition tracking tools designed to support individuals on
+            GLiPra provides nutrition tracking tools designed to support individuals on
             GLP-1 medications. By using this app, you agree to use it only for its
             intended purpose and to provide accurate information to receive appropriate
             guidance.
             {'\n\n'}
-            You may not use Glipra for any unlawful purpose. We reserve the right to
+            You may not use GLiPra for any unlawful purpose. We reserve the right to
             suspend accounts that misuse the service. Your continued use constitutes
             acceptance of any updates to these terms.
           </Text>
@@ -55,7 +55,7 @@ export default function ConsentScreen() {
         {/* Medical Disclaimer — Tier 1, full content weight per Rule 8 */}
         <DisclaimerBanner tier={1}>
           <Text style={styles.disclaimerBody}>
-            Glipra is designed by a licensed pharmacist to support your nutrition while
+            GLiPra is designed by a licensed pharmacist to support your nutrition while
             on GLP-1 medication. It is
             {' '}
             <Text style={styles.disclaimerBold}>not a substitute</Text>
@@ -114,7 +114,7 @@ export default function ConsentScreen() {
           onPress={handleContinue}
           disabled={!agreed}
           accessibilityRole="button"
-          accessibilityLabel="Continue to Glipra"
+          accessibilityLabel="Continue to GLiPra"
         >
           <Text style={[styles.continueButtonText, !agreed && styles.continueButtonTextDisabled]}>
             Continue

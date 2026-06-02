@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Glipra** — a product of **Leonava** (a Texas company)
+**GLiPra** — a product of **Leonava** (a Texas company)
 **Effective date:** [DATE]
 **Last updated:** [DATE]
 
@@ -8,13 +8,13 @@
 
 ---
 
-> **IMPORTANT — HEALTH DATA NOTICE.** Glipra collects health-related personal information including weight, medication data, injection history, and symptoms. This data is used solely to provide the Service to you. We do not sell your health data. See Section 5 for the complete list of data we collect and how we use it.
+> **IMPORTANT — HEALTH DATA NOTICE.** GLiPra collects health-related personal information including weight, medication data, injection history, and symptoms. This data is used solely to provide the Service to you. We do not sell your health data. See Section 5 for the complete list of data we collect and how we use it.
 
 ---
 
 ## 1. Who We Are and How to Contact Us
 
-Glipra is a mobile application operated by **Leonava**, a Texas company ("Company," "we," "us," or "our").
+GLiPra is a mobile application operated by **Leonava**, a Texas company ("Company," "we," "us," or "our").
 
 **Registered address:** [REGISTERED ADDRESS]
 **Privacy inquiries and data requests:** [LEGAL@GLIPRA.COM]
@@ -26,7 +26,7 @@ We are the "controller" (or "business" under CCPA) of the personal information d
 ## 2. Scope of This Policy
 
 This Privacy Policy applies to:
-- The Glipra mobile application (iOS and Android)
+- The GLiPra mobile application (iOS and Android)
 - Our website (if any) that links to this Policy
 - Any related services, features, or content we operate
 
@@ -38,7 +38,7 @@ It does not apply to third-party services we link to or integrate with (such as 
 
 This Policy applies to users in the **United States**, including residents of California, Washington, Texas, and all other states.
 
-Glipra is not intended for use by children under 13. If you are under 18, your parent or legal guardian must consent on your behalf. See Section 13 for more on children's privacy.
+GLiPra is not intended for use by children under 13. If you are under 18, your parent or legal guardian must consent on your behalf. See Section 13 for more on children's privacy.
 
 ---
 
@@ -231,7 +231,7 @@ To exercise these rights, email [LEGAL@GLIPRA.COM] with the subject line "Washin
 
 ### 10.4 Consent
 
-By creating an account and using Glipra, you provide the consent required under the WMHMD Act for our collection and use of consumer health data as described in this Policy. You may withdraw consent at any time by contacting [LEGAL@GLIPRA.COM] or deleting your account.
+By creating an account and using GLiPra, you provide the consent required under the WMHMD Act for our collection and use of consumer health data as described in this Policy. You may withdraw consent at any time by contacting [LEGAL@GLIPRA.COM] or deleting your account.
 
 ---
 
@@ -288,7 +288,7 @@ If we deny your request, you may appeal by emailing [LEGAL@GLIPRA.COM] with "TDP
 
 ## 13. Children's Privacy
 
-Glipra is not directed to children under 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child under 13 has provided personal information to us, please contact [LEGAL@GLIPRA.COM] and we will delete that information.
+GLiPra is not directed to children under 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child under 13 has provided personal information to us, please contact [LEGAL@GLIPRA.COM] and we will delete that information.
 
 Users aged 13-17 must have parental or guardian consent to use the Service, as described in our Terms of Service. We do not knowingly collect personal information from users aged 13-17 without verifiable parental consent.
 
@@ -322,7 +322,7 @@ Our analytics are conducted on anonymized, aggregated data and cannot be linked 
 
 ### 15.1 Apple Health and Google Health Connect
 
-If you choose to connect Apple Health or Google Health Connect, data from those services is governed by Apple's and Google's respective privacy policies. We only receive data you authorize us to read, and we only use it to enhance your Glipra experience.
+If you choose to connect Apple Health or Google Health Connect, data from those services is governed by Apple's and Google's respective privacy policies. We only receive data you authorize us to read, and we only use it to enhance your GLiPra experience.
 
 ### 15.2 App Stores
 
@@ -332,7 +332,7 @@ Downloads and purchases through the Apple App Store or Google Play Store are gov
 
 ## 16. International Users
 
-Glipra is designed for users in the United States. If you access the Service from outside the United States, please be aware that your information will be transferred to, processed, and stored in the United States, where data protection laws may differ from those in your jurisdiction. By using the Service, you consent to this transfer.
+GLiPra is designed for users in the United States. If you access the Service from outside the United States, please be aware that your information will be transferred to, processed, and stored in the United States, where data protection laws may differ from those in your jurisdiction. By using the Service, you consent to this transfer.
 
 ---
 
@@ -353,7 +353,7 @@ We aim to respond to all privacy inquiries within **30 days**.
 
 ---
 
-*Glipra is a product of Leonava. Leonava is the sole controller of personal information processed through the Service.*
+*GLiPra is a product of Leonava. Leonava is the sole controller of personal information processed through the Service.*
 
 ---
 

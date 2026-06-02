@@ -6,7 +6,7 @@ import { LegalDocScreen } from '@/components/legal/LegalDocScreen';
 const SECTIONS: LegalSection[] = [
   {
     heading: '1. Who We Are',
-    body: 'Glipra is operated by Leonava, a Texas company. We are the controller of the personal information described in this Privacy Policy.\n\nPrivacy inquiries and data requests: legal@glipra.com',
+    body: 'GLiPra is operated by Leonava, a Texas company. We are the controller of the personal information described in this Privacy Policy.\n\nPrivacy inquiries and data requests: legal@glipra.com',
   },
   {
     heading: '2. Information We Collect',
@@ -42,7 +42,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     heading: '10. Children\'s Privacy',
-    body: 'Glipra is not directed to children under 13. We do not knowingly collect personal information from children under 13. Users aged 13-17 must have parental or guardian consent to use the Service.\n\nIf you believe your child under 13 has provided us with personal information, contact legal@glipra.com and we will delete it.',
+    body: 'GLiPra is not directed to children under 13. We do not knowingly collect personal information from children under 13. Users aged 13-17 must have parental or guardian consent to use the Service.\n\nIf you believe your child under 13 has provided us with personal information, contact legal@glipra.com and we will delete it.',
   },
   {
     heading: '11. Your Choices',
@@ -67,7 +67,7 @@ export default function PrivacyPolicyScreen() {
     <LegalDocScreen
       title="Privacy Policy"
       effectiveDate="Effective date: See glipra.com for current version"
-      intro="This policy explains what personal information Glipra collects, how we use it, and your rights. We collect health-related data including weight, medication, and injection history. We do not sell your data."
+      intro="This policy explains what personal information GLiPra collects, how we use it, and your rights. We collect health-related data including weight, medication, and injection history. We do not sell your data."
       sections={SECTIONS}
     />
   );

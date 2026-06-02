@@ -39,7 +39,7 @@ export function ProGate({ children, featureName, fallback }: ProGateProps) {
       <Text style={styles.body}>
         {featureName}
         {' '}
-        is available on Glipra Pro
+        is available on GLiPra Pro
       </Text>
       <Text style={styles.price}>$9.99/month · $79.99/year</Text>
       <TouchableOpacity

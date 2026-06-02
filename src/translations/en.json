@@ -26,11 +26,11 @@
     "sign_in": "Sign In",
     "sign_in_heading": "Welcome back",
     "sign_in_link": "Sign in",
-    "sign_in_subheading": "Sign in to your Glipra account",
+    "sign_in_subheading": "Sign in to your GLiPra account",
     "sign_up": "Create Account",
     "sign_up_heading": "Create account",
     "sign_up_link": "Sign up",
-    "sign_up_subheading": "Join Glipra, it's free",
+    "sign_up_subheading": "Join GLiPra, it's free",
     "welcome_tagline": "Your GLP-1 nutrition companion"
   },
   "checkin": {
@@ -162,7 +162,7 @@
     "appearance_title": "Choose your appearance",
     "language_subtitle": "You can change this later in Settings.",
     "language_title": "Choose your language",
-    "message": "Welcome to Glipra"
+    "message": "Welcome to GLiPra"
   },
   "progress": {
     "adherence_card": {

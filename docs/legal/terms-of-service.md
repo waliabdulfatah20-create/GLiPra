@@ -1,6 +1,6 @@
 # Terms of Service
 
-**Glipra** — a product of **Leonava** (a Texas company)
+**GLiPra** — a product of **Leonava** (a Texas company)
 **Effective date:** [DATE]
 **Last updated:** [DATE]
 
@@ -8,13 +8,13 @@
 
 ---
 
-> **IMPORTANT — PLEASE READ CAREFULLY.** These Terms of Service contain a mandatory arbitration clause and class action waiver in Section 17. By using Glipra you agree to resolve disputes by binding individual arbitration rather than in court, and you waive the right to participate in a class action. See Section 17 for details and your 30-day opt-out right.
+> **IMPORTANT — PLEASE READ CAREFULLY.** These Terms of Service contain a mandatory arbitration clause and class action waiver in Section 17. By using GLiPra you agree to resolve disputes by binding individual arbitration rather than in court, and you waive the right to participate in a class action. See Section 17 for details and your 30-day opt-out right.
 
 ---
 
 ## 1. Who We Are
 
-Glipra is a mobile application operated by **Leonava**, a Texas company ("Company," "we," "us," or "our"). Glipra provides GLP-1 medication companion features including nutrition tracking, weight logging, injection-cycle tracking, and educational pharmacist content.
+GLiPra is a mobile application operated by **Leonava**, a Texas company ("Company," "we," "us," or "our"). GLiPra provides GLP-1 medication companion features including nutrition tracking, weight logging, injection-cycle tracking, and educational pharmacist content.
 
 Our registered address and legal notices address is: **[REGISTERED ADDRESS]**
 Legal and privacy inquiries: **[LEGAL@GLIPRA.COM]**
@@ -23,26 +23,26 @@ Legal and privacy inquiries: **[LEGAL@GLIPRA.COM]**
 
 ## 2. Acceptance of Terms
 
-By downloading, installing, creating an account, or using Glipra (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree, do not use the Service.
+By downloading, installing, creating an account, or using GLiPra (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree, do not use the Service.
 
 If you are using the Service on behalf of an organization, you represent that you have authority to bind that organization.
 
-You must be at least **13 years old** to use Glipra. If you are under 18, you must have your parent or legal guardian's permission and they must agree to these Terms on your behalf.
+You must be at least **13 years old** to use GLiPra. If you are under 18, you must have your parent or legal guardian's permission and they must agree to these Terms on your behalf.
 
 ---
 
 ## 3. Medical and Clinical Disclaimer
 
-**Glipra is not a medical device, clinical service, or substitute for professional medical advice.**
+**GLiPra is not a medical device, clinical service, or substitute for professional medical advice.**
 
 The Service is designed for informational and wellness-support purposes only. All content — including pharmacist-authored tips, nutrition guidance, injection-cycle tracking, medication level estimates, readiness scores, and AI-generated responses — is **educational in nature and does not constitute medical advice, diagnosis, or treatment.**
 
-- Glipra is **designed by a licensed pharmacist** but is not your pharmacist and does not establish a pharmacist-patient relationship.
+- GLiPra is **designed by a licensed pharmacist** but is not your pharmacist and does not establish a pharmacist-patient relationship.
 - Medication level estimates are mathematical approximations based on published half-life data. Actual serum levels vary by individual metabolism, body composition, timing, and other factors.
 - Always consult your prescribing physician, pharmacist, or other qualified healthcare provider before making any changes to your medication, diet, or treatment plan.
 - **In a medical emergency, call 911 or your local emergency services immediately.**
 
-If Glipra displays a symptom-escalation notice, contact your prescriber promptly. Do not rely solely on the app to determine whether you need medical attention.
+If GLiPra displays a symptom-escalation notice, contact your prescriber promptly. Do not rely solely on the app to determine whether you need medical attention.
 
 ---
 
@@ -63,7 +63,7 @@ We may suspend or terminate accounts that contain false information or that are 
 
 ### 5.1 Free and Pro Tiers
 
-Glipra offers a free tier and a paid Pro subscription. Features available on each tier are described in the app and may change over time with reasonable notice.
+GLiPra offers a free tier and a paid Pro subscription. Features available on each tier are described in the app and may change over time with reasonable notice.
 
 ### 5.2 Billing
 
@@ -266,7 +266,7 @@ You may opt out of this arbitration agreement by sending written notice to [LEGA
 
 ---
 
-*Glipra is a product of Leonava. These Terms do not create any agency, partnership, joint venture, or employment relationship between you and Leonava.*
+*GLiPra is a product of Leonava. These Terms do not create any agency, partnership, joint venture, or employment relationship between you and Leonava.*
 
 ---
 

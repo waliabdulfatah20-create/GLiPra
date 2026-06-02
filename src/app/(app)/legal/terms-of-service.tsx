@@ -6,15 +6,15 @@ import { LegalDocScreen } from '@/components/legal/LegalDocScreen';
 const SECTIONS: LegalSection[] = [
   {
     heading: '1. Who We Are',
-    body: 'Glipra is a mobile application operated by Leonava, a Texas company. Glipra provides GLP-1 medication companion features including nutrition tracking, weight logging, injection-cycle tracking, and educational pharmacist content.\n\nLegal and privacy inquiries: legal@glipra.com',
+    body: 'GLiPra is a mobile application operated by Leonava, a Texas company. GLiPra provides GLP-1 medication companion features including nutrition tracking, weight logging, injection-cycle tracking, and educational pharmacist content.\n\nLegal and privacy inquiries: legal@glipra.com',
   },
   {
     heading: '2. Acceptance of Terms',
-    body: 'By downloading, installing, creating an account, or using Glipra, you agree to be bound by these Terms of Service. If you do not agree, do not use the Service.\n\nYou must be at least 13 years old to use Glipra. If you are under 18, you must have your parent or legal guardian\'s permission.',
+    body: 'By downloading, installing, creating an account, or using GLiPra, you agree to be bound by these Terms of Service. If you do not agree, do not use the Service.\n\nYou must be at least 13 years old to use GLiPra. If you are under 18, you must have your parent or legal guardian\'s permission.',
   },
   {
     heading: '3. Medical and Clinical Disclaimer',
-    body: 'GLIPRA IS NOT A MEDICAL DEVICE, CLINICAL SERVICE, OR SUBSTITUTE FOR PROFESSIONAL MEDICAL ADVICE.\n\nAll content (including pharmacist-authored tips, nutrition guidance, injection-cycle tracking, medication level estimates, readiness scores, and AI-generated responses) is educational in nature and does not constitute medical advice, diagnosis, or treatment.\n\nGlipra is designed by a licensed pharmacist but is not your pharmacist and does not establish a pharmacist-patient relationship. Medication level estimates are mathematical approximations. Actual serum levels vary by individual metabolism, body composition, timing, and other factors.\n\nAlways consult your prescribing physician, pharmacist, or other qualified healthcare provider before making any changes to your medication, diet, or treatment plan.\n\nIN A MEDICAL EMERGENCY, CALL 911 IMMEDIATELY.',
+    body: 'GLIPRA IS NOT A MEDICAL DEVICE, CLINICAL SERVICE, OR SUBSTITUTE FOR PROFESSIONAL MEDICAL ADVICE.\n\nAll content (including pharmacist-authored tips, nutrition guidance, injection-cycle tracking, medication level estimates, readiness scores, and AI-generated responses) is educational in nature and does not constitute medical advice, diagnosis, or treatment.\n\nGLiPra is designed by a licensed pharmacist but is not your pharmacist and does not establish a pharmacist-patient relationship. Medication level estimates are mathematical approximations. Actual serum levels vary by individual metabolism, body composition, timing, and other factors.\n\nAlways consult your prescribing physician, pharmacist, or other qualified healthcare provider before making any changes to your medication, diet, or treatment plan.\n\nIN A MEDICAL EMERGENCY, CALL 911 IMMEDIATELY.',
   },
   {
     heading: '4. Account Registration',
@@ -22,7 +22,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     heading: '5. Subscription and Payment',
-    body: 'Glipra offers a free tier and a paid Pro subscription. Subscriptions are billed through the Apple App Store or Google Play Store. We do not directly store your payment card information.\n\nSubscriptions automatically renew at the end of each billing period unless you cancel before the renewal date through your Apple or Google account settings.\n\nWe may change subscription prices with at least 30 days\' notice. Refund eligibility is governed by Apple\'s or Google\'s refund policies.',
+    body: 'GLiPra offers a free tier and a paid Pro subscription. Subscriptions are billed through the Apple App Store or Google Play Store. We do not directly store your payment card information.\n\nSubscriptions automatically renew at the end of each billing period unless you cancel before the renewal date through your Apple or Google account settings.\n\nWe may change subscription prices with at least 30 days\' notice. Refund eligibility is governed by Apple\'s or Google\'s refund policies.',
   },
   {
     heading: '6. User Content',
@@ -75,7 +75,7 @@ export default function TermsOfServiceScreen() {
     <LegalDocScreen
       title="Terms of Service"
       effectiveDate="Effective date: See glipra.com for current version"
-      intro="IMPORTANT: These Terms contain a mandatory arbitration clause and class action waiver in Section 14. By using Glipra you agree to resolve disputes by binding individual arbitration. See Section 14 for your 30-day opt-out right."
+      intro="IMPORTANT: These Terms contain a mandatory arbitration clause and class action waiver in Section 14. By using GLiPra you agree to resolve disputes by binding individual arbitration. See Section 14 for your 30-day opt-out right."
       sections={SECTIONS}
     />
   );

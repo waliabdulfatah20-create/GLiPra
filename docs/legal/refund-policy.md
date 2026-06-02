@@ -1,6 +1,6 @@
 # Refund Policy
 
-**Glipra** — a product of **Leonava** (a Texas company)
+**GLiPra** — a product of **Leonava** (a Texas company)
 **Effective date:** [DATE]
 **Last updated:** [DATE]
 
@@ -10,7 +10,7 @@
 
 ## 1. Overview
 
-Glipra subscriptions are purchased and managed through the **Apple App Store** (iOS) or **Google Play Store** (Android). Because all billing is handled by Apple or Google, **refund eligibility and processing is governed by their respective policies** — not by Leonava directly.
+GLiPra subscriptions are purchased and managed through the **Apple App Store** (iOS) or **Google Play Store** (Android). Because all billing is handled by Apple or Google, **refund eligibility and processing is governed by their respective policies** — not by Leonava directly.
 
 Leonava does not have access to your payment card details and cannot process refunds.
 
@@ -42,7 +42,7 @@ All purchases made through Google Play are subject to **Google's refund policies
 **To request a refund from Google:**
 
 1. Visit [play.google.com/store/account/subscriptions](https://play.google.com/store/account/subscriptions)
-2. Select the Glipra subscription
+2. Select the GLiPra subscription
 3. Select "Manage" then "Cancel subscription" (for future billing) or follow the refund request flow
 4. For direct refund requests: visit [support.google.com/googleplay](https://support.google.com/googleplay) and contact Google Play Support
 
@@ -56,18 +56,18 @@ Leonava cannot approve, deny, or accelerate Google refund decisions.
 
 ## 4. Cancellation
 
-You may cancel your Glipra Pro subscription at any time. Cancellation prevents future billing but does not automatically trigger a refund for the current billing period.
+You may cancel your GLiPra Pro subscription at any time. Cancellation prevents future billing but does not automatically trigger a refund for the current billing period.
 
 **To cancel on iOS:**
 1. Open Settings on your iPhone or iPad
 2. Tap your Apple ID at the top
 3. Tap "Subscriptions"
-4. Select Glipra and tap "Cancel Subscription"
+4. Select GLiPra and tap "Cancel Subscription"
 
 **To cancel on Android:**
 1. Open the Google Play Store app
 2. Tap your profile icon, then "Payments & subscriptions," then "Subscriptions"
-3. Select Glipra and tap "Cancel subscription"
+3. Select GLiPra and tap "Cancel subscription"
 
 You will retain access to Pro features through the end of your current paid billing period. After cancellation takes effect, your account reverts to the free tier.
 
@@ -81,7 +81,7 @@ Subscriptions auto-renew at the end of each billing period unless cancelled befo
 
 ## 6. Free Trial (if applicable)
 
-If Glipra offers a free trial period, you will not be charged during the trial. To avoid being charged, you must cancel before the trial ends. Once a free trial converts to a paid subscription, the standard refund policies of Apple or Google apply.
+If GLiPra offers a free trial period, you will not be charged during the trial. To avoid being charged, you must cancel before the trial ends. Once a free trial converts to a paid subscription, the standard refund policies of Apple or Google apply.
 
 ---
 
@@ -93,7 +93,7 @@ If Leonava changes subscription pricing, we will provide at least **30 days' not
 
 ## 8. Technical Issues and Exceptions
 
-If you experience a technical issue that prevented you from using Glipra — such as the app being consistently unavailable or a core feature being broken — please contact us first at [LEGAL@GLIPRA.COM] before requesting a refund from Apple or Google.
+If you experience a technical issue that prevented you from using GLiPra — such as the app being consistently unavailable or a core feature being broken — please contact us first at [LEGAL@GLIPRA.COM] before requesting a refund from Apple or Google.
 
 We cannot guarantee refunds but will review documented technical issues in good faith. In cases where we determine that a technical issue on our end significantly impaired your use of paid features, we may issue a credit or take other steps at our discretion.
 
@@ -112,7 +112,7 @@ For refund requests, please use the Apple or Google channels described in Sectio
 
 ---
 
-*This Refund Policy is incorporated into and forms part of the Glipra Terms of Service.*
+*This Refund Policy is incorporated into and forms part of the GLiPra Terms of Service.*
 
 ---
 

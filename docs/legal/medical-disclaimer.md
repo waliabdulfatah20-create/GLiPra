@@ -1,6 +1,6 @@
 # Medical Disclaimer
 
-**Glipra** — a product of **Leonava** (a Texas company)
+**GLiPra** — a product of **Leonava** (a Texas company)
 **Effective date:** [DATE]
 **Last updated:** [DATE]
 
@@ -10,9 +10,9 @@
 
 ## 1. Not Medical Advice
 
-**Glipra is not a medical device, clinical service, or substitute for professional medical advice, diagnosis, or treatment.**
+**GLiPra is not a medical device, clinical service, or substitute for professional medical advice, diagnosis, or treatment.**
 
-All content available through Glipra — including but not limited to pharmacist-authored educational tips, nutrition guidance, protein floor calculations, injection-cycle phase descriptions, medication level estimates, readiness scores, weight progress charts, AI-generated meal analyses, symptom-escalation notices, and any AI-generated coaching responses — is provided **for informational and wellness-support purposes only**.
+All content available through GLiPra — including but not limited to pharmacist-authored educational tips, nutrition guidance, protein floor calculations, injection-cycle phase descriptions, medication level estimates, readiness scores, weight progress charts, AI-generated meal analyses, symptom-escalation notices, and any AI-generated coaching responses — is provided **for informational and wellness-support purposes only**.
 
 Nothing in the Service constitutes, and nothing should be understood as constituting, medical advice, a clinical recommendation, a diagnosis, or a treatment plan.
 
@@ -20,9 +20,9 @@ Nothing in the Service constitutes, and nothing should be understood as constitu
 
 ## 2. No Healthcare Provider Relationship
 
-**Use of Glipra does not create a physician-patient, pharmacist-patient, or any other healthcare provider relationship between you and Leonava, or between you and any individual who contributed to the development of the app.**
+**Use of GLiPra does not create a physician-patient, pharmacist-patient, or any other healthcare provider relationship between you and Leonava, or between you and any individual who contributed to the development of the app.**
 
-Glipra is designed by a licensed pharmacist but:
+GLiPra is designed by a licensed pharmacist but:
 - Is not your pharmacist.
 - Does not dispense medications.
 - Does not review your prescriptions.
@@ -63,7 +63,7 @@ Protein floor calculations, daily nutrition targets, meal analyses, and macro es
 
 ## 5. Symptom-Escalation Notices
 
-Glipra may display a symptom-escalation notice when you log certain combinations of symptoms. These notices are generated automatically based on rule-based algorithms and are intended to prompt you to **contact your prescriber or healthcare provider**.
+GLiPra may display a symptom-escalation notice when you log certain combinations of symptoms. These notices are generated automatically based on rule-based algorithms and are intended to prompt you to **contact your prescriber or healthcare provider**.
 
 **Symptom-escalation notices:**
 - Are not a diagnosis.
@@ -77,7 +77,7 @@ Glipra may display a symptom-escalation notice when you log certain combinations
 
 ## 6. AI-Generated Content
 
-Certain features of Glipra use artificial intelligence to generate responses, nutritional estimates, or guidance. AI-generated content:
+Certain features of GLiPra use artificial intelligence to generate responses, nutritional estimates, or guidance. AI-generated content:
 
 - Is based on patterns in data and may contain inaccuracies.
 - Is not reviewed by a healthcare provider before being displayed to you.
@@ -90,7 +90,7 @@ Leonava does not warrant the accuracy, completeness, or suitability of AI-genera
 
 ## 7. Accuracy of Information
 
-While we work to ensure that educational content in Glipra is accurate and based on credible sources, we cannot guarantee that all information is complete, current, or free from error. Medical knowledge evolves, and information that was accurate at publication may become outdated.
+While we work to ensure that educational content in GLiPra is accurate and based on credible sources, we cannot guarantee that all information is complete, current, or free from error. Medical knowledge evolves, and information that was accurate at publication may become outdated.
 
 **Always consult your prescribing physician, pharmacist, or other qualified healthcare provider before:**
 - Making any changes to your medication, dose, or injection schedule.
@@ -102,7 +102,7 @@ While we work to ensure that educational content in Glipra is accurate and based
 
 ## 8. Personal Responsibility
 
-You are solely responsible for your healthcare decisions. By using Glipra, you acknowledge and agree that:
+You are solely responsible for your healthcare decisions. By using GLiPra, you acknowledge and agree that:
 
 - You will not use the app as a substitute for professional medical advice.
 - You will consult a qualified healthcare provider for any health concerns.
@@ -115,7 +115,7 @@ You are solely responsible for your healthcare decisions. By using Glipra, you a
 
 **If you are experiencing a medical emergency, call 911 or your local emergency services immediately.**
 
-Do not use Glipra to seek emergency medical assistance. The app is not designed for, and should not be used in, emergency situations.
+Do not use GLiPra to seek emergency medical assistance. The app is not designed for, and should not be used in, emergency situations.
 
 ---
 
@@ -125,7 +125,7 @@ TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, LEONAVA DISCLAIMS ALL LIABILI
 
 ---
 
-*This Medical Disclaimer is incorporated into and forms part of the Glipra Terms of Service. Defined terms used here have the meanings given in the Terms of Service.*
+*This Medical Disclaimer is incorporated into and forms part of the GLiPra Terms of Service. Defined terms used here have the meanings given in the Terms of Service.*
 
 ---
 

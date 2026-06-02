@@ -153,7 +153,7 @@ export default function RevealScreen() {
           </View>
 
           <Text style={styles.heading}>You're all set</Text>
-          <Text style={styles.subheading}>Here's what Glipra will do for you every day.</Text>
+          <Text style={styles.subheading}>Here's what GLiPra will do for you every day.</Text>
         </LinearGradient>
 
         {/* Summary cards */}
@@ -199,11 +199,11 @@ export default function RevealScreen() {
           onPress={handleStart}
           disabled={loading}
           accessibilityRole="button"
-          accessibilityLabel="Start Glipra"
+          accessibilityLabel="Start GLiPra"
           accessibilityState={{ busy: loading }}
         >
           <Text style={styles.startButtonText}>
-            {loading ? 'Setting up your profile…' : 'Start Glipra →'}
+            {loading ? 'Setting up your profile…' : 'Start GLiPra →'}
           </Text>
         </Pressable>
       </View>

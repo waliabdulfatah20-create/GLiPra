@@ -42,7 +42,7 @@ export default function WelcomeScreen() {
           {/* Logo + tagline — FadeInDown on mount */}
           <Animated.View entering={FadeInDown.duration(600)} style={styles.logoSection}>
             <View style={styles.logoBox} />
-            <Text style={styles.appName}>Glipra</Text>
+            <Text style={styles.appName}>GLiPra</Text>
             <Text style={styles.tagline}>{t('auth.welcome_tagline')}</Text>
           </Animated.View>
 

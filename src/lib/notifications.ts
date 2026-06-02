@@ -76,7 +76,7 @@ async function scheduleInjectionReminder(
       identifier: 'injection-reminder',
       content: {
         title: 'Injection day',
-        body: 'Time for your GLP-1 dose. Log your injection site in Glipra after.',
+        body: 'Time for your GLP-1 dose. Log your injection site in GLiPra after.',
         data: { type: 'injection-reminder' },
       },
       trigger: {

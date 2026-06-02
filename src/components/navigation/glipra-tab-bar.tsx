@@ -17,7 +17,7 @@ import { useTheme } from '@/lib/ThemeContext';
 
 // ─── Tab configuration ────────────────────────────────────────────────────────
 
-const VISIBLE_TAB_NAMES = ['index', 'progress', 'log', 'injection-sites', 'coach'] as const;
+const VISIBLE_TAB_NAMES = ['index', 'injection-sites', 'log', 'progress', 'coach'] as const;
 type VisibleTabName = typeof VISIBLE_TAB_NAMES[number];
 
 type TabConfig = {

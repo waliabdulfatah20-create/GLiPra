@@ -63,9 +63,9 @@ export default function TabLayout() {
           Note: GlipraTabBar reads labels from its own TAB_CONFIG (not these titles).
           Titles kept for documentation and potential header fallback only. ── */}
       <Tabs.Screen name="index" options={{ title: t('tabs.today'), headerShown: false }} />
-      <Tabs.Screen name="progress" options={{ title: t('tabs.progress'), headerShown: false }} />
-      <Tabs.Screen name="log" options={{ title: t('tabs.nutrition'), headerShown: false }} />
       <Tabs.Screen name="injection-sites" options={{ title: t('tabs.sites'), headerShown: false }} />
+      <Tabs.Screen name="log" options={{ title: t('tabs.nutrition'), headerShown: false }} />
+      <Tabs.Screen name="progress" options={{ title: t('tabs.progress'), headerShown: false }} />
       <Tabs.Screen name="coach" options={{ title: t('tabs.coach'), headerShown: false }} />
 
       {/* ── Settings — hidden from tab bar; accessible via gear icon on Today ── */}

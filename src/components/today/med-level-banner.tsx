@@ -5,7 +5,6 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Circle, Line, Polyline, Svg } from 'react-native-svg';
 import { Activity } from '@/components/ui/icons';
 import { useMedicationLevelCurve } from '@/features/medication-level/hooks';
 import { haptics } from '@/lib/haptics';
@@ -13,7 +12,6 @@ import { useTheme } from '@/lib/ThemeContext';
 
 // Brand tokens for Clean Clinical design
 const BRAND = '#5b21b6';
-const AMBER = '#d97706';
 const MED_BLUE = '#60a5fa';
 const MED_BLUE_BG = 'rgba(37,99,235,0.12)';
 
@@ -22,69 +20,6 @@ type MedLevelBannerProps = {
   phase: InjectionPhase | null;
 };
 
-const SPARKLINE_W = 200;
-const SPARKLINE_H = 36;
-
-/** Mini SVG sparkline of the steady-state concentration curve */
-function CurveSparkline({
-  curve,
-  todayOffset,
-  injectionIntervalDays,
-}: {
-  curve: Array<{ dayOffset: number; levelMg: number }>;
-  todayOffset: number;
-  injectionIntervalDays: number;
-}) {
-  const windowEnd = injectionIntervalDays * 2;
-  const visible = curve.filter(p => p.dayOffset <= windowEnd);
-  if (visible.length < 2)
-    return null;
-
-  const minOffset = visible[0].dayOffset;
-  const maxOffset = visible[visible.length - 1].dayOffset;
-  const maxLevel = Math.max(...visible.map(p => p.levelMg));
-
-  function toX(offset: number): number {
-    if (maxOffset === minOffset)
-      return 0;
-    return ((offset - minOffset) / (maxOffset - minOffset)) * SPARKLINE_W;
-  }
-  function toY(level: number): number {
-    return maxLevel > 0 ? SPARKLINE_H - (level / maxLevel) * SPARKLINE_H : SPARKLINE_H;
-  }
-
-  const points = visible.map(p => `${toX(p.dayOffset)},${toY(p.levelMg)}`).join(' ');
-  const todayX = toX(todayOffset);
-  const todayY = toY(visible.find(p => p.dayOffset === todayOffset)?.levelMg ?? maxLevel * 0.5);
-
-  return (
-    <Svg width={SPARKLINE_W} height={SPARKLINE_H} viewBox={`0 0 ${SPARKLINE_W} ${SPARKLINE_H}`}>
-      {/* Curve line */}
-      <Polyline
-        points={points}
-        fill="none"
-        stroke={BRAND}
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity={0.7}
-      />
-      {/* Today marker */}
-      <Line
-        x1={todayX}
-        y1={0}
-        x2={todayX}
-        y2={SPARKLINE_H}
-        stroke={AMBER}
-        strokeWidth={1}
-        strokeDasharray="2 2"
-        opacity={0.8}
-      />
-      <Circle cx={todayX} cy={todayY} r={3} fill={AMBER} />
-    </Svg>
-  );
-}
-
 export function MedLevelBanner({ phase }: MedLevelBannerProps) {
   const { t } = useTranslation();
   const { colors, spacing, radius, shadows } = useTheme();
@@ -92,7 +27,7 @@ export function MedLevelBanner({ phase }: MedLevelBannerProps) {
     () => makeStyles({ colors, spacing, radius, shadows }),
     [colors, spacing, radius, shadows],
   );
-  const { curve, todayOffset, injectionIntervalDays, isLoading } = useMedicationLevelCurve();
+  const { curve, isLoading } = useMedicationLevelCurve();
 
   // Still loading — don't flash a card yet
   if (isLoading)
@@ -137,15 +72,6 @@ export function MedLevelBanner({ phase }: MedLevelBannerProps) {
       accessibilityRole="button"
       accessibilityLabel="View medication level curve"
     >
-      {/* Sparkline row */}
-      <View style={styles.sparklineRow}>
-        <CurveSparkline
-          curve={curve}
-          todayOffset={todayOffset}
-          injectionIntervalDays={injectionIntervalDays}
-        />
-      </View>
-
       {/* Headline + pill */}
       <View style={styles.textRow}>
         <View style={styles.iconCircle}>
@@ -180,10 +106,6 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       borderTopWidth: 2,
       borderTopColor: BRAND,
       ...shadows.sm,
-    },
-    sparklineRow: {
-      alignItems: 'flex-start',
-      overflow: 'hidden',
     },
     textRow: {
       flexDirection: 'row',

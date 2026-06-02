@@ -418,7 +418,7 @@ export function TodayScreen() {
                   </View>
                 )
               : (
-                  <View style={[styles.phaseCard, styles.phaseAccentBg, { borderTopColor: phaseAccentColor }]}>
+                  <View style={[styles.phaseCard, { borderTopColor: phaseAccentColor }]}>
                     <Text style={styles.cardLabel}>{t('today.injection_label')}</Text>
                     {injectionCycle
                       ? (

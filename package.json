@@ -28,6 +28,8 @@
     "build:preview:android": "eas build --profile preview --platform android",
     "build:production:ios": "eas build --profile production --platform ios",
     "build:production:android": "eas build --profile production --platform android",
+    "ota:dev": "cross-env EXPO_USE_FAST_RESOLVER=1 eas update --branch development --non-interactive",
+    "ota:dev:clear": "cross-env EXPO_USE_FAST_RESOLVER=1 eas update --branch development --clear-cache --non-interactive",
     "prepare": "husky",
     "app-release": "cross-env SKIP_BRANCH_PROTECTION=true np --no-publish --no-cleanup --no-release-draft",
     "lint": "eslint .",
@@ -165,6 +167,11 @@
         "eslint-config-expo",
         "react-native-worklets"
       ]
+    }
+  },
+  "pnpm": {
+    "overrides": {
+      "hermes-parser": "0.32.1"
     }
   }
 }

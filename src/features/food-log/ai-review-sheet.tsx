@@ -28,6 +28,7 @@ import {
 } from 'react-native';
 import { useTheme } from '@/lib/ThemeContext';
 import { useConfirmPhotoLog, useUserFoodDefault } from './hooks';
+import { ProInsightCard } from './pro-insight-card';
 
 // ---------------------------------------------------------------------------
 // Props
@@ -329,6 +330,8 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
                 </View>
               </>
             )}
+
+            <ProInsightCard mealProteinG={parseFloat(form.proteinG) || 0} />
 
             <View style={styles.buttonRow}>
               <Pressable

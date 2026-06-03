@@ -166,6 +166,18 @@
     "language_title": "Choose your language",
     "message": "Welcome to GLiPra"
   },
+  "pro_insight": {
+    "headline_at_floor": "You hit your floor. {{projectedG}}g protein today.",
+    "headline_over_floor": "Past your floor by {{overG}}g. Strong day.",
+    "headline_under_floor": "Brings you to {{projectedG}}g. {{remainingG}}g to go to hit your floor.",
+    "label": "PRO INSIGHT",
+    "subline_adjustment": "Day {{n}} after injection. Appetite usually starts returning. Eggs or cottage cheese are easy wins.",
+    "subline_injection_day": "Injection day. Small protein snacks digest easier on a fresh dose.",
+    "subline_overdue": "Cycle window passed. Log your next dose to get phase-aware nudges again.",
+    "subline_peak_suppression": "Day {{n}} after injection. Many people eat less. A Greek yogurt cup tonight closes the gap.",
+    "subline_recovery_window": "Day {{n}} after injection. Appetite peaks now. Front-load protein at breakfast.",
+    "teaser": "Unlock Pro Insights. See how each meal fits your floor."
+  },
   "progress": {
     "adherence_card": {
       "biweekly": "biweekly",

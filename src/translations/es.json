@@ -166,6 +166,18 @@
     "language_title": "Elige tu idioma",
     "message": "Bienvenido a GLiPra"
   },
+  "pro_insight": {
+    "headline_at_floor": "Llegaste a tu mínimo. {{projectedG}}g de proteína hoy.",
+    "headline_over_floor": "Pasaste tu mínimo por {{overG}}g. Día fuerte.",
+    "headline_under_floor": "Te lleva a {{projectedG}}g. Faltan {{remainingG}}g para alcanzar tu mínimo.",
+    "label": "INFO PRO",
+    "subline_adjustment": "Día {{n}} después de la inyección. El apetito suele volver. Huevos o requesón son fáciles.",
+    "subline_injection_day": "Día de inyección. Las meriendas pequeñas con proteína se digieren mejor con dosis fresca.",
+    "subline_overdue": "Pasó la ventana del ciclo. Registra tu próxima dosis para recibir consejos por fase.",
+    "subline_peak_suppression": "Día {{n}} después de la inyección. Muchas personas comen menos. Un yogur griego esta noche cierra la brecha.",
+    "subline_recovery_window": "Día {{n}} después de la inyección. El apetito sube ahora. Carga proteína en el desayuno.",
+    "teaser": "Desbloquea Pro Insights. Ve cómo cada comida encaja en tu mínimo."
+  },
   "progress": {
     "adherence_card": {
       "biweekly": "quincenal",

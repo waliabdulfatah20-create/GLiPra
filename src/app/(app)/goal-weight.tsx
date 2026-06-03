@@ -123,7 +123,7 @@ export default function GoalWeightScreen() {
           <View style={styles.labelRow}>
             <Text style={styles.fieldLabel}>GOAL WEIGHT</Text>
             <UnitToggle
-              options={['kg', 'lbs']}
+              options={['lbs', 'kg']}
               active={weightUnit}
               onToggle={toggleWeightUnit}
             />

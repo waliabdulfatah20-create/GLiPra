@@ -79,7 +79,7 @@ export default function WeightScreen() {
           </Pressable>
           <Text style={styles.title}>Weight</Text>
           <UnitToggle
-            options={['kg', 'lbs']}
+            options={['lbs', 'kg']}
             active={weightUnit}
             onToggle={toggleWeightUnit}
           />

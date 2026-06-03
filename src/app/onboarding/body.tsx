@@ -136,7 +136,7 @@ export default function BodyScreen() {
         <View style={styles.labelRow}>
           <Text style={styles.fieldLabel}>WEIGHT</Text>
           <UnitToggle
-            options={['kg', 'lbs']}
+            options={['lbs', 'kg']}
             active={weightUnit}
             onToggle={toggleWeightUnit}
           />
@@ -159,7 +159,7 @@ export default function BodyScreen() {
         <View style={[styles.labelRow, { marginTop: spacing.lg }]}>
           <Text style={styles.fieldLabel}>HEIGHT</Text>
           <UnitToggle
-            options={['cm', 'ft · in']}
+            options={['ft · in', 'cm']}
             active={heightUnit === 'metric' ? 'cm' : 'ft · in'}
             onToggle={toggleHeightUnit}
           />

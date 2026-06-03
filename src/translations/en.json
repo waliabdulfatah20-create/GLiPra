@@ -200,9 +200,15 @@
     },
     "subtitle": "Your trends over time",
     "symptoms_card": {
+      "avg": "avg",
       "empty": "Complete a daily check-in to see your symptoms",
       "energy": "Energy",
+      "higher_is_better": "higher is better",
       "label": "SYMPTOM TRENDS",
+      "legend_mild": "mild",
+      "legend_no_data": "no check-in",
+      "legend_severe": "severe",
+      "lower_is_better": "lower is better",
       "nausea": "Nausea"
     },
     "tips": {

@@ -103,9 +103,20 @@ export type GlipraGradients = {
   warning: readonly [string, string, string];
 };
 
+/**
+ * 5-step severity ramps for heat-strip / heatmap visualizations.
+ * Index 0 = mildest / lowest value; index 4 = most severe / highest value.
+ * Used by SeverityHeatStrip for nausea (warning) and energy (success).
+ */
+export type GlipraSeverityScales = {
+  warningScale: readonly [string, string, string, string, string];
+  successScale: readonly [string, string, string, string, string];
+};
+
 export type GlipraTokens = {
   colors: GlipraColorTokens;
   gradients: GlipraGradients;
+  scales: GlipraSeverityScales;
   spacing: typeof spacing;
   radius: typeof radius;
   shadows: GlipraShadowTokens;
@@ -121,6 +132,12 @@ export const lightTokens: GlipraTokens = {
   gradients: {
     hero: ['#6d28d9', '#2563eb', '#0284c7'],
     warning: ['#d97706', '#b45309', '#92400e'],
+  },
+  scales: {
+    // Amber ramp — mild → severe (Tailwind amber 100→700)
+    warningScale: ['#fef3c7', '#fde68a', '#fcd34d', '#f59e0b', '#b45309'],
+    // Emerald ramp — low → high (Tailwind emerald 200→700)
+    successScale: ['#a7f3d0', '#6ee7b7', '#34d399', '#10b981', '#047857'],
   },
   shadows: {
     sm: {
@@ -210,6 +227,10 @@ export const darkTokens: GlipraTokens = {
   gradients: {
     hero: ['#3b0764', '#1e3a8a', '#0c4a6e'],
     warning: ['#92400e', '#78350f', '#451a03'],
+  },
+  scales: {
+    warningScale: ['#451a03', '#78350f', '#b45309', '#d97706', '#fbbf24'],
+    successScale: ['#064e3b', '#065f46', '#047857', '#10b981', '#34d399'],
   },
   shadows: {
     sm: {

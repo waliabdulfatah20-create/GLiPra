@@ -200,9 +200,15 @@
     },
     "subtitle": "Tus tendencias a lo largo del tiempo",
     "symptoms_card": {
+      "avg": "prom",
       "empty": "Completa un check-in diario para ver tus síntomas",
       "energy": "Energía",
+      "higher_is_better": "más alto es mejor",
       "label": "TENDENCIA DE SÍNTOMAS",
+      "legend_mild": "leve",
+      "legend_no_data": "sin check-in",
+      "legend_severe": "severo",
+      "lower_is_better": "más bajo es mejor",
       "nausea": "Náusea"
     },
     "tips": {

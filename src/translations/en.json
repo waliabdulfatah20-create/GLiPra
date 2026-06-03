@@ -9,6 +9,34 @@
     "delete_warning": "This permanently deletes your account and all of your data. This cannot be undone.",
     "export_failed": "Export failed. Please try again."
   },
+  "analyzing": {
+    "a11y_done": "complete",
+    "a11y_failed": "failed",
+    "a11y_in_progress": "in progress",
+    "a11y_pending": "pending",
+    "cancel": "Cancel",
+    "close": "Close",
+    "error_photo": "Couldn't analyze this photo. Try again?",
+    "error_voice": "Couldn't transcribe your voice. Try again?",
+    "hero_sub_error": "Trouble analyzing",
+    "hero_sub_photo": "Analyzing",
+    "hero_sub_voice": "Listening",
+    "hero_title_error_photo": "Couldn't read this meal",
+    "hero_title_error_voice": "Couldn't catch that",
+    "hero_title_photo": "Reading your meal...",
+    "hero_title_voice": "Working on your meal...",
+    "retry": "Try again",
+    "slow_hint": "Hang tight. This can take up to a minute on slow connections.",
+    "stage": {
+      "audio_received": "Audio received",
+      "building_pro_insight": "Building your Pro Insight",
+      "calculating_macros": "Calculating macros",
+      "checking_glp_nutrients": "Checking GLP-1 nutrients",
+      "identifying_food": "Identifying food",
+      "image_received": "Image received",
+      "transcribing_voice": "Transcribing your voice"
+    }
+  },
   "auth": {
     "back_to_sign_in": "← Back to sign in",
     "email_label": "EMAIL",

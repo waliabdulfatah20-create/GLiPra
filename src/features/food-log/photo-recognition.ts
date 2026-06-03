@@ -76,6 +76,46 @@ function adaptMockToResult(): RecognitionResult {
 }
 
 // ---------------------------------------------------------------------------
+// Abort race helper
+// ---------------------------------------------------------------------------
+
+/**
+ * Resolve with the network result if it lands first, or `null` if the
+ * AbortSignal fires first. The orphan network call continues in the
+ * background but its result is discarded.
+ */
+function raceAgainstAbort<T>(p: Promise<T>, signal: AbortSignal): Promise<T | null> {
+  if (signal.aborted)
+    return Promise.resolve(null);
+  return new Promise<T | null>((resolve, reject) => {
+    let settled = false;
+    const onAbort = () => {
+      if (settled)
+        return;
+      settled = true;
+      resolve(null);
+    };
+    signal.addEventListener('abort', onAbort, { once: true });
+    p.then(
+      (v) => {
+        if (settled)
+          return;
+        settled = true;
+        signal.removeEventListener('abort', onAbort);
+        resolve(v);
+      },
+      (e) => {
+        if (settled)
+          return;
+        settled = true;
+        signal.removeEventListener('abort', onAbort);
+        reject(e);
+      },
+    );
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Hook
 // ---------------------------------------------------------------------------
 
@@ -89,6 +129,7 @@ export function usePhotoFoodRecognition() {
       mimeType: 'image/jpeg' | 'image/png' | 'image/webp',
       recentCorrections?: Array<{ originalName: string; correctedName: string }>,
       userComment?: string,
+      signal?: AbortSignal,
     ): Promise<RecognitionResult | null> => {
       setIsLoading(true);
       setError(null);
@@ -101,7 +142,7 @@ export function usePhotoFoodRecognition() {
 
         // Rule 1 — client never calls OpenAI directly.
         // All OpenAI work happens inside the 'recognize-food' edge function.
-        const { data, error: fnError } = await supabase.functions.invoke(
+        const invokePromise = supabase.functions.invoke(
           'recognize-food',
           {
             body: {
@@ -116,6 +157,18 @@ export function usePhotoFoodRecognition() {
           },
         );
 
+        // Race the call against an abort signal. The underlying fetch doesn't
+        // get cancelled (supabase-js v2 doesn't propagate signals), but the UI
+        // unblocks immediately and the discarded response wastes only one quota
+        // slot in `ai_invocations`. Acceptable trade vs. a forked fetch path.
+        const result = signal
+          ? await raceAgainstAbort(invokePromise, signal)
+          : await invokePromise;
+
+        if (result == null)
+          return null; // Aborted
+
+        const { data, error: fnError } = result;
         if (fnError) {
           throw fnError;
         }
@@ -123,6 +176,9 @@ export function usePhotoFoodRecognition() {
         return data as RecognitionResult;
       }
       catch (e) {
+        // If we aborted, swallow — the caller knows.
+        if (signal?.aborted)
+          return null;
         const message
           = e instanceof Error ? e.message : 'Recognition failed';
         setError(message);

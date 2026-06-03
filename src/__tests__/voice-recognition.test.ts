@@ -36,17 +36,18 @@ describe('transcribeVoice — mock path', () => {
 
   it('result has transcript string', async () => {
     const result = await transcribeVoice({ audioBase64: 'dGVzdA==', mimeType: 'audio/m4a' });
-    expect(typeof result.transcript).toBe('string');
-    expect(result.transcript!.length).toBeGreaterThan(0);
+    expect(result).not.toBeNull();
+    expect(typeof result!.transcript).toBe('string');
+    expect(result!.transcript!.length).toBeGreaterThan(0);
   });
 
   it('result has valid confidence value', async () => {
     const result = await transcribeVoice({ audioBase64: 'dGVzdA==', mimeType: 'audio/m4a' });
-    expect(['high', 'medium', 'low']).toContain(result.confidence);
+    expect(['high', 'medium', 'low']).toContain(result!.confidence);
   });
 
   it('result has non-negative proteinG', async () => {
     const result = await transcribeVoice({ audioBase64: 'dGVzdA==', mimeType: 'audio/m4a' });
-    expect(result.proteinG).toBeGreaterThanOrEqual(0);
+    expect(result!.proteinG).toBeGreaterThanOrEqual(0);
   });
 });

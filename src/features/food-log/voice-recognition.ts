@@ -27,14 +27,44 @@ const VOICE_FALLBACK: RecognitionResult = {
   confidence: 'low',
 };
 
-export async function transcribeVoice(input: VoiceInput): Promise<RecognitionResult> {
+export async function transcribeVoice(
+  input: VoiceInput,
+  signal?: AbortSignal,
+): Promise<RecognitionResult | null> {
   if (isMockAIEnabled())
     return MOCK_VOICE_PARSE;
 
   try {
-    const { data, error } = await supabase.functions.invoke('transcribe-food', {
+    const invokePromise = supabase.functions.invoke('transcribe-food', {
       body: { audioBase64: input.audioBase64, mimeType: input.mimeType },
     });
+
+    // Race against abort signal — see photo-recognition.ts for rationale.
+    const result = signal
+      ? await new Promise<Awaited<typeof invokePromise> | null>((resolve, reject) => {
+          if (signal.aborted) {
+            resolve(null);
+            return;
+          }
+          const onAbort = () => resolve(null);
+          signal.addEventListener('abort', onAbort, { once: true });
+          invokePromise.then(
+            (v) => {
+              signal.removeEventListener('abort', onAbort);
+              resolve(v);
+            },
+            (e) => {
+              signal.removeEventListener('abort', onAbort);
+              reject(e);
+            },
+          );
+        })
+      : await invokePromise;
+
+    if (result == null)
+      return null; // Aborted
+
+    const { data, error } = result;
     if (error || !data) {
       console.error('[transcribeVoice] edge function error:', error?.message);
       return VOICE_FALLBACK;
@@ -42,6 +72,8 @@ export async function transcribeVoice(input: VoiceInput): Promise<RecognitionRes
     return data as RecognitionResult;
   }
   catch (err) {
+    if (signal?.aborted)
+      return null;
     console.error('[transcribeVoice] unexpected error:', err);
     return VOICE_FALLBACK;
   }

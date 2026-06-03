@@ -9,6 +9,34 @@
     "delete_warning": "Esto elimina permanentemente tu cuenta y todos tus datos. No se puede deshacer.",
     "export_failed": "La exportación falló. Inténtalo de nuevo."
   },
+  "analyzing": {
+    "a11y_done": "completado",
+    "a11y_failed": "falló",
+    "a11y_in_progress": "en progreso",
+    "a11y_pending": "pendiente",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "error_photo": "No se pudo analizar esta foto. ¿Intentar de nuevo?",
+    "error_voice": "No se pudo transcribir tu voz. ¿Intentar de nuevo?",
+    "hero_sub_error": "Problema al analizar",
+    "hero_sub_photo": "Analizando",
+    "hero_sub_voice": "Escuchando",
+    "hero_title_error_photo": "No se pudo leer esta comida",
+    "hero_title_error_voice": "No se pudo captar eso",
+    "hero_title_photo": "Leyendo tu comida...",
+    "hero_title_voice": "Trabajando en tu comida...",
+    "retry": "Intentar de nuevo",
+    "slow_hint": "Aguanta. Esto puede tardar hasta un minuto en conexiones lentas.",
+    "stage": {
+      "audio_received": "Audio recibido",
+      "building_pro_insight": "Construyendo tu Pro Insight",
+      "calculating_macros": "Calculando macros",
+      "checking_glp_nutrients": "Comprobando nutrientes GLP-1",
+      "identifying_food": "Identificando comida",
+      "image_received": "Imagen recibida",
+      "transcribing_voice": "Transcribiendo tu voz"
+    }
+  },
   "auth": {
     "back_to_sign_in": "← Volver a inicio de sesión",
     "email_label": "CORREO ELECTRÓNICO",

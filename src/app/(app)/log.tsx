@@ -42,6 +42,7 @@ import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
 import { VoiceCaptureButton } from '@/components/log/voice-capture-button';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { AIReviewSheet } from '@/features/food-log/ai-review-sheet';
+import { AnalyzingModal } from '@/features/food-log/analyzing-modal';
 import { DailyMacroCard } from '@/features/food-log/daily-macro-card';
 import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useTodayFoodLogs } from '@/features/food-log/hooks';
 import { MicronutrientWatchCard } from '@/features/food-log/micronutrient-watch-card';
@@ -127,33 +128,132 @@ export default function LogScreen() {
     setMode('manual');
   }
 
-  function handlePhotoReviewClose() {
-    clearPending();
-    // Stay on the log screen so user can take another photo if needed
+  // ── Analyzing modal state ─────────────────────────────────────────────────
+  // Tracks which capture flow is currently being analyzed so a single modal can
+  // service both photo and voice. The result hook (pendingResult / voiceResult)
+  // is set INSIDE the modal flow; the AIReviewSheet only opens after the modal
+  // fires onComplete (which gives the user the green-check beat).
+  const [analyzingSource, setAnalyzingSource] = React.useState<'photo' | 'voice' | null>(null);
+  const [analyzingImage, setAnalyzingImage]
+    = React.useState<{ base64: string; mime: string } | null>(null);
+  const [analyzingError, setAnalyzingError] = React.useState<string | null>(null);
+  const [analyzingComment, setAnalyzingComment] = React.useState<string | undefined>(undefined);
+  // Voice retry needs the original audio bytes — capture is one-shot otherwise.
+  const [analyzingAudio, setAnalyzingAudio]
+    = React.useState<{ base64: string; mime: string } | null>(null);
+  // Local "modal-complete" gate so AIReviewSheet doesn't open until the modal's
+  // drain animation finishes.
+  const [modalComplete, setModalComplete] = React.useState(false);
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+
+  function newAbortController(): AbortController {
+    if (abortControllerRef.current)
+      abortControllerRef.current.abort();
+    const ac = new AbortController();
+    abortControllerRef.current = ac;
+    return ac;
+  }
+
+  function runPhotoRecognize(
+    base64: string,
+    mime: 'image/jpeg' | 'image/png' | 'image/webp',
+    comment: string | undefined,
+  ) {
+    setAnalyzingSource('photo');
+    setAnalyzingImage({ base64, mime });
+    setAnalyzingError(null);
+    setModalComplete(false);
+    const ac = newAbortController();
+    void (async () => {
+      const result = await recognize(base64, mime, comment, ac.signal);
+      if (ac.signal.aborted)
+        return; // user cancelled
+      if (!result) {
+        setAnalyzingError('photo');
+      }
+    })();
   }
 
   function handleAnalyze(comment?: string) {
     if (!pendingCapture)
       return;
-    recognize(pendingCapture.base64, pendingCapture.mimeType, comment);
+    setAnalyzingComment(comment);
+    runPhotoRecognize(pendingCapture.base64, pendingCapture.mimeType, comment);
     setPendingCapture(null);
   }
 
-  const [isVoiceLoading, setIsVoiceLoading] = React.useState(false);
   const [voiceResult, setVoiceResult] = React.useState<RecognitionResult | null>(null);
+
+  function runVoiceTranscribe(base64: string, mime: string) {
+    setAnalyzingSource('voice');
+    setAnalyzingAudio({ base64, mime });
+    setAnalyzingError(null);
+    setModalComplete(false);
+    const ac = newAbortController();
+    void (async () => {
+      const result = await transcribeVoice({ audioBase64: base64, mimeType: mime }, ac.signal);
+      if (ac.signal.aborted)
+        return;
+      if (!result) {
+        setAnalyzingError('voice');
+        return;
+      }
+      setVoiceResult(result);
+    })();
+  }
 
   const handleAudioCaptured = React.useCallback(
     async (base64: string, mimeType: string) => {
-      setIsVoiceLoading(true);
-      const result = await transcribeVoice({ audioBase64: base64, mimeType });
-      setIsVoiceLoading(false);
-      setVoiceResult(result);
+      runVoiceTranscribe(base64, mimeType);
     },
+    // runVoiceTranscribe captures setters which are stable; safe to omit
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
+  function handleAnalyzingCancel() {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setAnalyzingSource(null);
+    setAnalyzingImage(null);
+    setAnalyzingAudio(null);
+    setAnalyzingError(null);
+    setModalComplete(false);
+    clearPending();
+    setVoiceResult(null);
+  }
+
+  function handleAnalyzingRetry() {
+    if (analyzingSource === 'photo' && analyzingImage) {
+      runPhotoRecognize(
+        analyzingImage.base64,
+        analyzingImage.mime as 'image/jpeg' | 'image/png' | 'image/webp',
+        analyzingComment,
+      );
+    }
+    else if (analyzingSource === 'voice' && analyzingAudio) {
+      runVoiceTranscribe(analyzingAudio.base64, analyzingAudio.mime);
+    }
+  }
+
+  function handleAnalyzingComplete() {
+    setModalComplete(true);
+    setAnalyzingSource(null);
+    setAnalyzingImage(null);
+    setAnalyzingAudio(null);
+    setAnalyzingError(null);
+  }
+
+  function handlePhotoReviewClose() {
+    clearPending();
+    setModalComplete(false);
+  }
+
   function handleVoiceReviewClose() {
     setVoiceResult(null);
+    setModalComplete(false);
   }
 
   // ---------------------------------------------------------------------------
@@ -200,12 +300,12 @@ export default function LogScreen() {
             {/* 4. AI logging — voice hero card, then compact photo row (each full-width) */}
             <VoiceCaptureButton
               onAudioCaptured={handleAudioCaptured}
-              isLoading={isVoiceLoading}
+              isLoading={analyzingSource === 'voice'}
             />
             <PhotoCaptureButton
               onImageSelected={(base64, mimeType) =>
                 setPendingCapture({ base64, mimeType })}
-              isLoading={recognizing}
+              isLoading={analyzingSource === 'photo' || recognizing}
             />
 
             {/* 5. 2-tab toggle — Manual | Barcode */}
@@ -321,15 +421,33 @@ export default function LogScreen() {
         onDismiss={() => setPendingCapture(null)}
       />
 
-      {/* Photo review sheet — slides up after AI recognition */}
+      {/* Analyzing modal — full-screen staged checklist while AI runs */}
+      <AnalyzingModal
+        visible={analyzingSource != null}
+        source={analyzingSource ?? 'photo'}
+        isLoading={analyzingSource != null && (recognizing || (analyzingSource === 'voice' && voiceResult == null && analyzingError == null))}
+        hasResult={
+          analyzingSource === 'photo'
+            ? pendingResult != null
+            : voiceResult != null
+        }
+        error={analyzingError}
+        imageBase64={analyzingSource === 'photo' ? analyzingImage?.base64 : null}
+        imageMimeType={analyzingSource === 'photo' ? analyzingImage?.mime : null}
+        onCancel={handleAnalyzingCancel}
+        onRetry={handleAnalyzingRetry}
+        onComplete={handleAnalyzingComplete}
+      />
+
+      {/* Photo review sheet — opens AFTER analyzing modal finishes */}
       <AIReviewSheet
-        result={pendingResult}
+        result={modalComplete && analyzingSource == null ? pendingResult : null}
         onClose={handlePhotoReviewClose}
       />
 
-      {/* Voice review sheet — slides up after voice transcription */}
+      {/* Voice review sheet — opens AFTER analyzing modal finishes */}
       <AIReviewSheet
-        result={voiceResult}
+        result={modalComplete && analyzingSource == null ? voiceResult : null}
         transcript={voiceResult?.transcript}
         onClose={handleVoiceReviewClose}
       />

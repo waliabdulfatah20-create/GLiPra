@@ -606,7 +606,7 @@ export function TodayScreen() {
           >
             <Text style={styles.browseAllText}>{t('today.browse_all_tips')}</Text>
           </Pressable>
-          {showCarousel && <CardsCarousel cards={getActiveCards()} />}
+          {showCarousel && <CardsCarousel cards={getActiveCards()} onCardPress={setSheetCard} />}
           <ContentCardSheet card={sheetCard} onClose={() => setSheetCard(null)} />
 
         </View>

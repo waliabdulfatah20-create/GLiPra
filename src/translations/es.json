@@ -74,6 +74,8 @@
     "disclaimer": "Este contenido es educativo. Siempre sigue las indicaciones de tu médico o farmacéutico.",
     "education": "EDUCACIÓN",
     "milestone": "LOGRO",
+    "min": "MIN",
+    "read_full_note": "Leer la nota completa",
     "tip": "CONSEJO",
     "warning": "ADVERTENCIA"
   },

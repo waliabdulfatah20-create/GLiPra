@@ -1,5 +1,6 @@
 import type { ContentCard } from '@/features/content-cards/data';
 import type { GlipraTokens } from '@/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as React from 'react';
 
 import { useTranslation } from 'react-i18next';
@@ -19,9 +20,13 @@ export type ContentCardSheetProps = {
   onClose: () => void;
 };
 
+function estimateReadMinutes(body: string): number {
+  return Math.max(1, Math.round(body.length / 1000));
+}
+
 export function ContentCardSheet({ card, onClose }: ContentCardSheetProps) {
   const { t } = useTranslation();
-  const { colors, spacing, radius } = useTheme();
+  const { colors, gradients, spacing, radius } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius }),
     [colors, spacing, radius],
@@ -30,8 +35,10 @@ export function ContentCardSheet({ card, onClose }: ContentCardSheetProps) {
   if (!card)
     return null;
 
-  const accentColor = card.tier === 1 ? colors.warning : colors.primary;
-  const badgeBg = card.tier === 1 ? colors.warningLight : colors.primaryLight;
+  const isWarning = card.tier === 1;
+  const accentColor = isWarning ? colors.warning : colors.primary;
+  const headerGradient = isWarning ? gradients.warning : gradients.hero;
+  const readMinutes = estimateReadMinutes(card.body);
 
   return (
     <Modal
@@ -50,20 +57,37 @@ export function ContentCardSheet({ card, onClose }: ContentCardSheetProps) {
 
       {/* Sheet */}
       <View style={styles.sheet}>
-        {/* Drag handle */}
-        <View style={styles.handle} />
+        {/* Gradient hero header — matches the carousel card language */}
+        <LinearGradient
+          colors={[headerGradient[0], headerGradient[1], headerGradient[2]]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.header}
+        >
+          <View style={styles.handle} />
+          <View style={styles.headerRow}>
+            <View style={styles.headerLeft}>
+              <View style={styles.pill}>
+                <Text style={[styles.pillText, { color: accentColor }]}>
+                  {t(`content_card.${card.cardType}`)}
+                </Text>
+              </View>
+              <Text style={styles.readTime}>
+                {readMinutes}
+                {' '}
+                {t('content_card.min')}
+              </Text>
+            </View>
+            <View style={styles.rxPill}>
+              <Text style={[styles.rxMark, { color: accentColor }]}>℞</Text>
+            </View>
+          </View>
+        </LinearGradient>
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Type badge */}
-          <View style={[styles.badge, { backgroundColor: badgeBg }]}>
-            <Text style={[styles.badgeText, { color: accentColor }]}>
-              {t(`content_card.${card.cardType}`)}
-            </Text>
-          </View>
-
           {/* Title */}
           <Text style={styles.title}>{card.title}</Text>
 
@@ -108,45 +132,84 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       backgroundColor: colors.surface,
       borderTopLeftRadius: radius.xl,
       borderTopRightRadius: radius.xl,
-      paddingHorizontal: spacing.lg,
       paddingBottom: spacing.xxl,
+      maxHeight: '85%',
+      overflow: 'hidden',
+    },
+
+    // ── Gradient header ──────────────────────────────────────────────────────
+    header: {
+      paddingHorizontal: spacing.lg,
       paddingTop: spacing.sm,
-      maxHeight: '80%',
+      paddingBottom: spacing.md,
     },
     handle: {
       width: 40,
       height: 4,
       borderRadius: radius.full,
-      backgroundColor: colors.gray300,
+      backgroundColor: colors.surface,
+      opacity: 0.5,
       alignSelf: 'center',
       marginBottom: spacing.md,
     },
-    scrollContent: {
-      paddingTop: spacing.xs,
-      paddingBottom: spacing.md,
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
     },
-
-    // ── Badge ────────────────────────────────────────────────────────────────
-    badge: {
-      alignSelf: 'flex-start',
-      borderRadius: radius.sm,
-      paddingHorizontal: spacing.sm,
-      paddingVertical: 2,
-      marginBottom: spacing.sm,
+    headerLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      flex: 1,
     },
-    badgeText: {
+    pill: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.sm + 2,
+      paddingVertical: 3,
+    },
+    pillText: {
+      fontSize: 10,
+      fontWeight: '800',
+      letterSpacing: 1.2,
+    },
+    readTime: {
+      color: colors.surface,
       fontSize: 10,
       fontWeight: '700',
-      letterSpacing: 0.8,
+      letterSpacing: 1.2,
+      opacity: 0.92,
+    },
+    rxPill: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    rxMark: {
+      fontSize: 20,
+      fontWeight: '700',
+      letterSpacing: -0.5,
+      lineHeight: 24,
+    },
+
+    scrollContent: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.md,
     },
 
     // ── Title + body ─────────────────────────────────────────────────────────
     title: {
-      fontSize: 20,
+      fontSize: 22,
       fontWeight: '700',
       color: colors.textPrimary,
       marginBottom: spacing.md,
       lineHeight: 28,
+      letterSpacing: -0.4,
     },
     body: {
       fontSize: 15,
@@ -169,6 +232,7 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       paddingVertical: 14,
       alignItems: 'center',
       marginTop: spacing.md,
+      marginHorizontal: spacing.lg,
     },
     closeButtonPressed: {
       backgroundColor: colors.primaryDark,

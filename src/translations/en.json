@@ -74,6 +74,8 @@
     "disclaimer": "This content is educational. Always follow the guidance of your prescriber or pharmacist.",
     "education": "EDUCATION",
     "milestone": "MILESTONE",
+    "min": "MIN",
+    "read_full_note": "Read the full note",
     "tip": "TIP",
     "warning": "WARNING"
   },

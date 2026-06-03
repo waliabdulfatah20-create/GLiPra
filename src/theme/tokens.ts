@@ -99,6 +99,8 @@ export type GlipraShadowTokens = {
 export type GlipraGradients = {
   /** Hero header gradient — purple → blue → teal. Always dark; text on top should be white. */
   hero: readonly [string, string, string];
+  /** Warning gradient — amber → deep amber. For tier-1 content cards. Text on top should be white. */
+  warning: readonly [string, string, string];
 };
 
 export type GlipraTokens = {
@@ -118,6 +120,7 @@ export const lightTokens: GlipraTokens = {
   radius,
   gradients: {
     hero: ['#6d28d9', '#2563eb', '#0284c7'],
+    warning: ['#d97706', '#b45309', '#92400e'],
   },
   shadows: {
     sm: {
@@ -206,6 +209,7 @@ export const darkTokens: GlipraTokens = {
   radius,
   gradients: {
     hero: ['#3b0764', '#1e3a8a', '#0c4a6e'],
+    warning: ['#92400e', '#78350f', '#451a03'],
   },
   shadows: {
     sm: {

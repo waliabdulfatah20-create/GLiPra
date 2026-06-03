@@ -8,11 +8,12 @@ import { useTheme } from '@/lib/ThemeContext';
 
 export type CardsCarouselProps = {
   cards: ContentCard[];
+  onCardPress?: (card: ContentCard) => void;
 };
 
 const CARD_WIDTH = 280;
 
-export function CardsCarousel({ cards }: CardsCarouselProps) {
+export function CardsCarousel({ cards, onCardPress }: CardsCarouselProps) {
   const { spacing } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ spacing }),
@@ -28,7 +29,7 @@ export function CardsCarousel({ cards }: CardsCarouselProps) {
       >
         {cards.map(card => (
           <View key={card.id} style={styles.cardWrapper}>
-            <ContentCardView card={card} />
+            <ContentCardView card={card} onPress={onCardPress} />
           </View>
         ))}
       </ScrollView>

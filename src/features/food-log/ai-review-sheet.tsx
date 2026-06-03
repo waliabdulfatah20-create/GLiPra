@@ -28,6 +28,13 @@ import {
 } from 'react-native';
 import { useTheme } from '@/lib/ThemeContext';
 import { useConfirmPhotoLog, useUserFoodDefault } from './hooks';
+import { PortionMultiplier } from './portion-multiplier';
+import {
+  deriveFieldBase,
+  type MacroBase,
+  type PortionMultiplier as PortionMultiplierValue,
+  scaleMacros,
+} from './portion-multiplier-helpers';
 import { ProInsightCard } from './pro-insight-card';
 
 // ---------------------------------------------------------------------------
@@ -91,6 +98,24 @@ function defaultsToForm(d: PhotoFoodEntry): FormState {
   };
 }
 
+/**
+ * Snapshot the numeric macro fields off either source so the portion
+ * multiplier has a stable base to scale from.
+ */
+function extractMacroBase(src: RecognitionResult | (PhotoFoodEntry & { name: string })): MacroBase {
+  return {
+    proteinG: src.proteinG,
+    carbsG: src.carbsG,
+    fatG: src.fatG,
+    fiberG: src.fiberG,
+    caloriesKcal: src.caloriesKcal,
+    b12Mcg: src.b12Mcg,
+    vitaminDIu: src.vitaminDIu,
+    magnesiumMg: src.magnesiumMg,
+    zincMg: src.zincMg,
+  };
+}
+
 function parseEntry(form: FormState): PhotoFoodEntry {
   return {
     name: form.name.trim(),
@@ -124,6 +149,14 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
   const originalAiName = React.useRef<string>('');
   const [form, setForm] = React.useState<FormState | null>(null);
 
+  // Portion multiplier — scales the AI's macro estimate. `aiBase` is the
+  // current 1× snapshot; the form's numeric fields are always rendered as
+  // `aiBase × multiplier`. Manual edits to a field re-derive that field's
+  // base via `deriveFieldBase()` so subsequent multiplier moves scale from
+  // the user's correction.
+  const [aiBase, setAiBase] = React.useState<MacroBase | null>(null);
+  const [multiplier, setMultiplier] = React.useState<PortionMultiplierValue>(1);
+
   // Look up personal defaults for this food name (pre-fills on repeat scans)
   const { defaults } = useUserFoodDefault(result?.name ?? '');
   const { confirm, isLoading: confirming } = useConfirmPhotoLog();
@@ -132,21 +165,59 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
   React.useEffect(() => {
     if (!result) {
       setForm(null);
+      setAiBase(null);
+      setMultiplier(1);
       return;
     }
     originalAiName.current = result.name;
     // If we have saved personal defaults for this food, use them
     // (they represent the user's preferred portions, not the AI guess)
-    if (defaults) {
-      setForm(defaultsToForm({ ...defaults, name: result.name }));
-    }
-    else {
-      setForm(resultToForm(result));
-    }
+    const source = defaults ? { ...defaults, name: result.name } : result;
+    setForm(defaults ? defaultsToForm({ ...defaults, name: result.name }) : resultToForm(result));
+    setAiBase(extractMacroBase(source));
+    setMultiplier(1);
   }, [result, defaults]);
+
+  // Numeric macro fields — manual edits to these re-derive aiBase.
+  const NUMERIC_FIELDS = React.useMemo(
+    () => new Set<keyof FormState>([
+      'proteinG',
+      'carbsG',
+      'fatG',
+      'fiberG',
+      'caloriesKcal',
+      'b12Mcg',
+      'vitaminDIu',
+      'magnesiumMg',
+      'zincMg',
+    ]),
+    [],
+  );
 
   function handleField(field: keyof FormState, value: string) {
     setForm(prev => (prev ? { ...prev, [field]: value } : prev));
+    if (NUMERIC_FIELDS.has(field)) {
+      // Re-derive this field's base so subsequent multiplier moves scale
+      // around the user's correction, not the AI's original.
+      const newBase = deriveFieldBase(value, multiplier);
+      setAiBase((prev) => {
+        if (!prev)
+          return prev;
+        // proteinG is required (number, not nullable). If the user clears it,
+        // treat it as 0 in the base rather than null to keep the type honest.
+        if (field === 'proteinG')
+          return { ...prev, proteinG: newBase ?? 0 };
+        return { ...prev, [field]: newBase } as MacroBase;
+      });
+    }
+  }
+
+  function handleMultiplierChange(next: PortionMultiplierValue) {
+    if (!aiBase || !form)
+      return;
+    setMultiplier(next);
+    const scaled = scaleMacros(aiBase, next);
+    setForm(prev => (prev ? { ...prev, ...scaled } : prev));
   }
 
   async function handleConfirm() {
@@ -258,6 +329,13 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
                 accessibilityLabel="Serving description"
               />
             </FieldRow>
+
+            <PortionMultiplier
+              value={multiplier}
+              onChange={handleMultiplierChange}
+              scaledKcal={form.caloriesKcal !== '' ? Number.parseFloat(form.caloriesKcal) || 0 : null}
+              scaledProteinG={Number.parseFloat(form.proteinG) || 0}
+            />
 
             {/* Macros */}
             <SectionHeader title="MACROS PER SERVING" />

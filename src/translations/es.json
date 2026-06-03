@@ -166,6 +166,12 @@
     "language_title": "Elige tu idioma",
     "message": "Bienvenido a GLiPra"
   },
+  "portion_multiplier": {
+    "label": "Ajustar porción",
+    "pill_a11y": "Porción {{label}}",
+    "readout_protein_only": "{{proteinG}}g de proteína",
+    "readout_with_kcal": "{{kcal}} kcal · {{proteinG}}g de proteína"
+  },
   "pro_insight": {
     "headline_at_floor": "Llegaste a tu mínimo. {{projectedG}}g de proteína hoy.",
     "headline_over_floor": "Pasaste tu mínimo por {{overG}}g. Día fuerte.",

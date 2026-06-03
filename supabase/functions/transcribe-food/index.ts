@@ -39,6 +39,8 @@ const OutputSchema = z.object({
   magnesiumMg: z.number().nonnegative().nullable().optional(),
   zincMg: z.number().nonnegative().nullable().optional(),
   confidence: z.enum(['high', 'medium', 'low']),
+  // Numeric self-reported confidence (0–100). Optional during rollout.
+  confidencePercent: z.number().min(0).max(100).optional(),
 });
 
 type TranscribeOutput = z.infer<typeof OutputSchema>;
@@ -61,6 +63,7 @@ const FALLBACK_RESULT: TranscribeOutput = {
   magnesiumMg: null,
   zincMg: null,
   confidence: 'low',
+  confidencePercent: 0,
 };
 
 // ---------------------------------------------------------------------------
@@ -94,11 +97,17 @@ const EXTRACTION_SYSTEM_PROMPT
     + '"vitaminDIu": number | null, '
     + '"magnesiumMg": number | null, '
     + '"zincMg": number | null, '
-    + '"confidence": "high" | "medium" | "low" '
+    + '"confidence": "high" | "medium" | "low", '
+    + '"confidencePercent": number '
     + '}. '
-    + 'For GLP-1 patients, micronutrient estimates are especially important -- provide '
+    + 'For GLP-1 patients, micronutrient estimates are especially important — provide '
     + 'best estimates for B12, vitamin D, magnesium, zinc, or null if unknown. '
-  + 'Do not include any user-identifying information.';
+    + 'For confidencePercent, return an integer 0–100 reflecting how sure you are of the food '
+    + 'identification AND macro estimate. Guide: 85+ if the user clearly named a common dish '
+    + 'with predictable macros; 60–84 if the description is partial or quantities are vague; '
+    + '40–59 if the description is unusual or the user trailed off; under 40 if you are '
+    + 'guessing. The confidence enum should match: high = 80+, medium = 50–79, low = <50. '
+    + 'Do not include any user-identifying information.';
 
 // ---------------------------------------------------------------------------
 // Handler

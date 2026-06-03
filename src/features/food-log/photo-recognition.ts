@@ -41,8 +41,27 @@ export type RecognitionResult = {
   vitaminDIu: number | null;
   magnesiumMg: number | null;
   zincMg: number | null;
+  /** Bucketed confidence — kept for backward-compat. */
   confidence: 'high' | 'medium' | 'low';
+  /**
+   * Numeric self-reported confidence (0–100). Optional during the
+   * edge-function rollout — clients should read this if present and fall
+   * back to deriving from `confidence` via `bucketToPercent()`.
+   */
+  confidencePercent?: number;
 };
+
+/**
+ * Map the legacy confidence enum to a numeric percent (mid-range of each
+ * band). Used as a fallback when the response only has the enum field.
+ */
+export function bucketToPercent(bucket: RecognitionResult['confidence']): number {
+  switch (bucket) {
+    case 'high': return 90;
+    case 'medium': return 65;
+    case 'low': return 35;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Mock adapter
@@ -72,6 +91,7 @@ function adaptMockToResult(): RecognitionResult {
     magnesiumMg: mock.magnesium_mg,
     zincMg: mock.zinc_mg,
     confidence,
+    confidencePercent: Math.round(mock.confidence * 100),
   };
 }
 

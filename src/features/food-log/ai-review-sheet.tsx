@@ -9,6 +9,7 @@
 //     so repeat scans of the same food pre-fill with the saved values.
 
 import type { RecognitionResult } from './photo-recognition';
+import { bucketToPercent } from './photo-recognition';
 import type { PhotoFoodEntry } from './types';
 import type { GlipraTokens } from '@/theme/tokens';
 
@@ -230,19 +231,23 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
     onClose();
   }
 
+  // Prefer the new numeric percent from the edge function; fall back to
+  // bucket-derived percent if the response predates the schema change.
+  const confidencePercent
+    = result?.confidencePercent
+      ?? (result ? bucketToPercent(result.confidence) : 0);
+
+  // Bucket thresholds keep the chip-color hierarchy stable across the
+  // bucket-vs-percent transition. Same green/amber/red the chip used before.
   const confidenceColor
-    = result?.confidence === 'high'
+    = confidencePercent >= 80
       ? colors.proteinGood
-      : result?.confidence === 'medium'
+      : confidencePercent >= 50
         ? colors.warning
         : colors.proteinLow;
 
-  const confidenceLabel
-    = result?.confidence === 'high'
-      ? 'High confidence'
-      : result?.confidence === 'medium'
-        ? 'Medium confidence'
-        : 'Low confidence - please verify';
+  // Leading "~" signals AI self-report, not a calibrated probability.
+  const confidenceLabel = `~${confidencePercent}%`;
 
   const hasMicroData
     = form

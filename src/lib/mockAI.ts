@@ -36,6 +36,9 @@ export const MOCK_MEAL_RECOGNITION = {
   magnesium_mg: 58,
   zinc_mg: 1.1,
   confidence: 0.87,
+  /** Numeric percent equivalent — same value as `confidence * 100`, kept
+   *  explicit so the adapter doesn't have to know the 0-1 → 0-100 conversion. */
+  confidence_percent: 87,
 } as const;
 
 export const MOCK_DAILY_GUIDANCE = {
@@ -75,6 +78,7 @@ export const MOCK_VOICE_PARSE: RecognitionResult = {
   magnesiumMg: null,
   zincMg: 1.5,
   confidence: 'medium',
+  confidencePercent: 65,
 };
 
 // Mock visit prep questions — returned when EXPO_PUBLIC_USE_MOCK_AI=true.

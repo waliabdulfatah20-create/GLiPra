@@ -53,6 +53,9 @@ const OutputSchema = z.object({
   magnesiumMg: z.number().nonnegative().nullable().optional(),
   zincMg: z.number().nonnegative().nullable().optional(),
   confidence: z.enum(['high', 'medium', 'low']),
+  // Numeric self-reported confidence (0–100). Optional during rollout; the
+  // client falls back to deriving from the enum if absent.
+  confidencePercent: z.number().min(0).max(100).optional(),
 });
 
 type RecognitionOutput = z.infer<typeof OutputSchema>;
@@ -75,6 +78,7 @@ const FALLBACK_RESULT: RecognitionOutput = {
   magnesiumMg: null,
   zincMg: null,
   confidence: 'low',
+  confidencePercent: 0,
 };
 
 // ---------------------------------------------------------------------------
@@ -109,11 +113,18 @@ function buildSystemPrompt(
       + '"vitaminDIu": number | null, '
       + '"magnesiumMg": number | null, '
       + '"zincMg": number | null, '
-      + '"confidence": "high" | "medium" | "low" '
+      + '"confidence": "high" | "medium" | "low", '
+      + '"confidencePercent": number '
       + '}. '
       + 'For GLP-1 patients, micronutrient estimates (B12, vitamin D, magnesium, zinc) are '
       + 'especially important — provide your best estimate based on the food type, or null if '
-    + 'truly uncertain. Do not include any user-identifying information.';
+      + 'truly uncertain. '
+      + 'For confidencePercent, return an integer 0–100 reflecting how sure you are of the food '
+      + 'identification AND macro estimate. Guide: 85+ if the food is clearly visible and a '
+      + 'common dish with predictable macros; 60–84 if uncertain about portion size or '
+      + 'ingredients; 40–59 if the dish is unusual or partially obscured; under 40 if you are '
+      + 'guessing. The confidence enum should match: high = 80+, medium = 50–79, low = <50. '
+      + 'Do not include any user-identifying information.';
 
   if (recentCorrections && recentCorrections.length > 0) {
     const correctionList = recentCorrections

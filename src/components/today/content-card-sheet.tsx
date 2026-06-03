@@ -59,7 +59,7 @@ export function ContentCardSheet({ card, onClose }: ContentCardSheetProps) {
       <View style={styles.sheet}>
         {/* Gradient hero header — matches the carousel card language */}
         <LinearGradient
-          colors={[headerGradient[0], headerGradient[1], headerGradient[2]]}
+          colors={headerGradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.header}

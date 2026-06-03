@@ -64,7 +64,7 @@ export function ContentCardView({ card, onPress }: ContentCardViewProps) {
     >
       {/* ── Gradient band ────────────────────────────────────────────── */}
       <LinearGradient
-        colors={[bandGradient[0], bandGradient[1], bandGradient[2]]}
+        colors={bandGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.band}
@@ -103,17 +103,19 @@ export function ContentCardView({ card, onPress }: ContentCardViewProps) {
         )}
 
         {/* ── Footer ─────────────────────────────────────────────────── */}
-        {onPress && (
-          <>
-            <View style={styles.divider} />
-            <View style={styles.ctaRow}>
-              <Text style={[styles.ctaText, { color: accentColor }]}>
-                {t('content_card.read_full_note')}
-              </Text>
-              <Text style={[styles.ctaArrow, { color: accentColor }]}>→</Text>
-            </View>
-          </>
-        )}
+        {onPress
+          ? (
+              <View style={styles.footer}>
+                <View style={styles.divider} />
+                <View style={styles.ctaRow}>
+                  <Text style={[styles.ctaText, { color: accentColor }]}>
+                    {t('content_card.read_full_note')}
+                  </Text>
+                  <Text style={[styles.ctaArrow, { color: accentColor }]}>→</Text>
+                </View>
+              </View>
+            )
+          : null}
       </View>
     </Pressable>
   );
@@ -217,6 +219,9 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     },
 
     // ── Footer ────────────────────────────────────────────────────────
+    footer: {
+      // wrapper, no extra layout needed
+    },
     divider: {
       height: 1,
       backgroundColor: colors.border,

@@ -42,7 +42,9 @@ import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
 import { VoiceCaptureButton } from '@/components/log/voice-capture-button';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { AIReviewSheet } from '@/features/food-log/ai-review-sheet';
+import { AiPrivacyDisclaimerModal } from '@/features/food-log/ai-privacy-disclaimer-modal';
 import { AnalyzingModal } from '@/features/food-log/analyzing-modal';
+import { useAiPrivacyAck } from '@/features/food-log/use-ai-privacy-ack';
 import { DailyMacroCard } from '@/features/food-log/daily-macro-card';
 import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useTodayFoodLogs } from '@/features/food-log/hooks';
 import { MicronutrientWatchCard } from '@/features/food-log/micronutrient-watch-card';
@@ -128,6 +130,20 @@ export default function LogScreen() {
     setMode('manual');
   }
 
+  // ── AI Data & Privacy disclaimer ───────────────────────────────────────────
+  // One-time gate shown before the first AI scan (photo or voice). The pending
+  // action is captured so we can resume after the user taps "I understand".
+  // Cancel does NOT set the ack — user is re-prompted next time.
+  const { needsAck, acknowledge } = useAiPrivacyAck();
+  const [disclaimerVisible, setDisclaimerVisible] = React.useState(false);
+  // For photo: stash the capture so we can replay handleAnalyze post-ack.
+  // For voice: a promise resolver the VoiceCaptureButton awaits.
+  const pendingPhotoRef = React.useRef<
+    | { base64: string; mime: 'image/jpeg' | 'image/png' | 'image/webp'; comment: string | undefined }
+    | null
+  >(null);
+  const pendingVoiceResolverRef = React.useRef<((ok: boolean) => void) | null>(null);
+
   // ── Analyzing modal state ─────────────────────────────────────────────────
   // Tracks which capture flow is currently being analyzed so a single modal can
   // service both photo and voice. The result hook (pendingResult / voiceResult)
@@ -178,9 +194,58 @@ export default function LogScreen() {
     if (!pendingCapture)
       return;
     setAnalyzingComment(comment);
+    if (needsAck) {
+      // First-ever scan — gate behind the disclaimer modal. Stash the
+      // capture; we'll resume in handleDisclaimerAck. Pre-clear pendingCapture
+      // so the comment sheet doesn't reopen behind the disclaimer.
+      pendingPhotoRef.current = {
+        base64: pendingCapture.base64,
+        mime: pendingCapture.mimeType,
+        comment,
+      };
+      setPendingCapture(null);
+      setDisclaimerVisible(true);
+      return;
+    }
     runPhotoRecognize(pendingCapture.base64, pendingCapture.mimeType, comment);
     setPendingCapture(null);
   }
+
+  // Voice gate — returns a promise the VoiceCaptureButton awaits. If the user
+  // taps "I understand" → resolve(true) → recording proceeds. Cancel → resolve(false).
+  const handleVoiceBeforeRecord = React.useCallback(async (): Promise<boolean> => {
+    if (!needsAck)
+      return true;
+    return new Promise<boolean>((resolve) => {
+      pendingVoiceResolverRef.current = resolve;
+      setDisclaimerVisible(true);
+    });
+  }, [needsAck]);
+
+  const handleDisclaimerAck = React.useCallback(() => {
+    void acknowledge();
+    setDisclaimerVisible(false);
+    // Resume whichever flow triggered the gate.
+    if (pendingPhotoRef.current) {
+      const { base64, mime, comment } = pendingPhotoRef.current;
+      pendingPhotoRef.current = null;
+      runPhotoRecognize(base64, mime, comment);
+    }
+    else if (pendingVoiceResolverRef.current) {
+      pendingVoiceResolverRef.current(true);
+      pendingVoiceResolverRef.current = null;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [acknowledge]);
+
+  const handleDisclaimerCancel = React.useCallback(() => {
+    setDisclaimerVisible(false);
+    pendingPhotoRef.current = null;
+    if (pendingVoiceResolverRef.current) {
+      pendingVoiceResolverRef.current(false);
+      pendingVoiceResolverRef.current = null;
+    }
+  }, []);
 
   const [voiceResult, setVoiceResult] = React.useState<RecognitionResult | null>(null);
 
@@ -305,6 +370,7 @@ export default function LogScreen() {
             <VoiceCaptureButton
               onAudioCaptured={handleAudioCaptured}
               isLoading={analyzingSource === 'voice'}
+              onBeforeRecord={handleVoiceBeforeRecord}
             />
             <PhotoCaptureButton
               onImageSelected={(base64, mimeType) =>
@@ -423,6 +489,13 @@ export default function LogScreen() {
         visible={!!pendingCapture}
         onAnalyze={handleAnalyze}
         onDismiss={() => setPendingCapture(null)}
+      />
+
+      {/* AI Data & Privacy disclaimer — one-time gate before first scan */}
+      <AiPrivacyDisclaimerModal
+        visible={disclaimerVisible}
+        onAcknowledge={handleDisclaimerAck}
+        onCancel={handleDisclaimerCancel}
       />
 
       {/* Analyzing modal — full-screen staged checklist while AI runs */}

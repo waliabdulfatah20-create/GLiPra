@@ -9,6 +9,23 @@
     "delete_warning": "This permanently deletes your account and all of your data. This cannot be undone.",
     "export_failed": "Export failed. Please try again."
   },
+  "ai_privacy": {
+    "acknowledge": "I understand. Continue",
+    "bullet_1": "Your photo or voice recording is sent securely through our server to OpenAI for analysis.",
+    "bullet_2": "OpenAI identifies the food and estimates protein, carbs, fat, calories, and GLP-1 micronutrients (B-12, vitamin D, magnesium, zinc).",
+    "bullet_3": "Your photo or audio is never stored on GLiPra servers. Only the nutrition results are saved to your log.",
+    "bullet_4": "Results are estimates only. Accuracy varies by meal complexity, typically within 15 to 25 percent.",
+    "cancel": "Cancel",
+    "eyebrow": "Data & Privacy",
+    "link_glipra": "GLiPra Privacy Policy",
+    "link_openai": "OpenAI API Data Policy",
+    "section_what_happens": "What happens when you scan",
+    "title": "Before your first scan.",
+    "trust_body": "Your photos, voice recordings, and health data are never sold, shared with advertisers, or used to train AI models. GLiPra earns revenue from subscriptions only.",
+    "trust_title": "Data not used for ads or training",
+    "warning_body": "AI nutrition estimates are for general wellness tracking only. Consult a registered dietitian or your prescriber before making significant dietary changes.",
+    "warning_title": "Not medical advice"
+  },
   "analyzing": {
     "a11y_done": "complete",
     "a11y_failed": "failed",

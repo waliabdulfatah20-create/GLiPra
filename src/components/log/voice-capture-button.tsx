@@ -37,13 +37,19 @@ import { useTheme } from '@/lib/ThemeContext';
 type VoiceCaptureButtonProps = {
   onAudioCaptured: (base64: string, mimeType: string) => void;
   isLoading: boolean;
+  /**
+   * Optional gate fired after Pro check + mic permission but BEFORE recording
+   * actually starts. Return `false` to abort (recording does not begin).
+   * Used for the one-time AI data & privacy disclaimer on first tap.
+   */
+  onBeforeRecord?: () => Promise<boolean>;
 };
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureButtonProps) {
+export function VoiceCaptureButton({ onAudioCaptured, isLoading, onBeforeRecord }: VoiceCaptureButtonProps) {
   const { t } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const { isPro } = useSubscription();
@@ -116,6 +122,14 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading }: VoiceCaptureB
         [{ text: 'OK' }],
       );
       return;
+    }
+
+    // Optional one-time AI data & privacy gate. If the parent says no
+    // (user tapped Cancel on the disclaimer), bail before the mic activates.
+    if (onBeforeRecord) {
+      const ok = await onBeforeRecord();
+      if (!ok)
+        return;
     }
 
     await startRecording();

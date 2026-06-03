@@ -211,7 +211,9 @@ export default function LogScreen() {
     [],
   );
 
-  function handleAnalyzingCancel() {
+  // useCallback wrappers so AnalyzingModal's onComplete useEffect doesn't
+  // re-schedule the 350ms timer on every parent re-render (B1 from code review).
+  const handleAnalyzingCancel = React.useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
@@ -223,9 +225,9 @@ export default function LogScreen() {
     setModalComplete(false);
     clearPending();
     setVoiceResult(null);
-  }
+  }, [clearPending]);
 
-  function handleAnalyzingRetry() {
+  const handleAnalyzingRetry = React.useCallback(() => {
     if (analyzingSource === 'photo' && analyzingImage) {
       runPhotoRecognize(
         analyzingImage.base64,
@@ -236,15 +238,17 @@ export default function LogScreen() {
     else if (analyzingSource === 'voice' && analyzingAudio) {
       runVoiceTranscribe(analyzingAudio.base64, analyzingAudio.mime);
     }
-  }
+    // runPhotoRecognize/runVoiceTranscribe close over setters which are stable.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [analyzingSource, analyzingImage, analyzingAudio, analyzingComment]);
 
-  function handleAnalyzingComplete() {
+  const handleAnalyzingComplete = React.useCallback(() => {
     setModalComplete(true);
     setAnalyzingSource(null);
     setAnalyzingImage(null);
     setAnalyzingAudio(null);
     setAnalyzingError(null);
-  }
+  }, []);
 
   function handlePhotoReviewClose() {
     clearPending();

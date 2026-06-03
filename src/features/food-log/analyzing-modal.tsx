@@ -27,6 +27,14 @@ import {
   Text,
   View,
 } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 
@@ -100,9 +108,11 @@ export function AnalyzingModal({
     ? (['#1e1b4b', '#312e81', '#1e3a8a'] as const)
     : gradients.hero;
 
-  const imageUri = imageBase64 && imageMimeType
-    ? `data:${imageMimeType};base64,${imageBase64}`
-    : null;
+  // Memoize the data URI so we don't rebuild ~1.3MB of string on every render (B2).
+  const imageUri = React.useMemo(
+    () => (imageBase64 && imageMimeType ? `data:${imageMimeType};base64,${imageBase64}` : null),
+    [imageBase64, imageMimeType],
+  );
 
   const handleCancel = () => {
     haptics.tap();
@@ -167,6 +177,25 @@ export function AnalyzingModal({
               </View>
             )}
           </LinearGradient>
+
+          {/* Screen-reader live region — single source-of-truth announcement
+              for stage transitions. Visually hidden so it doesn't take layout
+              space; per-row live regions don't reliably re-trigger VoiceOver/
+              TalkBack on the active-row swap (B5 from code review). */}
+          <View
+            accessibilityLiveRegion="polite"
+            importantForAccessibility="yes"
+            accessibilityElementsHidden={false}
+            style={styles.srOnly}
+          >
+            <Text style={styles.srOnly}>
+              {activeIndex >= 0 && activeIndex < stages.length
+                ? `${t(`analyzing.stage.${stages[activeIndex]}`)}, ${
+                    error ? t('analyzing.a11y_failed') : t('analyzing.a11y_in_progress')
+                  }`
+                : ''}
+            </Text>
+          </View>
 
           {/* Checklist */}
           <View style={styles.checklist}>
@@ -279,7 +308,6 @@ function StageRow({ stageKey, index, activeIndex, hasError, styles, t }: StageRo
       ]}
       accessibilityRole="text"
       accessibilityLabel={`${label}, ${stateLabel}`}
-      accessibilityLiveRegion={isActive ? 'polite' : 'none'}
     >
       <View
         style={[
@@ -319,27 +347,64 @@ function StageRow({ stageKey, index, activeIndex, hasError, styles, t }: StageRo
 // Waveform glyph (voice variant)
 // ---------------------------------------------------------------------------
 
+/**
+ * Animated waveform — five vertical bars that gently scale on a staggered loop
+ * to suggest "we're listening / processing your voice." Reanimated worklets so
+ * the animation runs on the UI thread; no JS-thread churn during the wait.
+ */
 function WaveformGlyph() {
   const { colors } = useTheme();
-  // Five static bars — could animate but the modal is already busy; subtle wins.
-  const heights = [16, 28, 22, 32, 18];
+  // Five bars with different base heights and staggered animation delays.
+  const bars: Array<{ height: number; delay: number }> = [
+    { height: 16, delay: 0 },
+    { height: 28, delay: 120 },
+    { height: 22, delay: 240 },
+    { height: 32, delay: 360 },
+    { height: 18, delay: 480 },
+  ];
   return (
     <View style={waveformStyles.container}>
-      {heights.map((h, i) => (
-        <View
+      {bars.map((b, i) => (
+        <WaveformBar
           // eslint-disable-next-line react/no-array-index-key
           key={i}
-          style={[
-            waveformStyles.bar,
-            {
-              height: h,
-              backgroundColor: colors.primary,
-              opacity: 0.55 + (i % 2) * 0.25,
-            },
-          ]}
+          height={b.height}
+          delay={b.delay}
+          color={colors.primary}
         />
       ))}
     </View>
+  );
+}
+
+function WaveformBar({ height, delay, color }: { height: number; delay: number; color: string }) {
+  const scaleY = useSharedValue(0.6);
+  React.useEffect(() => {
+    scaleY.value = withDelay(
+      delay,
+      withRepeat(
+        withTiming(1, { duration: 600, easing: Easing.inOut(Easing.ease) }),
+        -1, // infinite
+        true, // reverse — bounces between 0.6 and 1
+      ),
+    );
+    return () => {
+      scaleY.value = 0.6;
+    };
+  }, [delay, scaleY]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scaleY: scaleY.value }],
+  }));
+
+  return (
+    <Animated.View
+      style={[
+        waveformStyles.bar,
+        animatedStyle,
+        { height, backgroundColor: color },
+      ]}
+    />
   );
 }
 
@@ -576,6 +641,18 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     },
     btnPressed: {
       opacity: 0.85,
+    },
+
+    // ── Screen-reader live region (visually hidden) ─────────────────────────
+    srOnly: {
+      position: 'absolute',
+      width: 1,
+      height: 1,
+      overflow: 'hidden',
+      opacity: 0,
+      // Position off-screen so it never grabs layout / pointer events.
+      top: -1000,
+      left: -1000,
     },
   });
 }

@@ -66,12 +66,15 @@ export function useAnalyzingStages(input: UseAnalyzingStagesInput): UseAnalyzing
   }, [input.isLoading, activeIndex]);
 
   // Reset to -1 when both loading and result/error clear (e.g. modal closes).
+  // The `activeIndex !== -1` guard prevents a stale reset firing during the
+  // brief microtask gap where isLoading just flipped false but hasResult
+  // hasn't yet flipped true (B3 from code review).
   React.useEffect(() => {
-    if (!input.isLoading && !input.hasResult && !input.hasError) {
+    if (!input.isLoading && !input.hasResult && !input.hasError && activeIndex !== -1) {
       setActiveIndex(-1);
       setShowSlowHint(false);
     }
-  }, [input.isLoading, input.hasResult, input.hasError]);
+  }, [input.isLoading, input.hasResult, input.hasError, activeIndex]);
 
   // Tick to the next stage at the natural cadence (used while call still in flight).
   React.useEffect(() => {

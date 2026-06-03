@@ -3192,6 +3192,85 @@ Photo recognition is the cost driver. The Pro-only gate (50/day cap) and
 
 ---
 
+## Windows EAS Update runbook
+
+The OTA pipeline (Expo SDK 54 + RN 0.81 + Hermes 0.12.0 + Node 24 + Windows + OneDrive)
+has hit Hermes bytecode failures 4× in session 39. After investigation:
+
+**Confirmed contributing factors:**
+- `hermesc.exe` shipped with RN 0.81.5 is a **debug build of LLVM 8.0** (assertion-heavy,
+  fragile under Windows memory pressure)
+- Node 24 is **not LTS** and **not officially supported by Metro 0.83 / RN 0.81**; some
+  Metro internals use libuv APIs whose Node-24 behavior differs
+- Repo lives under `OneDrive\Desktop\DosePath`; **OneDrive periodically holds file handles
+  open during sync**, racing Metro's parallel sourcemap merger and producing the
+  "preceding mapping" errors
+- Default `maxWorkers` = CPU count; high concurrency on Windows triggers a `0xC0000142`
+  init race when many `hermesc.exe` child processes spawn simultaneously
+- Multiple `hermes-parser` versions can coexist in `node_modules` without explicit pinning
+
+**Mitigations applied in commit `6b70ef8` (H1–H4):**
+1. `.npmrc` pins `node-linker=hoisted` and disables strict peer deps
+2. `package.json` `pnpm.overrides` pins `hermes-parser` to `0.32.1` (matches RN 0.81.5)
+3. `metro.config.js` caps `maxWorkers = 2` on Windows only (Linux EAS cloud unaffected)
+4. New `pnpm ota:dev` and `pnpm ota:dev:clear` scripts wrap `eas update` with
+   `EXPO_USE_FAST_RESOLVER=1` to reduce filesystem churn
+
+**Canonical OTA invocation (use this first):**
+```
+pnpm ota:dev              # standard OTA
+pnpm ota:dev:clear        # OTA with cache wipe
+```
+
+### Failure escalation ladder
+
+When `pnpm ota:dev` fails with a Hermes-related error, walk this ladder:
+
+1. **Plain retry** of `pnpm ota:dev`. The OS file-handle race resolves on a second pass
+   more often than not.
+2. **Cache wipe**: `pnpm ota:dev:clear`. Forces a fresh Metro cache.
+3. **Plain retry after cache wipe**: `pnpm ota:dev`. The cache-miss + segfault combination
+   is sticky on Windows; the second clean run after a wipe usually succeeds.
+4. **Only at this point** consider code-level investigation. Common code-level triggers
+   that have surfaced this session:
+   - `<>...</>` Fragment shorthand inside a conditional ternary/`&&` render — replace with
+     an explicit `<View>` wrapper
+   - Newly-imported third-party packages with unusual export shapes (`react-native-purchases`
+     bundled inline has triggered minifier output that confuses Hermes)
+5. **As a last resort**, check the two deferred user-decision items below.
+
+### Deferred user-decision mitigations (NOT applied)
+
+Both would significantly reduce or eliminate the Hermes failures but require deliberate
+choices outside Claude's scope:
+
+**Move repo off OneDrive.** OneDrive's file-locking is the most likely root cause of the
+intermittent sourcemap mapping errors. Mitigation: relocate `dosepath/` to e.g.
+`C:\dev\dosepath` (or a non-synced drive). Significant work — the workspace path is
+referenced in CLAUDE.md, plan files, mockups, and Claude's own working memory of paths.
+Decision belongs to the user.
+
+**Downgrade local Node to 22 LTS.** Node 24 is current but not LTS; Metro 0.83 / RN 0.81
+target Node 22. Local-only change; EAS cloud builders run on Linux + Node 22 already, so
+this only affects local OTA bundling. Install via nvm-windows; ~5 min. Decision belongs
+to the user; flagged for future-session consideration if Hermes failures continue after
+H1–H4 take effect.
+
+### Related GitHub issues for future reference
+
+- [facebook/react-native#55538](https://github.com/facebook/react-native/issues/55538) —
+  hermesc.exe missing on Windows release builds
+- [expo/expo#43949](https://github.com/expo/expo/issues/43949) — Android release builds
+  fail on Windows for Expo 55 due to hermesc
+- [microsoft/react-native-windows#15538](https://github.com/microsoft/react-native-windows/issues/15538)
+  — Hermes access violations on Windows with large JS bundles
+- [expo/eas-cli#1274](https://github.com/expo/eas-cli/issues/1274) — eas update Hermes
+  sourcemap composition errors
+- [expo/expo#31989](https://github.com/expo/expo/issues/31989) — custom Metro minifier
+  interactions with Hermes minify step
+
+---
+
 ## How to Set Up Claude for Coding Glipra
 
 This is the recommended setup for working with Claude (Cursor, Claude.ai, or Claude Code)

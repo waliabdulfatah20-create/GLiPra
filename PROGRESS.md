@@ -13,6 +13,23 @@
 | **1** | **Rescan button** | Re-run recognize-food on same photo without re-snapping. Cache base64 in state; "Try again" in error path is half-done. ~1 hr. |
 | **2** | **Wrong food? Search database** | New OFF name-search modal → tap result → pre-fills AIReviewSheet. ~2–3 hrs. |
 
+### Scan Accuracy & Cost Cascade — committed roadmap (assessed session 40)
+Target the accuracy cascade: cheapest + most accurate inputs first, fewest expensive AI calls.
+**9 of 13 strategy points already shipped** (barcode-first, model routing 4o/mini, smarter prompts,
+userComment, portion multiplier, user_food_defaults, rate limit, free-tier gating, mock AI).
+Only the items below remain. Build order = leverage-first, one feature per session.
+
+| Order | Item | Cost/effort | Notes |
+|---|---|---|---|
+| **A** | **"Log again" from history** (recent/frequent foods list, one-tap re-log) | FREE, no AI, no attorney gate | Biggest open lever. Eliminates 40-60% of AI calls for repeat eaters. Query distinct recent `food_logs`; one tap re-inserts. Completes cascade step 3. |
+| **B** | **Low-confidence confirmation nudge** | FREE, no new AI | When `confidencePercent` < ~55, AIReviewSheet surfaces a "double-check this" prompt highlighting fields to verify. Converts accuracy weakness into trust feature. Microcopy only, not clinical. |
+| **C** | **Prompt enhancement: dietary pattern + allergens** | FREE prompt change | Pass diet/allergens into recognize-food ("vegetarian, do not identify meat"). NOT PII under Rule 2. Cheap accuracy bump. Fold into a small session. |
+| **D** | **Seeded ~200 GLP-1 foods table + pre-AI lookup** | New migration + RLS (Rule 7) | Local verified-food lookup before any AI call. Pharmacist-curated data. Merges with backlog item "Wrong food? Search database." |
+| **E** | **Global anonymized AI recognition cache** | Biggest effort; design pass first | New table keyed by normalized food description, RLS-careful (no cross-user PII leak), lookup-before-OpenAI + write-through. Compounding moat: cheaper + more accurate as user base grows. |
+
+Note: backlogged **Rescan** (Tier 2 #1) is still useful for the "AI got it wrong, try once more" case,
+but it spends another AI call — schedule it AFTER A/B since the cascade reduces how often Rescan is needed.
+
 ### Attorney-review queue — BLOCKS preview/production
 | Item | Status |
 |---|---|

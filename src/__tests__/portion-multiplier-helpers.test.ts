@@ -164,7 +164,7 @@ describe('snapToMultiplier', () => {
   });
 });
 
-describe('PORTION_MULTIPLIERS constant', () => {
+describe('pORTION_MULTIPLIERS constant', () => {
   it('has exactly the four expected snap points in ascending order', () => {
     expect(PORTION_MULTIPLIERS).toEqual([0.5, 1, 1.5, 2]);
   });

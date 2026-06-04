@@ -27,17 +27,17 @@ export type InsightInput = {
   daysSinceInjection: number | null;
 };
 
-export type InsightHeadlineKey =
-  | 'headline_under_floor'
-  | 'headline_at_floor'
-  | 'headline_over_floor';
+export type InsightHeadlineKey
+  = | 'headline_under_floor'
+    | 'headline_at_floor'
+    | 'headline_over_floor';
 
-export type InsightSublineKey =
-  | 'subline_injection_day'
-  | 'subline_peak_suppression'
-  | 'subline_adjustment'
-  | 'subline_recovery_window'
-  | 'subline_overdue';
+export type InsightSublineKey
+  = | 'subline_injection_day'
+    | 'subline_peak_suppression'
+    | 'subline_adjustment'
+    | 'subline_recovery_window'
+    | 'subline_overdue';
 
 export type InsightOutput = {
   headlineKey: InsightHeadlineKey;

@@ -19,7 +19,6 @@ let PostHogProvider: React.ComponentType<{
 }> | null = null;
 
 try {
-  // eslint-disable-next-line ts/no-require-imports
   const pkg = require('posthog-react-native') as {
     PostHogProvider: React.ComponentType<{
       apiKey: string;

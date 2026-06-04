@@ -42,9 +42,11 @@ export function formatWeight(kg: number, unit: WeightUnit): string {
 
 // ── Hooks ──────────────────────────────────────────────────────────────────
 
-/** Read/write the user's weight unit preference. Persists across app launches.
+/**
+ * Read/write the user's weight unit preference. Persists across app launches.
  *  Default is imperial (lbs) since the primary launch market is US-based GLP-1 users;
- *  metric users can flip the toggle once and the choice persists. */
+ *  metric users can flip the toggle once and the choice persists.
+ */
 export function useWeightUnit(): { unit: WeightUnit; toggle: () => void } {
   const [unit, setUnit] = React.useState<WeightUnit>('lbs');
 
@@ -66,8 +68,10 @@ export function useWeightUnit(): { unit: WeightUnit; toggle: () => void } {
   return { unit, toggle };
 }
 
-/** Read/write the user's height unit preference. Persists across app launches.
- *  Default is imperial (ft + in) for the same reason as weight. */
+/**
+ * Read/write the user's height unit preference. Persists across app launches.
+ *  Default is imperial (ft + in) for the same reason as weight.
+ */
 export function useHeightUnit(): { unit: HeightUnit; toggle: () => void } {
   const [unit, setUnit] = React.useState<HeightUnit>('imperial');
 

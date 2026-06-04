@@ -80,7 +80,6 @@ function getClient(): PostHogInstance | null {
   _initialized = true;
 
   try {
-    // eslint-disable-next-line ts/no-require-imports
     const { PostHog } = require('posthog-react-native') as {
       PostHog: new (apiKey: string, options?: Record<string, unknown>) => PostHogInstance;
     };

@@ -12,7 +12,7 @@
  * v1 has no per-cell tooltip; that's a v2 enhancement.
  */
 
-import type { GlipraSeverityScales, GlipraTokens } from '@/theme/tokens';
+import type { GlipraSeverityScales } from '@/theme/tokens';
 import * as React from 'react';
 
 import { StyleSheet, View } from 'react-native';
@@ -100,13 +100,13 @@ export function SeverityHeatStrip({
           {/* Pad short final row with invisible placeholders so cells in the
               last row don't stretch wider than rows above. */}
           {row.length < cellsPerRow
-          && Array.from({ length: cellsPerRow - row.length }).map((_, i) => (
-            <View
+            && Array.from({ length: cellsPerRow - row.length }).map((_, i) => (
+              <View
               // eslint-disable-next-line react/no-array-index-key
-              key={`pad-${i}`}
-              style={styles.cellPad}
-            />
-          ))}
+                key={`pad-${i}`}
+                style={styles.cellPad}
+              />
+            ))}
         </View>
       ))}
     </View>

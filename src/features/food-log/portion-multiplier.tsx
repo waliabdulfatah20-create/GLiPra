@@ -13,14 +13,15 @@
  * presentation layer.
  */
 
+import type { PortionMultiplier } from './portion-multiplier-helpers';
 import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import { PORTION_MULTIPLIERS, type PortionMultiplier } from './portion-multiplier-helpers';
+import { PORTION_MULTIPLIERS } from './portion-multiplier-helpers';
 
 export type PortionMultiplierProps = {
   /** Current selection. */

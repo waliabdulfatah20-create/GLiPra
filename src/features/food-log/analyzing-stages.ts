@@ -23,16 +23,16 @@
 
 export type AnalyzingSource = 'photo' | 'voice';
 
-export type StageKey =
+export type StageKey
   // photo stages
-  | 'image_received'
-  | 'identifying_food'
-  | 'calculating_macros'
-  | 'checking_glp_nutrients'
-  | 'building_pro_insight'
+  = | 'image_received'
+    | 'identifying_food'
+    | 'calculating_macros'
+    | 'checking_glp_nutrients'
+    | 'building_pro_insight'
   // voice-only stages (replaces image_received + adds transcribing)
-  | 'audio_received'
-  | 'transcribing_voice';
+    | 'audio_received'
+    | 'transcribing_voice';
 
 /** The ordered stage list per source. */
 export const PHOTO_STAGES: readonly StageKey[] = [

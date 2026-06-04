@@ -19,12 +19,11 @@ export type HealthWeightReading = {
 
 // ─── Module load (graceful stub) ──────────────────────────────────────────────
 
-// eslint-disable-next-line ts/no-explicit-any
 let HealthLink: any = null;
 
 try {
   // Dynamic require so bundler doesn't hard-fail in Expo Go
-  // eslint-disable-next-line ts/no-require-imports
+
   HealthLink = require('react-native-health-link').default ?? require('react-native-health-link');
 }
 catch {

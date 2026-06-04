@@ -46,7 +46,6 @@ export function ProGate({ children, featureName, fallback }: ProGateProps) {
         style={styles.button}
         onPress={() => {
           try {
-            // eslint-disable-next-line ts/no-require-imports
             const { RevenueCatUI } = require('react-native-purchases-ui');
             RevenueCatUI.presentPaywallIfNeeded({
               requiredEntitlementIdentifier: 'GLiPra Pro',

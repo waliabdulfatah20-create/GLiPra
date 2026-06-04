@@ -1,6 +1,6 @@
 import { FlashList as NFlashList } from '@shopify/flash-list';
 import * as React from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Text } from './text';
@@ -13,12 +13,12 @@ export const List = NFlashList;
 
 export const EmptyList = React.memo(({ isLoading }: Props) => {
   return (
-    <View className="min-h-[400px] flex-1 items-center justify-center">
+    <View style={emptyListStyles.container}>
       {!isLoading
         ? (
             <View>
               <NoData />
-              <Text className="pt-4 text-center">Sorry! No data found</Text>
+              <Text style={emptyListStyles.text}>Sorry! No data found</Text>
             </View>
           )
         : (
@@ -26,6 +26,19 @@ export const EmptyList = React.memo(({ isLoading }: Props) => {
           )}
     </View>
   );
+});
+
+const emptyListStyles = StyleSheet.create({
+  container: {
+    minHeight: 400,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    paddingTop: 16,
+    textAlign: 'center',
+  },
 });
 
 export function NoData() {

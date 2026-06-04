@@ -56,3 +56,7 @@ eas
 .superpowers/
 .claude/
 docs/superpowers/
+
+# Supabase CLI scratch (regenerated every run — never track)
+supabase/.temp/
+supabase/.branches/

@@ -3227,9 +3227,17 @@ has hit Hermes bytecode failures 4× in session 39. After investigation:
 
 **Canonical OTA invocation (use this first):**
 ```
-pnpm ota:dev              # standard OTA
-pnpm ota:dev:clear        # OTA with cache wipe
+pnpm ota:dev --message "..."        # standard OTA
+pnpm ota:dev:clear --message "..."  # OTA with cache wipe
 ```
+The `--message` is REQUIRED. The scripts invoke `eas update --branch development
+--non-interactive`, and non-interactive mode rejects a publish without a message
+(`--branch and --message ... are required when updating in non-interactive mode unless
+--auto is specified`). pnpm forwards the trailing `--message "..."` through to eas. Bare
+`pnpm ota:dev` fails instantly on arg validation — confirmed session 40. Keep the message
+descriptive (the feature/entry shipped) so the dashboard update history stays readable.
+We keep `--branch development` static rather than switching to `--auto` (which would derive
+the branch from git = `master`, breaking the dev-channel mapping).
 
 ### Failure escalation ladder
 

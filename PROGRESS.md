@@ -61,10 +61,14 @@ but it spends another AI call — schedule it AFTER A/B since the cascade reduce
 
 ### OTA workflow reminder
 ```
-pnpm ota:dev          # standard OTA (use this first)
-pnpm ota:dev:clear    # OTA with cache wipe
+pnpm ota:dev --message "..."          # standard OTA (use this first)
+pnpm ota:dev:clear --message "..."    # OTA with cache wipe
 ```
-Both wrap `EXPO_USE_FAST_RESOLVER=true`. Hardened in entry 70 — 3 consecutive clean first-try OTAs since.
+Both wrap `EXPO_USE_FAST_RESOLVER`. The `--message` is REQUIRED: the scripts run
+`eas update --non-interactive`, which rejects a publish with no message (bare `pnpm ota:dev`
+fails with "--branch and --message ... are required"). pnpm forwards the trailing
+`--message "..."` to eas. Keep the message descriptive (e.g. the feature/entry shipped) so the
+EAS dashboard history stays readable. Hardened in entry 70.
 
 ---
 

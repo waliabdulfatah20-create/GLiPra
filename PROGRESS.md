@@ -57,7 +57,7 @@ but it spends another AI call — schedule it AFTER A/B since the cascade reduce
 ### Code health (non-blocking)
 - ~226 eslint warnings — burn down opportunistically
 - GitHub Actions CI workflow (`pnpm check-all` on PR)
-- 6 perpetually-dirty files (app.config.ts, 4 icon PNGs, supabase/.temp) — figure out what's modifying them
+- ~~6 perpetually-dirty files~~ ✅ RESOLVED session 40. Was NOT tool churn: `supabase/.temp/*` (9 CLI scratch files) was tracked-but-should-be-ignored (`adbe526` — gitignored + untracked); the other 5 (`app.config.ts` + 4 icon PNGs) were a real never-committed brand-icon refresh (purple `#5b21b6` + white G monogram), now committed (`5a5ec84`). Working tree is clean.
 
 ### OTA workflow reminder
 ```

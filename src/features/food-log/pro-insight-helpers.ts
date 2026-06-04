@@ -51,7 +51,7 @@ export type InsightOutput = {
   /** i18n key for the contextual subline, or null when no injection logged. */
   sublineKey: InsightSublineKey | null;
   /** Interpolation value for sublines that reference a specific day count. */
-  sublineVars: { n: number };
+  sublineVars: { day: number };
 };
 
 /** Margin (in grams) within which a meal is considered to "hit" the floor exactly. */
@@ -103,7 +103,7 @@ export function composeInsight(input: InsightInput): InsightOutput | null {
   };
 
   const sublineKey = phaseSublineKey(phase);
-  const sublineVars = { n: Math.max(0, daysSinceInjection ?? 0) };
+  const sublineVars = { day: Math.max(0, daysSinceInjection ?? 0) };
 
   return { headlineKey, headlineVars, sublineKey, sublineVars };
 }

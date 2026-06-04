@@ -16,6 +16,10 @@ const images = [
 type Props = Post;
 
 export function PostCard({ title, body, id }: Props) {
+  // Deterministic image pick from id — Math.random() in render is impure
+  // (react-hooks/purity) and would also reshuffle on every render.
+  const imageIndex
+    = String(id).split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % images.length;
   return (
     <Link href={`/feed/${id}`} asChild>
       <Pressable>
@@ -24,8 +28,7 @@ export function PostCard({ title, body, id }: Props) {
             className="h-56 w-full overflow-hidden rounded-t-xl"
             contentFit="cover"
             source={{
-
-              uri: images[Math.floor(Math.random() * images.length)],
+              uri: images[imageIndex],
             }}
           />
 

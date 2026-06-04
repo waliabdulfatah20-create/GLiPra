@@ -149,7 +149,7 @@ export default function VisitPrepScreen() {
       'PDF Ready',
       `PDF generated successfully.\nBase64 length: ${pdfBase64.length} chars.\n\nSharing is not available on this device.`,
     );
-  }, [data, generate, pdfError]);
+  }, [data, generate, pdfError, isPro]);
 
   if (data.isLoading) {
     return (

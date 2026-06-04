@@ -1,7 +1,53 @@
 # Glipra — Build Progress
 # Full history of what has been built. Not needed by Claude during coding.
 # Update this file at the end of each session.
-# Last updated: 2026-06-03 (session 39 — Nutrition redesign, Micronutrient upsell, entitlement fix, voice tokens, expo-av→expo-audio, real AI confirmed on device, Glipra→GLiPra rebrand, Today tile polish, pain-level drag slider, tab order swap, pharmacist content cards premium redesign, symptom heat strip, AI Review Pro Insight card, portion multiplier pills, AnalyzingModal, code-review polish + Windows EAS hardening, numeric confidence chip, imperial unit defaults, AI Data & Privacy disclaimer)
+# Last updated: 2026-06-04 (session 39 end — see backlog below)
+
+---
+
+## Current Backlog (as of session 39 end — master @ ae9fc33)
+
+### Tier 2 — ready to ship next (one session each)
+| Priority | Item | Notes |
+|---|---|---|
+| **1** | **Rescan button** | Re-run recognize-food on same photo without re-snapping. Cache base64 in state; "Try again" in error path is half-done. ~1 hr. |
+| **2** | **Wrong food? Search database** | New OFF name-search modal → tap result → pre-fills AIReviewSheet. ~2–3 hrs. |
+
+### Attorney-review queue — BLOCKS preview/production
+| Item | Status |
+|---|---|
+| `ai-coach` prompts + keyword blocklist | Pending attorney |
+| `EscalationCard` copy | Pending attorney |
+| `daily-guidance` edge function prompts | Pending attorney |
+| `pro_insight.subline_*` copy | Pending attorney |
+| Delete-account modal copy | Pending attorney |
+| **`ai_privacy.*` copy (entry 73)** | **Pending attorney — NEW** |
+
+### Infra / pre-launch blockers
+| Item | Notes |
+|---|---|
+| Apple Developer account | D-U-N-S for "Leonava" requested 2026-05-30, awaiting issuance |
+| Email confirmation | Re-enable in Supabase dashboard before public release |
+| `.env.production` | All keys empty; populate before first production build |
+| Home-screen app label "GLiPra" | Requires next native EAS build |
+
+### Tier 3 backlog
+| Item | Notes |
+|---|---|
+| Other estimates (alternatives) | GPT-4o prompt + Zod change + Pro-gated UI. Wait for user data showing Rescan isn't enough. |
+| Symptom card v2 — phase-correlation bars | Direction C from the symptom redesign. Needs ≥2 full injection cycles of data. |
+
+### Code health (non-blocking)
+- ~226 eslint warnings — burn down opportunistically
+- GitHub Actions CI workflow (`pnpm check-all` on PR)
+- 6 perpetually-dirty files (app.config.ts, 4 icon PNGs, supabase/.temp) — figure out what's modifying them
+
+### OTA workflow reminder
+```
+pnpm ota:dev          # standard OTA (use this first)
+pnpm ota:dev:clear    # OTA with cache wipe
+```
+Both wrap `EXPO_USE_FAST_RESOLVER=true`. Hardened in entry 70 — 3 consecutive clean first-try OTAs since.
 
 ---
 

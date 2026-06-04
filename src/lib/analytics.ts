@@ -24,6 +24,7 @@ export const EVENTS = {
   FOOD_LOGGED_MANUAL: 'food_logged_manual',
   FOOD_LOGGED_BARCODE: 'food_logged_barcode',
   FOOD_LOGGED_PHOTO: 'food_logged_photo',
+  FOOD_LOGGED_RELOG: 'food_logged_relog', // one-tap re-log from Recent Foods
 
   // Check-in
   CHECKIN_COMPLETED: 'checkin_completed',

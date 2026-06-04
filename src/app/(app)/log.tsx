@@ -20,6 +20,7 @@
 import type { MealSlot } from '@/components/log/meal-chip-row';
 import type { BarcodeProduct } from '@/features/food-log/barcode-lookup';
 import type { RecognitionResult } from '@/features/food-log/photo-recognition';
+import type { RecentFood } from '@/features/food-log/recent-foods';
 
 import type { FoodLogEntry, ManualFoodEntry } from '@/features/food-log/types';
 import type { GlipraTokens } from '@/theme/tokens';
@@ -39,6 +40,7 @@ import { MealChipRow } from '@/components/log/meal-chip-row';
 import { NutritionHeaderRing } from '@/components/log/nutrition-header-ring';
 import { PhotoCaptureButton } from '@/components/log/photo-capture-button';
 import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
+import { RecentFoodsRow } from '@/components/log/recent-foods-row';
 import { VoiceCaptureButton } from '@/components/log/voice-capture-button';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { AIReviewSheet } from '@/features/food-log/ai-review-sheet';
@@ -46,10 +48,11 @@ import { AiPrivacyDisclaimerModal } from '@/features/food-log/ai-privacy-disclai
 import { AnalyzingModal } from '@/features/food-log/analyzing-modal';
 import { useAiPrivacyAck } from '@/features/food-log/use-ai-privacy-ack';
 import { DailyMacroCard } from '@/features/food-log/daily-macro-card';
-import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useTodayFoodLogs } from '@/features/food-log/hooks';
+import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useRecentFoods, useRelogFoodEntry, useTodayFoodLogs } from '@/features/food-log/hooks';
 import { MicronutrientWatchCard } from '@/features/food-log/micronutrient-watch-card';
 import { transcribeVoice } from '@/features/food-log/voice-recognition';
 import { useTodayData } from '@/features/today/hooks';
+import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 
 // ---------------------------------------------------------------------------
@@ -80,6 +83,8 @@ export default function LogScreen() {
   } | null>(null);
 
   const { logs, isLoading: logsLoading } = useTodayFoodLogs();
+  const { items: recentItems } = useRecentFoods();
+  const { mutate: relog } = useRelogFoodEntry();
   const { mutate: insertManual, isLoading: insertingManual } = useInsertFoodLog();
   const { mutate: insertBarcode, isLoading: insertingBarcode } = useInsertBarcodeFoodLog();
   const {
@@ -98,6 +103,15 @@ export default function LogScreen() {
   // ---------------------------------------------------------------------------
   // Handlers
   // ---------------------------------------------------------------------------
+
+  // One-tap re-log from the Recent Foods quick-add bar. Free, no AI.
+  const handleRelog = React.useCallback(
+    (item: RecentFood) => {
+      haptics.success();
+      relog(item);
+    },
+    [relog],
+  );
 
   function handleManualSubmit(entry: ManualFoodEntry) {
     insertManual(entry);
@@ -431,6 +445,10 @@ export default function LogScreen() {
                 self-manages (Pro+data -> grid, Pro+empty -> null, free -> upsell teaser). */}
             {logs.length > 0 && <DailyMacroCard />}
             <MicronutrientWatchCard />
+
+            {/* 6c. Recent Foods quick-add — one-tap re-log of staples (free, no AI).
+                Renders nothing when there is no history. */}
+            <RecentFoodsRow items={recentItems} onRelog={handleRelog} />
 
             {/* 7. Today's log section header — label reflects active meal chip */}
             {logs.length > 0 && (

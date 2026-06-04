@@ -1,11 +1,11 @@
 # Glipra — Build Progress
 # Full history of what has been built. Not needed by Claude during coding.
 # Update this file at the end of each session.
-# Last updated: 2026-06-04 (session 40 — Recent Foods quick-add + Nutrition screen reorder)
+# Last updated: 2026-06-04 (session 40 — Recent Foods, screen reorder, check-all green + CI)
 
 ---
 
-## Current Backlog (as of session 40 — master @ 9a3e85b)
+## Current Backlog (as of session 40 — master @ 550f7a2)
 
 ### Tier 2 — ready to ship next (one session each)
 | Priority | Item | Notes |
@@ -55,8 +55,9 @@ but it spends another AI call — schedule it AFTER A/B since the cascade reduce
 | Symptom card v2 — phase-correlation bars | Direction C from the symptom redesign. Needs ≥2 full injection cycles of data. |
 
 ### Code health (non-blocking)
-- ~226 eslint warnings — burn down opportunistically
-- GitHub Actions CI workflow (`pnpm check-all` on PR)
+- **220 eslint WARNINGS** remain (down from 226; non-blocking — eslint passes on warnings). Top: `max-lines-per-function` (~76, incl. long edge-function handlers), `react-hooks-extra/no-direct-set-state-in-use-effect` (~54), `style/max-statements-per-line`, `react/no-array-index-key`. Burn down opportunistically; CI does NOT fail on them. Future ratchet: `eslint . --max-warnings=<n>` to drive the count down without blocking.
+- ~~GitHub Actions CI workflow~~ ✅ DONE session 40 (`550f7a2`). `.github/workflows/ci.yml` runs `pnpm check-all` + `pnpm test:utils` (vitest) on every PR + push to master (ubuntu, Node 22, pnpm 10, frozen lockfile). Gated on the lint-error budget being 0.
+- ~~32 lint ERRORS / `check-all` red~~ ✅ RESOLVED session 40. `pnpm check-all` is now GREEN (exit 0): auto-fixed 23 (`3fc2357`), hand-fixed 9 (`e8cc328` — react-hooks purity/memo/set-state, unused var, type-redeclare alias, i18next `{{n}}`→`{{day}}` 2-char-var fix). type-check 0, jest 63, vitest 422.
 - ~~6 perpetually-dirty files~~ ✅ RESOLVED session 40. Was NOT tool churn: `supabase/.temp/*` (9 CLI scratch files) was tracked-but-should-be-ignored (`adbe526` — gitignored + untracked); the other 5 (`app.config.ts` + 4 icon PNGs) were a real never-committed brand-icon refresh (purple `#5b21b6` + white G monogram), now committed (`5a5ec84`). Working tree is clean.
 
 ### OTA workflow reminder

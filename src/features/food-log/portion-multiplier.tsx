@@ -13,20 +13,21 @@
  * presentation layer.
  */
 
+import type { PortionMultiplier as PortionMultiplierValue } from './portion-multiplier-helpers';
 import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-import { PORTION_MULTIPLIERS, type PortionMultiplier } from './portion-multiplier-helpers';
+import { PORTION_MULTIPLIERS } from './portion-multiplier-helpers';
 
 export type PortionMultiplierProps = {
   /** Current selection. */
-  value: PortionMultiplier;
+  value: PortionMultiplierValue;
   /** Fires when the user picks a new multiplier. */
-  onChange: (value: PortionMultiplier) => void;
+  onChange: (value: PortionMultiplierValue) => void;
   /** Live readout shown beside the multiplier — scaled kcal preview. */
   scaledKcal: number | null;
   /** Live readout shown beside the multiplier — scaled protein in grams. */
@@ -34,7 +35,7 @@ export type PortionMultiplierProps = {
 };
 
 /** Human-readable label for a multiplier (½× / 1× / 1½× / 2×). */
-function formatMultiplier(m: PortionMultiplier): string {
+function formatMultiplier(m: PortionMultiplierValue): string {
   switch (m) {
     case 0.5: return '½×';
     case 1: return '1×';
@@ -57,7 +58,7 @@ export function PortionMultiplier({
   );
 
   const handlePress = React.useCallback(
-    (m: PortionMultiplier) => {
+    (m: PortionMultiplierValue) => {
       if (m === value)
         return;
       haptics.tap();

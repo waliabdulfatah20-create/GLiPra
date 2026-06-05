@@ -3,23 +3,23 @@
 //
 // Layout (top to bottom) — logging-first, results below:
 //   1. Header — "Nutrition Log" title + compact protein ring
-//   2. MealChipRow — Breakfast / Lunch / Dinner / Snack time-based filter
-//   3. VoiceCaptureButton — full-width navy AI hero card (Pro-gated internally)
+//   2. VoiceCaptureButton — full-width navy AI hero card (Pro-gated internally)
 //      + PhotoCaptureButton — compact AI action row (Pro-gated internally)
+//   3. RecentFoodsRow — one-tap re-log of staples (free; renders null when no history)
 //   4. 2-tab toggle — Manual | Barcode, with a "free" caption underneath
 //   5. ManualEntryForm (when mode === 'manual')
 //   6. Results cluster — DailyMacroCard (when entries exist) + MicronutrientWatchCard
 //      (Pro+data -> grid, Pro+empty -> null, free -> frosted "Unlock with Pro" upsell)
-//   7. Today's log / filtered section header
-//   8. FoodLogRow list (filtered by selectedMeal)
+//   7. Today's log section header
+//   8. FoodLogRow list
 //
 // Barcode scanning is always free (never paywalled).
 // AI Photo Recognition is Pro-only (gated via PhotoCaptureButton internally).
 // DisclaimerBanner tier={2} required per Rule 8 (clinical screen).
 
-import type { MealSlot } from '@/components/log/meal-chip-row';
 import type { BarcodeProduct } from '@/features/food-log/barcode-lookup';
 import type { RecognitionResult } from '@/features/food-log/photo-recognition';
+import type { RecentFood } from '@/features/food-log/recent-foods';
 
 import type { FoodLogEntry, ManualFoodEntry } from '@/features/food-log/types';
 import type { GlipraTokens } from '@/theme/tokens';
@@ -35,36 +35,23 @@ import {
 } from 'react-native';
 import { BarcodeScannerSheet } from '@/components/log/barcode-scanner-sheet';
 import { ManualEntryForm } from '@/components/log/manual-entry-form';
-import { MealChipRow } from '@/components/log/meal-chip-row';
 import { NutritionHeaderRing } from '@/components/log/nutrition-header-ring';
 import { PhotoCaptureButton } from '@/components/log/photo-capture-button';
 import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
+import { RecentFoodsRow } from '@/components/log/recent-foods-row';
 import { VoiceCaptureButton } from '@/components/log/voice-capture-button';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
-import { AIReviewSheet } from '@/features/food-log/ai-review-sheet';
 import { AiPrivacyDisclaimerModal } from '@/features/food-log/ai-privacy-disclaimer-modal';
+import { AIReviewSheet } from '@/features/food-log/ai-review-sheet';
 import { AnalyzingModal } from '@/features/food-log/analyzing-modal';
-import { useAiPrivacyAck } from '@/features/food-log/use-ai-privacy-ack';
 import { DailyMacroCard } from '@/features/food-log/daily-macro-card';
-import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useTodayFoodLogs } from '@/features/food-log/hooks';
+import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useRecentFoods, useRelogFoodEntry, useTodayFoodLogs } from '@/features/food-log/hooks';
 import { MicronutrientWatchCard } from '@/features/food-log/micronutrient-watch-card';
+import { useAiPrivacyAck } from '@/features/food-log/use-ai-privacy-ack';
 import { transcribeVoice } from '@/features/food-log/voice-recognition';
 import { useTodayData } from '@/features/today/hooks';
+import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-
-// ---------------------------------------------------------------------------
-// Meal slot helper — client-side time-based filter, no DB column needed.
-// ---------------------------------------------------------------------------
-function getMealSlot(loggedAt: string): MealSlot {
-  const hour = new Date(loggedAt).getHours(); // local time
-  if (hour >= 5 && hour < 11)
-    return 'breakfast';
-  if (hour >= 11 && hour < 15)
-    return 'lunch';
-  if (hour >= 15 && hour < 21)
-    return 'dinner';
-  return 'snack';
-}
 
 type LogMode = 'manual' | 'barcode';
 
@@ -72,7 +59,6 @@ export default function LogScreen() {
   const { t } = useTranslation();
   const [mode, setMode] = React.useState<LogMode>('manual');
   const [scannerVisible, setScannerVisible] = React.useState(false);
-  const [selectedMeal, setSelectedMeal] = React.useState<MealSlot | null>(null);
   // Holds the captured image until the user fills in optional comment context.
   const [pendingCapture, setPendingCapture] = React.useState<{
     base64: string;
@@ -80,6 +66,8 @@ export default function LogScreen() {
   } | null>(null);
 
   const { logs, isLoading: logsLoading } = useTodayFoodLogs();
+  const { items: recentItems } = useRecentFoods();
+  const { mutate: relog } = useRelogFoodEntry();
   const { mutate: insertManual, isLoading: insertingManual } = useInsertFoodLog();
   const { mutate: insertBarcode, isLoading: insertingBarcode } = useInsertBarcodeFoodLog();
   const {
@@ -98,6 +86,15 @@ export default function LogScreen() {
   // ---------------------------------------------------------------------------
   // Handlers
   // ---------------------------------------------------------------------------
+
+  // One-tap re-log from the Recent Foods quick-add bar. Free, no AI.
+  const handleRelog = React.useCallback(
+    (item: RecentFood) => {
+      haptics.success();
+      relog(item);
+    },
+    [relog],
+  );
 
   function handleManualSubmit(entry: ManualFoodEntry) {
     insertManual(entry);
@@ -331,13 +328,7 @@ export default function LogScreen() {
 
   const totalProteinToday = logs.reduce((sum, entry) => sum + entry.proteinG, 0);
 
-  const filteredLogs = selectedMeal
-    ? logs.filter(log => getMealSlot(log.loggedAt) === selectedMeal)
-    : logs;
-
-  const sectionLabel = selectedMeal
-    ? selectedMeal.toUpperCase()
-    : t('log.todays_log').toUpperCase();
+  const sectionLabel = t('log.todays_log').toUpperCase();
 
   // ---------------------------------------------------------------------------
   // Render
@@ -346,7 +337,7 @@ export default function LogScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <FlatList
-        data={filteredLogs}
+        data={logs}
         keyExtractor={item => item.id}
         ListHeaderComponent={(
           <>
@@ -363,10 +354,7 @@ export default function LogScreen() {
               <NutritionHeaderRing consumed={totalProteinToday} floor={proteinFloorG} />
             </View>
 
-            {/* 2. Meal context chips */}
-            <MealChipRow active={selectedMeal} onSelect={setSelectedMeal} />
-
-            {/* 4. AI logging — voice hero card, then compact photo row (each full-width) */}
+            {/* 2. AI logging — voice hero card, then compact photo row (each full-width) */}
             <VoiceCaptureButton
               onAudioCaptured={handleAudioCaptured}
               isLoading={analyzingSource === 'voice'}
@@ -378,7 +366,12 @@ export default function LogScreen() {
               isLoading={analyzingSource === 'photo' || recognizing}
             />
 
-            {/* 5. 2-tab toggle — Manual | Barcode */}
+            {/* 3. Recent Foods quick-add — one-tap re-log of staples (free, no AI).
+                Sits in the logging zone right under the AI surfaces. Renders nothing
+                when there is no history. */}
+            <RecentFoodsRow items={recentItems} onRelog={handleRelog} />
+
+            {/* 4. 2-tab toggle — Manual | Barcode */}
             <View style={styles.modeToggleRow}>
               <Pressable
                 style={[styles.modeButton, mode === 'manual' && styles.modeButtonActive]}
@@ -432,7 +425,7 @@ export default function LogScreen() {
             {logs.length > 0 && <DailyMacroCard />}
             <MicronutrientWatchCard />
 
-            {/* 7. Today's log section header — label reflects active meal chip */}
+            {/* 5. Today's log section header */}
             {logs.length > 0 && (
               <Text style={styles.sectionTitle}>{sectionLabel}</Text>
             )}
@@ -441,25 +434,12 @@ export default function LogScreen() {
               <Text style={styles.emptyText}>{t('log.loading')}</Text>
             )}
 
-            {/* 8. Empty state */}
-            {!logsLoading && filteredLogs.length === 0 && logs.length === 0 && (
+            {/* 6. Empty state */}
+            {!logsLoading && logs.length === 0 && (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyStateIcon}>🍽</Text>
                 <Text style={styles.emptyStateTitle}>{t('log.nothing_logged')}</Text>
                 <Text style={styles.emptyStateBody}>{t('log.nothing_logged_body')}</Text>
-              </View>
-            )}
-
-            {/* 8b. Empty state for filtered view with entries */}
-            {!logsLoading && filteredLogs.length === 0 && logs.length > 0 && (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyStateBody}>
-                  No entries for
-                  {' '}
-                  {selectedMeal}
-                  {' '}
-                  yet
-                </Text>
               </View>
             )}
           </>

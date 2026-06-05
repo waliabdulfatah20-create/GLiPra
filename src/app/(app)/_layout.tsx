@@ -72,7 +72,6 @@ export default function TabLayout() {
       <Tabs.Screen name="settings" options={{ href: null, headerShown: false }} />
 
       {/* ── Hidden screens — accessible by programmatic navigation ────────── */}
-      <Tabs.Screen name="style" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="check-in" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="weight" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="medication-level" options={{ href: null, headerShown: false }} />

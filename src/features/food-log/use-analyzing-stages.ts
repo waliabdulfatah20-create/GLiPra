@@ -13,16 +13,17 @@
  * cancel) to advance / pause / finalize the checklist.
  */
 
-import * as React from 'react';
+import type { AnalyzingSource, StageKey } from './analyzing-stages';
 
+import * as React from 'react';
 import {
-  type AnalyzingSource,
+
   planDrainDelay,
   planNextStageDelay,
   shouldShowSlowHint,
   SLOW_HINT_AFTER_MS,
   stagesFor,
-  type StageKey,
+
 } from './analyzing-stages';
 
 export type UseAnalyzingStagesInput = {

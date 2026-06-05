@@ -126,7 +126,7 @@ export default function VisitPrepScreen() {
     // module doesn't crash in environments where it isn't installed.
     try {
       const FileSystem = require('expo-file-system/legacy');
-      // eslint-disable-next-line ts/no-require-imports
+
       const Sharing = require('expo-sharing');
       if (await Sharing.isAvailableAsync()) {
         const fileUri = `${FileSystem.cacheDirectory}visit-prep.pdf`;
@@ -149,7 +149,7 @@ export default function VisitPrepScreen() {
       'PDF Ready',
       `PDF generated successfully.\nBase64 length: ${pdfBase64.length} chars.\n\nSharing is not available on this device.`,
     );
-  }, [data, generate, pdfError]);
+  }, [data, generate, pdfError, isPro]);
 
   if (data.isLoading) {
     return (

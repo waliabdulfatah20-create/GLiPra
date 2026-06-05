@@ -33,7 +33,6 @@ type CheckInSymptomCardProps = {
   width: number;
 };
 
-const MIN_SCORE = 1;
 const MAX_SCORE = 5;
 
 /**

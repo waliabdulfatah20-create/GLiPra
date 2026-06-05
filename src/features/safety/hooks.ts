@@ -21,6 +21,10 @@ export function useRedFlagSnooze(): {
 } {
   const [snoozedUntil, setSnoozedUntil] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Point-in-time clock held in state so `isSnoozed` stays pure at render
+  // (Date.now() in render body trips react-hooks/purity). Refreshed by the
+  // timer below exactly when the snooze lapses.
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
     AsyncStorage.getItem(SNOOZE_KEY)
@@ -29,6 +33,19 @@ export function useRedFlagSnooze(): {
       .finally(() => setIsLoading(false));
   }, []);
 
+  // Schedule a single re-render at the snooze expiry so the card reappears on
+  // time. setNow runs inside a timeout (not synchronously in the effect), so it
+  // does not trigger cascading renders.
+  useEffect(() => {
+    if (snoozedUntil === null)
+      return;
+    const ms = snoozedUntil - Date.now();
+    if (ms <= 0)
+      return;
+    const timer = setTimeout(() => setNow(Date.now()), ms);
+    return () => clearTimeout(timer);
+  }, [snoozedUntil]);
+
   const snooze = useCallback(async () => {
     const until = Date.now() + SNOOZE_DURATION_MS;
     await AsyncStorage.setItem(SNOOZE_KEY, String(until));
@@ -36,7 +53,7 @@ export function useRedFlagSnooze(): {
   }, []);
 
   return {
-    isSnoozed: snoozedUntil !== null && Date.now() < snoozedUntil,
+    isSnoozed: snoozedUntil !== null && now < snoozedUntil,
     isLoading,
     snooze,
   };

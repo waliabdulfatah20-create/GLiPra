@@ -32,7 +32,6 @@ import { useTheme } from '@/lib/ThemeContext';
 
 function getPurchasesModule(): typeof import('react-native-purchases').default | null {
   try {
-    // eslint-disable-next-line ts/no-require-imports
     const mod = require('react-native-purchases');
     if (mod && mod.default && typeof mod.default.purchaseProduct === 'function') {
       return mod.default;
@@ -111,7 +110,7 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
       catch (e) {
         // PurchasesError with code PURCHASE_CANCELLED (2) is a user action —
         // do not show an error alert.
-        // eslint-disable-next-line ts/no-explicit-any
+
         const code = (e as any)?.code ?? (e as any)?.userInfo?.readableErrorCode;
         if (code !== 'PURCHASE_CANCELLED' && code !== 2) {
           Alert.alert(

@@ -92,25 +92,25 @@ describe('composeInsight — phase subline mapping', () => {
   it('injection_day → subline_injection_day', () => {
     const out = composeInsight({ ...BASE, phase: 'injection_day', daysSinceInjection: 0 });
     expect(out?.sublineKey).toBe('subline_injection_day');
-    expect(out?.sublineVars.n).toBe(0);
+    expect(out?.sublineVars.day).toBe(0);
   });
 
   it('peak_suppression → subline_peak_suppression with day count', () => {
     const out = composeInsight({ ...BASE, phase: 'peak_suppression', daysSinceInjection: 2 });
     expect(out?.sublineKey).toBe('subline_peak_suppression');
-    expect(out?.sublineVars.n).toBe(2);
+    expect(out?.sublineVars.day).toBe(2);
   });
 
   it('adjustment → subline_adjustment', () => {
     const out = composeInsight({ ...BASE, phase: 'adjustment', daysSinceInjection: 3 });
     expect(out?.sublineKey).toBe('subline_adjustment');
-    expect(out?.sublineVars.n).toBe(3);
+    expect(out?.sublineVars.day).toBe(3);
   });
 
   it('recovery_window → subline_recovery_window', () => {
     const out = composeInsight({ ...BASE, phase: 'recovery_window', daysSinceInjection: 6 });
     expect(out?.sublineKey).toBe('subline_recovery_window');
-    expect(out?.sublineVars.n).toBe(6);
+    expect(out?.sublineVars.day).toBe(6);
   });
 
   it('overdue → subline_overdue', () => {
@@ -120,11 +120,11 @@ describe('composeInsight — phase subline mapping', () => {
 
   it('null daysSinceInjection → n falls back to 0', () => {
     const out = composeInsight({ ...BASE, phase: 'peak_suppression', daysSinceInjection: null });
-    expect(out?.sublineVars.n).toBe(0);
+    expect(out?.sublineVars.day).toBe(0);
   });
 
   it('negative daysSinceInjection is clamped at 0', () => {
     const out = composeInsight({ ...BASE, phase: 'injection_day', daysSinceInjection: -1 });
-    expect(out?.sublineVars.n).toBe(0);
+    expect(out?.sublineVars.day).toBe(0);
   });
 });

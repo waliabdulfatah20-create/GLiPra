@@ -1,6 +1,7 @@
 // Supabase queries for the food_logs table.
 // Column names follow the snake_case convention of the database schema.
 
+import type { RecentFood } from './recent-foods';
 import type { BarcodeFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
 import { endOfDay as getEndOfDay, startOfDay as getStartOfDay } from 'date-fns';
 
@@ -149,6 +150,44 @@ export async function insertPhotoFoodLog(
 
   if (error) {
     throw new Error(`insertPhotoFoodLog failed: ${error.message}`);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// relogFoodEntry
+// One-tap "log again" from the Recent Foods quick-add row. Inserts a fresh
+// food_logs row copying the food's last-confirmed macros/micros, stamped at
+// `now` (the user is eating it again now). Source provenance is preserved so
+// analytics + the today list reflect where the food originally came from.
+// Free, no AI — this is the cost/accuracy win of the cascade.
+// ---------------------------------------------------------------------------
+export async function relogFoodEntry(
+  userId: string,
+  item: RecentFood,
+): Promise<void> {
+  const now = new Date().toISOString();
+
+  const { error } = await supabase.from('food_logs').insert({
+    user_id: userId,
+    logged_at: now,
+    name: item.name,
+    serving_description: item.servingDescription,
+    protein_g: item.proteinG,
+    carbs_g: item.carbsG,
+    fat_g: item.fatG,
+    fiber_g: item.fiberG,
+    calories_kcal: item.caloriesKcal,
+    b12_mcg: item.b12Mcg,
+    vitamin_d_iu: item.vitaminDIu,
+    magnesium_mg: item.magnesiumMg,
+    zinc_mg: item.zincMg,
+    barcode_ean: item.barcodeEan,
+    source: item.source,
+    created_at: now,
+  });
+
+  if (error) {
+    throw new Error(`relogFoodEntry failed: ${error.message}`);
   }
 }
 

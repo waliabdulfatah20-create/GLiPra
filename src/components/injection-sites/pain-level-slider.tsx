@@ -133,7 +133,7 @@ export function PainLevelSlider({ value, onChange }: PainLevelSliderProps) {
         <GestureDetector gesture={composed}>
           <View
             style={styles.trackHit}
-            onLayout={(e) => setTrackW(e.nativeEvent.layout.width)}
+            onLayout={e => setTrackW(e.nativeEvent.layout.width)}
             accessibilityRole="adjustable"
             accessibilityLabel="Pain level"
             accessibilityValue={{ min: 0, max: MAX, now: value }}
@@ -142,15 +142,17 @@ export function PainLevelSlider({ value, onChange }: PainLevelSliderProps) {
               { name: 'decrement', label: 'Decrease pain level' },
             ]}
             onAccessibilityAction={(event) => {
-              if (event.nativeEvent.actionName === 'increment') bump(1);
-              if (event.nativeEvent.actionName === 'decrement') bump(-1);
+              if (event.nativeEvent.actionName === 'increment')
+                bump(1);
+              if (event.nativeEvent.actionName === 'decrement')
+                bump(-1);
             }}
           >
             <View style={styles.track}>
               <Animated.View style={[styles.fill, fillStyle]} />
             </View>
             <View style={styles.ticksRow} pointerEvents="none">
-              {TICKS.map((t) => (
+              {TICKS.map(t => (
                 <View key={t} style={styles.tick} />
               ))}
             </View>

@@ -36,8 +36,10 @@ export const MOCK_MEAL_RECOGNITION = {
   magnesium_mg: 58,
   zinc_mg: 1.1,
   confidence: 0.87,
-  /** Numeric percent equivalent — same value as `confidence * 100`, kept
-   *  explicit so the adapter doesn't have to know the 0-1 → 0-100 conversion. */
+  /**
+   * Numeric percent equivalent — same value as `confidence * 100`, kept
+   *  explicit so the adapter doesn't have to know the 0-1 → 0-100 conversion.
+   */
   confidence_percent: 87,
 } as const;
 

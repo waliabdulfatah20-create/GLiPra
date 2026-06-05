@@ -33,6 +33,9 @@ export function useShotDayPrep(injectionDate: string) {
   useEffect(() => {
     if (!isLoading && initializedForDate.current !== injectionDate) {
       const items = log?.completedItems ?? [];
+      // One-time init of optimistic local state from async server data; ref-guarded
+      // to run exactly once per injectionDate, so it cannot cascade.
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- guarded one-time init, see comment above
       setLocalCompleted(items);
       committedItems.current = items;
       initializedForDate.current = injectionDate;

@@ -2,26 +2,33 @@
 
 import type { BarcodeProduct } from './barcode-lookup';
 import type { RecognitionResult } from './photo-recognition';
+import type { RecentFood } from './recent-foods';
 import type { BarcodeFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
+import { format, subDays } from 'date-fns';
 
 import { useCallback, useState } from 'react';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { analytics, EVENTS } from '@/lib/analytics';
 import {
+  fetchFoodLogsInRange,
   fetchTodayFoodLogs,
   getFoodDefault,
   getRecentCorrections,
   insertBarcodeFoodLog,
   insertFoodLog,
   insertPhotoFoodLog,
+  relogFoodEntry,
   saveFoodCorrection,
   upsertFoodDefault,
 } from './api';
 import { fetchBarcodeCorrection, saveBarcodeCorrection } from './barcode-corrections';
 import { usePhotoFoodRecognition } from './photo-recognition';
+import { deriveRecentFoods } from './recent-foods';
+
+// Days of history scanned to build the Recent Foods quick-add list.
+const RECENT_FOODS_WINDOW_DAYS = 30;
 
 // ---------------------------------------------------------------------------
 // Query key factory
@@ -31,6 +38,8 @@ const foodLogKeys = {
     ['food-logs', 'today', userId, today] as const,
   foodDefault: (userId: string, foodNameKey: string) =>
     ['food-defaults', userId, foodNameKey] as const,
+  recent: (userId: string) =>
+    ['food-logs', 'recent', userId] as const,
 };
 
 // ---------------------------------------------------------------------------
@@ -61,6 +70,77 @@ export function useTodayFoodLogs(): {
 }
 
 // ---------------------------------------------------------------------------
+// useRecentFoods
+// Builds the one-tap quick-add list from a 30-day history window. Free, no AI.
+// Dedupes + ranks via deriveRecentFoods (frequency desc, recency tiebreak).
+// ---------------------------------------------------------------------------
+export function useRecentFoods(): {
+  items: RecentFood[];
+  isLoading: boolean;
+} {
+  const session = useAuthStore.use.session();
+  const userId = session?.user.id;
+  const today = new Date();
+  const endDate = format(today, 'yyyy-MM-dd');
+  const startDate = format(subDays(today, RECENT_FOODS_WINDOW_DAYS), 'yyyy-MM-dd');
+
+  const { data, isLoading } = useQuery({
+    queryKey: foodLogKeys.recent(userId ?? ''),
+    queryFn: async () => {
+      const logs = await fetchFoodLogsInRange(userId!, startDate, endDate);
+      return deriveRecentFoods(logs);
+    },
+    enabled: !!userId,
+    staleTime: 60 * 1000, // 1 minute — refreshed on any food-log mutation anyway
+  });
+
+  return {
+    items: data ?? [],
+    isLoading,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// useRelogFoodEntry
+// One-tap re-log of a Recent Food. Inserts a fresh row at `now`, preserving the
+// food's macros + source. Invalidates today's logs AND the recent list.
+// Always free — no paywall, no AI.
+// ---------------------------------------------------------------------------
+export function useRelogFoodEntry(): {
+  mutate: (item: RecentFood) => void;
+  isLoading: boolean;
+} {
+  const queryClient = useQueryClient();
+  const session = useAuthStore.use.session();
+  const userId = session?.user.id;
+  const today = format(new Date(), 'yyyy-MM-dd');
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (item: RecentFood) => {
+      if (!userId)
+        throw new Error('Not authenticated');
+      return relogFoodEntry(userId, item);
+    },
+    onSuccess: () => {
+      analytics.capture(EVENTS.FOOD_LOGGED_RELOG, { source: 'relog' });
+      if (userId) {
+        queryClient.invalidateQueries({
+          queryKey: foodLogKeys.todayLogs(userId, today),
+        });
+        queryClient.invalidateQueries({
+          queryKey: foodLogKeys.recent(userId),
+        });
+      }
+    },
+  });
+
+  return {
+    mutate,
+    isLoading: isPending,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // useInsertFoodLog
 // Inserts a food log entry and invalidates today's query on success.
 // ---------------------------------------------------------------------------
@@ -84,6 +164,11 @@ export function useInsertFoodLog(): {
       if (userId) {
         queryClient.invalidateQueries({
           queryKey: foodLogKeys.todayLogs(userId, today),
+        });
+        // Keep Recent Foods fresh so a just-logged food bubbles into the
+        // quick-add row without waiting for staleTime.
+        queryClient.invalidateQueries({
+          queryKey: foodLogKeys.recent(userId),
         });
       }
     },
@@ -120,6 +205,11 @@ export function useInsertBarcodeFoodLog(): {
       if (userId) {
         queryClient.invalidateQueries({
           queryKey: foodLogKeys.todayLogs(userId, today),
+        });
+        // Keep Recent Foods fresh so a just-logged food bubbles into the
+        // quick-add row without waiting for staleTime.
+        queryClient.invalidateQueries({
+          queryKey: foodLogKeys.recent(userId),
         });
       }
     },
@@ -239,6 +329,11 @@ export function useConfirmPhotoLog(): {
       if (userId) {
         queryClient.invalidateQueries({
           queryKey: foodLogKeys.todayLogs(userId, today),
+        });
+        // Keep Recent Foods fresh so a just-logged food bubbles into the
+        // quick-add row without waiting for staleTime.
+        queryClient.invalidateQueries({
+          queryKey: foodLogKeys.recent(userId),
         });
       }
     },

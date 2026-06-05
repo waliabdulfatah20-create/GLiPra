@@ -37,7 +37,9 @@ export default function JourneyScreen() {
   const useTwoColumns = width >= 600;
 
   const { entries, unlockedIds, isLoading } = useJourneyCards();
-  const now = Date.now();
+  // Stable per-mount timestamp (Date.now() in render body is impure — react-hooks/purity).
+  // Only used for the 24h "new" badge, so a fixed-at-mount value is correct.
+  const [now] = React.useState(() => Date.now());
 
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(

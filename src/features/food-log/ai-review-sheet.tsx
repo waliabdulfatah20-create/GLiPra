@@ -9,7 +9,7 @@
 //     so repeat scans of the same food pre-fill with the saved values.
 
 import type { RecognitionResult } from './photo-recognition';
-import { bucketToPercent } from './photo-recognition';
+import type { MacroBase, PortionMultiplier as PortionMultiplierValue } from './portion-multiplier-helpers';
 import type { PhotoFoodEntry } from './types';
 import type { GlipraTokens } from '@/theme/tokens';
 
@@ -29,11 +29,11 @@ import {
 } from 'react-native';
 import { useTheme } from '@/lib/ThemeContext';
 import { useConfirmPhotoLog, useUserFoodDefault } from './hooks';
+import { bucketToPercent } from './photo-recognition';
 import { PortionMultiplier } from './portion-multiplier';
 import {
   deriveFieldBase,
-  type MacroBase,
-  type PortionMultiplier as PortionMultiplierValue,
+
   scaleMacros,
 } from './portion-multiplier-helpers';
 import { ProInsightCard } from './pro-insight-card';
@@ -414,7 +414,7 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
               </>
             )}
 
-            <ProInsightCard mealProteinG={parseFloat(form.proteinG) || 0} />
+            <ProInsightCard mealProteinG={Number.parseFloat(form.proteinG) || 0} />
 
             <View style={styles.buttonRow}>
               <Pressable

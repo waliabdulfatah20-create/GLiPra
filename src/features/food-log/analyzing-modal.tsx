@@ -13,11 +13,12 @@
  * brand-purple, cream pills inside the gradient, no em dashes anywhere.
  */
 
+import type { AnalyzingSource, StageKey } from './analyzing-stages';
 import type { GlipraTokens } from '@/theme/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 
+import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   Image,
@@ -36,9 +37,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { haptics } from '@/lib/haptics';
-import { useTheme } from '@/lib/ThemeContext';
 
-import { type AnalyzingSource, type StageKey } from './analyzing-stages';
+import { useTheme } from '@/lib/ThemeContext';
 import { useAnalyzingStages } from './use-analyzing-stages';
 
 export type AnalyzingModalProps = {
@@ -191,8 +191,8 @@ export function AnalyzingModal({
             <Text style={styles.srOnly}>
               {activeIndex >= 0 && activeIndex < stages.length
                 ? `${t(`analyzing.stage.${stages[activeIndex]}`)}, ${
-                    error ? t('analyzing.a11y_failed') : t('analyzing.a11y_in_progress')
-                  }`
+                  error ? t('analyzing.a11y_failed') : t('analyzing.a11y_in_progress')
+                }`
                 : ''}
             </Text>
           </View>

@@ -60,7 +60,6 @@ const IS_DEV_FORCE_PRO = process.env.EXPO_PUBLIC_APP_ENV === 'development';
 
 function getPurchasesModule(): typeof import('react-native-purchases').default | null {
   try {
-    // eslint-disable-next-line ts/no-require-imports
     const mod = require('react-native-purchases');
     // Basic shape-check: Purchases object must exist
     if (mod && mod.default && typeof mod.default.getCustomerInfo === 'function') {
@@ -89,7 +88,7 @@ function tierFromEntitlements(
   // contains 'lifetime' so we use that as a marker.
   // Note: entitlements[id].latestPurchaseDate alone is not enough —
   // we check the latestPurchasedProductIdentifier when available.
-  // eslint-disable-next-line ts/no-explicit-any
+
   const raw = proEntitlement as any;
   const productId: string
     = raw.latestPurchasedProductIdentifier

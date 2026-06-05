@@ -134,7 +134,6 @@ const SAMPLE_NUTRIENTS: NutrientConfig[] = [
 
 function openPaywall() {
   try {
-    // eslint-disable-next-line ts/no-require-imports
     const { RevenueCatUI } = require('react-native-purchases-ui');
     RevenueCatUI.presentPaywallIfNeeded({
       requiredEntitlementIdentifier: 'GLiPra Pro',

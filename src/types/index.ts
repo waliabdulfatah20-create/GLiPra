@@ -11,9 +11,15 @@ export type GLP1MedicationId
     | 'liraglutide_saxenda'
     | 'liraglutide_victoza'
     | 'dulaglutide_trulicity'
+    | 'semaglutide_rybelsus' // oral semaglutide (Rybelsus / oral Wegovy), taken daily
+    | 'orforglipron' // oral GLP-1 (Lilly), once daily — future-proofing
     | 'compounded_semaglutide'
     | 'compounded_tirzepatide'
     | 'compounded_glp1_gip';
+
+// How the medication is administered. Drives the Today hero, onboarding,
+// notifications, and which logging surfaces are shown.
+export type AdministrationRoute = 'injection' | 'oral';
 
 // Injection cycle phases — derived from days since last injection in calculator.ts
 export type InjectionPhase
@@ -22,6 +28,16 @@ export type InjectionPhase
     | 'adjustment' // 3–4 days
     | 'recovery_window' // 5–7 days
     | 'overdue'; // 8+ days
+
+// Oral daily-dosing phases — the route-aware analog of InjectionPhase for oral
+// GLP-1s. Daily dosing reaches steady state instead of a weekly peak/trough,
+// so the model is titration position + daily adherence, not a peak cycle.
+// Derived in features/oral-cycle/calculator.ts.
+export type OralPhase
+  = | 'building' // within the titration ramp, levels still climbing to steady state
+    | 'steady_state' // past the ramp, dosing consistently
+    | 'dose_due' // today's dose not logged yet
+    | 'dose_missed'; // a recent dose was skipped — daily analog of "overdue"
 
 // Subscription tiers — gated via RevenueCat entitlement 'dosepath_pro'
 export type SubscriptionTier = 'free' | 'pro' | 'founder_lifetime';

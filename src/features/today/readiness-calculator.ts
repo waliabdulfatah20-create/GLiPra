@@ -1,7 +1,10 @@
-import type { InjectionPhase } from '@/types';
+import type { InjectionPhase, OralPhase } from '@/types';
 
 export type ReadinessInput = {
-  injectionPhase: InjectionPhase;
+  /** Injectable route: the weekly injection cycle phase. */
+  injectionPhase?: InjectionPhase;
+  /** Oral route: the daily-dosing phase (steady-state + adherence). */
+  doseStatus?: OralPhase;
   proteinProgress: number; // 0–1 (consumed / floor)
   hourOfDay: number; // 0–23
   nausea?: number; // 1–5
@@ -13,6 +16,7 @@ export type ReadinessInput = {
 
 export type FactorId
   = | 'injection_phase'
+    | 'dose_status'
     | 'protein_pace'
     | 'prev_day_protein'
     | 'nausea'
@@ -45,6 +49,22 @@ export function calculateReadinessScore(input: ReadinessInput): ReadinessResult 
     factors.push({ id: 'injection_phase', delta: 5 });
   }
   // adjustment and overdue: delta = 0, no factor pushed
+  // Oral dose-status adjustments — route-aware analog of injection phase.
+  // Magnitudes are gentler than injection (±15) because steady-state oral
+  // dosing has far less day-to-day variation than a weekly peak/trough.
+  else if (input.doseStatus === 'steady_state') {
+    score += 5;
+    factors.push({ id: 'dose_status', delta: 5 });
+  }
+  else if (input.doseStatus === 'building') {
+    score -= 5;
+    factors.push({ id: 'dose_status', delta: -5 });
+  }
+  else if (input.doseStatus === 'dose_missed') {
+    score -= 5;
+    factors.push({ id: 'dose_status', delta: -5 });
+  }
+  // dose_due: delta = 0, no factor pushed
 
   // Nausea modifier
   if (input.nausea !== undefined) {

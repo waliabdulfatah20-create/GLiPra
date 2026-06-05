@@ -91,7 +91,9 @@ export function TodayScreen() {
   const {
     isLoading,
     profile,
+    administrationRoute,
     injectionCycle,
+    oralCycle,
     proteinFloorG,
     proteinConsumedG,
     readinessCard,
@@ -101,6 +103,8 @@ export function TodayScreen() {
     redFlagDetection,
     guidanceContext,
   } = useTodayData();
+
+  const isOral = administrationRoute === 'oral';
 
   const { checkIn } = useTodayCheckIn();
   const hasCheckedInToday = checkIn !== null;
@@ -420,33 +424,42 @@ export function TodayScreen() {
               : (
                   <View style={[styles.phaseCard, { borderTopColor: phaseAccentColor }]}>
                     <Text style={styles.cardLabel}>{t('today.injection_label')}</Text>
-                    {injectionCycle
+                    {isOral && oralCycle
                       ? (
-                          <>
-                            <PhaseBadge
-                              phase={injectionCycle.phase}
-                              daysSinceInjection={injectionCycle.daysSinceInjection}
-                            />
-                            {injectionCycle.daysUntilNextInjection !== null && (
-                              <Text style={styles.nextInjection}>
-                                {t('today.next_injection')}
-                                {'\n'}
-                                <Text style={styles.nextInjectionDays}>
-                                  {injectionCycle.daysUntilNextInjection}
-                                  d
-                                </Text>
-                              </Text>
-                            )}
-                            {injectionCycle.isOverdue && (
-                              <Text style={styles.overdueText}>{t('today.injection_overdue_inline')}</Text>
-                            )}
-                          </>
+                          <PhaseBadge
+                            route="oral"
+                            phase={oralCycle.phase}
+                            daysOnMed={oralCycle.daysOnMed}
+                          />
                         )
-                      : (
-                          <Text style={styles.noDataText}>
-                            {t('today.no_injection_data')}
-                          </Text>
-                        )}
+                      : injectionCycle
+                        ? (
+                            <>
+                              <PhaseBadge
+                                route="injection"
+                                phase={injectionCycle.phase}
+                                daysSinceInjection={injectionCycle.daysSinceInjection}
+                              />
+                              {injectionCycle.daysUntilNextInjection !== null && (
+                                <Text style={styles.nextInjection}>
+                                  {t('today.next_injection')}
+                                  {'\n'}
+                                  <Text style={styles.nextInjectionDays}>
+                                    {injectionCycle.daysUntilNextInjection}
+                                    d
+                                  </Text>
+                                </Text>
+                              )}
+                              {injectionCycle.isOverdue && (
+                                <Text style={styles.overdueText}>{t('today.injection_overdue_inline')}</Text>
+                              )}
+                            </>
+                          )
+                        : (
+                            <Text style={styles.noDataText}>
+                              {t('today.no_injection_data')}
+                            </Text>
+                          )}
                   </View>
                 )}
           </View>

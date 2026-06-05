@@ -75,6 +75,86 @@ describe('calculateReadinessScore — injection phase adjustments', () => {
   });
 });
 
+describe('calculateReadinessScore — oral dose-status adjustments', () => {
+  it('steady_state adds 5', () => {
+    const { score } = calculateReadinessScore({ ...base, doseStatus: 'steady_state' });
+    expect(score).toBe(75);
+  });
+
+  it('building subtracts 5', () => {
+    const { score } = calculateReadinessScore({ ...base, doseStatus: 'building' });
+    expect(score).toBe(65);
+  });
+
+  it('dose_missed subtracts 5', () => {
+    const { score } = calculateReadinessScore({ ...base, doseStatus: 'dose_missed' });
+    expect(score).toBe(65);
+  });
+
+  it('dose_due applies no adjustment', () => {
+    const { score } = calculateReadinessScore({ ...base, doseStatus: 'dose_due' });
+    expect(score).toBe(70);
+  });
+
+  it('steady_state pushes dose_status factor with delta 5', () => {
+    const { factors } = calculateReadinessScore({ ...base, doseStatus: 'steady_state' });
+    const f = getFactor(factors, 'dose_status');
+    expect(f).toBeDefined();
+    expect(f?.delta).toBe(5);
+  });
+
+  it('building pushes dose_status factor with delta -5', () => {
+    const { factors } = calculateReadinessScore({ ...base, doseStatus: 'building' });
+    const f = getFactor(factors, 'dose_status');
+    expect(f).toBeDefined();
+    expect(f?.delta).toBe(-5);
+  });
+
+  it('dose_missed pushes dose_status factor with delta -5', () => {
+    const { factors } = calculateReadinessScore({ ...base, doseStatus: 'dose_missed' });
+    const f = getFactor(factors, 'dose_status');
+    expect(f).toBeDefined();
+    expect(f?.delta).toBe(-5);
+  });
+
+  it('dose_due does NOT push a dose_status factor', () => {
+    const { factors } = calculateReadinessScore({ ...base, doseStatus: 'dose_due' });
+    expect(hasFactor(factors, 'dose_status')).toBe(false);
+  });
+
+  it('oral dose-status composes with the shared factors (nausea, streak)', () => {
+    // steady_state(+5) + nausea=3(-10) + streak(+5) = 70
+    const { score, factors } = calculateReadinessScore({
+      ...base,
+      doseStatus: 'steady_state',
+      nausea: 3,
+      streakActive: true,
+    });
+    expect(score).toBe(70);
+    expect(factors).toContainEqual({ id: 'dose_status', delta: 5 });
+    expect(factors).toContainEqual({ id: 'nausea', delta: -10 });
+    expect(factors).toContainEqual({ id: 'streak', delta: 5 });
+  });
+
+  it('injectionPhase takes precedence when both are provided', () => {
+    // injection_day(+5) wins; dose_status is ignored
+    const { factors } = calculateReadinessScore({
+      ...base,
+      injectionPhase: 'injection_day',
+      doseStatus: 'building',
+    });
+    expect(hasFactor(factors, 'injection_phase')).toBe(true);
+    expect(hasFactor(factors, 'dose_status')).toBe(false);
+  });
+
+  it('no phase and no dose-status pushes neither factor', () => {
+    const { score, factors } = calculateReadinessScore({ ...base });
+    expect(score).toBe(70);
+    expect(hasFactor(factors, 'injection_phase')).toBe(false);
+    expect(hasFactor(factors, 'dose_status')).toBe(false);
+  });
+});
+
 describe('calculateReadinessScore — protein progress penalty', () => {
   it('no penalty when progress matches expected pace', () => {
     // hour=9, expected=0.5, progress=0.5 → diff=0 → no penalty

@@ -9,6 +9,7 @@ import { useCheckInHistory, useTodayCheckIn } from '@/features/check-in/hooks';
 import { fetchFoodLogsInRange } from '@/features/food-log/api';
 import { useDailyMacros } from '@/features/food-log/hooks';
 import { calculateInjectionPhase } from '@/features/injection-cycle/calculator';
+import { calculateOralPhase } from '@/features/oral-cycle/calculator';
 import { detectRedFlags } from '@/features/safety/redFlagDetector';
 import { useStreak } from '@/features/streaks/hooks';
 import { fetchTodayProfile } from '@/features/today/api';
@@ -55,10 +56,24 @@ export function useTodayData() {
   const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
   const hourOfDay = new Date().getHours();
 
+  const isOral = profile?.administrationRoute === 'oral';
+
   const injectionCycle
-    = profile?.lastInjectionDate
+    = !isOral && profile?.lastInjectionDate
       ? calculateInjectionPhase({
           lastInjectionDate: profile.lastInjectionDate,
+          today,
+        })
+      : null;
+
+  // Oral users get a daily-dosing phase instead of a weekly injection cycle.
+  // lastDoseDate from oral_dose_logs is not yet fetched here (Phase 2), so we
+  // pass null — the calculator defaults to dose_due (gentle reminder state).
+  const oralCycle
+    = isOral
+      ? calculateOralPhase({
+          startDate: profile?.medicationStartDate ?? null,
+          lastDoseDate: null, // wired in Phase 2 when oral_dose_logs hook exists
           today,
         })
       : null;
@@ -79,6 +94,8 @@ export function useTodayData() {
       }
     : null;
 
+  const administrationRoute = profile?.administrationRoute ?? 'injection';
+
   const prevDayProteinRatio
     = proteinFloorG > 0 ? yesterdayProteinG / proteinFloorG : undefined;
 
@@ -88,10 +105,14 @@ export function useTodayData() {
 
   const newDoseWeek = profile?.medicationStatus === 'starting';
 
+  // Readiness score: one engine, route-aware factor.
+  // Injectable supplies injectionPhase; oral supplies doseStatus.
+  // Re-gated on profile presence (not injectionCycle) so oral users always get a card.
   const readinessResult
-    = injectionCycle
+    = profile
       ? calculateReadinessScore({
-          injectionPhase: injectionCycle.phase,
+          injectionPhase: injectionCycle?.phase,
+          doseStatus: oralCycle?.phase,
           proteinProgress,
           hourOfDay,
           nausea: checkIn?.nausea,
@@ -102,9 +123,16 @@ export function useTodayData() {
         })
       : null;
 
+  // buildReadinessCard accepts an optional injectionPhase and an optional oralPhase.
+  // Pass whichever applies so the banner headline + tip keys are route-correct.
   const readinessCard
-    = readinessResult && injectionCycle
-      ? buildReadinessCard(readinessResult, injectionCycle.phase, t)
+    = readinessResult
+      ? buildReadinessCard(
+          readinessResult,
+          injectionCycle?.phase ?? null,
+          oralCycle?.phase ?? null,
+          t,
+        )
       : null;
 
   // Run red-flag detection on check-in history
@@ -120,7 +148,9 @@ export function useTodayData() {
     isLoading,
     error,
     profile,
+    administrationRoute,
     injectionCycle,
+    oralCycle,
     proteinFloorG,
     proteinConsumedG,
     proteinProgress,

@@ -12,13 +12,18 @@ import {
   TrendingUp as ProgressIcon,
   Syringe as SyringeIcon,
 } from '@/components/ui/icons';
+import { useTodayProfile } from '@/features/today/hooks';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 
 // ─── Tab configuration ────────────────────────────────────────────────────────
 
-const VISIBLE_TAB_NAMES = ['index', 'injection-sites', 'log', 'progress', 'coach'] as const;
-type VisibleTabName = typeof VISIBLE_TAB_NAMES[number];
+// All possible visible tab names. The injection-sites tab is hidden for oral
+// users — this list is filtered at render time based on administration_route.
+const ALL_VISIBLE_TAB_NAMES = ['index', 'injection-sites', 'log', 'progress', 'coach'] as const;
+const ORAL_VISIBLE_TAB_NAMES = ['index', 'log', 'progress', 'coach'] as const;
+
+type VisibleTabName = typeof ALL_VISIBLE_TAB_NAMES[number];
 
 type TabConfig = {
   labelKey: string;
@@ -39,9 +44,14 @@ const TAB_CONFIG: Record<VisibleTabName, TabConfig> = {
 export function GlipraTabBar({ state, navigation, insets }: BottomTabBarProps) {
   const { t } = useTranslation();
   const { colors, spacing, gradients } = useTheme();
+  const { data: profile } = useTodayProfile();
+  const isOral = profile?.administrationRoute === 'oral';
+
+  // Oral users do not have injection-sites — hide that tab entirely.
+  const visibleTabNames: readonly string[] = isOral ? ORAL_VISIBLE_TAB_NAMES : ALL_VISIBLE_TAB_NAMES;
 
   const visibleRoutes = state.routes.filter(
-    r => VISIBLE_TAB_NAMES.includes(r.name as VisibleTabName),
+    r => visibleTabNames.includes(r.name),
   );
 
   return (

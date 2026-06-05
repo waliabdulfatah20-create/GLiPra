@@ -1,5 +1,5 @@
 import type { FactorDelta, ReadinessResult } from './readiness-calculator';
-import type { InjectionPhase } from '@/types';
+import type { InjectionPhase, OralPhase } from '@/types';
 
 export type DisplayFactor = {
   label: string;
@@ -17,11 +17,15 @@ export type ReadinessCard = {
 // t is the i18next translate function — typed as (key: string) => string
 export function buildReadinessCard(
   result: ReadinessResult,
-  injectionPhase: InjectionPhase,
+  injectionPhase: InjectionPhase | null,
+  oralPhase: OralPhase | null,
   t: (key: string) => string,
 ): ReadinessCard {
-  // 1. Headline — one per phase
-  const headline = t(`readiness.headlines.${injectionPhase}`);
+  // 1. Headline — route-aware: injection phase or oral phase
+  const headlineKey = injectionPhase
+    ? `readiness.headlines.${injectionPhase}`
+    : `readiness.headlines.oral_${oralPhase ?? 'dose_due'}`;
+  const headline = t(headlineKey);
 
   // 2. Map FactorDelta to DisplayFactor
   const mapped: DisplayFactor[] = result.factors.map(factor => ({
@@ -75,12 +79,16 @@ export function buildReadinessCard(
 
   let tip: string;
   if (tipFactor === null) {
-    // No negative factors — fallback to injection_phase tip using current phase
-    tip = t(`readiness.tips.injection_phase_${injectionPhase}`);
+    // No negative factors — positive / neutral state. Route-aware fallback tip.
+    tip = injectionPhase
+      ? t(`readiness.tips.injection_phase_${injectionPhase}`)
+      : t(`readiness.tips.oral_${oralPhase ?? 'dose_due'}`);
   }
   else if (tipFactor.id === 'injection_phase') {
-    // injection_phase tip key includes the current phase
     tip = t(`readiness.tips.injection_phase_${injectionPhase}`);
+  }
+  else if (tipFactor.id === 'dose_status') {
+    tip = t(`readiness.tips.oral_${oralPhase ?? 'dose_due'}`);
   }
   else {
     // All other factors use their id directly

@@ -31,6 +31,8 @@ const MEDICATION_DISPLAY_NAMES: Record<GLP1MedicationId, string> = {
   liraglutide_saxenda: 'Saxenda',
   liraglutide_victoza: 'Victoza',
   dulaglutide_trulicity: 'Trulicity',
+  semaglutide_rybelsus: 'Rybelsus',
+  orforglipron: 'Orforglipron',
   compounded_semaglutide: 'Compounded Semaglutide',
   compounded_tirzepatide: 'Compounded Tirzepatide',
   compounded_glp1_gip: 'Compounded GLP-1/GIP',
@@ -238,6 +240,7 @@ export default function MedicationLevelScreen() {
               <View style={styles.phaseCard}>
                 <Text style={styles.phaseLabel}>CURRENT PHASE</Text>
                 <PhaseBadge
+                  route="injection"
                   phase={injectionCycle.phase}
                   daysSinceInjection={injectionCycle.daysSinceInjection}
                 />

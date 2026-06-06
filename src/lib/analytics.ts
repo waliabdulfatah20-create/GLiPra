@@ -35,6 +35,9 @@ export const EVENTS = {
   // Injection logging
   INJECTION_LOGGED: 'injection_logged',
 
+  // Oral dose logging (Rybelsus / oral GLP-1)
+  ORAL_DOSE_LOGGED: 'oral_dose_logged',
+
   // AI Coach
   COACH_MESSAGE_SENT: 'coach_message_sent',
   COACH_MESSAGE_BLOCKED: 'coach_message_blocked', // keyword blocklist triggered

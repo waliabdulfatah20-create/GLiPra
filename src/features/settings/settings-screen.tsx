@@ -88,7 +88,7 @@ export function SettingsScreen() {
   const { t } = useTranslation();
   const { data: profile } = useTodayProfile();
   const { unit: weightUnit } = useWeightUnit();
-  const { injectionEnabled, proteinEnabled, toggle } = useNotificationSettings();
+  const { injectionEnabled, proteinEnabled, oralDoseEnabled, isOral, toggle } = useNotificationSettings();
   const { colors, spacing, radius } = useTheme();
   const { selectedTheme, setSelectedTheme } = useThemeSelector();
   const styles = React.useMemo(
@@ -200,12 +200,23 @@ export function SettingsScreen() {
 
         {/* ── Notifications ─────────────────────────────────────────── */}
         <SettingsSection title={t('settings.notifications')}>
-          <NotificationRow
-            label={t('settings.notif_injection')}
-            subtitle={t('settings.notif_injection_subtitle')}
-            value={injectionEnabled}
-            onToggle={() => void toggle('injection-reminder')}
-          />
+          {isOral
+            ? (
+                <NotificationRow
+                  label={t('settings.notif_oral_dose')}
+                  subtitle={t('settings.notif_oral_dose_subtitle')}
+                  value={oralDoseEnabled}
+                  onToggle={() => void toggle('oral-dose-reminder')}
+                />
+              )
+            : (
+                <NotificationRow
+                  label={t('settings.notif_injection')}
+                  subtitle={t('settings.notif_injection_subtitle')}
+                  value={injectionEnabled}
+                  onToggle={() => void toggle('injection-reminder')}
+                />
+              )}
           <NotificationRow
             label={t('settings.notif_protein')}
             subtitle={t('settings.notif_protein_subtitle')}

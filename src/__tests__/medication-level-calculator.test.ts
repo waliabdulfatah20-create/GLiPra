@@ -116,6 +116,33 @@ describe('generateSteadyStateCurve', () => {
     expect(today!.levelMg).toBeGreaterThan(0);
   });
 
+  it('models the oral daily curve (normalized dose) accumulating to steady state', () => {
+    // Mirrors the oral PK curve: daily dosing of oral semaglutide (Rybelsus, t½ 7d)
+    // with a normalized unit dose and real logged dates. Steady state from ~14 days
+    // of daily dosing should sit well above a single dose, and today must be positive.
+    const TODAY_ORAL = '2026-06-06';
+    const dailyDates: string[] = [];
+    for (let i = 0; i <= 14; i++) {
+      const d = new Date(Date.UTC(2026, 4, 23) + i * 86400000);
+      dailyDates.push(d.toISOString().slice(0, 10));
+    }
+    const lastDate = dailyDates[dailyDates.length - 1];
+    const curve = generateSteadyStateCurve(
+      1, // NORMALIZED_ORAL_DOSE
+      'semaglutide_rybelsus',
+      lastDate,
+      1, // daily
+      TODAY_ORAL,
+      14,
+      undefined,
+      dailyDates,
+    );
+    const today = curve.find(p => p.dayOffset === 0);
+    expect(today).toBeDefined();
+    expect(today!.levelMg).toBeGreaterThan(1); // accumulated above a single unit dose
+    expect(curve.every(p => p.levelMg >= 0)).toBe(true);
+  });
+
   it('all dates are YYYY-MM-DD', () => {
     const curve = generateSteadyStateCurve(1.0, 'semaglutide_ozempic', LAST_INJ, 7, TODAY);
     for (const p of curve) {

@@ -589,11 +589,12 @@ export function TodayScreen() {
             <Text style={styles.rowChevron}>›</Text>
           </TouchableOpacity>
 
-          {/* Medication Level — injectable only (PK banner reads injection_logs);
-              hidden for oral users and when discontinued. */}
-          {!isOral && profile?.medicationStatus !== 'discontinued' && (
+          {/* Medication Level — route-aware PK curve. Hidden only when discontinued. */}
+          {profile?.medicationStatus !== 'discontinued' && (
             <View style={styles.bannerWrapper}>
-              <MedLevelBanner phase={injectionCycle?.phase ?? null} />
+              {isOral
+                ? <MedLevelBanner route="oral" phase={oralCycle?.phase ?? null} />
+                : <MedLevelBanner route="injection" phase={injectionCycle?.phase ?? null} />}
             </View>
           )}
 

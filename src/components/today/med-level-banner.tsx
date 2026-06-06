@@ -1,5 +1,5 @@
 import type { GlipraTokens } from '@/theme/tokens';
-import type { InjectionPhase } from '@/types';
+import type { InjectionPhase, OralPhase } from '@/types';
 import { router } from 'expo-router';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,12 +15,13 @@ const BRAND = '#5b21b6';
 const MED_BLUE = '#60a5fa';
 const MED_BLUE_BG = 'rgba(37,99,235,0.12)';
 
-type MedLevelBannerProps = {
-  /** Current injection cycle phase — from useTodayData() */
-  phase: InjectionPhase | null;
-};
+// Route-aware: injection users key off InjectionPhase + med_banner.*; oral users
+// off OralPhase + med_banner_oral.*. The curve hook is itself route-aware.
+type MedLevelBannerProps
+  = | { route: 'injection'; phase: InjectionPhase | null }
+    | { route: 'oral'; phase: OralPhase | null };
 
-export function MedLevelBanner({ phase }: MedLevelBannerProps) {
+export function MedLevelBanner({ route, phase }: MedLevelBannerProps) {
   const { t } = useTranslation();
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
@@ -29,11 +30,17 @@ export function MedLevelBanner({ phase }: MedLevelBannerProps) {
   );
   const { curve, isLoading } = useMedicationLevelCurve();
 
+  const isOral = route === 'oral';
+  const namespace = isOral ? 'med_banner_oral' : 'med_banner';
+  const emptyCta = isOral
+    ? 'Log your dose to view your curve'
+    : 'Log your injection to view your curve';
+
   // Still loading — don't flash a card yet
   if (isLoading)
     return null;
 
-  // No injection data yet — show a persistent setup CTA
+  // No dose data yet — show a persistent setup CTA
   if (!curve || !phase) {
     return (
       <TouchableOpacity
@@ -52,7 +59,7 @@ export function MedLevelBanner({ phase }: MedLevelBannerProps) {
               Medication level estimator
             </Text>
             <View style={styles.pill}>
-              <Text style={styles.pillText}>Log your injection to view your curve</Text>
+              <Text style={styles.pillText}>{emptyCta}</Text>
             </View>
           </View>
           <Text style={styles.chevron}>›</Text>
@@ -61,8 +68,8 @@ export function MedLevelBanner({ phase }: MedLevelBannerProps) {
     );
   }
 
-  const headline = t(`med_banner.${phase}_headline`);
-  const pill = t(`med_banner.${phase}_pill`);
+  const headline = t(`${namespace}.${phase}_headline`);
+  const pill = t(`${namespace}.${phase}_pill`);
 
   return (
     <TouchableOpacity

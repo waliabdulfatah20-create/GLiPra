@@ -201,6 +201,16 @@
     "recovery_window_headline": "Ventana de recuperación: el apetito puede volver",
     "recovery_window_pill": "Aumenta la frecuencia de comidas si es necesario"
   },
+  "med_banner_oral": {
+    "building_headline": "Subiendo al estado estable",
+    "building_pill": "Los niveles aún suben",
+    "dose_due_headline": "Tu dosis de hoy toca ahora",
+    "dose_due_pill": "Estómago vacío y espera 30 min",
+    "dose_missed_headline": "Volvamos al buen camino",
+    "dose_missed_pill": "Toma la dosis de hoy cuando puedas",
+    "steady_state_headline": "En estado estable",
+    "steady_state_pill": "La dosis diaria lo mantiene estable"
+  },
   "medication": {
     "adjustment": "Ajuste",
     "current_phase": "Fase actual",

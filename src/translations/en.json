@@ -201,6 +201,16 @@
     "recovery_window_headline": "Recovery window: appetite may return",
     "recovery_window_pill": "Increase meal frequency if needed"
   },
+  "med_banner_oral": {
+    "building_headline": "Building to steady state",
+    "building_pill": "Levels still rising",
+    "dose_due_headline": "Today's dose is due",
+    "dose_due_pill": "Empty stomach, then wait 30 min",
+    "dose_missed_headline": "Let's get back on track",
+    "dose_missed_pill": "Take today's dose when you can",
+    "steady_state_headline": "At steady state",
+    "steady_state_pill": "Daily dosing keeps it steady"
+  },
   "medication": {
     "adjustment": "Adjustment",
     "current_phase": "Current Phase",

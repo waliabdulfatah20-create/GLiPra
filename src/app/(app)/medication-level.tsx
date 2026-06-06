@@ -65,15 +65,19 @@ export default function MedicationLevelScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
 
-  const { profile, isLoading: profileLoading, injectionCycle } = useTodayData();
+  const { profile, isLoading: profileLoading, injectionCycle, oralCycle } = useTodayData();
   const {
     isLoading: curveLoading,
+    administrationRoute,
     medicationId,
     doseMg,
     injectionIntervalDays,
     lastInjectionDate,
     injectionDates,
+    isRelative,
   } = useMedicationLevelCurve();
+
+  const isOral = administrationRoute === 'oral';
 
   const isLoading = profileLoading || curveLoading;
 
@@ -126,6 +130,11 @@ export default function MedicationLevelScreen() {
   // Derive current level from displayCurve (which falls back to doseMg ?? 1.0),
   // so the card always renders when the chart renders.
   const currentLevelMg = displayCurve?.find(p => p.date === today)?.levelMg ?? null;
+  // Peak level across the visible curve — used to express the oral "relative
+  // level" as a percent of steady state (no mg available for oral).
+  const displayCurveMax = displayCurve && displayCurve.length > 0
+    ? Math.max(...displayCurve.map(p => p.levelMg), 1)
+    : 1;
 
   if (isLoading) {
     return (
@@ -138,7 +147,8 @@ export default function MedicationLevelScreen() {
   const hasData = !!lastInjectionDate;
   const medId = medicationId ?? ((profile?.medicationId ?? 'semaglutide_ozempic') as GLP1MedicationId);
   const medName = MEDICATION_DISPLAY_NAMES[medId] ?? 'GLP-1 Medication';
-  const doseLabel = doseMg ? `${doseMg}mg` : '-';
+  // Oral has no recorded dose amount; show only the frequency (no misleading mg).
+  const doseLabel = isOral ? null : (doseMg ? `${doseMg}mg` : '-');
   const freqLabel = formatFrequency(injectionIntervalDays);
 
   return (
@@ -175,11 +185,8 @@ export default function MedicationLevelScreen() {
               <View style={styles.medicationBadge}>
                 <Text style={styles.medicationBadgeText}>
                   {medName}
-                  {' '}
-                  ·
-                  {doseLabel}
-                  {' '}
-                  {freqLabel}
+                  {' · '}
+                  {doseLabel ? `${doseLabel} ${freqLabel}` : freqLabel}
                 </Text>
               </View>
             </View>
@@ -214,14 +221,17 @@ export default function MedicationLevelScreen() {
                   )}
             </View>
 
-            {/* Current level summary card */}
+            {/* Current level summary card. Oral has no recorded dose, so the
+                value is a RELATIVE level (no mg unit) — see useMedicationLevelCurve. */}
             {currentLevelMg !== null && (
               <View style={styles.summaryCard}>
-                <Text style={styles.summaryLabel}>ESTIMATED IN SYSTEM</Text>
+                <Text style={styles.summaryLabel}>
+                  {isRelative ? 'RELATIVE LEVEL' : 'ESTIMATED IN SYSTEM'}
+                </Text>
                 <Text style={styles.summaryValue}>
-                  ~
-                  {currentLevelMg.toFixed(1)}
-                  mg
+                  {isRelative
+                    ? `${Math.round((currentLevelMg / displayCurveMax) * 100)}%`
+                    : `~${currentLevelMg.toFixed(1)}mg`}
                 </Text>
               </View>
             )}
@@ -235,17 +245,24 @@ export default function MedicationLevelScreen() {
               </Text>
             </DisclaimerBanner>
 
-            {/* Phase context */}
-            {injectionCycle && (
-              <View style={styles.phaseCard}>
-                <Text style={styles.phaseLabel}>CURRENT PHASE</Text>
-                <PhaseBadge
-                  route="injection"
-                  phase={injectionCycle.phase}
-                  daysSinceInjection={injectionCycle.daysSinceInjection}
-                />
-              </View>
-            )}
+            {/* Phase context — route-aware */}
+            {isOral
+              ? (oralCycle && (
+                  <View style={styles.phaseCard}>
+                    <Text style={styles.phaseLabel}>CURRENT PHASE</Text>
+                    <PhaseBadge route="oral" phase={oralCycle.phase} daysOnMed={oralCycle.daysOnMed} />
+                  </View>
+                ))
+              : (injectionCycle && (
+                  <View style={styles.phaseCard}>
+                    <Text style={styles.phaseLabel}>CURRENT PHASE</Text>
+                    <PhaseBadge
+                      route="injection"
+                      phase={injectionCycle.phase}
+                      daysSinceInjection={injectionCycle.daysSinceInjection}
+                    />
+                  </View>
+                ))}
 
             {/* Bottom disclaimer — Rule 8 footer */}
             <DisclaimerBanner tier={1}>

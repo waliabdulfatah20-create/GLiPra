@@ -17,6 +17,14 @@ export type DoseWindowCardProps = {
   onTake: () => void;
   /** True while the log mutation is in flight. */
   isLogging: boolean;
+  /** Id of the most recent dose row (target of the technique confirm). */
+  lastDoseId: string | null;
+  /** Whether the empty-stomach window was respected; null = unanswered. */
+  lastDoseWindowRespected: boolean | null;
+  /** Fired when the user answers the post-window confirm. */
+  onConfirmWindow: (respected: boolean) => void;
+  /** True while the confirm mutation is in flight. */
+  isConfirming: boolean;
 };
 
 /** Format whole seconds as M:SS (e.g. 1799 → "29:59"). */
@@ -40,6 +48,10 @@ export function DoseWindowCard({
   currentStreak,
   onTake,
   isLogging,
+  lastDoseId,
+  lastDoseWindowRespected,
+  onConfirmWindow,
+  isConfirming,
 }: DoseWindowCardProps) {
   const { t } = useTranslation();
   const { colors, spacing, radius, shadows } = useTheme();
@@ -52,6 +64,19 @@ export function DoseWindowCard({
   // before the dose-log refetch round-trips and updates lastDoseTakenAt.
   const [localTakenAt, setLocalTakenAt] = React.useState<string | null>(null);
   const effectiveTakenAt = pickLatest(lastDoseTakenAt, localTakenAt);
+
+  // Optimistic technique answer so the confirm UI resolves instantly on tap,
+  // before the update mutation round-trips and sets lastDoseWindowRespected.
+  const [localAnswered, setLocalAnswered] = React.useState<boolean | null>(null);
+
+  const handleConfirm = React.useCallback(
+    (respected: boolean) => {
+      haptics.selection();
+      setLocalAnswered(respected);
+      onConfirmWindow(respected);
+    },
+    [onConfirmWindow],
+  );
 
   // Live clock. Tick every second while absorbing (countdown needs it); poll
   // slowly otherwise to catch the day rollover and the just-took transition.
@@ -77,19 +102,27 @@ export function DoseWindowCard({
         ? colors.success
         : colors.primary;
 
-  const title
-    = window.state === 'absorbing'
-      ? t('oral_dose.absorbing_title')
-      : window.state === 'clear'
-        ? t('oral_dose.clear_title')
-        : t('oral_dose.not_taken_title');
-
   const body
     = window.state === 'absorbing'
       ? t('oral_dose.absorbing_body')
       : window.state === 'clear'
         ? t('oral_dose.clear_body')
         : t('oral_dose.not_taken_body');
+
+  // After the window clears, ask once whether the empty-stomach window was kept.
+  // Shows only while unanswered (server null + no optimistic local answer).
+  const answered = localAnswered !== null || lastDoseWindowRespected !== null;
+  const showConfirm
+    = window.state === 'clear' && lastDoseId !== null && !answered;
+
+  const title
+    = showConfirm
+      ? t('oral_dose.confirm_title')
+      : window.state === 'absorbing'
+        ? t('oral_dose.absorbing_title')
+        : window.state === 'clear'
+          ? t('oral_dose.clear_title')
+          : t('oral_dose.not_taken_title');
 
   return (
     <View style={[styles.card, { borderTopColor: accent }]}>
@@ -114,7 +147,42 @@ export function DoseWindowCard({
           </Text>
         )}
 
-        <Text style={styles.bodyText}>{body}</Text>
+        <Text style={styles.bodyText}>
+          {showConfirm
+            ? t('oral_dose.confirm_body')
+            : window.state === 'clear' && answered
+              ? t('oral_dose.confirm_done')
+              : body}
+        </Text>
+
+        {showConfirm && (
+          <View style={styles.confirmRow}>
+            <TouchableOpacity
+              style={[styles.confirmButton, styles.confirmButtonYes]}
+              onPress={() => handleConfirm(true)}
+              disabled={isConfirming}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel={t('oral_dose.confirm_yes')}
+            >
+              <Text style={[styles.confirmButtonText, { color: colors.success }]}>
+                {t('oral_dose.confirm_yes')}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.confirmButton, styles.confirmButtonNo]}
+              onPress={() => handleConfirm(false)}
+              disabled={isConfirming}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel={t('oral_dose.confirm_no')}
+            >
+              <Text style={[styles.confirmButtonText, { color: colors.warning }]}>
+                {t('oral_dose.confirm_no')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {window.state === 'not_taken' && (
           <TouchableOpacity
@@ -217,6 +285,34 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       fontSize: 16,
       fontWeight: '700',
       letterSpacing: 0.2,
+    },
+    confirmRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+      marginTop: spacing.md,
+    },
+    confirmButton: {
+      flex: 1,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      paddingVertical: spacing.sm + 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: 44,
+    },
+    confirmButtonYes: {
+      backgroundColor: colors.successLight,
+      borderColor: colors.success,
+    },
+    confirmButtonNo: {
+      backgroundColor: colors.warningLight,
+      borderColor: colors.warning,
+    },
+    confirmButtonText: {
+      fontSize: 14,
+      fontWeight: '700',
+      letterSpacing: 0.1,
+      textAlign: 'center',
     },
     disclaimerText: {
       fontSize: 11,

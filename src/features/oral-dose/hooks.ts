@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { analytics, EVENTS } from '@/lib/analytics';
 import { notifications } from '@/lib/notifications';
-import { fetchRecentOralDoseLogs, logOralDose } from './api';
+import { fetchRecentOralDoseLogs, logOralDose, updateOralDoseWindowRespected } from './api';
 
 const QUERY_KEY = 'oral-dose-logs';
 
@@ -48,6 +48,27 @@ export function useLogOralDose() {
             return notifications.scheduleAbsorptionClear();
         })
         .catch(() => {}); // non-critical — silent fail
+    },
+  });
+}
+
+/**
+ * Capture whether the empty-stomach window was respected for a logged dose,
+ * after the absorption window clears. Invalidates the dose-log cache and the
+ * Today profile so the technique-aware adherence streak refreshes.
+ */
+export function useSetDoseWindowRespected() {
+  const session = useAuthStore.use.session();
+  const userId = session?.user.id;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ logId, windowRespected }: { logId: string; windowRespected: boolean }) =>
+      updateOralDoseWindowRespected(userId!, logId, windowRespected),
+    onSuccess: () => {
+      analytics.capture(EVENTS.ORAL_WINDOW_CONFIRMED);
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY, userId] });
+      queryClient.invalidateQueries({ queryKey: ['today-profile', userId] });
     },
   });
 }

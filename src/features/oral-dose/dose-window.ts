@@ -107,15 +107,27 @@ export type DoseAdherenceResult = {
   lastDoseDate: string | null; // 'YYYY-MM-DD' or null
 };
 
+/** One logged oral dose — timestamp plus whether the empty-stomach window was respected. */
+export type DoseDay = {
+  takenAt: string; // ISO 8601
+  windowRespected: boolean | null;
+};
+
 /**
- * Daily-dosing adherence streak from a list of dose timestamps.
+ * Technique-aware daily-dosing adherence streak.
  *
- * A calendar day "counts" when it has at least one logged dose. Mirrors the
- * protein streak engine: longest = max unbroken run; current is live only when
- * the most recent dose day is today or yesterday. Future-dated logs are ignored.
+ * A calendar day counts toward the streak when it has at least one logged dose
+ * AND the empty-stomach window was not broken that day. A day is "technique
+ * broken" only when a dose that day is explicitly windowRespected === false
+ * (the user reported eating or drinking early); such a day acts like a missing
+ * day and breaks the run. Unanswered (null) and respected (true) days both
+ * count — so with all-null data this behaves identically to a pure dosing
+ * streak. Mirrors the protein streak engine: longest = max unbroken run;
+ * current is live only when the most recent counting day is today or yesterday.
+ * Future-dated logs are ignored.
  */
 export function computeDoseAdherenceStreak(
-  takenAtList: string[],
+  doses: DoseDay[],
   today: string,
 ): DoseAdherenceResult {
   const empty: DoseAdherenceResult = {
@@ -124,16 +136,26 @@ export function computeDoseAdherenceStreak(
     lastDoseDate: null,
   };
 
-  if (takenAtList.length === 0)
+  if (doses.length === 0)
     return empty;
 
   const todayDate = parseISO(today);
 
-  // Reduce timestamps to unique calendar dates, drop future days, sort ascending.
-  const dates = Array.from(
-    new Set(takenAtList.map(iso => format(parseISO(iso), 'yyyy-MM-dd'))),
-  )
-    .filter(d => differenceInCalendarDays(parseISO(d), todayDate) <= 0)
+  // Group doses by calendar day. A day is technique-broken if ANY dose that day
+  // was explicitly reported as not respecting the window. Future days dropped.
+  const dayBroken = new Map<string, boolean>();
+  for (const dose of doses) {
+    const day = format(parseISO(dose.takenAt), 'yyyy-MM-dd');
+    if (differenceInCalendarDays(parseISO(day), todayDate) > 0)
+      continue;
+    const wasBroken = dayBroken.get(day) ?? false;
+    dayBroken.set(day, wasBroken || dose.windowRespected === false);
+  }
+
+  // Counting days = days with a dose that were not technique-broken, sorted asc.
+  const dates = Array.from(dayBroken.entries())
+    .filter(([, broken]) => !broken)
+    .map(([day]) => day)
     .sort((a, b) => a.localeCompare(b));
 
   if (dates.length === 0)

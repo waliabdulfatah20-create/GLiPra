@@ -87,3 +87,21 @@ export async function deleteOralDoseLog(
     .eq('user_id', userId);
   return !error;
 }
+
+/**
+ * Set whether the empty-stomach window was respected for an already-logged dose.
+ * Captured after the absorption window clears (the technique signal). User-scoped
+ * by id + user_id (RLS owner-update policy). Returns true on success.
+ */
+export async function updateOralDoseWindowRespected(
+  userId: string,
+  logId: string,
+  windowRespected: boolean,
+): Promise<boolean> {
+  const { error } = await supabase
+    .from('oral_dose_logs')
+    .update({ window_respected: windowRespected })
+    .eq('id', logId)
+    .eq('user_id', userId);
+  return !error;
+}

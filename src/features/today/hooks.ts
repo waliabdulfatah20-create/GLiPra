@@ -64,13 +64,17 @@ export function useTodayData() {
 
   const isOral = profile?.administrationRoute === 'oral';
 
-  // Oral dose history → last dose date (phase input), most-recent timestamp
-  // (dose-window card), and the daily-dosing adherence streak.
+  // Oral dose history → last dose date (phase input), most-recent dose row
+  // (dose-window card + technique confirm), and the technique-aware streak.
   const oralTakenAtList = oralDoseLogs.map(log => log.takenAt);
-  const oralLastDoseTakenAt = isOral && oralDoseLogs.length > 0 ? oralDoseLogs[0]!.takenAt : null;
+  const oralLastDose = isOral && oralDoseLogs.length > 0 ? oralDoseLogs[0]! : null;
+  const oralLastDoseTakenAt = oralLastDose?.takenAt ?? null;
   const oralLastDoseDate = isOral ? deriveLastDoseDate(oralTakenAtList) : null;
   const oralAdherence = isOral
-    ? computeDoseAdherenceStreak(oralTakenAtList, today)
+    ? computeDoseAdherenceStreak(
+        oralDoseLogs.map(log => ({ takenAt: log.takenAt, windowRespected: log.windowRespected })),
+        today,
+      )
     : { currentStreak: 0, longestStreak: 0, lastDoseDate: null };
 
   const injectionCycle
@@ -167,6 +171,8 @@ export function useTodayData() {
     injectionCycle,
     oralCycle,
     oralLastDoseTakenAt,
+    oralLastDoseId: oralLastDose?.id ?? null,
+    oralLastDoseWindowRespected: oralLastDose?.windowRespected ?? null,
     oralAdherenceStreak: oralAdherence.currentStreak,
     proteinFloorG,
     proteinConsumedG,

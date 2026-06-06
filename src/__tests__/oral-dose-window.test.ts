@@ -126,6 +126,11 @@ describe('deriveLastDoseDate', () => {
 describe('computeDoseAdherenceStreak', () => {
   const TODAY = '2026-06-05';
 
+  // Helper: build DoseDay[] from bare timestamps with windowRespected = null,
+  // so the existing assertions prove the all-null path is unchanged.
+  const mk = (...takenAt: string[]) =>
+    takenAt.map(t => ({ takenAt: t, windowRespected: null as boolean | null }));
+
   it('returns zeros for an empty list', () => {
     expect(computeDoseAdherenceStreak([], TODAY)).toEqual({
       currentStreak: 0,
@@ -135,7 +140,7 @@ describe('computeDoseAdherenceStreak', () => {
   });
 
   it('counts a single dose taken today', () => {
-    const r = computeDoseAdherenceStreak(['2026-06-05T08:00:00'], TODAY);
+    const r = computeDoseAdherenceStreak(mk('2026-06-05T08:00:00'), TODAY);
     expect(r.currentStreak).toBe(1);
     expect(r.longestStreak).toBe(1);
     expect(r.lastDoseDate).toBe('2026-06-05');
@@ -143,11 +148,7 @@ describe('computeDoseAdherenceStreak', () => {
 
   it('counts an unbroken run ending today', () => {
     const r = computeDoseAdherenceStreak(
-      [
-        '2026-06-03T08:00:00',
-        '2026-06-04T08:00:00',
-        '2026-06-05T08:00:00',
-      ],
+      mk('2026-06-03T08:00:00', '2026-06-04T08:00:00', '2026-06-05T08:00:00'),
       TODAY,
     );
     expect(r.currentStreak).toBe(3);
@@ -156,7 +157,7 @@ describe('computeDoseAdherenceStreak', () => {
 
   it('keeps the streak live when the last dose was yesterday', () => {
     const r = computeDoseAdherenceStreak(
-      ['2026-06-03T08:00:00', '2026-06-04T08:00:00'],
+      mk('2026-06-03T08:00:00', '2026-06-04T08:00:00'),
       TODAY,
     );
     expect(r.currentStreak).toBe(2);
@@ -164,7 +165,7 @@ describe('computeDoseAdherenceStreak', () => {
 
   it('breaks the current streak when the last dose is 2+ days ago', () => {
     const r = computeDoseAdherenceStreak(
-      ['2026-06-01T08:00:00', '2026-06-02T08:00:00'],
+      mk('2026-06-01T08:00:00', '2026-06-02T08:00:00'),
       TODAY,
     );
     expect(r.currentStreak).toBe(0);
@@ -174,11 +175,11 @@ describe('computeDoseAdherenceStreak', () => {
 
   it('dedupes multiple doses on the same calendar day', () => {
     const r = computeDoseAdherenceStreak(
-      [
+      mk(
         '2026-06-05T08:00:00',
         '2026-06-05T08:30:00', // duplicate day (e.g. re-log)
         '2026-06-04T08:00:00',
-      ],
+      ),
       TODAY,
     );
     expect(r.currentStreak).toBe(2);
@@ -187,13 +188,13 @@ describe('computeDoseAdherenceStreak', () => {
 
   it('reports the longest historical run even when the current streak is broken', () => {
     const r = computeDoseAdherenceStreak(
-      [
+      mk(
         '2026-05-20T08:00:00',
         '2026-05-21T08:00:00',
         '2026-05-22T08:00:00',
         '2026-05-23T08:00:00', // 4-day run
         '2026-06-01T08:00:00', // gap, then isolated day
-      ],
+      ),
       TODAY,
     );
     expect(r.longestStreak).toBe(4);
@@ -202,10 +203,65 @@ describe('computeDoseAdherenceStreak', () => {
 
   it('ignores future-dated dose logs', () => {
     const r = computeDoseAdherenceStreak(
-      ['2026-06-05T08:00:00', '2026-06-10T08:00:00'],
+      mk('2026-06-05T08:00:00', '2026-06-10T08:00:00'),
       TODAY,
     );
     expect(r.lastDoseDate).toBe('2026-06-05');
     expect(r.currentStreak).toBe(1);
+  });
+
+  // ── Technique weighting (window_respected) ──────────────────────────────────
+
+  it('respected (true) days count exactly like null days', () => {
+    const r = computeDoseAdherenceStreak(
+      [
+        { takenAt: '2026-06-03T08:00:00', windowRespected: true },
+        { takenAt: '2026-06-04T08:00:00', windowRespected: true },
+        { takenAt: '2026-06-05T08:00:00', windowRespected: true },
+      ],
+      TODAY,
+    );
+    expect(r.currentStreak).toBe(3);
+    expect(r.longestStreak).toBe(3);
+  });
+
+  it('a broken-window day today breaks the current streak (acts like a missing day)', () => {
+    const r = computeDoseAdherenceStreak(
+      [
+        { takenAt: '2026-06-03T08:00:00', windowRespected: true },
+        { takenAt: '2026-06-04T08:00:00', windowRespected: true },
+        { takenAt: '2026-06-05T08:00:00', windowRespected: false }, // ate early today
+      ],
+      TODAY,
+    );
+    // Today excluded; last counting day is yesterday, so the run through
+    // yesterday is still live (one grace day, same as a missed dose).
+    expect(r.currentStreak).toBe(2);
+    expect(r.lastDoseDate).toBe('2026-06-04');
+  });
+
+  it('a broken-window day in the middle caps the longest run', () => {
+    const r = computeDoseAdherenceStreak(
+      [
+        { takenAt: '2026-05-20T08:00:00', windowRespected: true },
+        { takenAt: '2026-05-21T08:00:00', windowRespected: false }, // breaks the run
+        { takenAt: '2026-05-22T08:00:00', windowRespected: true },
+        { takenAt: '2026-05-23T08:00:00', windowRespected: true },
+      ],
+      TODAY,
+    );
+    expect(r.longestStreak).toBe(2); // 05-22 + 05-23, not the full 4
+  });
+
+  it('treats a day broken if any dose that day broke the window', () => {
+    const r = computeDoseAdherenceStreak(
+      [
+        { takenAt: '2026-06-05T08:00:00', windowRespected: true },
+        { takenAt: '2026-06-05T09:00:00', windowRespected: false }, // same day broke
+      ],
+      TODAY,
+    );
+    expect(r.currentStreak).toBe(0);
+    expect(r.lastDoseDate).toBeNull();
   });
 });

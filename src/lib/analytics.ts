@@ -37,6 +37,7 @@ export const EVENTS = {
 
   // Oral dose logging (Rybelsus / oral GLP-1)
   ORAL_DOSE_LOGGED: 'oral_dose_logged',
+  ORAL_WINDOW_CONFIRMED: 'oral_window_confirmed', // user answered the empty-stomach confirm
 
   // AI Coach
   COACH_MESSAGE_SENT: 'coach_message_sent',

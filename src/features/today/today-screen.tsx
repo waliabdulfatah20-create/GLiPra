@@ -43,7 +43,7 @@ import { getActiveCardsForRoute } from '@/features/content-cards/data';
 import { useDailyGuidance } from '@/features/daily-guidance/hooks';
 import { useCheckAndUnlockMilestones } from '@/features/journey-cards/hooks';
 import { MILESTONES } from '@/features/journey-cards/milestones';
-import { useLogOralDose } from '@/features/oral-dose/hooks';
+import { useLogOralDose, useSetDoseWindowRespected } from '@/features/oral-dose/hooks';
 import { useRedFlagSnooze } from '@/features/safety/hooks';
 import { useTodayData } from '@/features/today/hooks';
 import { analytics, EVENTS } from '@/lib/analytics';
@@ -97,6 +97,8 @@ export function TodayScreen() {
     injectionCycle,
     oralCycle,
     oralLastDoseTakenAt,
+    oralLastDoseId,
+    oralLastDoseWindowRespected,
     oralAdherenceStreak,
     proteinFloorG,
     proteinConsumedG,
@@ -110,10 +112,19 @@ export function TodayScreen() {
 
   const isOral = administrationRoute === 'oral';
   const logOralDose = useLogOralDose();
+  const setWindowRespected = useSetDoseWindowRespected();
 
   const handleTakeOralDose = React.useCallback(() => {
     logOralDose.mutate({ takenAt: new Date().toISOString() });
   }, [logOralDose]);
+
+  const handleConfirmWindow = React.useCallback(
+    (respected: boolean) => {
+      if (oralLastDoseId)
+        setWindowRespected.mutate({ logId: oralLastDoseId, windowRespected: respected });
+    },
+    [setWindowRespected, oralLastDoseId],
+  );
 
   const { checkIn } = useTodayCheckIn();
   const hasCheckedInToday = checkIn !== null;
@@ -515,6 +526,10 @@ export function TodayScreen() {
               currentStreak={oralAdherenceStreak}
               onTake={handleTakeOralDose}
               isLogging={logOralDose.isPending}
+              lastDoseId={oralLastDoseId}
+              lastDoseWindowRespected={oralLastDoseWindowRespected}
+              onConfirmWindow={handleConfirmWindow}
+              isConfirming={setWindowRespected.isPending}
             />
           )}
 

@@ -21,6 +21,7 @@ import { EscalationCard } from '@/components/safety/escalation-card';
 import { CardsCarousel } from '@/components/today/cards-carousel';
 import { ContentCardSheet } from '@/components/today/content-card-sheet';
 import { DailyGuidanceCard } from '@/components/today/daily-guidance-card';
+import { DoseWindowCard } from '@/components/today/dose-window-card';
 import { InjectionCycleCard } from '@/components/today/injection-cycle-card';
 import { MedLevelBanner } from '@/components/today/med-level-banner';
 import { PharmacistSpotlightCard } from '@/components/today/pharmacist-spotlight-card';
@@ -42,6 +43,7 @@ import { getActiveCards } from '@/features/content-cards/data';
 import { useDailyGuidance } from '@/features/daily-guidance/hooks';
 import { useCheckAndUnlockMilestones } from '@/features/journey-cards/hooks';
 import { MILESTONES } from '@/features/journey-cards/milestones';
+import { useLogOralDose } from '@/features/oral-dose/hooks';
 import { useRedFlagSnooze } from '@/features/safety/hooks';
 import { useTodayData } from '@/features/today/hooks';
 import { analytics, EVENTS } from '@/lib/analytics';
@@ -94,6 +96,8 @@ export function TodayScreen() {
     administrationRoute,
     injectionCycle,
     oralCycle,
+    oralLastDoseTakenAt,
+    oralAdherenceStreak,
     proteinFloorG,
     proteinConsumedG,
     readinessCard,
@@ -105,6 +109,11 @@ export function TodayScreen() {
   } = useTodayData();
 
   const isOral = administrationRoute === 'oral';
+  const logOralDose = useLogOralDose();
+
+  const handleTakeOralDose = React.useCallback(() => {
+    logOralDose.mutate({ takenAt: new Date().toISOString() });
+  }, [logOralDose]);
 
   const { checkIn } = useTodayCheckIn();
   const hasCheckedInToday = checkIn !== null;
@@ -497,6 +506,16 @@ export function TodayScreen() {
           {/* ── Daily Actions ─────────────────────────────────────── */}
           <SectionLabel label={t('today.daily_actions')} />
 
+          {/* Dose Window — oral GLP-1 only. The empty-stomach absorption timer. */}
+          {isOral && (
+            <DoseWindowCard
+              lastDoseTakenAt={oralLastDoseTakenAt}
+              currentStreak={oralAdherenceStreak}
+              onTake={handleTakeOralDose}
+              isLogging={logOralDose.isPending}
+            />
+          )}
+
           {/* Check-in */}
           <TouchableOpacity
             style={[
@@ -553,8 +572,9 @@ export function TodayScreen() {
             <Text style={styles.rowChevron}>›</Text>
           </TouchableOpacity>
 
-          {/* Medication Level — hidden when discontinued */}
-          {profile?.medicationStatus !== 'discontinued' && (
+          {/* Medication Level — injectable only (PK banner reads injection_logs);
+              hidden for oral users and when discontinued. */}
+          {!isOral && profile?.medicationStatus !== 'discontinued' && (
             <View style={styles.bannerWrapper}>
               <MedLevelBanner phase={injectionCycle?.phase ?? null} />
             </View>

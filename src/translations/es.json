@@ -214,6 +214,18 @@
     "language_title": "Elige tu idioma",
     "message": "Bienvenido a GLiPra"
   },
+  "oral_dose": {
+    "a11y_take": "Registra que tomaste tu dosis oral",
+    "absorbing_body": "Un pequeño sorbo de agua está bien. Evita comida, café y otros medicamentos hasta que termine el temporizador.",
+    "absorbing_title": "Absorbiendo. Espera antes de comer.",
+    "clear_body": "Tu dosis está registrada y absorbida. Tomarla a la misma hora cada día mantiene tus niveles estables.",
+    "clear_title": "Ya puedes comer",
+    "disclaimer": "Solo información educativa sobre el tiempo. Sigue las indicaciones de quien te receta y de tu farmacéutico para tu medicamento específico.",
+    "not_taken_body": "Tómala con el estómago vacío con un pequeño sorbo de agua. Luego espera 30 minutos antes de cualquier comida u otras bebidas.",
+    "not_taken_title": "Hora de tu tableta",
+    "streak_pill": "{{count}} días seguidos",
+    "took_it": "Ya la tomé"
+  },
   "oral_phase": {
     "building": "Alcanzando nivel estable",
     "dose_due": "Hora de tu dosis de hoy",
@@ -357,6 +369,8 @@
     "medication_status": "Estado del GLP-1",
     "notif_injection": "Recordatorio de inyección",
     "notif_injection_subtitle": "8 AM en tu día de dosis",
+    "notif_oral_dose": "Recordatorio diario de dosis",
+    "notif_oral_dose_subtitle": "Te recuerda a la hora de dosis que elegiste",
     "notif_protein": "Recordatorio diario de proteína",
     "notif_protein_subtitle": "7 PM si no has alcanzado tu meta",
     "notifications": "Notificaciones",

@@ -10,6 +10,11 @@ import { fetchFoodLogsInRange } from '@/features/food-log/api';
 import { useDailyMacros } from '@/features/food-log/hooks';
 import { calculateInjectionPhase } from '@/features/injection-cycle/calculator';
 import { calculateOralPhase } from '@/features/oral-cycle/calculator';
+import {
+  computeDoseAdherenceStreak,
+  deriveLastDoseDate,
+} from '@/features/oral-dose/dose-window';
+import { useOralDoseLogs } from '@/features/oral-dose/hooks';
 import { detectRedFlags } from '@/features/safety/redFlagDetector';
 import { useStreak } from '@/features/streaks/hooks';
 import { fetchTodayProfile } from '@/features/today/api';
@@ -51,12 +56,22 @@ export function useTodayData() {
   const { history: checkInHistory } = useCheckInHistory(30);
   const streakData = useStreak();
   const { proteinG: yesterdayProteinG } = useYesterdayProtein();
+  const { logs: oralDoseLogs } = useOralDoseLogs();
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
   const hourOfDay = new Date().getHours();
 
   const isOral = profile?.administrationRoute === 'oral';
+
+  // Oral dose history → last dose date (phase input), most-recent timestamp
+  // (dose-window card), and the daily-dosing adherence streak.
+  const oralTakenAtList = oralDoseLogs.map(log => log.takenAt);
+  const oralLastDoseTakenAt = isOral && oralDoseLogs.length > 0 ? oralDoseLogs[0]!.takenAt : null;
+  const oralLastDoseDate = isOral ? deriveLastDoseDate(oralTakenAtList) : null;
+  const oralAdherence = isOral
+    ? computeDoseAdherenceStreak(oralTakenAtList, today)
+    : { currentStreak: 0, longestStreak: 0, lastDoseDate: null };
 
   const injectionCycle
     = !isOral && profile?.lastInjectionDate
@@ -67,13 +82,13 @@ export function useTodayData() {
       : null;
 
   // Oral users get a daily-dosing phase instead of a weekly injection cycle.
-  // lastDoseDate from oral_dose_logs is not yet fetched here (Phase 2), so we
-  // pass null — the calculator defaults to dose_due (gentle reminder state).
+  // lastDoseDate comes from oral_dose_logs so the phase reflects real adherence
+  // (dose_due / dose_missed / building / steady_state).
   const oralCycle
     = isOral
       ? calculateOralPhase({
           startDate: profile?.medicationStartDate ?? null,
-          lastDoseDate: null, // wired in Phase 2 when oral_dose_logs hook exists
+          lastDoseDate: oralLastDoseDate,
           today,
         })
       : null;
@@ -151,6 +166,8 @@ export function useTodayData() {
     administrationRoute,
     injectionCycle,
     oralCycle,
+    oralLastDoseTakenAt,
+    oralAdherenceStreak: oralAdherence.currentStreak,
     proteinFloorG,
     proteinConsumedG,
     proteinProgress,

@@ -2,9 +2,11 @@
  * Push notification scheduling — wraps expo-notifications with semantically
  * named functions.
  *
- * Two local notifications are managed:
- *   'injection-reminder'   — fires at 8 AM on the user's next injection date
- *   'daily-protein-nudge'  — fires every day at 7 PM
+ * Local notifications managed:
+ *   'injection-reminder'    — fires at 8 AM on the user's next injection date
+ *   'daily-protein-nudge'   — fires every day at 7 PM
+ *   'oral-dose-reminder'    — fires daily at the user's chosen oral-dose time
+ *   'oral-absorption-clear' — one-shot 30 min after a logged oral dose
  *
  * Fixed identifiers let callers cancel by type without storing dynamic IDs.
  * All functions are wrapped in try/catch — silently no-op in environments
@@ -37,7 +39,31 @@ catch {
   // no-op — handler will be registered on next render cycle
 }
 
-export type NotificationId = 'injection-reminder' | 'daily-protein-nudge';
+export type NotificationId
+  = | 'injection-reminder'
+    | 'daily-protein-nudge'
+    | 'oral-dose-reminder'
+    | 'oral-absorption-clear';
+
+/** Minutes to wait after an oral dose before eating/drinking. Mirrors ABSORPTION_WINDOW_MIN. */
+const ORAL_ABSORPTION_MIN = 30;
+
+/**
+ * Parse a Postgres TIME string ('HH:MM' or 'HH:MM:SS') into hour + minute.
+ * Returns null when the string is missing or malformed.
+ */
+function parseLocalTime(time: string | null | undefined): { hour: number; minute: number } | null {
+  if (!time)
+    return null;
+  const parts = time.split(':');
+  const hour = Number(parts[0]);
+  const minute = Number(parts[1] ?? '0');
+  if (!Number.isInteger(hour) || hour < 0 || hour > 23)
+    return null;
+  if (!Number.isInteger(minute) || minute < 0 || minute > 59)
+    return null;
+  return { hour, minute };
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -120,6 +146,70 @@ async function scheduleDailyProteinNudge(
   }
 }
 
+/**
+ * Schedule (or replace) a repeating daily reminder at the user's chosen oral
+ * dose time. `doseTimeLocal` is the profiles.dose_time_local TIME string
+ * ('HH:MM' or 'HH:MM:SS'). No-op if the time string is malformed.
+ *
+ * Copy is educational only (oral dosing joins the attorney-review gate).
+ * English-only, matching the existing injection/protein notifications — the
+ * native scheduler fires outside React so it cannot read i18next.
+ */
+async function scheduleOralDoseReminder(doseTimeLocal: string): Promise<void> {
+  try {
+    await Notifications.cancelScheduledNotificationAsync('oral-dose-reminder');
+
+    const parsed = parseLocalTime(doseTimeLocal);
+    if (!parsed)
+      return;
+
+    await Notifications.scheduleNotificationAsync({
+      identifier: 'oral-dose-reminder',
+      content: {
+        title: 'Time for your tablet',
+        body: 'Take it on an empty stomach with a small sip of water, then wait 30 minutes before food or drinks.',
+        data: { type: 'oral-dose-reminder' },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
+        hour: parsed.hour,
+        minute: parsed.minute,
+      },
+    });
+  }
+  catch {
+    // Silent fail — notifications are non-critical
+  }
+}
+
+/**
+ * Schedule a one-shot "you're clear to eat" notification 30 minutes from now,
+ * called right after a dose is logged. Cancels any pending clear notification
+ * first so re-logging restarts the single timer.
+ */
+async function scheduleAbsorptionClear(): Promise<void> {
+  try {
+    await Notifications.cancelScheduledNotificationAsync('oral-absorption-clear');
+
+    await Notifications.scheduleNotificationAsync({
+      identifier: 'oral-absorption-clear',
+      content: {
+        title: 'You\'re clear to eat',
+        body: 'Your 30-minute absorption window is done. Food and drinks are fine now.',
+        data: { type: 'oral-absorption-clear' },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: ORAL_ABSORPTION_MIN * 60,
+        repeats: false,
+      },
+    });
+  }
+  catch {
+    // Silent fail
+  }
+}
+
 /** Cancel a specific notification by its fixed identifier. */
 async function cancel(id: NotificationId): Promise<void> {
   try {
@@ -156,6 +246,8 @@ export const notifications = {
   requestPermission,
   scheduleInjectionReminder,
   scheduleDailyProteinNudge,
+  scheduleOralDoseReminder,
+  scheduleAbsorptionClear,
   cancel,
   cancelAll,
   getScheduled,

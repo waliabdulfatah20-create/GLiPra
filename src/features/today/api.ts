@@ -14,6 +14,7 @@ export type TodayProfile = {
   lastInjectionDate: string | null;
   injectionDayOfWeek: number | null;
   medicationStartDate: string | null;
+  doseTimeLocal: string | null;
   weightKg: number | null;
   heightCm: number | null;
   goalWeightKg: number | null;
@@ -28,7 +29,7 @@ export async function fetchTodayProfile(userId: string): Promise<TodayProfile | 
   const { data, error } = await supabase
     .from('profiles')
     .select(
-      'medication_id, administration_route, protein_floor_g, last_injection_date, injection_day_of_week, medication_start_date, weight_kg, height_cm, goal_weight_kg, phase, medication_status, has_kidney_disease, is_pregnant, created_at',
+      'medication_id, administration_route, protein_floor_g, last_injection_date, injection_day_of_week, medication_start_date, dose_time_local, weight_kg, height_cm, goal_weight_kg, phase, medication_status, has_kidney_disease, is_pregnant, created_at',
     )
     .eq('user_id', userId)
     .single();
@@ -43,6 +44,7 @@ export async function fetchTodayProfile(userId: string): Promise<TodayProfile | 
     lastInjectionDate: data.last_injection_date ?? null,
     injectionDayOfWeek: data.injection_day_of_week ?? null,
     medicationStartDate: (data as { medication_start_date?: string | null }).medication_start_date ?? null,
+    doseTimeLocal: (data as { dose_time_local?: string | null }).dose_time_local ?? null,
     weightKg: data.weight_kg ?? null,
     heightCm: data.height_cm ?? null,
     goalWeightKg: data.goal_weight_kg ?? null,

@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -351,8 +351,10 @@ export type Database = {
         Row: {
           activity_level: string
           administration_route: string
+          allergens: string[] | null
           bmi: number | null
           created_at: string
+          dietary_pattern: string | null
           dose_frequency: string | null
           dose_mg: number | null
           dose_time_local: string | null
@@ -376,8 +378,10 @@ export type Database = {
         Insert: {
           activity_level?: string
           administration_route?: string
+          allergens?: string[] | null
           bmi?: number | null
           created_at?: string
+          dietary_pattern?: string | null
           dose_frequency?: string | null
           dose_mg?: number | null
           dose_time_local?: string | null
@@ -401,8 +405,10 @@ export type Database = {
         Update: {
           activity_level?: string
           administration_route?: string
+          allergens?: string[] | null
           bmi?: number | null
           created_at?: string
+          dietary_pattern?: string | null
           dose_frequency?: string | null
           dose_mg?: number | null
           dose_time_local?: string | null

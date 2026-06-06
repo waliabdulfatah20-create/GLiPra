@@ -1,6 +1,7 @@
 // Supabase queries for the food_logs table.
 // Column names follow the snake_case convention of the database schema.
 
+import type { DietaryContext } from './dietary-context';
 import type { RecentFood } from './recent-foods';
 import type { BarcodeFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
 import { endOfDay as getEndOfDay, startOfDay as getStartOfDay } from 'date-fns';
@@ -8,6 +9,7 @@ import { endOfDay as getEndOfDay, startOfDay as getStartOfDay } from 'date-fns';
 import { z } from 'zod';
 
 import { supabase } from '@/lib/supabase';
+import { buildDietaryContext } from './dietary-context';
 
 // ---------------------------------------------------------------------------
 // Zod schema — validates rows coming out of the database
@@ -242,6 +244,30 @@ export async function getRecentCorrections(
     originalName: row.original_ai_name,
     correctedName: row.corrected_name,
   }));
+}
+
+// ---------------------------------------------------------------------------
+// getUserDietaryContext
+// Fetch the user's dietary pattern + allergens to bias photo recognition.
+// Rule 2: categorical preferences only — never user identity. Returns null
+// when there is nothing useful to send (see buildDietaryContext).
+// ---------------------------------------------------------------------------
+export async function getUserDietaryContext(
+  userId: string,
+): Promise<DietaryContext | null> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('dietary_pattern, allergens')
+    .eq('user_id', userId)
+    .single();
+
+  if (error || !data)
+    return null;
+
+  return buildDietaryContext(
+    (data as { dietary_pattern?: string | null }).dietary_pattern ?? null,
+    (data as { allergens?: string[] | null }).allergens ?? null,
+  );
 }
 
 // ---------------------------------------------------------------------------

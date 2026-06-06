@@ -149,6 +149,7 @@ export function usePhotoFoodRecognition() {
       mimeType: 'image/jpeg' | 'image/png' | 'image/webp',
       recentCorrections?: Array<{ originalName: string; correctedName: string }>,
       userComment?: string,
+      dietaryContext?: { dietaryPattern?: string; allergens?: string[] } | null,
       signal?: AbortSignal,
     ): Promise<RecognitionResult | null> => {
       setIsLoading(true);
@@ -168,11 +169,18 @@ export function usePhotoFoodRecognition() {
             body: {
               imageBase64,
               mimeType,
-              // Rule 2: only food names + food-context comment — never user ID or email
+              // Rule 2: only food names + food-context comment + categorical
+              // dietary prefs — never user ID, email, or other PII.
               ...(recentCorrections && recentCorrections.length > 0
                 ? { recentCorrections }
                 : {}),
               ...(userComment ? { userComment } : {}),
+              ...(dietaryContext?.dietaryPattern
+                ? { dietaryPattern: dietaryContext.dietaryPattern }
+                : {}),
+              ...(dietaryContext?.allergens && dietaryContext.allergens.length > 0
+                ? { allergens: dietaryContext.allergens }
+                : {}),
             },
           },
         );

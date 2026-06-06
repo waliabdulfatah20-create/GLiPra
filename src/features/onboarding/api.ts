@@ -29,6 +29,7 @@ export async function saveOnboardingProfile(
     has_kidney_disease: data.hasKidneyDisease ?? false,
     is_pregnant: data.isPregnant ?? false,
     activity_level: data.activityLevel ?? 'moderate',
+    dietary_pattern: data.dietaryPattern ?? null,
     phase:
       data.medicationStatus === 'maintenance' || data.medicationStatus === 'tapering'
         ? 'maintenance'

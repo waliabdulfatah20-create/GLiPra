@@ -16,6 +16,7 @@ import {
   fetchTodayFoodLogs,
   getFoodDefault,
   getRecentCorrections,
+  getUserDietaryContext,
   insertBarcodeFoodLog,
   insertFoodLog,
   insertPhotoFoodLog,
@@ -252,9 +253,22 @@ export function usePhotoFoodLog(): {
       userComment?: string,
       signal?: AbortSignal,
     ): Promise<RecognitionResult | null> => {
-      // Fetch recent corrections to improve AI accuracy (Rule 2: food names only)
-      const corrections = userId ? await getRecentCorrections(userId) : [];
-      const result = await recognizeRaw(base64, mimeType, corrections, userComment, signal);
+      // Fetch recent corrections + dietary context to improve AI accuracy.
+      // Rule 2: food names + categorical dietary prefs only — never user identity.
+      const [corrections, dietaryContext] = userId
+        ? await Promise.all([
+            getRecentCorrections(userId),
+            getUserDietaryContext(userId),
+          ])
+        : [[], null];
+      const result = await recognizeRaw(
+        base64,
+        mimeType,
+        corrections,
+        userComment,
+        dietaryContext,
+        signal,
+      );
       if (result) {
         setPendingResult(result);
       }

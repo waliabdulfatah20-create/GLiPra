@@ -131,7 +131,7 @@ export function AbsorptionWindowNote() {
           accessibilityLabel={t('absorption_note.dismiss_a11y')}
           hitSlop={8}
         >
-          <Text style={styles.dismissText}>{'×'}</Text>
+          <Text style={styles.dismissText}>×</Text>
         </Pressable>
       </View>
       <Text style={styles.body}>

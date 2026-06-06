@@ -33,12 +33,12 @@ import {
   Text,
   View,
 } from 'react-native';
+import { AbsorptionWindowNote } from '@/components/log/absorption-window-note';
 import { BarcodeScannerSheet } from '@/components/log/barcode-scanner-sheet';
 import { ManualEntryForm } from '@/components/log/manual-entry-form';
 import { NutritionHeaderRing } from '@/components/log/nutrition-header-ring';
 import { PhotoCaptureButton } from '@/components/log/photo-capture-button';
 import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
-import { AbsorptionWindowNote } from '@/components/log/absorption-window-note';
 import { RecentFoodsRow } from '@/components/log/recent-foods-row';
 import { VoiceCaptureButton } from '@/components/log/voice-capture-button';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';

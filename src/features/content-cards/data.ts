@@ -4,8 +4,10 @@
 //
 // keyTakeaway  — 1-sentence bold headline shown in the spotlight card
 // phases       — injection phases this card is most relevant to; omit for universal
+// route        — administration route this card is exclusive to; omit for universal
+//                (a card with route: 'oral' is hidden from injection users and vice versa)
 
-import type { GLP1MedicationId, InjectionPhase } from '@/types';
+import type { AdministrationRoute, GLP1MedicationId, InjectionPhase } from '@/types';
 
 export type CardType = 'tip' | 'warning' | 'milestone' | 'education';
 
@@ -15,6 +17,8 @@ export type ContentCard = {
   body: string;
   keyTakeaway: string;
   phases?: InjectionPhase[];
+  /** Restrict this card to one administration route. Omit for universal cards. */
+  route?: AdministrationRoute;
   cardType: CardType;
   medicationIds: GLP1MedicationId[];
   tier: 1 | 2;
@@ -307,6 +311,18 @@ export const CONTENT_CARDS: ContentCard[] = [
     tier: 2,
     sortOrder: 25,
   },
+  {
+    id: 'oral-empty-stomach',
+    title: 'Oral GLP-1: The Empty-Stomach Rule',
+    keyTakeaway: 'Take it on an empty stomach with a small sip of water, then wait 30 minutes before anything else.',
+    route: 'oral',
+    body:
+      'Oral GLP-1 tablets are absorbed very differently from the injectable versions, and the empty-stomach rule is what makes them work. Take your tablet first thing after waking, on a completely empty stomach, with no more than a small sip of plain water. Then wait at least 30 minutes before any food, coffee, other drinks, or other medicines. Food and liquids in the stomach during that window sharply reduce how much medication your body absorbs, which can quietly make your dose less effective without you noticing. The 30-minute timer in GLiPra is here to make that wait easy to follow. Pharmacist note: the exact directions printed for your specific product, and the instructions from your prescriber and pharmacist, always take priority over general guidance.',
+    cardType: 'warning',
+    medicationIds: [],
+    tier: 1,
+    sortOrder: 26,
+  },
 ];
 
 /**
@@ -315,6 +331,16 @@ export const CONTENT_CARDS: ContentCard[] = [
  */
 export function getActiveCards(): ContentCard[] {
   return [...CONTENT_CARDS].sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+/**
+ * Returns active cards visible to a given administration route. Cards with no
+ * `route` are universal (shown to everyone); a card tagged with a route is only
+ * shown to users on that route. Keeps oral-only cards away from injection users
+ * and vice versa.
+ */
+export function getActiveCardsForRoute(route: AdministrationRoute): ContentCard[] {
+  return getActiveCards().filter(c => !c.route || c.route === route);
 }
 
 /**

@@ -39,7 +39,7 @@ import { TodaySkeleton } from '@/components/ui/today-skeleton';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { markRedFlagTriggered } from '@/features/check-in/api';
 import { useTodayCheckIn } from '@/features/check-in/hooks';
-import { getActiveCards } from '@/features/content-cards/data';
+import { getActiveCardsForRoute } from '@/features/content-cards/data';
 import { useDailyGuidance } from '@/features/daily-guidance/hooks';
 import { useCheckAndUnlockMilestones } from '@/features/journey-cards/hooks';
 import { MILESTONES } from '@/features/journey-cards/milestones';
@@ -189,10 +189,12 @@ export function TodayScreen() {
     [colors],
   );
 
-  // Phase-aware spotlight card selection — phase match first, then daily rotation
+  // Phase-aware spotlight card selection — phase match first, then daily rotation.
+  // Route-filtered so oral-only cards never surface for injection users (and v.v.).
   const currentPhase = injectionCycle?.phase ?? null;
+  const cardRoute = isOral ? 'oral' : 'injection';
   const spotlightCard = React.useMemo(() => {
-    const all = getActiveCards();
+    const all = getActiveCardsForRoute(cardRoute);
     if (currentPhase) {
       const phaseMatch = all.find(
         c => c.phases?.includes(currentPhase as InjectionPhase),
@@ -207,7 +209,7 @@ export function TodayScreen() {
       new Date(new Date().getFullYear(), 0, 0),
     );
     return universal[dayOfYear % universal.length] ?? all[0];
-  }, [currentPhase]);
+  }, [currentPhase, cardRoute]);
   const spotlightPhaseLabel = currentPhase
     ? (PHASE_LABELS[currentPhase as InjectionPhase] ?? undefined)
     : undefined;
@@ -639,7 +641,7 @@ export function TodayScreen() {
           >
             <Text style={styles.browseAllText}>{t('today.browse_all_tips')}</Text>
           </Pressable>
-          {showCarousel && <CardsCarousel cards={getActiveCards()} onCardPress={setSheetCard} />}
+          {showCarousel && <CardsCarousel cards={getActiveCardsForRoute(cardRoute)} onCardPress={setSheetCard} />}
           <ContentCardSheet card={sheetCard} onClose={() => setSheetCard(null)} />
 
         </View>

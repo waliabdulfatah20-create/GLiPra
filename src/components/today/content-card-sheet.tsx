@@ -88,13 +88,25 @@ export function ContentCardSheet({ card, onClose }: ContentCardSheetProps) {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          {/* Top disclaimer — tier-1 (clinical) cards carry a dual disclaimer,
+              top AND bottom, per liability rule 4. Tier-2 keep bottom-only. */}
+          {card.tier === 1 && (
+            <View style={styles.topDisclaimer}>
+              <DisclaimerBanner tier={1}>
+                <Text style={styles.disclaimerText}>
+                  {t('content_card.disclaimer')}
+                </Text>
+              </DisclaimerBanner>
+            </View>
+          )}
+
           {/* Title */}
           <Text style={styles.title}>{card.title}</Text>
 
           {/* Body */}
           <Text style={styles.body}>{card.body}</Text>
 
-          {/* Disclaimer (Rule 8 — required for all clinical cards) */}
+          {/* Bottom disclaimer (Rule 8 — required for all clinical cards) */}
           <DisclaimerBanner tier={card.tier}>
             <Text style={styles.disclaimerText}>
               {t('content_card.disclaimer')}
@@ -219,6 +231,9 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
     },
 
     // ── Disclaimer ───────────────────────────────────────────────────────────
+    topDisclaimer: {
+      marginBottom: spacing.md,
+    },
     disclaimerText: {
       fontSize: 12,
       color: colors.textSecondary,

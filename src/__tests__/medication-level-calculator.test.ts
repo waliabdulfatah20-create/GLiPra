@@ -245,4 +245,31 @@ describe('generateSteadyStateCurve — actualInjectionDates', () => {
       expect(p.levelMg).toBe(0);
     }
   });
+
+  it('dedupes same-day dose dates (no double-count)', () => {
+    const single = generateSteadyStateCurve(
+      2.0,
+      'semaglutide_ozempic',
+      TODAY,
+      7,
+      TODAY,
+      7,
+      7,
+      [TODAY],
+    );
+    const duplicated = generateSteadyStateCurve(
+      2.0,
+      'semaglutide_ozempic',
+      TODAY,
+      7,
+      TODAY,
+      7,
+      7,
+      [TODAY, TODAY, TODAY], // same calendar day logged 3x (e.g. re-logs)
+    );
+    const singleToday = single.find(p => p.dayOffset === 0)?.levelMg;
+    const dupToday = duplicated.find(p => p.dayOffset === 0)?.levelMg;
+    expect(dupToday).toBeCloseTo(singleToday ?? -1, 5); // not 3x
+    expect(dupToday).toBeCloseTo(2.0, 5);
+  });
 });

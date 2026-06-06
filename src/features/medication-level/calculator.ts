@@ -97,9 +97,11 @@ export function generateSteadyStateCurve(
   const resolvedPastDays = pastDays ?? (NUM_PAST_CYCLES * injectionIntervalDays);
 
   // When actual logged dates are provided, use only those (no phantom history).
-  // Otherwise fall back to synthetic extrapolation for backward compatibility.
+  // Dedupe by calendar day first so two doses logged on the same day cannot
+  // double-count the concentration. Otherwise fall back to synthetic
+  // extrapolation for backward compatibility.
   const injectionDates: Date[] = actualInjectionDates
-    ? [...actualInjectionDates]
+    ? Array.from(new Set(actualInjectionDates.map(d => d.slice(0, 10))))
         .map(d => parseISO(d))
         .sort((a, b) => a.getTime() - b.getTime())
     : (() => {

@@ -69,6 +69,18 @@ export function DoseWindowCard({
   // before the update mutation round-trips and sets lastDoseWindowRespected.
   const [localAnswered, setLocalAnswered] = React.useState<boolean | null>(null);
 
+  // Reset the optimistic answer + timestamp whenever a NEW dose arrives, so the
+  // technique confirm reappears for every dose, not just the first. The card is
+  // mounted persistently on Today; without this reset, day-2+ doses would keep
+  // day-1's answer forever (confirm silently suppressed, streak never captured).
+  // During-render reset is the React-recommended "adjust state on prop change".
+  const prevDoseIdRef = React.useRef(lastDoseId);
+  if (lastDoseId !== prevDoseIdRef.current) {
+    prevDoseIdRef.current = lastDoseId;
+    setLocalAnswered(null);
+    setLocalTakenAt(null);
+  }
+
   const handleConfirm = React.useCallback(
     (respected: boolean) => {
       haptics.selection();

@@ -147,6 +147,27 @@ describe('calculateReadinessScore — oral dose-status adjustments', () => {
     expect(hasFactor(factors, 'dose_status')).toBe(false);
   });
 
+  it('a zero-delta injection phase (adjustment) does NOT fall through into dose_status', () => {
+    // Regression: 'adjustment'/'overdue' push no injection_phase factor, but must
+    // also NOT leak into the oral dose-status branches when doseStatus is present.
+    const adjustment = calculateReadinessScore({
+      ...base,
+      injectionPhase: 'adjustment',
+      doseStatus: 'building',
+    });
+    expect(hasFactor(adjustment.factors, 'dose_status')).toBe(false);
+    expect(hasFactor(adjustment.factors, 'injection_phase')).toBe(false);
+    expect(adjustment.score).toBe(70);
+
+    const overdue = calculateReadinessScore({
+      ...base,
+      injectionPhase: 'overdue',
+      doseStatus: 'dose_missed',
+    });
+    expect(hasFactor(overdue.factors, 'dose_status')).toBe(false);
+    expect(overdue.score).toBe(70);
+  });
+
   it('no phase and no dose-status pushes neither factor', () => {
     const { score, factors } = calculateReadinessScore({ ...base });
     expect(score).toBe(70);

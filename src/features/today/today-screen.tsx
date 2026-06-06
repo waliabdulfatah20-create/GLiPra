@@ -435,25 +435,35 @@ export function TodayScreen() {
               </View>
             </View>
 
-            {/* Injection phase — hidden when discontinued */}
+            {/* Medication phase — route-aware label/copy. Hidden when discontinued. */}
             {profile?.medicationStatus === 'discontinued'
               ? (
                   <View style={[styles.phaseCard, { borderTopColor: colors.textDisabled }]}>
-                    <Text style={styles.cardLabel}>{t('today.injection_label')}</Text>
-                    <Text style={styles.noDataText}>{t('today.injection_discontinued')}</Text>
+                    <Text style={styles.cardLabel}>
+                      {t(isOral ? 'today.oral_label' : 'today.injection_label')}
+                    </Text>
+                    <Text style={styles.noDataText}>
+                      {t(isOral ? 'today.oral_discontinued' : 'today.injection_discontinued')}
+                    </Text>
                   </View>
                 )
               : (
                   <View style={[styles.phaseCard, { borderTopColor: phaseAccentColor }]}>
-                    <Text style={styles.cardLabel}>{t('today.injection_label')}</Text>
-                    {isOral && oralCycle
-                      ? (
-                          <PhaseBadge
-                            route="oral"
-                            phase={oralCycle.phase}
-                            daysOnMed={oralCycle.daysOnMed}
-                          />
-                        )
+                    <Text style={styles.cardLabel}>
+                      {t(isOral ? 'today.oral_label' : 'today.injection_label')}
+                    </Text>
+                    {isOral
+                      ? oralCycle
+                        ? (
+                            <PhaseBadge
+                              route="oral"
+                              phase={oralCycle.phase}
+                              daysOnMed={oralCycle.daysOnMed}
+                            />
+                          )
+                        : (
+                            <Text style={styles.noDataText}>{t('today.no_oral_data')}</Text>
+                          )
                       : injectionCycle
                         ? (
                             <>

@@ -163,14 +163,27 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
   const { defaults } = useUserFoodDefault(result?.name ?? '');
   const { confirm, isLoading: confirming } = useConfirmPhotoLog();
 
-  // Initialize form when a new recognition result arrives
+  // Tracks which recognition result the form was initialized for, and whether
+  // the user has started editing — so the personal-defaults query (which
+  // resolves asynchronously AFTER the result arrives) can prefill saved portions
+  // on a repeat scan, but can NEVER overwrite in-progress corrections.
+  const appliedForResultRef = React.useRef<RecognitionResult | null>(null);
+  const userEditedRef = React.useRef(false);
+
+  // Initialize form when a new recognition result arrives. Re-running when
+  // `defaults` resolves later is allowed only if the user hasn't edited yet.
   React.useEffect(() => {
     if (!result) {
       setForm(null);
       setAiBase(null);
       setMultiplier(1);
+      appliedForResultRef.current = null;
+      userEditedRef.current = false;
       return;
     }
+    const isNewResult = appliedForResultRef.current !== result;
+    if (!isNewResult && userEditedRef.current)
+      return; // defaults arrived after the user started editing — do not clobber
     originalAiName.current = result.name;
     // If we have saved personal defaults for this food, use them
     // (they represent the user's preferred portions, not the AI guess)
@@ -178,6 +191,9 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
     setForm(defaults ? defaultsToForm({ ...defaults, name: result.name }) : resultToForm(result));
     setAiBase(extractMacroBase(source));
     setMultiplier(1);
+    appliedForResultRef.current = result;
+    if (isNewResult)
+      userEditedRef.current = false;
   }, [result, defaults]);
 
   // Numeric macro fields — manual edits to these re-derive aiBase.
@@ -197,6 +213,7 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
   );
 
   function handleField(field: keyof FormState, value: string) {
+    userEditedRef.current = true; // lock out late-arriving defaults from clobbering edits
     setForm(prev => (prev ? { ...prev, [field]: value } : prev));
     if (NUMERIC_FIELDS.has(field)) {
       // Re-derive this field's base so subsequent multiplier moves scale
@@ -217,6 +234,7 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
   function handleMultiplierChange(next: PortionMultiplierValue) {
     if (!aiBase || !form)
       return;
+    userEditedRef.current = true; // a portion change is a user edit too
     setMultiplier(next);
     const scaled = scaleMacros(aiBase, next);
     setForm(prev => (prev ? { ...prev, ...scaled } : prev));

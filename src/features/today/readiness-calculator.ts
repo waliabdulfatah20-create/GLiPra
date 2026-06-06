@@ -35,7 +35,7 @@ export function calculateReadinessScore(input: ReadinessInput): ReadinessResult 
   let score = 70;
   const factors: FactorDelta[] = [];
 
-  // Injection phase adjustments
+  // Injection phase adjustments (injection route only)
   if (input.injectionPhase === 'peak_suppression') {
     score -= 15;
     factors.push({ id: 'injection_phase', delta: -15 });
@@ -49,22 +49,26 @@ export function calculateReadinessScore(input: ReadinessInput): ReadinessResult 
     factors.push({ id: 'injection_phase', delta: 5 });
   }
   // adjustment and overdue: delta = 0, no factor pushed
-  // Oral dose-status adjustments — route-aware analog of injection phase.
-  // Magnitudes are gentler than injection (±15) because steady-state oral
-  // dosing has far less day-to-day variation than a weekly peak/trough.
-  else if (input.doseStatus === 'steady_state') {
-    score += 5;
-    factors.push({ id: 'dose_status', delta: 5 });
+
+  // Oral dose-status adjustments — gated on NO injection phase so an injection
+  // user in 'adjustment'/'overdue' can never fall through into these. Magnitudes
+  // are gentler than injection (±15) because steady-state oral dosing has far
+  // less day-to-day variation than a weekly peak/trough.
+  if (input.injectionPhase === undefined) {
+    if (input.doseStatus === 'steady_state') {
+      score += 5;
+      factors.push({ id: 'dose_status', delta: 5 });
+    }
+    else if (input.doseStatus === 'building') {
+      score -= 5;
+      factors.push({ id: 'dose_status', delta: -5 });
+    }
+    else if (input.doseStatus === 'dose_missed') {
+      score -= 5;
+      factors.push({ id: 'dose_status', delta: -5 });
+    }
+    // dose_due: delta = 0, no factor pushed
   }
-  else if (input.doseStatus === 'building') {
-    score -= 5;
-    factors.push({ id: 'dose_status', delta: -5 });
-  }
-  else if (input.doseStatus === 'dose_missed') {
-    score -= 5;
-    factors.push({ id: 'dose_status', delta: -5 });
-  }
-  // dose_due: delta = 0, no factor pushed
 
   // Nausea modifier
   if (input.nausea !== undefined) {

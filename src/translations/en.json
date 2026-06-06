@@ -1,4 +1,9 @@
 {
+  "absorption_note": {
+    "body": "Your dose is still absorbing. To get the most out of it, hold off on eating for about {{minutes}} more minutes.",
+    "dismiss_a11y": "Dismiss absorption note",
+    "title": "Dose still absorbing"
+  },
   "account": {
     "cancel": "Cancel",
     "delete_button": "Delete account",

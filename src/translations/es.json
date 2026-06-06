@@ -1,4 +1,9 @@
 {
+  "absorption_note": {
+    "body": "Tu dosis aún se está absorbiendo. Para aprovecharla al máximo, espera unos {{minutes}} minutos más antes de comer.",
+    "dismiss_a11y": "Descartar nota de absorción",
+    "title": "Dosis aún absorbiendo"
+  },
   "account": {
     "cancel": "Cancelar",
     "delete_button": "Eliminar cuenta",

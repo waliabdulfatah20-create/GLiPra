@@ -38,6 +38,7 @@ import { ManualEntryForm } from '@/components/log/manual-entry-form';
 import { NutritionHeaderRing } from '@/components/log/nutrition-header-ring';
 import { PhotoCaptureButton } from '@/components/log/photo-capture-button';
 import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
+import { AbsorptionWindowNote } from '@/components/log/absorption-window-note';
 import { RecentFoodsRow } from '@/components/log/recent-foods-row';
 import { VoiceCaptureButton } from '@/components/log/voice-capture-button';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
@@ -370,6 +371,11 @@ export default function LogScreen() {
                 Sits in the logging zone right under the AI surfaces. Renders nothing
                 when there is no history. */}
             <RecentFoodsRow items={recentItems} onRelog={handleRelog} />
+
+            {/* 3b. Absorption window note — shown only for oral users inside the
+                30-min empty-stomach window. Non-blocking, dismissible for the session.
+                Renders null for injection users or when the window is not absorbing. */}
+            <AbsorptionWindowNote />
 
             {/* 4. 2-tab toggle — Manual | Barcode */}
             <View style={styles.modeToggleRow}>

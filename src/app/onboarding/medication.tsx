@@ -1,5 +1,5 @@
 import type { GlipraTokens } from '@/theme/tokens';
-import type { GLP1MedicationId } from '@/types';
+import type { AdministrationRoute, GLP1MedicationId } from '@/types';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
@@ -16,19 +16,22 @@ type MedicationOption = {
   id: GLP1MedicationId;
   brand: string;
   molecule: string;
+  route: AdministrationRoute;
 };
 
 const MEDICATIONS: MedicationOption[] = [
-  { id: 'semaglutide_wegovy', brand: 'Wegovy', molecule: 'Semaglutide' },
-  { id: 'semaglutide_ozempic', brand: 'Ozempic', molecule: 'Semaglutide' },
-  { id: 'tirzepatide_zepbound', brand: 'Zepbound', molecule: 'Tirzepatide' },
-  { id: 'tirzepatide_mounjaro', brand: 'Mounjaro', molecule: 'Tirzepatide' },
-  { id: 'liraglutide_saxenda', brand: 'Saxenda', molecule: 'Liraglutide' },
-  { id: 'liraglutide_victoza', brand: 'Victoza', molecule: 'Liraglutide' },
-  { id: 'dulaglutide_trulicity', brand: 'Trulicity', molecule: 'Dulaglutide' },
-  { id: 'compounded_semaglutide', brand: 'Compounded Semaglutide', molecule: 'Semaglutide' },
-  { id: 'compounded_tirzepatide', brand: 'Compounded Tirzepatide', molecule: 'Tirzepatide' },
-  { id: 'compounded_glp1_gip', brand: 'Compounded GLP-1/GIP', molecule: 'GLP-1 / GIP' },
+  { id: 'semaglutide_wegovy', brand: 'Wegovy', molecule: 'Semaglutide', route: 'injection' },
+  { id: 'semaglutide_ozempic', brand: 'Ozempic', molecule: 'Semaglutide', route: 'injection' },
+  { id: 'tirzepatide_zepbound', brand: 'Zepbound', molecule: 'Tirzepatide', route: 'injection' },
+  { id: 'tirzepatide_mounjaro', brand: 'Mounjaro', molecule: 'Tirzepatide', route: 'injection' },
+  { id: 'liraglutide_saxenda', brand: 'Saxenda', molecule: 'Liraglutide', route: 'injection' },
+  { id: 'liraglutide_victoza', brand: 'Victoza', molecule: 'Liraglutide', route: 'injection' },
+  { id: 'dulaglutide_trulicity', brand: 'Trulicity', molecule: 'Dulaglutide', route: 'injection' },
+  { id: 'semaglutide_rybelsus', brand: 'Rybelsus / Oral Wegovy', molecule: 'Oral Semaglutide · daily tablet', route: 'oral' },
+  { id: 'orforglipron', brand: 'Orforglipron', molecule: 'Oral GLP-1 · daily tablet', route: 'oral' },
+  { id: 'compounded_semaglutide', brand: 'Compounded Semaglutide', molecule: 'Semaglutide', route: 'injection' },
+  { id: 'compounded_tirzepatide', brand: 'Compounded Tirzepatide', molecule: 'Tirzepatide', route: 'injection' },
+  { id: 'compounded_glp1_gip', brand: 'Compounded GLP-1/GIP', molecule: 'GLP-1 / GIP', route: 'injection' },
 ];
 
 export default function MedicationScreen() {
@@ -49,8 +52,10 @@ export default function MedicationScreen() {
     if (!selectedId)
       return;
     haptics.medium();
+    const selected = MEDICATIONS.find(m => m.id === selectedId);
     setFormData({
       medicationId: selectedId,
+      administrationRoute: selected?.route ?? 'injection',
       isCompounded: selectedId.startsWith('compounded'),
     });
     router.push('/onboarding/injection-day');

@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -320,12 +320,42 @@ export type Database = {
         }
         Relationships: []
       }
+      oral_dose_logs: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          taken_at: string
+          user_id: string
+          window_respected: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          taken_at: string
+          user_id: string
+          window_respected?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          taken_at?: string
+          user_id?: string
+          window_respected?: boolean | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           activity_level: string
+          administration_route: string
           bmi: number | null
           created_at: string
+          dose_frequency: string | null
           dose_mg: number | null
+          dose_time_local: string | null
           goal_weight_kg: number | null
           has_kidney_disease: boolean
           height_cm: number | null
@@ -334,6 +364,7 @@ export type Database = {
           is_pregnant: boolean
           last_injection_date: string | null
           medication_id: string
+          medication_start_date: string | null
           medication_status: string
           onboarding_completed: boolean
           phase: string
@@ -344,9 +375,12 @@ export type Database = {
         }
         Insert: {
           activity_level?: string
+          administration_route?: string
           bmi?: number | null
           created_at?: string
+          dose_frequency?: string | null
           dose_mg?: number | null
+          dose_time_local?: string | null
           goal_weight_kg?: number | null
           has_kidney_disease?: boolean
           height_cm?: number | null
@@ -355,6 +389,7 @@ export type Database = {
           is_pregnant?: boolean
           last_injection_date?: string | null
           medication_id?: string
+          medication_start_date?: string | null
           medication_status?: string
           onboarding_completed?: boolean
           phase?: string
@@ -365,9 +400,12 @@ export type Database = {
         }
         Update: {
           activity_level?: string
+          administration_route?: string
           bmi?: number | null
           created_at?: string
+          dose_frequency?: string | null
           dose_mg?: number | null
+          dose_time_local?: string | null
           goal_weight_kg?: number | null
           has_kidney_disease?: boolean
           height_cm?: number | null
@@ -376,6 +414,7 @@ export type Database = {
           is_pregnant?: boolean
           last_injection_date?: string | null
           medication_id?: string
+          medication_start_date?: string | null
           medication_status?: string
           onboarding_completed?: boolean
           phase?: string

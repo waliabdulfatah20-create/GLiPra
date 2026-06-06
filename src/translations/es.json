@@ -214,6 +214,12 @@
     "language_title": "Elige tu idioma",
     "message": "Bienvenido a GLiPra"
   },
+  "oral_phase": {
+    "building": "Alcanzando nivel estable",
+    "dose_due": "Hora de tu dosis de hoy",
+    "dose_missed": "Retoma hoy tu rutina",
+    "steady_state": "En nivel estable"
+  },
   "portion_multiplier": {
     "label": "Ajustar porción",
     "pill_a11y": "Porción {{label}}",
@@ -292,6 +298,7 @@
   },
   "readiness": {
     "factor_labels": {
+      "dose_status": "Estado de dosis oral",
       "energy": "Energía",
       "injection_phase": "Fase GLP-1",
       "nausea": "Náuseas",
@@ -303,6 +310,10 @@
     "headlines": {
       "adjustment": "Días 3-4 tras la inyección",
       "injection_day": "Día de inyección",
+      "oral_building": "Alcanzando nivel estable",
+      "oral_dose_due": "Hora de tu dosis de hoy",
+      "oral_dose_missed": "Retoma hoy tu rutina",
+      "oral_steady_state": "En nivel estable",
       "overdue": "Inyección atrasada",
       "peak_suppression": "Días 1-2 tras la inyección",
       "recovery_window": "Días 5-7 tras la inyección"
@@ -316,6 +327,10 @@
       "injection_phase_recovery_window": "El apetito regresa - un buen día para alcanzar tu meta de proteínas",
       "nausea": "Porciones pequeñas y frecuentes funcionan mejor que comidas grandes hoy",
       "new_dose_week": "Las semanas de nueva dosis son las más difíciles - proteína frecuente es mejor",
+      "oral_building": "Los niveles aún están subiendo - toma tu pastilla con el estómago vacío cada mañana",
+      "oral_dose_due": "Toma tu pastilla con el estómago vacío y espera 30 min antes de comer o beber",
+      "oral_dose_missed": "Retoma hoy tu rutina - la dosis diaria constante protege tus resultados",
+      "oral_steady_state": "Medicamento en nivel estable - mantén tu rutina de dosis diaria",
       "prev_day_protein": "Ayer fue poco - hoy es el día más importante para proteger el músculo",
       "protein_pace": "Vas retrasado - intenta tomar 30g de proteína en tu próxima comida",
       "streak": "Manten tu racha - una comida con proteinas sella el dia"

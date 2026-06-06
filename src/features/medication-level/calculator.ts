@@ -11,7 +11,8 @@ export const HALF_LIVES: Record<string, number> = {
   liraglutide_saxenda: 0.5, // daily injection, ~13 hours
   liraglutide_victoza: 0.5,
   dulaglutide_trulicity: 4.5,
-  rybelsus: 0.04, // oral, ~1 hour — included for completeness
+  semaglutide_rybelsus: 7, // oral semaglutide: same molecule as injectable, ~1 week elimination half-life
+  orforglipron: 1.1, // oral GLP-1 (Lilly), ~24-30h elimination, once daily
   compounded_semaglutide: 7,
   compounded_tirzepatide: 5,
   compounded_glp1_gip: 5,

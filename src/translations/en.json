@@ -214,6 +214,12 @@
     "language_title": "Choose your language",
     "message": "Welcome to GLiPra"
   },
+  "oral_phase": {
+    "building": "Building to Steady State",
+    "dose_due": "Time for Today's Dose",
+    "dose_missed": "Back on Track Today",
+    "steady_state": "At Steady State"
+  },
   "portion_multiplier": {
     "label": "Adjust portion",
     "pill_a11y": "{{label}} portion",
@@ -292,6 +298,7 @@
   },
   "readiness": {
     "factor_labels": {
+      "dose_status": "Oral dose status",
       "energy": "Energy",
       "injection_phase": "GLP-1 phase",
       "nausea": "Nausea",
@@ -303,6 +310,10 @@
     "headlines": {
       "adjustment": "Days 3-4 after injection",
       "injection_day": "Injection day",
+      "oral_building": "Building to steady state",
+      "oral_dose_due": "Time for today's dose",
+      "oral_dose_missed": "Back on track today",
+      "oral_steady_state": "At steady state",
       "overdue": "Injection overdue",
       "peak_suppression": "Day 1-2 after injection",
       "recovery_window": "Days 5-7 after injection"
@@ -316,6 +327,10 @@
       "injection_phase_recovery_window": "Appetite returning - a good day to hit your full protein target",
       "nausea": "Small, frequent portions work better than large meals today",
       "new_dose_week": "New dose weeks are hardest - small frequent protein beats big meals",
+      "oral_building": "Levels are still building - take your tablet on an empty stomach each morning",
+      "oral_dose_due": "Take your tablet on an empty stomach and wait 30 min before eating or drinking",
+      "oral_dose_missed": "Get back on track today - consistent daily dosing protects your results",
+      "oral_steady_state": "Medication at steady state - keep your daily dose routine going strong",
       "prev_day_protein": "Yesterday was short - today matters most for protecting muscle",
       "protein_pace": "You are behind pace - aim for 30g protein in your next meal",
       "streak": "Keep your streak alive - one protein-rich meal seals the day"

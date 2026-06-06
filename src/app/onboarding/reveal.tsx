@@ -27,6 +27,8 @@ const MEDICATION_LABELS: Record<GLP1MedicationId, string> = {
   liraglutide_saxenda: 'Saxenda (Liraglutide)',
   liraglutide_victoza: 'Victoza (Liraglutide)',
   dulaglutide_trulicity: 'Trulicity (Dulaglutide)',
+  semaglutide_rybelsus: 'Rybelsus (Oral Semaglutide)',
+  orforglipron: 'Orforglipron (Oral GLP-1)',
   compounded_semaglutide: 'Compounded Semaglutide',
   compounded_tirzepatide: 'Compounded Tirzepatide',
   compounded_glp1_gip: 'Compounded GLP-1/GIP',

@@ -29,6 +29,7 @@ import {
 } from 'react-native';
 import { useTheme } from '@/lib/ThemeContext';
 import { useConfirmPhotoLog, useUserFoodDefault } from './hooks';
+import { shouldShowLowConfidenceNudge } from './low-confidence-nudge';
 import { bucketToPercent } from './photo-recognition';
 import { PortionMultiplier } from './portion-multiplier';
 import {
@@ -249,6 +250,11 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
   // Leading "~" signals AI self-report, not a calibrated probability.
   const confidenceLabel = `~${confidencePercent}%`;
 
+  // Below the threshold, actively nudge the user to verify the two fields that
+  // most affect their protein-floor tracking (protein + serving). Microcopy
+  // only, not clinical — see low-confidence-nudge.ts.
+  const showNudge = shouldShowLowConfidenceNudge(confidencePercent);
+
   const hasMicroData
     = form
       && (form.b12Mcg !== '' || form.vitaminDIu !== '' || form.magnesiumMg !== '' || form.zincMg !== '');
@@ -291,6 +297,19 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
             Edit any field before logging. Corrections improve future scans.
           </Text>
 
+          {/* Low-confidence nudge — appears below ~55% to push the user to
+              verify protein + serving before logging. Microcopy, not clinical. */}
+          {showNudge && (
+            <View
+              style={styles.nudgeBanner}
+              accessibilityRole="alert"
+              accessibilityLabel={`${t('low_confidence.banner_title')}. ${t('low_confidence.banner_body')}`}
+            >
+              <Text style={styles.nudgeTitle}>{t('low_confidence.banner_title')}</Text>
+              <Text style={styles.nudgeBody}>{t('low_confidence.banner_body')}</Text>
+            </View>
+          )}
+
           <ScrollView
             style={styles.scroll}
             showsVerticalScrollIndicator={false}
@@ -323,7 +342,7 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
                 accessibilityLabel="Food name"
               />
             </FieldRow>
-            <FieldRow label="Serving" unit="">
+            <FieldRow label="Serving" unit="" flag={showNudge}>
               <TextInput
                 style={styles.textInput}
                 value={form.servingDescription}
@@ -351,6 +370,7 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
                 value={form.proteinG}
                 onChangeText={v => handleField('proteinG', v)}
                 highlight
+                flag={showNudge}
               />
               <MacroInput
                 label="Carbs"
@@ -478,17 +498,19 @@ type FieldRowProps = {
   label: string;
   unit: string;
   children: React.ReactNode;
+  /** When true, draw an amber bottom border to flag the field for review. */
+  flag?: boolean;
 };
 
-function FieldRow({ label, children }: FieldRowProps) {
+function FieldRow({ label, children, flag = false }: FieldRowProps) {
   const { colors, spacing } = useTheme();
   return (
     <View style={{
       flexDirection: 'row',
       alignItems: 'center',
       paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+      borderBottomWidth: flag ? 1.5 : 1,
+      borderBottomColor: flag ? colors.warning : colors.border,
       gap: spacing.sm,
     }}
     >
@@ -504,9 +526,11 @@ type MacroInputProps = {
   value: string;
   onChangeText: (v: string) => void;
   highlight?: boolean;
+  /** When true, override the border to amber to flag the field for review. */
+  flag?: boolean;
 };
 
-function MacroInput({ label, unit, value, onChangeText, highlight = false }: MacroInputProps) {
+function MacroInput({ label, unit, value, onChangeText, highlight = false, flag = false }: MacroInputProps) {
   const { colors, spacing, radius } = useTheme();
   return (
     <View style={[
@@ -521,6 +545,8 @@ function MacroInput({ label, unit, value, onChangeText, highlight = false }: Mac
         alignItems: 'center',
       },
       highlight && { backgroundColor: colors.primaryLight, borderColor: `${colors.primary}60` },
+      // Flag overrides only the border (amber ring), keeping any highlight bg/text.
+      flag && { borderWidth: 1.5, borderColor: colors.warning },
     ]}
     >
       <TextInput
@@ -616,6 +642,26 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       color: colors.textSecondary,
       lineHeight: 18,
       marginBottom: spacing.md,
+    },
+    nudgeBanner: {
+      backgroundColor: colors.warningLight,
+      borderRadius: radius.md,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.warning,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      marginBottom: spacing.md,
+    },
+    nudgeTitle: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: colors.warning,
+      marginBottom: 2,
+    },
+    nudgeBody: {
+      fontSize: 12,
+      lineHeight: 17,
+      color: colors.textSecondary,
     },
     scroll: {
       flexGrow: 0,

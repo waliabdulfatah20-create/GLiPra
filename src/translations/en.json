@@ -185,6 +185,10 @@
     "voice_stop": "Tap to stop",
     "voice_transcript_label": "You said"
   },
+  "low_confidence": {
+    "banner_body": "The AI wasn't very sure about this food. Confirm the protein and serving size before logging.",
+    "banner_title": "Double-check this one"
+  },
   "med_banner": {
     "adjustment_headline": "Adjustment phase: monitor for GI symptoms",
     "adjustment_pill": "Stay hydrated",

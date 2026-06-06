@@ -26,13 +26,21 @@ import { corsHeaders } from '../_shared/cors.ts';
 const InputSchema = z.object({
   medicationId: z.string(),
   doseMg: z.number(),
-  injectionPhase: z.string(),
+  // Route discriminator. Defaults to injection for backward compatibility with
+  // older clients that send injectionPhase/daysSinceInjection without a route.
+  administrationRoute: z.enum(['injection', 'oral']).optional().default('injection'),
+  // Injection-route fields (present for injection users)
+  injectionPhase: z.string().optional(),
+  daysSinceInjection: z.number().optional(),
+  // Oral-route fields (present for oral users)
+  oralPhase: z.string().optional(),
+  doseAdherenceStreakDays: z.number().optional(),
+  daysSinceLastDose: z.number().optional(),
   avgNausea14d: z.number().nullable(),
   avgEnergy14d: z.number().nullable(),
   proteinFloorG: z.number(),
   avgProtein14d: z.number().nullable(),
   recentWeightTrendKg: z.number().nullable(), // positive = gaining, negative = losing
-  daysSinceInjection: z.number(),
 });
 
 // Rule 3: Every OpenAI response is validated through this schema.
@@ -163,12 +171,26 @@ serve(async (req: Request) => {
     });
 
     // Build a concise data context string from the anonymised metrics.
+    // Route-aware: oral users get adherence framing, injection users get cycle framing.
     const contextLines: string[] = [
       `Medication ID: ${input.medicationId}`,
       `Dose: ${input.doseMg} mg`,
-      `Current injection phase: ${input.injectionPhase}`,
-      `Days since last injection: ${input.daysSinceInjection}`,
     ];
+
+    if (input.administrationRoute === 'oral') {
+      contextLines.push(
+        'Administration: oral GLP-1 (daily tablet)',
+        `Treatment status: ${input.oralPhase ?? 'unknown'}`,
+        `Dose adherence: ${input.doseAdherenceStreakDays ?? 0}-day streak`,
+        `Days since last dose: ${input.daysSinceLastDose ?? 0}`,
+      );
+    }
+    else {
+      contextLines.push(
+        `Current injection phase: ${input.injectionPhase ?? 'unknown'}`,
+        `Days since last injection: ${input.daysSinceInjection ?? 0}`,
+      );
+    }
 
     if (input.avgNausea14d !== null) {
       contextLines.push(

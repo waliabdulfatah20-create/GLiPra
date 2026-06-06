@@ -2,6 +2,7 @@
 // Assembles the last-4-weeks data summary, provides AI question generation,
 // and a PDF generation mutation.
 
+import type { AdministrationRoute } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { format, subDays } from 'date-fns';
 import { useState } from 'react';
@@ -9,8 +10,14 @@ import { useState } from 'react';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { useProteinHistoryPerDay } from '@/features/progress/hooks';
 import { useTodayData } from '@/features/today/hooks';
+import {
+  daysSinceLastDose,
+  injectionPhaseLabel,
+  medicationIdToName,
+  oralPhaseLabel,
+} from '@/features/visit-prep/summary';
 import { useWeightLogs } from '@/features/weight/hooks';
-import { isMockAIEnabled, MOCK_VISIT_PREP_QUESTIONS } from '@/lib/mockAI';
+import { isMockAIEnabled, MOCK_VISIT_PREP_QUESTIONS, MOCK_VISIT_PREP_QUESTIONS_ORAL } from '@/lib/mockAI';
 import { supabase } from '@/lib/supabase';
 
 // ---------------------------------------------------------------------------
@@ -21,48 +28,19 @@ export type VisitPrepData = {
   currentWeightKg: number | null;
   ewmaWeightKg: number | null;
   avgProteinG: number;
+  administrationRoute: AdministrationRoute;
+  // Injection-route fields (null for oral users)
   injectionPhase: string | null;
   daysSinceInjection: number | null;
+  // Oral-route fields (null for injection users)
+  oralPhase: string | null;
+  doseAdherenceStreak: number | null;
+  daysSinceLastDose: number | null;
   medicationName: string | null;
   avgNausea: number | null;
   avgEnergy: number | null;
   isLoading: boolean;
 };
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Convert internal medication ID to a display name for the PDF. */
-function medicationIdToName(id: string | undefined | null): string | null {
-  if (!id)
-    return null;
-  const map: Record<string, string> = {
-    semaglutide_ozempic: 'Semaglutide (Ozempic)',
-    semaglutide_wegovy: 'Semaglutide (Wegovy)',
-    tirzepatide_mounjaro: 'Tirzepatide (Mounjaro)',
-    tirzepatide_zepbound: 'Tirzepatide (Zepbound)',
-    liraglutide_saxenda: 'Liraglutide (Saxenda)',
-    dulaglutide_trulicity: 'Dulaglutide (Trulicity)',
-    semaglutide_compounded: 'Compounded Semaglutide',
-    tirzepatide_compounded: 'Compounded Tirzepatide',
-  };
-  return map[id] ?? id;
-}
-
-/** Convert internal injection phase key to a human-readable label. */
-function phaseLabel(phase: string | null | undefined): string | null {
-  if (!phase)
-    return null;
-  const map: Record<string, string> = {
-    injection_day: 'Injection Day',
-    peak_suppression: 'Peak Suppression (Days 1–2)',
-    adjustment: 'Adjustment (Days 3–4)',
-    recovery_window: 'Recovery Window (Days 5–7)',
-    overdue: 'Overdue',
-  };
-  return map[phase] ?? phase;
-}
 
 // ---------------------------------------------------------------------------
 // useRecentCheckIns — fetches last 7 check-in records for symptom averages
@@ -107,7 +85,15 @@ function useRecentCheckIns(): {
 // ---------------------------------------------------------------------------
 
 export function useVisitPrepData(): VisitPrepData {
-  const { profile, injectionCycle, isLoading: isTodayLoading } = useTodayData();
+  const {
+    profile,
+    injectionCycle,
+    administrationRoute,
+    oralCycle,
+    oralAdherenceStreak,
+    oralLastDoseTakenAt,
+    isLoading: isTodayLoading,
+  } = useTodayData();
   const { logs, isLoading: isWeightLoading } = useWeightLogs();
   const { checkIns, isLoading: isCheckInsLoading } = useRecentCheckIns();
   // 28-day protein history (food logging is now live)
@@ -125,11 +111,23 @@ export function useVisitPrepData(): VisitPrepData {
       ? loggedDays.reduce((sum, d) => sum + d.proteinG, 0) / loggedDays.length
       : 0;
 
-  // Injection cycle data from today profile
-  const injectionPhase = injectionCycle
-    ? phaseLabel(injectionCycle.phase)
+  // Route-aware cycle data. Injection users get phase + days-since-injection;
+  // oral users get a treatment-status label, dosing streak, and days since the
+  // last dose. The other route's fields stay null.
+  const isOral = administrationRoute === 'oral';
+  const today = format(new Date(), 'yyyy-MM-dd');
+
+  const injectionPhase = !isOral && injectionCycle
+    ? injectionPhaseLabel(injectionCycle.phase)
     : null;
-  const daysSinceInjection = injectionCycle?.daysSinceInjection ?? null;
+  const daysSinceInjection = !isOral ? (injectionCycle?.daysSinceInjection ?? null) : null;
+
+  const oralPhase = isOral && oralCycle ? oralPhaseLabel(oralCycle.phase) : null;
+  const doseAdherenceStreak = isOral ? oralAdherenceStreak : null;
+  const oralDaysSinceLastDose = isOral
+    ? daysSinceLastDose(oralLastDoseTakenAt, today)
+    : null;
+
   const medicationName = medicationIdToName(profile?.medicationId);
 
   // Symptom averages from last 7 check-ins
@@ -147,8 +145,12 @@ export function useVisitPrepData(): VisitPrepData {
     currentWeightKg,
     ewmaWeightKg,
     avgProteinG,
+    administrationRoute,
     injectionPhase,
     daysSinceInjection,
+    oralPhase,
+    doseAdherenceStreak,
+    daysSinceLastDose: oralDaysSinceLastDose,
     medicationName,
     avgNausea,
     avgEnergy,
@@ -183,10 +185,12 @@ export function useVisitPrep(): UseVisitPrepResult {
     setIsLoading(true);
     setError(null);
 
+    const isOral = data.administrationRoute === 'oral';
+
     // Mock gate — zero OpenAI cost during development (Rule from CLAUDE.md cost section).
     if (isMockAIEnabled()) {
       await new Promise<void>(resolve => setTimeout(resolve, 800));
-      setQuestions([...MOCK_VISIT_PREP_QUESTIONS]);
+      setQuestions([...(isOral ? MOCK_VISIT_PREP_QUESTIONS_ORAL : MOCK_VISIT_PREP_QUESTIONS)]);
       setIsLoading(false);
       return;
     }
@@ -195,13 +199,23 @@ export function useVisitPrep(): UseVisitPrepResult {
       const body = {
         medicationId: data.medicationName ?? 'unknown',
         doseMg: data.doseMg ?? 0,
-        injectionPhase: data.injectionPhase ?? 'unknown',
+        administrationRoute: data.administrationRoute,
         avgNausea14d: data.avgNausea,
         avgEnergy14d: data.avgEnergy,
         proteinFloorG: data.proteinFloorG ?? 0,
         avgProtein14d: data.avgProteinG > 0 ? data.avgProteinG : null,
         recentWeightTrendKg: null, // Weight trend delta not yet computed; placeholder for Phase 2
-        daysSinceInjection: data.daysSinceInjection ?? 0,
+        // Route-specific clinical signal
+        ...(isOral
+          ? {
+              oralPhase: data.oralPhase ?? 'unknown',
+              doseAdherenceStreakDays: data.doseAdherenceStreak ?? 0,
+              daysSinceLastDose: data.daysSinceLastDose ?? 0,
+            }
+          : {
+              injectionPhase: data.injectionPhase ?? 'unknown',
+              daysSinceInjection: data.daysSinceInjection ?? 0,
+            }),
       };
 
       const { data: result, error: fnError }
@@ -251,18 +265,30 @@ export function useGeneratePdf(): GeneratePdfResult {
     try {
       const visitDate = format(new Date(), 'yyyy-MM-dd');
 
+      const isOral = data.administrationRoute === 'oral';
+
       const body = {
         visitDate,
         patientData: {
           currentWeightKg: data.currentWeightKg ?? undefined,
           ewmaWeightKg: data.ewmaWeightKg ?? undefined,
           avgProteinG: data.avgProteinG,
-          injectionPhase: data.injectionPhase ?? undefined,
-          daysSinceInjection: data.daysSinceInjection ?? undefined,
+          administrationRoute: data.administrationRoute,
           medicationName: data.medicationName ?? undefined,
           avgNausea: data.avgNausea ?? undefined,
           avgEnergy: data.avgEnergy ?? undefined,
           hasRedFlags: false, // Placeholder until red-flag history query is wired
+          // Route-specific clinical signal
+          ...(isOral
+            ? {
+                oralPhase: data.oralPhase ?? undefined,
+                doseAdherenceStreakDays: data.doseAdherenceStreak ?? undefined,
+                daysSinceLastDose: data.daysSinceLastDose ?? undefined,
+              }
+            : {
+                injectionPhase: data.injectionPhase ?? undefined,
+                daysSinceInjection: data.daysSinceInjection ?? undefined,
+              }),
         },
       };
 

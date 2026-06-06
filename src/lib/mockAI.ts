@@ -91,3 +91,11 @@ export const MOCK_VISIT_PREP_QUESTIONS: string[] = [
   'My energy scores have been low (2.1/5 on average). Could this be related to my current injection phase?',
   'It has been 9 days since my last injection. What is the best approach to get back on schedule?',
 ];
+
+// Oral-route variant — adherence-framed instead of injection-cycle framed.
+export const MOCK_VISIT_PREP_QUESTIONS_ORAL: string[] = [
+  'I have kept a steady daily dosing routine. Is my current dose still the right one for my progress?',
+  'My nausea has been averaging 3.8/5 over the past 14 days. Should we revisit my dose or my morning timing?',
+  'I have been at steady state for a few weeks. Should we discuss what maintenance looks like for me?',
+  'I sometimes find the empty-stomach wait hard to fit into my morning. Are there timing options we can talk through?',
+];

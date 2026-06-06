@@ -22,8 +22,15 @@ const PatientDataSchema = z.object({
   currentWeightKg: z.number().optional(),
   ewmaWeightKg: z.number().optional(),
   avgProteinG: z.number().optional(),
+  // Route discriminator — defaults to injection for backward compatibility.
+  administrationRoute: z.enum(['injection', 'oral']).optional().default('injection'),
+  // Injection-route fields
   injectionPhase: z.string().optional(),
   daysSinceInjection: z.number().optional(),
+  // Oral-route fields
+  oralPhase: z.string().optional(),
+  doseAdherenceStreakDays: z.number().optional(),
+  daysSinceLastDose: z.number().optional(),
   medicationName: z.string().optional(),
   avgNausea: z.number().optional(),
   avgEnergy: z.number().optional(),
@@ -42,9 +49,17 @@ const InputSchema = z.object({
 const DAILY_LIMIT = 5;
 const FUNCTION_NAME = 'generate-visit-pdf';
 
-const PRESCRIBER_QUESTIONS = [
+const PRESCRIBER_QUESTIONS_INJECTION = [
   'Is my current dose appropriate for my weight?',
   'Should I adjust my injection day based on my schedule?',
+  'Are my protein goals still appropriate?',
+  'What symptoms should prompt me to call between visits?',
+];
+
+// Oral variant — adherence and timing framing instead of injection-day framing.
+const PRESCRIBER_QUESTIONS_ORAL = [
+  'Is my current dose appropriate for my weight?',
+  'Is my once-daily timing working well for me?',
   'Are my protein goals still appropriate?',
   'What symptoms should prompt me to call between visits?',
 ];
@@ -257,20 +272,41 @@ serve(async (req: Request) => {
     curY = drawDataRow(page, regularFont, boldFont, 'Avg protein intake:', avgProteinStr, curY, margin);
     curY -= 10;
 
-    // --- Injection Cycle ---
-    curY = drawSectionHeading(page, boldFont, 'INJECTION CYCLE', curY, width, margin);
-    curY -= 4;
-
+    // --- Medication summary — Dose Adherence (oral) or Injection Cycle (injection) ---
     const medicationStr = patientData.medicationName ?? 'Not specified';
-    const phaseStr = patientData.injectionPhase ?? 'Unknown';
-    const daysStr = patientData.daysSinceInjection !== undefined
-      ? `${patientData.daysSinceInjection} days`
-      : 'Unknown';
 
-    curY = drawDataRow(page, regularFont, boldFont, 'Medication:', medicationStr, curY, margin);
-    curY = drawDataRow(page, regularFont, boldFont, 'Current phase:', phaseStr, curY, margin);
-    curY = drawDataRow(page, regularFont, boldFont, 'Days since injection:', daysStr, curY, margin);
-    curY -= 10;
+    if (patientData.administrationRoute === 'oral') {
+      curY = drawSectionHeading(page, boldFont, 'DOSE ADHERENCE', curY, width, margin);
+      curY -= 4;
+
+      const statusStr = patientData.oralPhase ?? 'Unknown';
+      const streakStr = patientData.doseAdherenceStreakDays !== undefined
+        ? `${patientData.doseAdherenceStreakDays}-day streak`
+        : 'No doses logged';
+      const sinceDoseStr = patientData.daysSinceLastDose !== undefined
+        ? `${patientData.daysSinceLastDose} days`
+        : 'Unknown';
+
+      curY = drawDataRow(page, regularFont, boldFont, 'Medication:', medicationStr, curY, margin);
+      curY = drawDataRow(page, regularFont, boldFont, 'Current status:', statusStr, curY, margin);
+      curY = drawDataRow(page, regularFont, boldFont, 'Dosing streak:', streakStr, curY, margin);
+      curY = drawDataRow(page, regularFont, boldFont, 'Days since last dose:', sinceDoseStr, curY, margin);
+      curY -= 10;
+    }
+    else {
+      curY = drawSectionHeading(page, boldFont, 'INJECTION CYCLE', curY, width, margin);
+      curY -= 4;
+
+      const phaseStr = patientData.injectionPhase ?? 'Unknown';
+      const daysStr = patientData.daysSinceInjection !== undefined
+        ? `${patientData.daysSinceInjection} days`
+        : 'Unknown';
+
+      curY = drawDataRow(page, regularFont, boldFont, 'Medication:', medicationStr, curY, margin);
+      curY = drawDataRow(page, regularFont, boldFont, 'Current phase:', phaseStr, curY, margin);
+      curY = drawDataRow(page, regularFont, boldFont, 'Days since injection:', daysStr, curY, margin);
+      curY -= 10;
+    }
 
     // --- Recent Symptoms ---
     curY = drawSectionHeading(page, boldFont, 'RECENT SYMPTOMS (last 7 check-ins)', curY, width, margin);
@@ -293,7 +329,11 @@ serve(async (req: Request) => {
     curY = drawSectionHeading(page, boldFont, 'QUESTIONS FOR YOUR PRESCRIBER', curY, width, margin);
     curY -= 4;
 
-    for (const question of PRESCRIBER_QUESTIONS) {
+    const prescriberQuestions = patientData.administrationRoute === 'oral'
+      ? PRESCRIBER_QUESTIONS_ORAL
+      : PRESCRIBER_QUESTIONS_INJECTION;
+
+    for (const question of prescriberQuestions) {
       page.drawText('•', {
         x: margin,
         y: curY,

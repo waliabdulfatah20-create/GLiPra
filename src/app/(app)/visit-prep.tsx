@@ -28,9 +28,17 @@ import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 
 // Static fallback questions shown before AI generation runs.
-const STATIC_QUESTIONS = [
+const STATIC_QUESTIONS_INJECTION = [
   'Is my current dose appropriate for my weight?',
   'Should I adjust my injection day based on my schedule?',
+  'Are my protein goals still appropriate?',
+  'What symptoms should prompt me to call between visits?',
+] as const;
+
+// Oral variant — adherence and timing framing instead of injection-day framing.
+const STATIC_QUESTIONS_ORAL = [
+  'Is my current dose appropriate for my weight?',
+  'Is my once-daily timing working well for me?',
   'Are my protein goals still appropriate?',
   'What symptoms should prompt me to call between visits?',
 ] as const;
@@ -97,9 +105,12 @@ export default function VisitPrepScreen() {
     [colors, spacing, radius, shadows],
   );
 
-  // Active question list — AI-generated when available, static fallback otherwise.
+  const isOral = data.administrationRoute === 'oral';
+
+  // Active question list — AI-generated when available, route-aware static fallback otherwise.
+  const staticQuestions = isOral ? STATIC_QUESTIONS_ORAL : STATIC_QUESTIONS_INJECTION;
   const activeQuestions: readonly string[]
-    = aiQuestions !== null ? aiQuestions : STATIC_QUESTIONS;
+    = aiQuestions !== null ? aiQuestions : staticQuestions;
 
   const handleGenerateQuestions = React.useCallback(async () => {
     haptics.medium();
@@ -230,25 +241,56 @@ export default function VisitPrepScreen() {
           />
         </SectionCard>
 
-        {/* Injection cycle card */}
-        <SectionCard label="INJECTION CYCLE">
-          <DataRow
-            name="Medication"
-            value={data.medicationName ?? 'Not specified'}
-          />
-          <DataRow
-            name="Current phase"
-            value={data.injectionPhase ?? 'Unknown'}
-          />
-          <DataRow
-            name="Days since injection"
-            value={
-              data.daysSinceInjection !== null
-                ? `${data.daysSinceInjection} days`
-                : 'Unknown'
-            }
-          />
-        </SectionCard>
+        {/* Medication summary card — dose adherence for oral, injection cycle for injection */}
+        {isOral
+          ? (
+              <SectionCard label="DOSE ADHERENCE">
+                <DataRow
+                  name="Medication"
+                  value={data.medicationName ?? 'Not specified'}
+                />
+                <DataRow
+                  name="Current status"
+                  value={data.oralPhase ?? 'Unknown'}
+                />
+                <DataRow
+                  name="Dosing streak"
+                  value={
+                    data.doseAdherenceStreak !== null
+                      ? `${data.doseAdherenceStreak}-day streak`
+                      : 'No doses logged'
+                  }
+                />
+                <DataRow
+                  name="Days since last dose"
+                  value={
+                    data.daysSinceLastDose !== null
+                      ? `${data.daysSinceLastDose} days`
+                      : 'Unknown'
+                  }
+                />
+              </SectionCard>
+            )
+          : (
+              <SectionCard label="INJECTION CYCLE">
+                <DataRow
+                  name="Medication"
+                  value={data.medicationName ?? 'Not specified'}
+                />
+                <DataRow
+                  name="Current phase"
+                  value={data.injectionPhase ?? 'Unknown'}
+                />
+                <DataRow
+                  name="Days since injection"
+                  value={
+                    data.daysSinceInjection !== null
+                      ? `${data.daysSinceInjection} days`
+                      : 'Unknown'
+                  }
+                />
+              </SectionCard>
+            )}
 
         {/* Symptoms card */}
         <SectionCard label="RECENT SYMPTOMS (last 7 check-ins)">

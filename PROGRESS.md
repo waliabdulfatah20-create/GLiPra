@@ -5,7 +5,7 @@
 
 ---
 
-## Current Backlog (as of session 42 — `origin/master` @ `6420b9a`)
+## Current Backlog (as of session 42 — `origin/master` @ `de9803c`)
 
 ### Tier 2 — ready to ship next (one session each)
 | Priority | Item | Notes |

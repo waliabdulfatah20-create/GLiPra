@@ -1,6 +1,6 @@
 # Glipra — Architecture Document
 > Paste this into every new Claude conversation. Keep it updated as decisions are made.
-> Last updated: 2026-05-30 (session 37). App name: Glipra. Formerly working name: Satia.
+> Last updated: 2026-06-05 (session 41). App name: Glipra. Formerly working name: Satia.
 > Scaffold complete: Obytes v9.0.0 / Expo SDK 54 / pnpm / NativeWind stripped.
 >
 > **Scaffold from:** [obytes/react-native-template-obytes](https://github.com/obytes/react-native-template-obytes)

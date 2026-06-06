@@ -5,13 +5,32 @@
 
 ---
 
-## Current Backlog (as of session 41 — branch `feat/oral-glp1` @ `3fb9ba8`, `origin/master` @ `2bbb947` post ci-setup merge)
+## Current Backlog (as of session 41 — branch `feat/oral-glp1` @ `2bbd532` / PR open; `origin/master` @ `2bbb947`)
 
 ### Tier 2 — ready to ship next (one session each)
 | Priority | Item | Notes |
 |---|---|---|
 | **1** | **Rescan button** | Re-run recognize-food on same photo without re-snapping. Cache base64 in state; "Try again" in error path is half-done. ~1 hr. |
 | **2** | **Wrong food? Search database** | New OFF name-search modal → tap result → pre-fills AIReviewSheet. ~2–3 hrs. |
+
+### Oral GLP-1 Phase 2 — Dose Window + adherence (the differentiator)
+Phase 1 foundation shipped (session 41). Phase 2 is the feature no competitor has: a 30-minute
+absorption timer with pharmacist context. Educational copy only; attorney gate before non-dev deploy.
+
+| File | What to build |
+|---|---|
+| `src/features/oral-dose/api.ts` (NEW) | `logOralDose(userId, { takenAt, windowRespected })` → inserts into `oral_dose_logs`. `fetchTodayOralDose(userId, today)` → latest row for today. |
+| `src/features/oral-dose/hooks.ts` (NEW) | `useTodayOralDose()` (staleTime: 1 min), `useLogOralDose()` (invalidates today-oral-dose + today-profile on success), `useOralDoseHistory(days)`. |
+| `src/components/today/dose-window-card.tsx` (NEW) | "Took it" CTA that inserts a log row, starts a 30-min countdown (Reanimated v4 `withTiming` or `setInterval`), transitions to "You're clear to eat" clear state. Tier 2 DisclaimerBanner (Rule 8). Educational copy only. |
+| `src/features/today/hooks.ts` (UPDATE) | Wire `lastDoseDate` from `useTodayOralDose()` into `calculateOralPhase` (currently passes `null`; placeholder comment on the line). |
+| `src/lib/notifications.ts` (UPDATE) | Add `scheduleOralDoseReminder(doseTimeLocal: string)` (daily at `doseTimeLocal`) + `scheduleAbsorptionClear()` (30-min one-shot). Route-aware: oral users get these, injectable users keep `scheduleInjectionReminder`. Guard: never call injection reminder for oral users. |
+| `src/lib/use-notification-settings.ts` (UPDATE) | Route-aware toggle: oral shows dose reminder + absorption clear settings instead of injection reminder settings. |
+| `src/__tests__/oral-dose-window.test.ts` (NEW) | Vitest: dose-window timing (30 min = 1800s), countdown state machine, `calculateOralPhase` with real `lastDoseDate` values. |
+| `src/translations/en.json` + `es.json` | Dose window copy: `oral_dose.*` namespace (took_it, window_heading, clear_heading, absorbing_subtext, clear_subtext, cta_log, reminder_body). Attorney gate before any non-dev deploy. |
+
+**Phase 2 verification:** `pnpm test` green with new dose-window tests. On device: oral user → tap "Took it" → countdown starts → 30-min clear notification fires → adherence streak increments on next Today load.
+
+**Phase 3 (later):** Food-logger coupling (gentle non-blocking note during absorption window), oral technique education card, visit-prep oral variant.
 
 ### Scan Accuracy & Cost Cascade — committed roadmap (assessed session 40)
 Target the accuracy cascade: cheapest + most accurate inputs first, fewest expensive AI calls.

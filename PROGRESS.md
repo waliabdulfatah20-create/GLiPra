@@ -69,7 +69,7 @@ fixed 3 issues (unit-race data corruption x2, stale-phase recompute). 10 Vitest 
 |---|---|
 | Richer in-hub PK / titration viz | Inline sparkline + days-to-steady-state in the Dose hub (enhances the working MedLevelBanner). |
 | Visit-prep hub link | A "Prep for your visit" ActionRow on the Dose hub → `/visit-prep` (today Settings-only). |
-| Stale `phase` column fix | `update-status.tsx` never rewrites `phase` on status change → drifts app-wide. Flagged as its own task (session 46). |
+| ~~Stale `phase` column fix~~ ✅ FIXED (session 46, `72595cd`) | `update-status.tsx` now writes the derived `phase` alongside `medication_status` (onboarding's derivation) + invalidates `['today-profile']`. Confirmed the only post-onboarding `medication_status` writer. +4 jest-expo tests. Stops `profile.phase` drifting app-wide. |
 
 **On-device test pending (Phase 1):** oral acct → bar Today/Dose/Nutrition/Progress/Coach, Today shows
 the dose once, Dose tab renders the oral hub; injection acct → Dose tab in slot 2 (no Sites tab),

@@ -1,6 +1,4 @@
-import type { RecentDoseStatus } from '@/features/dose/recent-doses';
 import type { GlipraTokens } from '@/theme/tokens';
-import { format, parseISO } from 'date-fns';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 
@@ -26,9 +24,9 @@ import {
   Syringe,
 } from '@/components/ui/icons';
 import { TodaySkeleton } from '@/components/ui/today-skeleton';
-import { buildRecentDoseStrip } from '@/features/dose/recent-doses';
+import { AdherenceCalendar } from '@/features/dose/adherence-calendar';
 import { RemindersPanel } from '@/features/dose/reminders-panel';
-import { useLogOralDose, useOralDoseLogs, useSetDoseWindowRespected } from '@/features/oral-dose/hooks';
+import { useLogOralDose, useSetDoseWindowRespected } from '@/features/oral-dose/hooks';
 import { useTodayData } from '@/features/today/hooks';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
@@ -79,7 +77,6 @@ export function DoseScreen() {
   const isOral = administrationRoute === 'oral';
   const logOralDose = useLogOralDose();
   const setWindowRespected = useSetDoseWindowRespected();
-  const { logs: oralDoseLogs } = useOralDoseLogs();
 
   const handleTakeOralDose = React.useCallback(() => {
     logOralDose.mutate({ takenAt: new Date().toISOString() });
@@ -93,27 +90,6 @@ export function DoseScreen() {
     [setWindowRespected, oralLastDoseId],
   );
 
-  const today = format(new Date(), 'yyyy-MM-dd');
-  const recentStrip = React.useMemo(
-    () =>
-      buildRecentDoseStrip(
-        oralDoseLogs.map(l => ({ takenAt: l.takenAt, windowRespected: l.windowRespected })),
-        today,
-        7,
-      ),
-    [oralDoseLogs, today],
-  );
-
-  function dotColor(status: RecentDoseStatus): string {
-    if (status === 'taken')
-      return colors.success;
-    if (status === 'broken')
-      return colors.warning;
-    if (status === 'missed')
-      return colors.error;
-    return colors.gray200;
-  }
-
   if (isLoading) {
     return (
       <SafeAreaView
@@ -126,7 +102,6 @@ export function DoseScreen() {
   }
 
   const isDiscontinued = profile?.medicationStatus === 'discontinued';
-  const hasOralDoses = oralDoseLogs.length > 0;
 
   return (
     <SafeAreaView
@@ -211,29 +186,9 @@ export function DoseScreen() {
                       </View>
                     )}
 
-                    {/* Recent doses strip */}
-                    <SectionLabel label={t('dose.recent_label')} />
-                    {hasOralDoses
-                      ? (
-                          <View style={styles.stripCard}>
-                            <View style={styles.stripRow}>
-                              {recentStrip.map(day => (
-                                <View key={day.date} style={styles.stripCell}>
-                                  <Text style={styles.stripDayLabel}>
-                                    {format(parseISO(day.date), 'EEEEE')}
-                                  </Text>
-                                  <View style={[styles.stripDot, { backgroundColor: dotColor(day.status) }]} />
-                                </View>
-                              ))}
-                            </View>
-                          </View>
-                        )
-                      : (
-                          <View style={styles.infoCard}>
-                            <Text style={styles.infoTitle}>{t('dose.empty_oral_title')}</Text>
-                            <Text style={styles.infoBody}>{t('dose.empty_oral_body')}</Text>
-                          </View>
-                        )}
+                    {/* Adherence calendar */}
+                    <SectionLabel label={t('dose.calendar_label')} />
+                    <AdherenceCalendar />
 
                     {/* Reminders */}
                     <RemindersPanel />
@@ -307,6 +262,10 @@ export function DoseScreen() {
                     {/* Level */}
                     <SectionLabel label={t('dose.medication_label')} />
                     <MedLevelBanner route="injection" phase={injectionCycle?.phase ?? null} />
+
+                    {/* Adherence calendar */}
+                    <SectionLabel label={t('dose.calendar_label')} />
+                    <AdherenceCalendar />
 
                     {/* Reminders */}
                     <RemindersPanel />
@@ -473,36 +432,6 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       fontSize: 13,
       color: colors.textSecondary,
       lineHeight: 19,
-    },
-
-    // Recent dose strip
-    stripCard: {
-      backgroundColor: colors.surface,
-      borderRadius: radius.lg,
-      padding: spacing.md,
-      borderWidth: 1,
-      borderColor: colors.border,
-      marginBottom: spacing.md,
-      ...shadows.sm,
-    },
-    stripRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-    },
-    stripCell: {
-      alignItems: 'center',
-      gap: spacing.xs,
-      flex: 1,
-    },
-    stripDayLabel: {
-      fontSize: 11,
-      color: colors.textSecondary,
-      fontWeight: '600',
-    },
-    stripDot: {
-      width: 14,
-      height: 14,
-      borderRadius: 7,
     },
 
     // Action rows

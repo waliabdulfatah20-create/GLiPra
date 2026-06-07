@@ -23,11 +23,11 @@ import { PhaseBadge } from '@/components/today/phase-badge';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import {
   ClipboardCheck,
-  Settings as SettingsIcon,
   Syringe,
 } from '@/components/ui/icons';
 import { TodaySkeleton } from '@/components/ui/today-skeleton';
 import { buildRecentDoseStrip } from '@/features/dose/recent-doses';
+import { RemindersPanel } from '@/features/dose/reminders-panel';
 import { useLogOralDose, useOralDoseLogs, useSetDoseWindowRespected } from '@/features/oral-dose/hooks';
 import { useTodayData } from '@/features/today/hooks';
 import { haptics } from '@/lib/haptics';
@@ -236,15 +236,7 @@ export function DoseScreen() {
                         )}
 
                     {/* Reminders */}
-                    <SectionLabel label={t('dose.reminders_title')} />
-                    <ActionRow
-                      icon={<SettingsIcon color={colors.primary} width={20} height={20} />}
-                      title={t('dose.reminders_title')}
-                      subtitle={t('dose.reminders_sub')}
-                      onPress={() => { haptics.tap(); router.push('/settings'); }}
-                      styles={styles}
-                      colors={colors}
-                    />
+                    <RemindersPanel />
                   </View>
                 )
               : (
@@ -317,15 +309,7 @@ export function DoseScreen() {
                     <MedLevelBanner route="injection" phase={injectionCycle?.phase ?? null} />
 
                     {/* Reminders */}
-                    <SectionLabel label={t('dose.reminders_title')} />
-                    <ActionRow
-                      icon={<SettingsIcon color={colors.primary} width={20} height={20} />}
-                      title={t('dose.reminders_title')}
-                      subtitle={t('dose.reminders_sub')}
-                      onPress={() => { haptics.tap(); router.push('/settings'); }}
-                      styles={styles}
-                      colors={colors}
-                    />
+                    <RemindersPanel />
                   </View>
                 )}
 

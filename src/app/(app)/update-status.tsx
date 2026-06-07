@@ -66,9 +66,16 @@ export default function UpdateStatusScreen() {
     haptics.medium();
     setIsSaving(true);
 
+    // Keep the derived `phase` column in sync with the new status (same
+    // derivation as onboarding) so every reader of profile.phase — readiness,
+    // protein guidance, etc. — never sees a stale value. The column is only
+    // otherwise written at onboarding, so without this it would drift.
+    const phase: 'maintenance' | 'weight_loss'
+      = selected === 'maintenance' || selected === 'tapering' ? 'maintenance' : 'weight_loss';
+
     await supabase
       .from('profiles')
-      .update({ medication_status: selected })
+      .update({ medication_status: selected, phase })
       .eq('user_id', session.user.id);
 
     await queryClient.invalidateQueries({ queryKey: ['today-profile'] });

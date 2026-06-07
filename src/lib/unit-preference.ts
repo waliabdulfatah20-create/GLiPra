@@ -47,14 +47,22 @@ export function formatWeight(kg: number, unit: WeightUnit): string {
  *  Default is imperial (lbs) since the primary launch market is US-based GLP-1 users;
  *  metric users can flip the toggle once and the choice persists.
  */
-export function useWeightUnit(): { unit: WeightUnit; toggle: () => void } {
+export function useWeightUnit(): { unit: WeightUnit; toggle: () => void; loaded: boolean } {
   const [unit, setUnit] = React.useState<WeightUnit>('lbs');
+  // `loaded` flips true once the persisted preference has resolved from
+  // AsyncStorage. Consumers that seed inputs from stored data must wait for this
+  // so they never seed in the default unit and then mismatch after the real
+  // preference loads a tick later.
+  const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
-    AsyncStorage.getItem(WEIGHT_UNIT_KEY).then((v) => {
-      if (v === 'kg' || v === 'lbs')
-        setUnit(v);
-    });
+    AsyncStorage.getItem(WEIGHT_UNIT_KEY)
+      .then((v) => {
+        if (v === 'kg' || v === 'lbs')
+          setUnit(v);
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true));
   }, []);
 
   const toggle = React.useCallback(() => {
@@ -65,21 +73,25 @@ export function useWeightUnit(): { unit: WeightUnit; toggle: () => void } {
     });
   }, []);
 
-  return { unit, toggle };
+  return { unit, toggle, loaded };
 }
 
 /**
  * Read/write the user's height unit preference. Persists across app launches.
  *  Default is imperial (ft + in) for the same reason as weight.
  */
-export function useHeightUnit(): { unit: HeightUnit; toggle: () => void } {
+export function useHeightUnit(): { unit: HeightUnit; toggle: () => void; loaded: boolean } {
   const [unit, setUnit] = React.useState<HeightUnit>('imperial');
+  const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
-    AsyncStorage.getItem(HEIGHT_UNIT_KEY).then((v) => {
-      if (v === 'metric' || v === 'imperial')
-        setUnit(v);
-    });
+    AsyncStorage.getItem(HEIGHT_UNIT_KEY)
+      .then((v) => {
+        if (v === 'metric' || v === 'imperial')
+          setUnit(v);
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true));
   }, []);
 
   const toggle = React.useCallback(() => {
@@ -90,5 +102,5 @@ export function useHeightUnit(): { unit: HeightUnit; toggle: () => void } {
     });
   }, []);
 
-  return { unit, toggle };
+  return { unit, toggle, loaded };
 }

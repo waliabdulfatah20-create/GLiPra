@@ -397,6 +397,27 @@
       "label": "TENDENCIA DE PESO"
     }
   },
+  "protein_target": {
+    "acknowledge": "Entiendo que es una estimación. Lo confirmaré con quien me receta.",
+    "activity_high": "Alta",
+    "activity_label": "NIVEL DE ACTIVIDAD",
+    "activity_low": "Baja",
+    "activity_moderate": "Moderada",
+    "badge_bmi": "Ajustado por IMC",
+    "badge_kidney": "Límite renal seguro",
+    "badge_pregnancy": "Mínimo de embarazo",
+    "current": "Actual",
+    "disclaimer": "Esta estimación se basa en la información que proporcionaste. Datos inexactos producirán estimaciones inexactas. Confirma siempre tu meta de proteína con quien te receta, sobre todo si tienes enfermedad renal, estás embarazada o tienes otras condiciones de salud.",
+    "height_label": "ALTURA",
+    "kidney_label": "Enfermedad renal",
+    "pregnancy_label": "Embarazada",
+    "result_hint": "Ingresa tu peso, altura y nivel de actividad para ver tu meta.",
+    "result_label": "piso diario de proteína",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "title": "Meta de proteína",
+    "weight_label": "PESO"
+  },
   "readiness": {
     "factor_labels": {
       "dose_status": "Estado de dosis oral",
@@ -465,6 +486,7 @@
     "notifications": "Notificaciones",
     "preferences": "Preferencias",
     "privacy": "Política de privacidad",
+    "protein_target": "Meta de proteína",
     "spanish": "Español",
     "terms": "Términos de servicio",
     "title": "Configuración",
@@ -539,6 +561,7 @@
     "pharmacist_content": "CONTENIDO DEL FARMACÉUTICO",
     "pharmacist_note_label": "NOTA DEL FARMACÉUTICO",
     "phase_label": "Fase de inyección",
+    "protein_edit_a11y": "Edita tu meta de proteína",
     "protein_label": "Proteína hoy",
     "protein_no_target": "Define tu meta",
     "protein_of": "de",

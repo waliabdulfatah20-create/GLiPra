@@ -408,8 +408,14 @@ export function TodayScreen() {
           {/* ── Today's Metrics ───────────────────────────────────── */}
           <SectionLabel label={t('today.metrics_title')} />
           <View style={styles.metricsRow}>
-            {/* Protein ring — top accent in primary */}
-            <View style={[styles.ringCard, { borderTopColor: colors.primary }]}>
+            {/* Protein ring — top accent in primary; tap to edit the target */}
+            <TouchableOpacity
+              style={[styles.ringCard, { borderTopColor: colors.primary }]}
+              onPress={() => { haptics.tap(); router.push('/protein-target'); }}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel={t('today.protein_edit_a11y')}
+            >
               <Text style={styles.cardLabel}>{t('today.protein_label')}</Text>
               <View style={styles.ringWrapper}>
                 <ProteinRing
@@ -419,7 +425,7 @@ export function TodayScreen() {
                   emptyLabel={t('today.protein_no_target')}
                 />
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
 
           {/* ── Daily Actions ─────────────────────────────────────── */}

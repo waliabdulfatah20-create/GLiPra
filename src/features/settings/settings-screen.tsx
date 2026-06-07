@@ -145,6 +145,11 @@ export function SettingsScreen() {
       ? formatWeight(profile.goalWeightKg, weightUnit)
       : undefined;
 
+  const proteinTargetValue
+    = profile?.proteinFloorG != null && profile.proteinFloorG > 0
+      ? `${Math.round(profile.proteinFloorG)}g`
+      : undefined;
+
   const currentStatusLabel = profile?.medicationStatus
     ? (STATUS_LABELS[profile.medicationStatus] ?? undefined)
     : undefined;
@@ -159,6 +164,11 @@ export function SettingsScreen() {
 
         {/* ── Body Metrics ──────────────────────────────────────────── */}
         <SettingsSection title={t('settings.body_metrics')}>
+          <SettingsRow
+            label={t('settings.protein_target')}
+            value={proteinTargetValue}
+            onPress={() => router.push('/protein-target')}
+          />
           <SettingsRow
             label={t('settings.goal_weight')}
             value={goalWeightValue}

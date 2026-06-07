@@ -397,6 +397,27 @@
       "label": "WEIGHT TREND"
     }
   },
+  "protein_target": {
+    "acknowledge": "I understand this is an estimate. I will confirm with my prescriber.",
+    "activity_high": "High",
+    "activity_label": "ACTIVITY LEVEL",
+    "activity_low": "Low",
+    "activity_moderate": "Moderate",
+    "badge_bmi": "Adjusted for BMI",
+    "badge_kidney": "Kidney-safe limit",
+    "badge_pregnancy": "Pregnancy minimum",
+    "current": "Current",
+    "disclaimer": "This estimate is based on the information you provided. Inaccurate inputs will produce inaccurate estimates. Always confirm your protein target with your prescriber, especially if you have kidney disease, are pregnant, or have other health conditions.",
+    "height_label": "HEIGHT",
+    "kidney_label": "Kidney disease",
+    "pregnancy_label": "Pregnant",
+    "result_hint": "Enter your weight, height, and activity level to see your target.",
+    "result_label": "daily protein floor",
+    "save": "Save",
+    "saving": "Saving...",
+    "title": "Protein Target",
+    "weight_label": "WEIGHT"
+  },
   "readiness": {
     "factor_labels": {
       "dose_status": "Oral dose status",
@@ -465,6 +486,7 @@
     "notifications": "Notifications",
     "preferences": "Preferences",
     "privacy": "Privacy Policy",
+    "protein_target": "Protein target",
     "spanish": "Español",
     "terms": "Terms of Service",
     "title": "Settings",
@@ -539,6 +561,7 @@
     "pharmacist_content": "PHARMACIST CONTENT",
     "pharmacist_note_label": "PHARMACIST'S NOTE",
     "phase_label": "Injection Phase",
+    "protein_edit_a11y": "Edit your protein target",
     "protein_label": "Protein today",
     "protein_no_target": "Set your target",
     "protein_of": "of",

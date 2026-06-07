@@ -1,3 +1,4 @@
+import type { ActivityLevel } from '@/utils/protein';
 import { supabase } from '@/lib/supabase';
 
 export type MedicationStatus
@@ -22,6 +23,7 @@ export type TodayProfile = {
   medicationStatus: MedicationStatus;
   hasKidneyDisease: boolean;
   isPregnant: boolean;
+  activityLevel: ActivityLevel;
   createdAt: string | null;
 };
 
@@ -29,7 +31,7 @@ export async function fetchTodayProfile(userId: string): Promise<TodayProfile | 
   const { data, error } = await supabase
     .from('profiles')
     .select(
-      'medication_id, administration_route, protein_floor_g, last_injection_date, injection_day_of_week, medication_start_date, dose_time_local, weight_kg, height_cm, goal_weight_kg, phase, medication_status, has_kidney_disease, is_pregnant, created_at',
+      'medication_id, administration_route, protein_floor_g, last_injection_date, injection_day_of_week, medication_start_date, dose_time_local, weight_kg, height_cm, goal_weight_kg, phase, medication_status, has_kidney_disease, is_pregnant, activity_level, created_at',
     )
     .eq('user_id', userId)
     .single();
@@ -52,6 +54,7 @@ export async function fetchTodayProfile(userId: string): Promise<TodayProfile | 
     medicationStatus: (data.medication_status as MedicationStatus) ?? 'active',
     hasKidneyDisease: data.has_kidney_disease ?? false,
     isPregnant: data.is_pregnant ?? false,
+    activityLevel: ((data.activity_level as ActivityLevel | null) ?? 'moderate'),
     createdAt: data.created_at ?? null,
   };
 }

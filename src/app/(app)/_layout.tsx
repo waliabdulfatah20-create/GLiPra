@@ -86,6 +86,7 @@ export default function TabLayout() {
       <Tabs.Screen name="add-shot" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="edit-shot" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="goal-weight" options={{ href: null, headerShown: false }} />
+      <Tabs.Screen name="protein-target" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="update-status" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="paywall" options={{ href: null, headerShown: false }} />
     </Tabs>

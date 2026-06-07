@@ -10,6 +10,7 @@ export * from './feed';
 export * from './github';
 export * from './home';
 export * from './language';
+export * from './pill';
 export * from './plus-circle';
 export * from './progress-path';
 export * from './rate';

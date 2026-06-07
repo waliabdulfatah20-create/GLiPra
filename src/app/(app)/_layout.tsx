@@ -33,7 +33,7 @@ export default function TabLayout() {
   // usePathname() gives us the actual current route so we can distinguish
   // tab roots (exit) from sub-screens like /shot-prep or /add-shot (let RN handle).
   useEffect(() => {
-    const TAB_ROOTS = new Set(['/', '/progress', '/log', '/injection-sites', '/coach']);
+    const TAB_ROOTS = new Set(['/', '/dose', '/progress', '/log', '/coach']);
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
       if (TAB_ROOTS.has(pathname)) {
         BackHandler.exitApp();
@@ -63,7 +63,7 @@ export default function TabLayout() {
           Note: GlipraTabBar reads labels from its own TAB_CONFIG (not these titles).
           Titles kept for documentation and potential header fallback only. ── */}
       <Tabs.Screen name="index" options={{ title: t('tabs.today'), headerShown: false }} />
-      <Tabs.Screen name="injection-sites" options={{ title: t('tabs.sites'), headerShown: false }} />
+      <Tabs.Screen name="dose" options={{ title: t('tabs.dose'), headerShown: false }} />
       <Tabs.Screen name="log" options={{ title: t('tabs.nutrition'), headerShown: false }} />
       <Tabs.Screen name="progress" options={{ title: t('tabs.progress'), headerShown: false }} />
       <Tabs.Screen name="coach" options={{ title: t('tabs.coach'), headerShown: false }} />
@@ -72,6 +72,8 @@ export default function TabLayout() {
       <Tabs.Screen name="settings" options={{ href: null, headerShown: false }} />
 
       {/* ── Hidden screens — accessible by programmatic navigation ────────── */}
+      {/* injection-sites retired as a tab; kept as a route so old deep links resolve. */}
+      <Tabs.Screen name="injection-sites" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="check-in" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="weight" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="medication-level" options={{ href: null, headerShown: false }} />

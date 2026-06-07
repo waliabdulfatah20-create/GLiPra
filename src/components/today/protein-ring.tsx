@@ -17,12 +17,15 @@ type ProteinRingProps = {
   proteinConsumedG: number;
   proteinFloorG: number;
   size?: number;
+  /** Shown in place of "of Xg" when no protein floor is set (floor <= 0). */
+  emptyLabel?: string;
 };
 
 export function ProteinRing({
   proteinConsumedG,
   proteinFloorG,
   size = 140,
+  emptyLabel,
 }: ProteinRingProps) {
   const { colors } = useTheme();
   const styles = React.useMemo(
@@ -89,13 +92,12 @@ export function ProteinRing({
       </Svg>
       <View style={styles.center}>
         <Text style={[styles.consumed, { color: fill }]}>
-          {Math.round(proteinConsumedG)}
-          g
+          {`${Math.round(proteinConsumedG)}g`}
         </Text>
         <Text style={styles.floor}>
-          of
-          {Math.round(proteinFloorG)}
-          g
+          {proteinFloorG > 0
+            ? `of ${Math.round(proteinFloorG)}g`
+            : (emptyLabel ?? 'Set your target')}
         </Text>
       </View>
     </View>

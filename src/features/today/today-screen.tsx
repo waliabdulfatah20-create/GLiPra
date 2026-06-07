@@ -22,16 +22,14 @@ import { CardsCarousel } from '@/components/today/cards-carousel';
 import { ContentCardSheet } from '@/components/today/content-card-sheet';
 import { DailyGuidanceCard } from '@/components/today/daily-guidance-card';
 import { DoseWindowCard } from '@/components/today/dose-window-card';
-import { InjectionCycleCard } from '@/components/today/injection-cycle-card';
-import { MedLevelBanner } from '@/components/today/med-level-banner';
 import { PharmacistSpotlightCard } from '@/components/today/pharmacist-spotlight-card';
-import { PhaseBadge } from '@/components/today/phase-badge';
 import { ProteinRing } from '@/components/today/protein-ring';
 import { StreakCard } from '@/components/today/streak-card';
 import {
   ClipboardCheck,
   ProgressPath,
   Settings as SettingsIcon,
+  Syringe,
   TrendingUp,
 } from '@/components/ui/icons';
 import { MilestoneToast } from '@/components/ui/milestone-toast';
@@ -41,6 +39,7 @@ import { markRedFlagTriggered } from '@/features/check-in/api';
 import { useTodayCheckIn } from '@/features/check-in/hooks';
 import { getActiveCardsForRoute } from '@/features/content-cards/data';
 import { useDailyGuidance } from '@/features/daily-guidance/hooks';
+import { selectInjectionDoseRow } from '@/features/dose/smart-dose-row';
 import { useCheckAndUnlockMilestones } from '@/features/journey-cards/hooks';
 import { MILESTONES } from '@/features/journey-cards/milestones';
 import { useLogOralDose, useSetDoseWindowRespected } from '@/features/oral-dose/hooks';
@@ -95,7 +94,6 @@ export function TodayScreen() {
     profile,
     administrationRoute,
     injectionCycle,
-    oralCycle,
     oralLastDoseTakenAt,
     oralLastDoseId,
     oralLastDoseWindowRespected,
@@ -111,6 +109,8 @@ export function TodayScreen() {
   } = useTodayData();
 
   const isOral = administrationRoute === 'oral';
+  // Single de-duplicated dose row for injection users (status moved to the Dose tab).
+  const injectionDoseRow = isOral ? null : selectInjectionDoseRow(injectionCycle);
   const logOralDose = useLogOralDose();
   const setWindowRespected = useSetDoseWindowRespected();
 
@@ -188,18 +188,6 @@ export function TodayScreen() {
     return () => clearInterval(timer);
   }, [readinessCard?.score]);
 
-  // Phase accent colors — useMemo so they re-derive when theme changes
-  const phaseAccent = React.useMemo<Record<InjectionPhase, string>>(
-    () => ({
-      injection_day: colors.phaseInjectionDay,
-      peak_suppression: colors.phasePeakSuppression,
-      adjustment: colors.phaseAdjustment,
-      recovery_window: colors.phaseRecoveryWindow,
-      overdue: colors.phaseOverdue,
-    }),
-    [colors],
-  );
-
   // Phase-aware spotlight card selection — phase match first, then daily rotation.
   // Route-filtered so oral-only cards never surface for injection users (and v.v.).
   const currentPhase = injectionCycle?.phase ?? null;
@@ -238,9 +226,6 @@ export function TodayScreen() {
   useCheckAndUnlockMilestones(profile?.createdAt, handleMilestonesUnlocked);
 
   const dateLabel = format(new Date(), 'EEEE, MMMM d');
-  const phaseAccentColor = injectionCycle
-    ? (phaseAccent[injectionCycle.phase] ?? colors.primary)
-    : colors.primary;
 
   const greeting = hourOfDay < 12
     ? t('today.greeting_morning')
@@ -431,106 +416,17 @@ export function TodayScreen() {
                   proteinConsumedG={proteinConsumedG}
                   proteinFloorG={proteinFloorG}
                   size={130}
+                  emptyLabel={t('today.protein_no_target')}
                 />
               </View>
             </View>
-
-            {/* Medication phase — route-aware label/copy. Hidden when discontinued. */}
-            {profile?.medicationStatus === 'discontinued'
-              ? (
-                  <View style={[styles.phaseCard, { borderTopColor: colors.textDisabled }]}>
-                    <Text style={styles.cardLabel}>
-                      {t(isOral ? 'today.oral_label' : 'today.injection_label')}
-                    </Text>
-                    <Text style={styles.noDataText}>
-                      {t(isOral ? 'today.oral_discontinued' : 'today.injection_discontinued')}
-                    </Text>
-                  </View>
-                )
-              : (
-                  <View style={[styles.phaseCard, { borderTopColor: phaseAccentColor }]}>
-                    <Text style={styles.cardLabel}>
-                      {t(isOral ? 'today.oral_label' : 'today.injection_label')}
-                    </Text>
-                    {isOral
-                      ? oralCycle
-                        ? (
-                            <PhaseBadge
-                              route="oral"
-                              phase={oralCycle.phase}
-                              daysOnMed={oralCycle.daysOnMed}
-                            />
-                          )
-                        : (
-                            <Text style={styles.noDataText}>{t('today.no_oral_data')}</Text>
-                          )
-                      : injectionCycle
-                        ? (
-                            <>
-                              <PhaseBadge
-                                route="injection"
-                                phase={injectionCycle.phase}
-                                daysSinceInjection={injectionCycle.daysSinceInjection}
-                              />
-                              {injectionCycle.daysUntilNextInjection !== null && (
-                                <Text style={styles.nextInjection}>
-                                  {t('today.next_injection')}
-                                  {'\n'}
-                                  <Text style={styles.nextInjectionDays}>
-                                    {injectionCycle.daysUntilNextInjection}
-                                    d
-                                  </Text>
-                                </Text>
-                              )}
-                              {injectionCycle.isOverdue && (
-                                <Text style={styles.overdueText}>{t('today.injection_overdue_inline')}</Text>
-                              )}
-                            </>
-                          )
-                        : (
-                            <Text style={styles.noDataText}>
-                              {t('today.no_injection_data')}
-                            </Text>
-                          )}
-                  </View>
-                )}
           </View>
-
-          {/* ── Injection Cycle Strip (D4) ───────────────────────── */}
-          {profile?.medicationStatus !== 'discontinued'
-            && profile?.lastInjectionDate
-            && injectionCycle && (
-            <InjectionCycleCard
-              lastInjectionDate={profile.lastInjectionDate}
-              injectionCycle={injectionCycle}
-            />
-          )}
-
-          {/* ── Shot Day Prep (injection day only) ────────────────── */}
-          {injectionCycle?.phase === 'injection_day' && (
-            <TouchableOpacity
-              style={styles.shotDayCard}
-              onPress={() => { haptics.tap(); router.push('/shot-prep'); }}
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel="Open injection day checklist"
-            >
-              <View style={styles.shotDayLeft}>
-                <Text style={styles.shotDayEmoji}>💉</Text>
-              </View>
-              <View style={styles.shotDayContent}>
-                <Text style={styles.shotDayTitle}>{t('today.shot_day_title')}</Text>
-                <Text style={styles.shotDayBody}>{t('today.shot_day_body')}</Text>
-              </View>
-              <Text style={[styles.rowChevron, { color: colors.phaseInjectionDay }]}>›</Text>
-            </TouchableOpacity>
-          )}
 
           {/* ── Daily Actions ─────────────────────────────────────── */}
           <SectionLabel label={t('today.daily_actions')} />
 
-          {/* Dose Window — oral GLP-1 only. The empty-stomach absorption timer. */}
-          {isOral && (
+          {/* Dose Window — oral GLP-1 only, and only while actively dosing. */}
+          {isOral && profile?.medicationStatus !== 'discontinued' && (
             <DoseWindowCard
               lastDoseTakenAt={oralLastDoseTakenAt}
               currentStreak={oralAdherenceStreak}
@@ -541,6 +437,33 @@ export function TodayScreen() {
               onConfirmWindow={handleConfirmWindow}
               isConfirming={setWindowRespected.isPending}
             />
+          )}
+
+          {/* Dose — injection users get one row that deep-links to the Dose tab. */}
+          {!isOral && injectionDoseRow && profile?.medicationStatus !== 'discontinued' && (
+            <TouchableOpacity
+              testID="today-dose-row"
+              style={[styles.actionCard, { borderTopColor: colors.primary }]}
+              onPress={() => { haptics.tap(); router.push(injectionDoseRow.target); }}
+              activeOpacity={0.75}
+              accessibilityRole="button"
+              accessibilityLabel={t('today.dose_row_title')}
+            >
+              <View style={[styles.actionIconCircle, styles.actionIconCirclePending]}>
+                <Syringe color={colors.primary} width={20} height={20} />
+              </View>
+              <View style={styles.actionTextBlock}>
+                <Text style={styles.actionHeadline}>{t('today.dose_row_title')}</Text>
+                <View style={styles.actionPill}>
+                  <Text style={styles.actionPillText}>
+                    {injectionDoseRow.pillKey === 'today.dose_row_next'
+                      ? t('today.dose_row_next', { days: injectionDoseRow.days ?? 0 })
+                      : t(injectionDoseRow.pillKey)}
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.rowChevron}>›</Text>
+            </TouchableOpacity>
           )}
 
           {/* Check-in */}
@@ -598,15 +521,6 @@ export function TodayScreen() {
             </View>
             <Text style={styles.rowChevron}>›</Text>
           </TouchableOpacity>
-
-          {/* Medication Level — route-aware PK curve. Hidden only when discontinued. */}
-          {profile?.medicationStatus !== 'discontinued' && (
-            <View style={styles.bannerWrapper}>
-              {isOral
-                ? <MedLevelBanner route="oral" phase={oralCycle?.phase ?? null} />
-                : <MedLevelBanner route="injection" phase={injectionCycle?.phase ?? null} />}
-            </View>
-          )}
 
           {/* Streak */}
           {!isStreakLoading && (

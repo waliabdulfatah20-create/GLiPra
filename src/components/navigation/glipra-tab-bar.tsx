@@ -9,6 +9,7 @@ import {
   ChatBubble as CoachIcon,
   Home as HomeIcon,
   Camera as LogIcon,
+  Pill as PillIcon,
   TrendingUp as ProgressIcon,
   Syringe as SyringeIcon,
 } from '@/components/ui/icons';
@@ -18,10 +19,10 @@ import { useTheme } from '@/lib/ThemeContext';
 
 // ─── Tab configuration ────────────────────────────────────────────────────────
 
-// All possible visible tab names. The injection-sites tab is hidden for oral
-// users — this list is filtered at render time based on administration_route.
-const ALL_VISIBLE_TAB_NAMES = ['index', 'injection-sites', 'log', 'progress', 'coach'] as const;
-const ORAL_VISIBLE_TAB_NAMES = ['index', 'log', 'progress', 'coach'] as const;
+// Visible tab names. Slot 2 is the route-aware Dose tab, shown to both routes;
+// only its icon switches by administration_route (Syringe injection / Pill oral).
+const ALL_VISIBLE_TAB_NAMES = ['index', 'dose', 'log', 'progress', 'coach'] as const;
+const ORAL_VISIBLE_TAB_NAMES = ['index', 'dose', 'log', 'progress', 'coach'] as const;
 
 type VisibleTabName = typeof ALL_VISIBLE_TAB_NAMES[number];
 
@@ -32,11 +33,12 @@ type TabConfig = {
 };
 
 const TAB_CONFIG: Record<VisibleTabName, TabConfig> = {
-  'index': { labelKey: 'tabs.today', testID: 'today-tab', Icon: HomeIcon },
-  'progress': { labelKey: 'tabs.progress', testID: 'progress-tab', Icon: ProgressIcon },
-  'log': { labelKey: 'tabs.nutrition', testID: 'log-tab', Icon: LogIcon },
-  'injection-sites': { labelKey: 'tabs.sites', testID: 'sites-tab', Icon: SyringeIcon },
-  'coach': { labelKey: 'tabs.coach', testID: 'coach-tab', Icon: CoachIcon },
+  index: { labelKey: 'tabs.today', testID: 'today-tab', Icon: HomeIcon },
+  progress: { labelKey: 'tabs.progress', testID: 'progress-tab', Icon: ProgressIcon },
+  log: { labelKey: 'tabs.nutrition', testID: 'log-tab', Icon: LogIcon },
+  // Icon is a fallback; the render overrides it per administration_route.
+  dose: { labelKey: 'tabs.dose', testID: 'dose-tab', Icon: SyringeIcon },
+  coach: { labelKey: 'tabs.coach', testID: 'coach-tab', Icon: CoachIcon },
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -70,6 +72,8 @@ export function GlipraTabBar({ state, navigation, insets }: BottomTabBarProps) {
         const config = TAB_CONFIG[name];
         if (!config)
           return null;
+        // Route-aware icon for the Dose tab only.
+        const IconComp = name === 'dose' ? (isOral ? PillIcon : SyringeIcon) : config.Icon;
         const isFocused
           = state.routes.findIndex(r => r.key === route.key) === state.index;
 
@@ -113,12 +117,12 @@ export function GlipraTabBar({ state, navigation, insets }: BottomTabBarProps) {
                     end={{ x: 1, y: 0 }}
                     style={styles.activePill}
                   >
-                    <config.Icon color={iconColor} />
+                    <IconComp color={iconColor} />
                   </LinearGradient>
                 )
               : (
                   <View style={styles.inactivePill}>
-                    <config.Icon color={iconColor} />
+                    <IconComp color={iconColor} />
                   </View>
                 )}
             <Text

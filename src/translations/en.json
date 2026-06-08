@@ -358,17 +358,16 @@
     "teaser": "Unlock Pro Insights. See how each meal fits your floor."
   },
   "progress": {
-    "adherence_card": {
-      "biweekly": "biweekly",
-      "custom": "custom",
-      "daily": "daily",
-      "empty": "Log your first shot to see adherence",
-      "label": "INJECTION ADHERENCE",
-      "subtitle": "{{count}} shots logged · {{interval}}",
-      "weekly": "weekly"
-    },
     "disclaimer": "Trends are based on what you've logged. Inaccurate or missing logs will produce inaccurate trends. For medical decisions, consult your prescriber.",
     "loading": "Loading…",
+    "muscle_card": {
+      "current": "this week",
+      "empty_body": "Keep logging protein and resistance sessions, and your weekly muscle trend will appear here.",
+      "empty_title": "Your muscle trend is building",
+      "label": "MUSCLE SCORE TREND",
+      "now": "now",
+      "weeks_ago": "{{weeks}} wk ago"
+    },
     "protein_card": {
       "label": "PROTEIN HIT RATE",
       "no_floor": "Set your protein floor in onboarding to see your hit rate",
@@ -382,12 +381,6 @@
       "total_gained": "Total Gained",
       "total_lost": "Total Lost",
       "weekly_avg": "Weekly Avg"
-    },
-    "streak_card": {
-      "label": "DAILY HITS",
-      "legend_hit": "Hit floor",
-      "legend_miss": "Missed",
-      "legend_none": "No log"
     },
     "subtitle": "Your trends over time",
     "symptoms_card": {
@@ -403,9 +396,8 @@
       "nausea": "Nausea"
     },
     "tips": {
-      "injection": "Consistent timing keeps medication levels stable. Shifting your dose day within a 24-hour window is clinically fine.",
+      "muscle": "Your muscle score blends how consistently you hit your protein floor with how often you train. Small, steady habits protect lean mass while GLP-1 does its job.",
       "protein": "Hitting 80% or more of your protein floor protects lean muscle while GLP-1 does its job. Aim for consistency over perfection.",
-      "streak": "Every green day fueled your muscle preservation goal. A missed day doesn't undo progress - keep going tomorrow.",
       "symptoms": "Symptoms usually settle as your body adjusts. Symptoms persisting beyond two weeks or sharply worsening deserve a prescriber conversation.",
       "weight": "Your weight line connects every entry you log. Day-to-day swings are normal - hydration and food timing affect the scale. Look at the direction over weeks, not single days."
     },

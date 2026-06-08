@@ -358,17 +358,16 @@
     "teaser": "Desbloquea Pro Insights. Ve cómo cada comida encaja en tu mínimo."
   },
   "progress": {
-    "adherence_card": {
-      "biweekly": "quincenal",
-      "custom": "personalizado",
-      "daily": "diario",
-      "empty": "Registra tu primera inyección para ver adherencia",
-      "label": "ADHERENCIA DE INYECCIÓN",
-      "subtitle": "{{count}} inyecciones · {{interval}}",
-      "weekly": "semanal"
-    },
     "disclaimer": "Las tendencias se basan en lo que has registrado. Registros inexactos o ausentes producirán tendencias inexactas. Consulta con tu médico para decisiones clínicas.",
     "loading": "Cargando…",
+    "muscle_card": {
+      "current": "esta semana",
+      "empty_body": "Sigue registrando proteína y sesiones de fuerza, y tu tendencia muscular semanal aparecerá aquí.",
+      "empty_title": "Tu tendencia muscular se está formando",
+      "label": "TENDENCIA MUSCULAR",
+      "now": "ahora",
+      "weeks_ago": "hace {{weeks}} sem"
+    },
     "protein_card": {
       "label": "META DE PROTEÍNA",
       "no_floor": "Configura tu mínimo de proteína en el onboarding para ver tu tasa",
@@ -382,12 +381,6 @@
       "total_gained": "Total ganado",
       "total_lost": "Total perdido",
       "weekly_avg": "Promedio semanal"
-    },
-    "streak_card": {
-      "label": "DÍAS CUMPLIDOS",
-      "legend_hit": "Alcanzado",
-      "legend_miss": "No alcanzado",
-      "legend_none": "Sin registro"
     },
     "subtitle": "Tus tendencias a lo largo del tiempo",
     "symptoms_card": {
@@ -403,9 +396,8 @@
       "nausea": "Náusea"
     },
     "tips": {
-      "injection": "La constancia en el horario mantiene los niveles del medicamento estables. Mover tu día de dosis dentro de 24 horas es clínicamente aceptable.",
+      "muscle": "Tu puntuación muscular combina qué tan constante alcanzas tu mínimo de proteína con qué tan seguido entrenas. Hábitos pequeños y constantes protegen la masa muscular mientras GLP-1 hace su trabajo.",
       "protein": "Cumplir el 80% o más de tu mínimo de proteína protege la masa muscular mientras GLP-1 hace su trabajo. Apunta a la consistencia, no a la perfección.",
-      "streak": "Cada día verde alimentó tu meta de preservación muscular. Un día perdido no borra el progreso - sigue mañana.",
       "symptoms": "Los síntomas suelen estabilizarse a medida que tu cuerpo se adapta. Síntomas que persisten más de dos semanas o que empeoran rápidamente merecen una conversación con tu médico.",
       "weight": "Tu línea de peso conecta cada entrada que registras. Los cambios diarios son normales: la hidratación y el momento de las comidas afectan la báscula. Observa la dirección en semanas, no en días sueltos."
     },

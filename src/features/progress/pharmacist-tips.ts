@@ -10,10 +10,9 @@
  */
 
 export type PharmacistTipKey
-  = | 'weight'
+  = | 'muscle'
+    | 'weight'
     | 'protein'
-    | 'streak'
-    | 'injection'
     | 'symptoms';
 
 /** Returns the i18n key for a tip. Use with useTranslation(). */

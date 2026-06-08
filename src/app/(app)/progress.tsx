@@ -1,7 +1,9 @@
 // Route: /progress
 // Progress dashboard — registered as a permanent bottom-nav tab.
-// Five metric cards (weight EWMA, protein hit-rate, streak calendar,
-// injection adherence, check-in symptoms) sharing one 7D/30D/90D selector.
+// Reframed around the Muscle Preservation Score trend (the core promise over
+// time), then weight + protein + symptom analytics. The protein-streak calendar
+// and injection-adherence cards were removed in Phase C: they duplicated the
+// Today streak and the Dose-tab on-time % respectively.
 //
 // Rule 8: clinical screen — Tier-2 DisclaimerBanner is rendered at the bottom.
 
@@ -18,9 +20,8 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CheckInSymptomCard } from '@/components/progress/check-in-symptom-card';
-import { InjectionAdherenceCard } from '@/components/progress/injection-adherence-card';
+import { MuscleScoreTrendCard } from '@/components/progress/muscle-score-trend-card';
 import { ProteinHitRateCard } from '@/components/progress/protein-hit-rate-card';
-import { StreakCalendarCard } from '@/components/progress/streak-calendar-card';
 import { WeightResultsCard } from '@/components/progress/weight-results-card';
 import { WeightTrendCard } from '@/components/progress/weight-trend-card';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
@@ -70,7 +71,9 @@ export default function ProgressScreen() {
           />
         </View>
 
-        {/* Cards — order chosen for at-a-glance: results → trend → hit-rate → calendar → adherence → symptoms */}
+        {/* Cards — muscle trend leads (the core promise over time), then weight,
+            protein, and symptom analytics. */}
+        <MuscleScoreTrendCard width={chartWidth} />
         <WeightResultsCard
           logs={weightLogsInRange}
           goalWeightKg={profile?.goalWeightKg ?? null}
@@ -78,8 +81,6 @@ export default function ProgressScreen() {
         />
         <WeightTrendCard days={days} width={chartWidth} />
         <ProteinHitRateCard days={days} width={chartWidth} />
-        <StreakCalendarCard days={days} width={chartWidth} />
-        <InjectionAdherenceCard days={days} width={chartWidth} />
         <CheckInSymptomCard days={days} width={chartWidth} />
 
         {/* Rule 8: Tier-2 disclaimer covers all metrics on this screen */}

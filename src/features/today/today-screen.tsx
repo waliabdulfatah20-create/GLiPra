@@ -574,8 +574,8 @@ export function TodayScreen() {
             <Text style={styles.rowChevron}>›</Text>
           </TouchableOpacity>
 
-          {/* Streak */}
-          {!isStreakLoading && (
+          {/* Streak — only once a streak is active (no empty-state nag) */}
+          {!isStreakLoading && (streak?.currentStreak ?? 0) > 0 && (
             <StreakCard
               currentStreak={streak?.currentStreak ?? 0}
               longestStreak={streak?.longestStreak ?? 0}

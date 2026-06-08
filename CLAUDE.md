@@ -114,7 +114,7 @@ Keyword blocklist runs before hitting OpenAI.
 
 | Blocker | What's needed |
 |---|---|
-| **Legal gate** | AI coach prompts + EscalationCard copy need attorney review before `EXPO_PUBLIC_USE_MOCK_AI=false` in any env |
+| **Legal gate (dev ungated by owner)** | Owner decision 2026-06-08: dev/testing runs real AI (`EXPO_PUBLIC_USE_MOCK_AI=false`). Owner handles attorney review of AI-coach prompts + EscalationCard copy before any PRODUCTION publish. Do NOT block dev OTAs/builds on this gate. |
 | **Email confirmation** | Currently OFF in Supabase dashboard for dev. Re-enable before any public release. |
 | **RevenueCat iOS** | Needs Apple Developer account ($99/yr) + P8 key from App Store Connect |
 | **Health package minSdk** | `react-native-health-link` 0.2.0 installed. `android.minSdkVersion` already bumped to 26 in app.config.ts. Re-add `pnpm expo install react-native-health-link` if ever removed. |
@@ -304,11 +304,14 @@ type SubscriptionTier = 'free' | 'pro' | 'founder_lifetime';
 
 ## Cost Rules
 
-**OpenAI is mocked during development by default.**
+**Real AI is ON in dev per owner decision (2026-06-08).** The dev env runs
+`EXPO_PUBLIC_USE_MOCK_AI=false` (real OpenAI). Owner accepts this for dev/testing
+and handles attorney review before any production publish. Mock mode still exists
+as a fallback for offline/cost-sensitive work.
 
 ```bash
-EXPO_PUBLIC_USE_MOCK_AI=true   # Development default — zero OpenAI cost
-EXPO_PUBLIC_USE_MOCK_AI=false  # Only when specifically testing AI output
+EXPO_PUBLIC_USE_MOCK_AI=false  # Dev default now — real OpenAI (owner decision)
+EXPO_PUBLIC_USE_MOCK_AI=true   # Optional fallback — zero OpenAI cost, uses mockAI.ts
 ```
 
 When mock is on, all AI calls must return data from `src/lib/mockAI.ts`.

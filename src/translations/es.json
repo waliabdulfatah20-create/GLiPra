@@ -285,6 +285,24 @@
     "recovery_window": "Ventana de recuperación",
     "title": "Nivel de medicamento"
   },
+  "muscle_score": {
+    "disclaimer": "Esta puntuación refleja tu constancia con la proteína y el entrenamiento de fuerza, lo principal que controlas para proteger el músculo. No es una medición de tu masa muscular real. Habla con tu prescriptor sobre tus necesidades individuales.",
+    "factor_protein": "Constancia de proteína",
+    "factor_resistance": "Entrenamiento de fuerza",
+    "headline_empty": "Empieza a proteger tu músculo",
+    "headline_low": "Vamos a proteger tu músculo",
+    "headline_solid": "Bien. Sigue avanzando",
+    "headline_strong": "Buena protección muscular",
+    "label": "Preservación muscular",
+    "out_of": "/ 100",
+    "pct": "{{pct}}%",
+    "tip_add_protein": "Define tu meta de proteína y registra comidas para iniciar tu puntuación.",
+    "tip_add_resistance": "Registra una sesión de fuerza esta semana para completar tu puntuación.",
+    "tip_empty": "Registra tus comidas y una sesión de fuerza para iniciar tu puntuación muscular.",
+    "tip_protein": "Alcanzar tu meta de proteína más días es la mayor palanca para tu músculo.",
+    "tip_resistance": "Intenta de 2 a 3 sesiones de fuerza por semana para proteger más músculo.",
+    "untracked": "Aún sin datos"
+  },
   "onboarding": {
     "appearance_dark": "Oscuro",
     "appearance_dark_sub": "Siempre modo oscuro",

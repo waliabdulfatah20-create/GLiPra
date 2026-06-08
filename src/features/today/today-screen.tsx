@@ -22,6 +22,7 @@ import { CardsCarousel } from '@/components/today/cards-carousel';
 import { ContentCardSheet } from '@/components/today/content-card-sheet';
 import { DailyGuidanceCard } from '@/components/today/daily-guidance-card';
 import { DoseWindowCard } from '@/components/today/dose-window-card';
+import { MuscleScoreCard } from '@/components/today/muscle-score-card';
 import { PharmacistSpotlightCard } from '@/components/today/pharmacist-spotlight-card';
 import { ProteinRing } from '@/components/today/protein-ring';
 import { StreakCard } from '@/components/today/streak-card';
@@ -347,6 +348,9 @@ export function TodayScreen() {
               </Text>
             </TouchableOpacity>
           )}
+
+          {/* ── Muscle Preservation Score (hero, the core promise) ── */}
+          <MuscleScoreCard />
 
           {/* ── Readiness Score ───────────────────────────────────── */}
           {readinessCard && (

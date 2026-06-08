@@ -285,6 +285,24 @@
     "recovery_window": "Recovery Window",
     "title": "Medication Level"
   },
+  "muscle_score": {
+    "disclaimer": "This score reflects your protein and resistance-training consistency, the main things you control to protect muscle. It is not a measurement of your actual muscle mass. Talk to your prescriber about your individual needs.",
+    "factor_protein": "Protein consistency",
+    "factor_resistance": "Resistance training",
+    "headline_empty": "Start protecting your muscle",
+    "headline_low": "Let's protect your muscle",
+    "headline_solid": "Solid. Keep building",
+    "headline_strong": "Strong muscle protection",
+    "label": "Muscle Preservation",
+    "out_of": "/ 100",
+    "pct": "{{pct}}%",
+    "tip_add_protein": "Set your protein target and log meals to start your score.",
+    "tip_add_resistance": "Log a resistance session this week to complete your score.",
+    "tip_empty": "Log your meals and a resistance session to start your muscle score.",
+    "tip_protein": "Hitting your protein floor more days is the biggest lever for your muscle.",
+    "tip_resistance": "Aim for 2 to 3 resistance sessions a week to protect more muscle.",
+    "untracked": "Not tracked yet"
+  },
   "onboarding": {
     "appearance_dark": "Dark",
     "appearance_dark_sub": "Always dark mode",

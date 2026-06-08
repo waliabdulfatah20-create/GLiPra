@@ -27,6 +27,7 @@ import { ProteinRing } from '@/components/today/protein-ring';
 import { StreakCard } from '@/components/today/streak-card';
 import {
   ClipboardCheck,
+  Dumbbell,
   ProgressPath,
   Settings as SettingsIcon,
   Syringe,
@@ -43,6 +44,7 @@ import { selectInjectionDoseRow } from '@/features/dose/smart-dose-row';
 import { useCheckAndUnlockMilestones } from '@/features/journey-cards/hooks';
 import { MILESTONES } from '@/features/journey-cards/milestones';
 import { useLogOralDose, useSetDoseWindowRespected } from '@/features/oral-dose/hooks';
+import { useResistanceWeekly } from '@/features/resistance/hooks';
 import { useRedFlagSnooze } from '@/features/safety/hooks';
 import { useTodayData } from '@/features/today/hooks';
 import { analytics, EVENTS } from '@/lib/analytics';
@@ -128,6 +130,10 @@ export function TodayScreen() {
 
   const { checkIn } = useTodayCheckIn();
   const hasCheckedInToday = checkIn !== null;
+
+  const { frequency: resistanceWeekly } = useResistanceWeekly();
+  const resistanceMet
+    = resistanceWeekly.currentWeekSessions >= resistanceWeekly.weeklyTarget;
 
   const session = useAuthStore.use.session();
   const userId = session?.user.id;
@@ -523,6 +529,42 @@ export function TodayScreen() {
               <Text style={styles.actionHeadline}>{t('today.weight_title')}</Text>
               <View style={styles.actionPill}>
                 <Text style={styles.actionPillText}>{t('today.weight_subtitle')}</Text>
+              </View>
+            </View>
+            <Text style={styles.rowChevron}>›</Text>
+          </TouchableOpacity>
+
+          {/* Resistance training — the muscle-preservation signal */}
+          <TouchableOpacity
+            style={[
+              styles.actionCard,
+              { borderTopColor: resistanceMet ? colors.success : colors.primary },
+            ]}
+            onPress={() => { haptics.tap(); router.push('/resistance'); }}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel={t('resistance.title')}
+          >
+            <View
+              style={[
+                styles.actionIconCircle,
+                resistanceMet ? styles.actionIconCircleDone : styles.actionIconCirclePending,
+              ]}
+            >
+              <Dumbbell
+                color={resistanceMet ? colors.white : colors.primary}
+                width={20}
+                height={20}
+              />
+            </View>
+            <View style={styles.actionTextBlock}>
+              <Text style={styles.actionHeadline}>{t('today.resistance_title')}</Text>
+              <View style={[styles.actionPill, resistanceMet && styles.actionPillDone]}>
+                <Text style={[styles.actionPillText, resistanceMet && styles.actionPillTextDone]}>
+                  {resistanceWeekly.currentWeekSessions > 0
+                    ? t('today.resistance_subtitle', { sessions: resistanceWeekly.currentWeekSessions })
+                    : t('today.resistance_cta')}
+                </Text>
               </View>
             </View>
             <Text style={styles.rowChevron}>›</Text>

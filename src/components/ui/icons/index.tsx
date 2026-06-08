@@ -6,6 +6,7 @@ export * from './camera';
 export * from './caret-down';
 export * from './chat-bubble';
 export * from './clipboard-check';
+export * from './dumbbell';
 export * from './feed';
 export * from './github';
 export * from './home';

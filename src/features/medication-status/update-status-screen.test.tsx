@@ -12,7 +12,7 @@ import { useTodayProfile } from '@/features/today/hooks';
 import { supabase } from '@/lib/supabase';
 import { cleanup, fireEvent, render, screen, waitFor } from '@/lib/test-utils';
 
-import UpdateStatusScreen from './update-status';
+import { UpdateStatusScreen } from './update-status-screen';
 
 jest.mock('@/features/today/hooks');
 jest.mock('expo-router', () => ({ router: { back: jest.fn() } }));

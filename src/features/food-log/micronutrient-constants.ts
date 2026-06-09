@@ -7,6 +7,10 @@ export const MICRONUTRIENT_RDAS = {
   zincMg: 11,
   b12Mcg: 2.4,
   vitaminDIu: 600,
+  // Iron: 18 mg = the protective target for adult women 19-50 (the GLP-1 audience
+  // skews female; iron + hair thinning is a top concern). 8 mg is the men /
+  // post-menopausal value. Single RDA for v1 (no sex field). Pharmacist to confirm.
+  ironMg: 18,
 } as const;
 
 export type NutrientKey = keyof typeof MICRONUTRIENT_RDAS;
@@ -46,6 +50,7 @@ const NUTRIENT_LABELS: Record<NutrientKey, string> = {
   vitaminDIu: 'Vitamin D',
   magnesiumMg: 'Magnesium',
   zincMg: 'Zinc',
+  ironMg: 'Iron',
 };
 
 const NUTRIENT_FOOD_TIPS: Record<NutrientKey, string> = {
@@ -53,6 +58,7 @@ const NUTRIENT_FOOD_TIPS: Record<NutrientKey, string> = {
   vitaminDIu: 'fatty fish, egg yolks, or fortified milk',
   magnesiumMg: 'nuts, seeds, or leafy greens',
   zincMg: 'beef, pumpkin seeds, or lentils',
+  ironMg: 'lean red meat, lentils, spinach, or fortified cereals',
 };
 
 /**

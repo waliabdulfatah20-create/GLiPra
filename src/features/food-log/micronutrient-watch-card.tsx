@@ -38,19 +38,20 @@ export function MicronutrientWatchCard() {
     [colors, spacing, radius, shadows],
   );
   const { t } = useTranslation();
-  const { magnesiumMg, zincMg, b12Mcg, vitaminDIu, hasMicronutrients, isLoading }
+  const { magnesiumMg, zincMg, b12Mcg, vitaminDIu, ironMg, hasMicronutrients, isLoading }
     = useDailyMacros();
 
   if (isLoading)
     return null;
 
-  const microData = { magnesiumMg, zincMg, b12Mcg, vitaminDIu };
+  const microData = { magnesiumMg, zincMg, b12Mcg, vitaminDIu, ironMg };
   const gapCount = hasMicronutrients ? getGapCount(microData) : 0;
   const gapText = hasMicronutrients ? getGapBannerText(microData) : null;
 
   const nutrients: NutrientConfig[] = [
     { key: 'magnesiumMg', labelKey: 'log.nutrient_magnesium', value: magnesiumMg, unit: 'mg' },
     { key: 'zincMg', labelKey: 'log.nutrient_zinc', value: zincMg, unit: 'mg' },
+    { key: 'ironMg', labelKey: 'log.nutrient_iron', value: ironMg, unit: 'mg' },
     { key: 'b12Mcg', labelKey: 'log.nutrient_b12', value: b12Mcg, unit: 'mcg' },
     { key: 'vitaminDIu', labelKey: 'log.nutrient_vitd', value: vitaminDIu, unit: 'IU' },
   ];
@@ -128,6 +129,7 @@ export function MicronutrientWatchCard() {
 const SAMPLE_NUTRIENTS: NutrientConfig[] = [
   { key: 'magnesiumMg', labelKey: 'log.nutrient_magnesium', value: 320, unit: 'mg' },
   { key: 'zincMg', labelKey: 'log.nutrient_zinc', value: 9, unit: 'mg' },
+  { key: 'ironMg', labelKey: 'log.nutrient_iron', value: 12, unit: 'mg' },
   { key: 'b12Mcg', labelKey: 'log.nutrient_b12', value: 2.1, unit: 'mcg' },
   { key: 'vitaminDIu', labelKey: 'log.nutrient_vitd', value: 480, unit: 'IU' },
 ];

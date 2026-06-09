@@ -47,6 +47,7 @@ export async function fetchBarcodeCorrection(
     zincMg: null,
     b12Mcg: null,
     vitaminDIu: null,
+    ironMg: null,
     servingWeightG: null,
     dataSource: 'user_corrected',
   };

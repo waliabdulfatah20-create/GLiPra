@@ -17,6 +17,7 @@ export type FoodLogEntry = {
   vitaminDIu: number | null; // added in migration 012 (GLP-1 watch)
   magnesiumMg: number | null;// added in migration 012 (GLP-1 watch)
   zincMg: number | null; // added in migration 012 (GLP-1 watch)
+  ironMg: number | null; // added in migration 021 (GLP-1 watch)
   barcodeEan: string | null;
   source: 'manual' | 'barcode' | 'photo' | 'voice';
   createdAt: string; // ISO 8601
@@ -47,6 +48,7 @@ export type BarcodeFoodEntry = {
   zincMg: number | null;
   b12Mcg: number | null;
   vitaminDIu: number | null;
+  ironMg: number | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -65,6 +67,7 @@ export type PhotoFoodEntry = {
   vitaminDIu: number | null;
   magnesiumMg: number | null;
   zincMg: number | null;
+  ironMg: number | null;
 };
 
 // ---------------------------------------------------------------------------

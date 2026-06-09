@@ -57,6 +57,7 @@ const OutputSchema = z.object({
   vitaminDIu: z.number().nonnegative().nullable().optional(),
   magnesiumMg: z.number().nonnegative().nullable().optional(),
   zincMg: z.number().nonnegative().nullable().optional(),
+  ironMg: z.number().nonnegative().nullable().optional(),
   confidence: z.enum(['high', 'medium', 'low']),
   // Numeric self-reported confidence (0–100). Optional during rollout; the
   // client falls back to deriving from the enum if absent.
@@ -82,6 +83,7 @@ const FALLBACK_RESULT: RecognitionOutput = {
   vitaminDIu: null,
   magnesiumMg: null,
   zincMg: null,
+  ironMg: null,
   confidence: 'low',
   confidencePercent: 0,
 };
@@ -120,10 +122,11 @@ function buildSystemPrompt(
       + '"vitaminDIu": number | null, '
       + '"magnesiumMg": number | null, '
       + '"zincMg": number | null, '
+      + '"ironMg": number | null, '
       + '"confidence": "high" | "medium" | "low", '
       + '"confidencePercent": number '
       + '}. '
-      + 'For GLP-1 patients, micronutrient estimates (B12, vitamin D, magnesium, zinc) are '
+      + 'For GLP-1 patients, micronutrient estimates (B12, vitamin D, magnesium, zinc, iron) are '
       + 'especially important — provide your best estimate based on the food type, or null if '
       + 'truly uncertain. '
       + 'For confidencePercent, return an integer 0–100 reflecting how sure you are of the food '

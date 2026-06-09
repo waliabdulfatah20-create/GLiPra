@@ -234,6 +234,7 @@ export type Database = {
           fat_g: number | null
           fiber_g: number | null
           id: string
+          iron_mg: number | null
           logged_at: string
           magnesium_mg: number | null
           name: string
@@ -253,6 +254,7 @@ export type Database = {
           fat_g?: number | null
           fiber_g?: number | null
           id?: string
+          iron_mg?: number | null
           logged_at: string
           magnesium_mg?: number | null
           name: string
@@ -272,6 +274,7 @@ export type Database = {
           fat_g?: number | null
           fiber_g?: number | null
           id?: string
+          iron_mg?: number | null
           logged_at?: string
           magnesium_mg?: number | null
           name?: string
@@ -524,6 +527,7 @@ export type Database = {
           fiber_g: number | null
           food_name_key: string
           id: string
+          iron_mg: number | null
           magnesium_mg: number | null
           protein_g: number
           serving_description: string
@@ -540,6 +544,7 @@ export type Database = {
           fiber_g?: number | null
           food_name_key: string
           id?: string
+          iron_mg?: number | null
           magnesium_mg?: number | null
           protein_g: number
           serving_description: string
@@ -556,6 +561,7 @@ export type Database = {
           fiber_g?: number | null
           food_name_key?: string
           id?: string
+          iron_mg?: number | null
           magnesium_mg?: number | null
           protein_g?: number
           serving_description?: string

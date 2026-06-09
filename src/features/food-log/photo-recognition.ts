@@ -41,6 +41,7 @@ export type RecognitionResult = {
   vitaminDIu: number | null;
   magnesiumMg: number | null;
   zincMg: number | null;
+  ironMg: number | null;
   /** Bucketed confidence — kept for backward-compat. */
   confidence: 'high' | 'medium' | 'low';
   /**
@@ -90,6 +91,7 @@ function adaptMockToResult(): RecognitionResult {
     vitaminDIu: mock.vitamin_d_iu,
     magnesiumMg: mock.magnesium_mg,
     zincMg: mock.zinc_mg,
+    ironMg: mock.iron_mg,
     confidence,
     confidencePercent: Math.round(mock.confidence * 100),
   };

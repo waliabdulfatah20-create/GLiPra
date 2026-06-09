@@ -16,6 +16,7 @@ const FULL_BASE = {
   vitaminDIu: 40,
   magnesiumMg: 60,
   zincMg: 3.5,
+  ironMg: 2.5,
 };
 
 const SPARSE_BASE = {
@@ -28,6 +29,7 @@ const SPARSE_BASE = {
   vitaminDIu: null,
   magnesiumMg: null,
   zincMg: null,
+  ironMg: null,
 };
 
 describe('scaleMacros — multiplier = 1', () => {
@@ -39,6 +41,7 @@ describe('scaleMacros — multiplier = 1', () => {
     expect(out.fiberG).toBe('4.0');
     expect(out.b12Mcg).toBe('2.1');
     expect(out.zincMg).toBe('3.5');
+    expect(out.ironMg).toBe('2.5');
   });
 
   it('returns identity strings with correct precision (integers)', () => {
@@ -93,6 +96,7 @@ describe('scaleMacros — null base fields stay empty', () => {
     expect(out.vitaminDIu).toBe('');
     expect(out.magnesiumMg).toBe('');
     expect(out.zincMg).toBe('');
+    expect(out.ironMg).toBe('');
   });
 });
 

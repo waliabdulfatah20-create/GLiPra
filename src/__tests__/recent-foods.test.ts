@@ -22,6 +22,7 @@ function makeLog(overrides: Partial<FoodLogEntry> = {}): FoodLogEntry {
     vitaminDIu: 5,
     magnesiumMg: 28,
     zincMg: 1.2,
+    ironMg: 1.1,
     barcodeEan: null,
     source: 'photo',
     createdAt: '2026-06-01T08:00:00.000Z',

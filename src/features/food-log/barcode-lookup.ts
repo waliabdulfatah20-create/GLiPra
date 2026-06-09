@@ -19,6 +19,7 @@ export type BarcodeProduct = {
   zincMg: number | null;
   b12Mcg: number | null;
   vitaminDIu: number | null;
+  ironMg: number | null;
   servingWeightG: number | null; // grams per serving from OFF serving_quantity; null for USDA
   ean: string;
   dataSource: BarcodeDataSource;
@@ -37,6 +38,7 @@ const offNutrimentsSchema = z
     'energy-kcal_100g': z.number().optional(),
     'magnesium_100g': z.number().optional(),
     'zinc_100g': z.number().optional(),
+    'iron_100g': z.number().optional(),
     'vitamin-b12_100g': z.number().optional(),
     'vitamin-d_100g': z.number().optional(),
   })
@@ -92,6 +94,8 @@ async function lookupBarcodeOFF(ean: string): Promise<BarcodeProduct | null> {
       // Vitamins: OFF stores in g/100g → B12: ×1e6 for mcg; D: ×1e6×40 for IU
       b12Mcg: n['vitamin-b12_100g'] != null ? Math.round(n['vitamin-b12_100g'] * 1_000_000 * 100) / 100 : null,
       vitaminDIu: n['vitamin-d_100g'] != null ? Math.round(n['vitamin-d_100g'] * 1_000_000 * 40) : null,
+      // Iron: OFF stores in g/100g → ×1000 for mg
+      ironMg: n.iron_100g != null ? Math.round(n.iron_100g * 1000 * 100) / 100 : null,
       servingWeightG,
       ean,
       dataSource: 'open_food_facts',
@@ -147,7 +151,7 @@ async function lookupBarcodeUSDA(ean: string): Promise<BarcodeProduct | null> {
 
     const nutrientMap = new Map(food.foodNutrients.map(n => [n.nutrientId, n.value]));
     // USDA nutrient IDs: protein=1003, fat=1004, carbs=1005, calories=1008, fiber=1079
-    // Minerals (mg): magnesium=1090, zinc=1095
+    // Minerals (mg): iron=1089, magnesium=1090, zinc=1095 (1087 is calcium, NOT iron)
     // Vitamins (µg): B12=1178, D(D2+D3)=1114 — multiply by 40 to get IU
     const get = (id: number): number | null => nutrientMap.has(id) ? (nutrientMap.get(id) ?? null) : null;
     const proteinG = nutrientMap.get(1003) ?? 0;
@@ -157,6 +161,7 @@ async function lookupBarcodeUSDA(ean: string): Promise<BarcodeProduct | null> {
     const caloriesKcal = get(1008);
     const magnesiumMg = get(1090);
     const zincMg = get(1095);
+    const ironMg = get(1089);
     const b12Mcg = get(1178);
     const vitaminDRaw = get(1114);
     const vitaminDIu = vitaminDRaw != null ? Math.round(vitaminDRaw * 40) : null;
@@ -173,6 +178,7 @@ async function lookupBarcodeUSDA(ean: string): Promise<BarcodeProduct | null> {
       zincMg,
       b12Mcg,
       vitaminDIu,
+      ironMg,
       servingWeightG: null,
       ean,
       dataSource: 'usda',

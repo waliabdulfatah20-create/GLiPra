@@ -120,6 +120,7 @@ export default function LogScreen() {
       zincMg: product.zincMg,
       b12Mcg: product.b12Mcg,
       vitaminDIu: product.vitaminDIu,
+      ironMg: product.ironMg,
     });
   }
 

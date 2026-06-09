@@ -326,29 +326,6 @@ export function TodayScreen() {
         {/* ── Content area — padded, sits below the gradient hero ─ */}
         <View style={styles.contentArea}>
 
-          {/* ── Conditional banners ───────────────────────────────── */}
-          {profile?.phase === 'maintenance' && (
-            <View style={styles.maintenanceBanner}>
-              <Text style={styles.maintenanceBannerText}>
-                {t('today.maintenance_banner')}
-              </Text>
-            </View>
-          )}
-
-          {profile?.medicationStatus === 'discontinued' && (
-            <TouchableOpacity
-              style={styles.discontinuedBanner}
-              onPress={() => { haptics.tap(); router.push('/discontinuation-mode'); }}
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel="Open Life After GLP-1 guidance"
-            >
-              <Text style={styles.discontinuedBannerText}>
-                {t('today.discontinued_banner')}
-              </Text>
-            </TouchableOpacity>
-          )}
-
           {/* ── Muscle Preservation Score (hero, the core promise) ── */}
           <MuscleScoreCard />
 
@@ -442,7 +419,7 @@ export function TodayScreen() {
           <SectionLabel label={t('today.daily_actions')} />
 
           {/* Dose Window — oral GLP-1 only, and only while actively dosing. */}
-          {isOral && profile?.medicationStatus !== 'discontinued' && (
+          {isOral && (
             <DoseWindowCard
               lastDoseTakenAt={oralLastDoseTakenAt}
               currentStreak={oralAdherenceStreak}
@@ -456,7 +433,7 @@ export function TodayScreen() {
           )}
 
           {/* Dose — injection users get one row that deep-links to the Dose tab. */}
-          {!isOral && injectionDoseRow && profile?.medicationStatus !== 'discontinued' && (
+          {!isOral && injectionDoseRow && (
             <TouchableOpacity
               testID="today-dose-row"
               style={[styles.actionCard, { borderTopColor: colors.primary }]}
@@ -605,16 +582,12 @@ export function TodayScreen() {
           {/* Nutrition Coach moved to its own bottom-nav tab — CTA removed 2026-05-24 */}
 
           {/* ── Daily AI Guidance ─────────────────────────────────── */}
-          {profile.medicationStatus !== 'discontinued' && (
-            <>
-              <SectionLabel label={t('today.daily_guidance_section')} />
-              <DailyGuidanceCard
-                guidance={dailyGuidance}
-                isLoading={isGuidanceLoading}
-                isError={isGuidanceError}
-              />
-            </>
-          )}
+          <SectionLabel label={t('today.daily_guidance_section')} />
+          <DailyGuidanceCard
+            guidance={dailyGuidance}
+            isLoading={isGuidanceLoading}
+            isError={isGuidanceError}
+          />
 
           {/* ── Pharmacist Content ────────────────────────────────── */}
           <SectionLabel label={t('today.pharmacist_content')} />
@@ -1030,36 +1003,6 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       fontSize: 22,
       color: colors.gray300,
       lineHeight: 26,
-    },
-
-    // ── Banners ──────────────────────────────────────────────────
-    maintenanceBanner: {
-      backgroundColor: colors.successLight,
-      borderRadius: radius.md,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
-      marginBottom: spacing.md,
-      borderLeftWidth: 3,
-      borderLeftColor: colors.success,
-    },
-    maintenanceBannerText: {
-      fontSize: 13,
-      fontWeight: '600',
-      color: colors.success,
-    },
-    discontinuedBanner: {
-      backgroundColor: colors.primaryLight,
-      borderRadius: radius.md,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
-      marginBottom: spacing.md,
-      borderLeftWidth: 3,
-      borderLeftColor: colors.primary,
-    },
-    discontinuedBannerText: {
-      fontSize: 13,
-      fontWeight: '600',
-      color: colors.primary,
     },
 
     // ── Empty state ──────────────────────────────────────────────

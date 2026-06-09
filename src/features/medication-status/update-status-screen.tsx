@@ -31,9 +31,6 @@ import { useTheme } from '@/lib/ThemeContext';
 const STATUS_OPTIONS: { value: MedicationStatus; label: string; description: string }[] = [
   { value: 'starting', label: 'Starting', description: 'New prescription or just starting' },
   { value: 'active', label: 'Active', description: 'Been on it a few weeks or months' },
-  { value: 'tapering', label: 'Tapering', description: 'Dose decreasing or reducing frequency' },
-  { value: 'maintenance', label: 'Maintenance', description: 'At goal dose, steady state' },
-  { value: 'discontinued', label: 'Discontinued', description: 'No longer taking GLP-1 medication' },
 ];
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
@@ -70,16 +67,12 @@ export function UpdateStatusScreen() {
     haptics.medium();
     setIsSaving(true);
 
-    // Keep the derived `phase` column in sync with the new status (same
-    // derivation as onboarding) so every reader of profile.phase — readiness,
-    // protein guidance, etc. — never sees a stale value. The column is only
-    // otherwise written at onboarding, so without this it would drift.
-    const phase: 'maintenance' | 'weight_loss'
-      = selected === 'maintenance' || selected === 'tapering' ? 'maintenance' : 'weight_loss';
-
+    // The protein floor uses the weight-loss phase for all active statuses.
+    // Keep the derived `phase` column in sync so a stale 'maintenance' value
+    // from an older row self-corrects on the next status change.
     await supabase
       .from('profiles')
-      .update({ medication_status: selected, phase })
+      .update({ medication_status: selected, phase: 'weight_loss' })
       .eq('user_id', session.user.id);
 
     await queryClient.invalidateQueries({ queryKey: ['today-profile'] });

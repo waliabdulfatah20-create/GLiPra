@@ -75,9 +75,6 @@ function NotificationRow({ label, subtitle, value, onToggle, isLast = false }: N
 const STATUS_LABELS: Record<string, string> = {
   starting: 'Starting',
   active: 'Active',
-  tapering: 'Tapering',
-  maintenance: 'Maintenance',
-  discontinued: 'Discontinued',
 };
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
@@ -196,14 +193,6 @@ export function SettingsScreen() {
             label={t('settings.medication_status')}
             value={currentStatusLabel}
             onPress={() => router.push('/update-status')}
-          />
-          <SettingsRow
-            label={t('settings.maintenance_mode')}
-            onPress={() => router.push('/maintenance-mode')}
-          />
-          <SettingsRow
-            label={t('settings.life_after_glp1')}
-            onPress={() => router.push('/discontinuation-mode')}
             isLast
           />
         </SettingsSection>

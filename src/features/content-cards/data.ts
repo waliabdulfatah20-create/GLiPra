@@ -301,17 +301,6 @@ export const CONTENT_CARDS: ContentCard[] = [
     sortOrder: 24,
   },
   {
-    id: 'maintenance-nutrition',
-    title: 'Nutrition When You Reach Your Goal',
-    keyTakeaway: 'Goal weight is a transition, not a finish line: your protein floor stays high.',
-    body:
-      'Reaching your goal weight does not mean stopping the habits that got you there: it means recalibrating them. Protein remains just as important in maintenance because muscle mass still requires regular stimulus and amino acid supply to stay in place. GLiPra\'s maintenance mode adjusts your protein floor by 10% to reflect reduced caloric needs, while keeping the floor high enough to protect the muscle you worked to preserve. This transition is a success, not an endpoint.',
-    cardType: 'education',
-    medicationIds: [],
-    tier: 2,
-    sortOrder: 25,
-  },
-  {
     id: 'oral-empty-stomach',
     title: 'Oral GLP-1: The Empty-Stomach Rule',
     keyTakeaway: 'Take it on an empty stomach with a small sip of water, then wait 30 minutes before anything else.',

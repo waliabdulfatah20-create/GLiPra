@@ -15,7 +15,6 @@ import {
   ACTIVITY_MULTIPLIERS,
   calculateProteinFloor,
   KIDNEY_DISEASE_MAX_G_PER_KG,
-  MAINTENANCE_MULTIPLIER,
 } from '@/utils/protein';
 
 export default function ProteinTargetScreen() {
@@ -32,8 +31,7 @@ export default function ProteinTargetScreen() {
   );
 
   const result = useMemo<ProteinResult | null>(() => {
-    const { weightKg, heightCm, hasKidneyDisease, isPregnant, activityLevel, medicationStatus }
-      = formData;
+    const { weightKg, heightCm, hasKidneyDisease, isPregnant, activityLevel } = formData;
 
     if (
       weightKg === undefined
@@ -47,18 +45,13 @@ export default function ProteinTargetScreen() {
 
     const bmi = weightKg / ((heightCm / 100) * (heightCm / 100));
 
-    const phase: 'weight_loss' | 'maintenance'
-      = medicationStatus === 'maintenance' || medicationStatus === 'tapering'
-        ? 'maintenance'
-        : 'weight_loss';
-
     return calculateProteinFloor({
       weightKg,
       heightCm,
       bmi,
       hasKidneyDisease,
       isPregnant,
-      phase,
+      phase: 'weight_loss',
       activityLevel,
     });
   }, [formData]);
@@ -76,19 +69,14 @@ export default function ProteinTargetScreen() {
       displayMultiplier = KIDNEY_DISEASE_MAX_G_PER_KG; // 0.8
     }
     else {
-      const phase: 'weight_loss' | 'maintenance'
-        = formData.medicationStatus === 'maintenance' || formData.medicationStatus === 'tapering'
-          ? 'maintenance'
-          : 'weight_loss';
-      displayMultiplier
-        = phase === 'maintenance' ? activityMultiplier * MAINTENANCE_MULTIPLIER : activityMultiplier;
+      displayMultiplier = activityMultiplier;
     }
 
     const weight = result.baseWeightUsedKg.toFixed(1);
     // Trim trailing zeros: 1.40 → 1.4, 1.44 → 1.44, 0.80 → 0.8
     const mult = displayMultiplier.toFixed(2).replace(/\.?0+$/, '');
     return `${weight} kg × ${mult} g/kg`;
-  }, [result, formData.activityLevel, formData.medicationStatus]);
+  }, [result, formData.activityLevel]);
 
   const canProceed = acknowledged && result !== null;
 

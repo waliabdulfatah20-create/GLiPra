@@ -15,8 +15,7 @@ or compounded GLP-1s who are anxious about muscle loss and underserved by every
 existing app.
 
 Primary benchmark competitor: MeAgain (meagain.com) — match their UX polish,
-beat them on pharmacist credential, safety features, Spanish localization,
-and discontinuation support.
+beat them on pharmacist credential, safety features, and Spanish localization.
 
 Full details in ARCHITECTURE.md. Read the relevant section before touching any feature.
 
@@ -274,9 +273,9 @@ type SubscriptionTier = 'free' | 'pro' | 'founder_lifetime';
 // Founder Lifetime = $149 one-time (first 500 users)
 
 // Locked to Pro: AI photo recognition, voice logging (fully gated — no free tier), daily AI guidance,
-//   micronutrient watch, unlimited protein history, prescriber visit prep + PDF, linked accounts
+//   unlimited protein history, prescriber visit prep + PDF, linked accounts
 
-// Always free: red-flag escalation, barcode scanning, manual food logging,
+// Always free: red-flag escalation, micronutrient watch, barcode scanning, manual food logging,
 //   data export (GDPR), account deletion
 ```
 

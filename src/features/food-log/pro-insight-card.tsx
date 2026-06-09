@@ -7,7 +7,6 @@
  *
  * The card is suppressed entirely when:
  *   - The user has no protein floor yet (pre-onboarding)
- *   - medicationStatus === 'discontinued' (cycle nudges no longer apply)
  *   - Both consumed and meal protein are zero (no data yet)
  *
  * All copy goes through i18n. No em dashes (CLAUDE.md rule).
@@ -52,12 +51,8 @@ export function ProInsightCard({ mealProteinG }: ProInsightCardProps) {
   );
 
   const { isPro } = useSubscription();
-  const { proteinFloorG, profile, injectionCycle } = useTodayData();
+  const { proteinFloorG, injectionCycle } = useTodayData();
   const { protein: proteinConsumedG } = useDailyMacros();
-
-  // Cycle nudges no longer apply once the user has stopped GLP-1.
-  if (profile?.medicationStatus === 'discontinued')
-    return null;
 
   const insight = composeInsight({
     proteinConsumedG,

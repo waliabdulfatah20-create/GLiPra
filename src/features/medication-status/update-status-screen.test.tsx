@@ -3,9 +3,9 @@ import { router } from 'expo-router';
 /**
  * UpdateStatusScreen — jest-expo RTL tests.
  *
- * Guards the regression where changing medication_status left the derived
- * `phase` column stale. Saving must write BOTH columns, with phase derived the
- * same way onboarding does.
+ * Saving writes BOTH medication_status and the derived `phase` column. With
+ * maintenance + discontinued removed, phase is always 'weight_loss', and a
+ * stale 'maintenance' row self-corrects on the next save.
  */
 import * as React from 'react';
 import { useTodayProfile } from '@/features/today/hooks';
@@ -51,31 +51,19 @@ describe('update status', () => {
     jest.clearAllMocks();
   });
 
-  it('writes maintenance phase when switching to maintenance', async () => {
-    setStatus('active');
-    render(<UpdateStatusScreen />);
-    const update = await selectAndSave('Maintenance');
-    expect(update).toHaveBeenCalledWith({ medication_status: 'maintenance', phase: 'maintenance' });
-  });
-
-  it('writes maintenance phase when switching to tapering', async () => {
-    setStatus('active');
-    render(<UpdateStatusScreen />);
-    const update = await selectAndSave('Tapering');
-    expect(update).toHaveBeenCalledWith({ medication_status: 'tapering', phase: 'maintenance' });
-  });
-
-  it('writes weight_loss phase when switching back to active from maintenance', async () => {
-    setStatus('maintenance');
+  it('writes weight_loss phase when switching from starting to active', async () => {
+    setStatus('starting');
     render(<UpdateStatusScreen />);
     const update = await selectAndSave('Active');
     expect(update).toHaveBeenCalledWith({ medication_status: 'active', phase: 'weight_loss' });
   });
 
-  it('writes weight_loss phase for discontinued', async () => {
-    setStatus('active');
+  it('self-corrects a stale maintenance row to weight_loss when switching to active', async () => {
+    // Mocks the hook directly with a legacy value. In production fetchTodayProfile
+    // also normalizes such rows to 'active'; this guards the save path either way.
+    setStatus('maintenance');
     render(<UpdateStatusScreen />);
-    const update = await selectAndSave('Discontinued');
-    expect(update).toHaveBeenCalledWith({ medication_status: 'discontinued', phase: 'weight_loss' });
+    const update = await selectAndSave('Active');
+    expect(update).toHaveBeenCalledWith({ medication_status: 'active', phase: 'weight_loss' });
   });
 });

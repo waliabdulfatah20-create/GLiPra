@@ -9,7 +9,7 @@
 //   4. 2-tab toggle — Manual | Barcode, with a "free" caption underneath
 //   5. ManualEntryForm (when mode === 'manual')
 //   6. Results cluster — DailyMacroCard (when entries exist) + MicronutrientWatchCard
-//      (Pro+data -> grid, Pro+empty -> null, free -> frosted "Unlock with Pro" upsell)
+//      (free; renders the grid when micros are logged, null otherwise)
 //   7. Today's log section header
 //   8. FoodLogRow list
 //

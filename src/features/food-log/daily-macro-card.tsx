@@ -1,7 +1,7 @@
 // DailyMacroCard — shows today's running nutrition totals on the Log screen.
 // Protein gets a progress bar vs the user's protein floor.
 // Micronutrient data (B12, vitamin D, magnesium, zinc) is now shown in the
-// dedicated MicronutrientWatchCard (Pro-gated) rendered below this card on log.tsx.
+// dedicated MicronutrientWatchCard (free) rendered below this card on log.tsx.
 
 import type { GlipraTokens } from '@/theme/tokens';
 import * as React from 'react';

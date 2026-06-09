@@ -81,8 +81,6 @@ export default function TabLayout() {
       <Tabs.Screen name="shot-prep" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="journey" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="health-import" options={{ href: null, headerShown: false }} />
-      <Tabs.Screen name="maintenance-mode" options={{ href: null, headerShown: false }} />
-      <Tabs.Screen name="discontinuation-mode" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="add-shot" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="edit-shot" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="goal-weight" options={{ href: null, headerShown: false }} />

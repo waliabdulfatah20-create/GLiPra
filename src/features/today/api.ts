@@ -3,10 +3,7 @@ import { supabase } from '@/lib/supabase';
 
 export type MedicationStatus
   = | 'starting'
-    | 'active'
-    | 'tapering'
-    | 'maintenance'
-    | 'discontinued';
+    | 'active';
 
 export type TodayProfile = {
   medicationId: string;
@@ -51,7 +48,10 @@ export async function fetchTodayProfile(userId: string): Promise<TodayProfile | 
     heightCm: data.height_cm ?? null,
     goalWeightKg: data.goal_weight_kg ?? null,
     phase: (data.phase as 'weight_loss' | 'maintenance') ?? 'weight_loss',
-    medicationStatus: (data.medication_status as MedicationStatus) ?? 'active',
+    // Normalize on read: legacy rows may hold removed statuses (maintenance /
+    // discontinued / tapering). Map anything that is not 'starting' to 'active'
+    // so the runtime value always matches the narrowed MedicationStatus type.
+    medicationStatus: data.medication_status === 'starting' ? 'starting' : 'active',
     hasKidneyDisease: data.has_kidney_disease ?? false,
     isPregnant: data.is_pregnant ?? false,
     activityLevel: ((data.activity_level as ActivityLevel | null) ?? 'moderate'),

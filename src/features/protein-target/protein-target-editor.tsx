@@ -151,20 +151,14 @@ export function ProteinTargetEditor() {
     heightCm = ft == null ? null : ftInToCm(ft, inches);
   }
 
-  // Derive phase from the live medication status (matching onboarding) rather
-  // than the persisted `phase` column, which is only written at onboarding and
-  // can drift stale after a status change — persisting a wrong floor otherwise.
-  const phase
-    = profile?.medicationStatus === 'maintenance' || profile?.medicationStatus === 'tapering'
-      ? 'maintenance'
-      : 'weight_loss';
+  // All active statuses use the weight-loss phase (maintenance phase removed).
   const result = previewProteinFloor({
     weightKg,
     heightCm,
     activityLevel,
     hasKidneyDisease,
     isPregnant,
-    phase,
+    phase: 'weight_loss',
   });
 
   const canSave = acknowledged && result !== null && !isSaving && !!session?.user.id;

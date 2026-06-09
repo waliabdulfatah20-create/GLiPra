@@ -29,7 +29,7 @@ export type OnboardingFormData = {
   // Step 6 — goals
   goal?: 'muscle_preservation' | 'weight_management' | 'both';
   // Step 7 — status
-  medicationStatus?: 'starting' | 'active' | 'tapering' | 'maintenance' | 'discontinued';
+  medicationStatus?: 'starting' | 'active';
   activityLevel?: 'sedentary' | 'moderate' | 'active';
   // Step 8 — protein floor (calculated, not user-entered)
   proteinFloorG?: number;

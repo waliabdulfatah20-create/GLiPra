@@ -19,7 +19,7 @@ export type InsightInput = {
   proteinConsumedG: number;
   /** Protein the AI estimated for THIS meal (or what the user edited it to). */
   mealProteinG: number;
-  /** User's daily protein floor. Null if pre-onboarding or discontinued. */
+  /** User's daily protein floor. Null if pre-onboarding. */
   proteinFloorG: number | null;
   /** Current injection cycle phase. Null if no injection logged yet. */
   phase: InjectionPhase | null;
@@ -60,10 +60,7 @@ export const FLOOR_HIT_TOLERANCE_G = 2;
 /**
  * Compose a Pro Insight from today's data + this meal's projected protein.
  *
- * Returns `null` to signal "suppress the card entirely". Callers should also
- * suppress when the user is in `medicationStatus === 'discontinued'`, since
- * the protein floor still exists but the phase nudges no longer apply; that
- * check lives in the component, not here.
+ * Returns `null` to signal "suppress the card entirely".
  */
 export function composeInsight(input: InsightInput): InsightOutput | null {
   const {

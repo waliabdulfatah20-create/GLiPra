@@ -10,15 +10,12 @@ import { StepFooter } from '@/features/onboarding/components/step-footer';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { useTheme } from '@/lib/ThemeContext';
 
-type MedicationStatus = 'starting' | 'active' | 'tapering' | 'maintenance' | 'discontinued';
+type MedicationStatus = 'starting' | 'active';
 type ActivityLevel = 'sedentary' | 'moderate' | 'active';
 
 const MEDICATION_OPTIONS: { value: MedicationStatus; title: string; description: string }[] = [
   { value: 'starting', title: 'Just starting out', description: 'I\'m new to GLP-1 or just got my prescription' },
   { value: 'active', title: 'Active & doing well', description: 'I\'ve been on it a few weeks or months' },
-  { value: 'tapering', title: 'Tapering down', description: 'My dose is decreasing or I\'m reducing frequency' },
-  { value: 'maintenance', title: 'Maintenance / stable', description: 'I\'m at my goal dose and in steady state' },
-  { value: 'discontinued', title: 'Recently stopped', description: 'I\'ve discontinued and am in maintenance mode' },
 ];
 
 const ACTIVITY_OPTIONS: { value: ActivityLevel; label: string; description: string }[] = [

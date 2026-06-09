@@ -101,8 +101,6 @@ export function DoseScreen() {
     );
   }
 
-  const isDiscontinued = profile?.medicationStatus === 'discontinued';
-
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: gradients.hero[0] }]}
@@ -135,142 +133,128 @@ export function DoseScreen() {
             <Text style={styles.tier1Text}>{t('dose.disclaimer_top')}</Text>
           </DisclaimerBanner>
 
-          {isDiscontinued
+          {isOral
             ? (
-                <TouchableOpacity
-                  testID="dose-discontinued"
-                  style={styles.infoCard}
-                  onPress={() => { haptics.tap(); router.push('/discontinuation-mode'); }}
-                  activeOpacity={0.75}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('dose.discontinued_title')}
-                >
-                  <Text style={styles.infoTitle}>{t('dose.discontinued_title')}</Text>
-                  <Text style={styles.infoBody}>{t('dose.discontinued_body')}</Text>
-                </TouchableOpacity>
+                <View testID="dose-oral">
+                  {/* Today's dose — the action */}
+                  <SectionLabel label={t('dose.today_label')} />
+                  <DoseWindowCard
+                    lastDoseTakenAt={oralLastDoseTakenAt}
+                    currentStreak={oralAdherenceStreak}
+                    onTake={handleTakeOralDose}
+                    isLogging={logOralDose.isPending}
+                    lastDoseId={oralLastDoseId}
+                    lastDoseWindowRespected={oralLastDoseWindowRespected}
+                    onConfirmWindow={handleConfirmWindow}
+                    isConfirming={setWindowRespected.isPending}
+                  />
+
+                  {/* Phase + level */}
+                  <SectionLabel label={t('dose.medication_label')} />
+                  {oralCycle && (
+                    <View style={styles.badgeCard}>
+                      <PhaseBadge
+                        route="oral"
+                        phase={oralCycle.phase}
+                        daysOnMed={oralCycle.daysOnMed}
+                      />
+                    </View>
+                  )}
+                  <MedLevelBanner route="oral" phase={oralCycle?.phase ?? null} />
+
+                  {/* Building / titration educational card */}
+                  {oralCycle?.phase === 'building' && (
+                    <View style={styles.infoCard}>
+                      <Text style={styles.infoTitle}>{t('dose.building_title')}</Text>
+                      <Text style={styles.infoBody}>{t('dose.building_body')}</Text>
+                    </View>
+                  )}
+
+                  {/* Adherence calendar */}
+                  <SectionLabel label={t('dose.calendar_label')} />
+                  <AdherenceCalendar />
+
+                  {/* Reminders */}
+                  <RemindersPanel />
+                </View>
               )
-            : isOral
-              ? (
-                  <View testID="dose-oral">
-                    {/* Today's dose — the action */}
-                    <SectionLabel label={t('dose.today_label')} />
-                    <DoseWindowCard
-                      lastDoseTakenAt={oralLastDoseTakenAt}
-                      currentStreak={oralAdherenceStreak}
-                      onTake={handleTakeOralDose}
-                      isLogging={logOralDose.isPending}
-                      lastDoseId={oralLastDoseId}
-                      lastDoseWindowRespected={oralLastDoseWindowRespected}
-                      onConfirmWindow={handleConfirmWindow}
-                      isConfirming={setWindowRespected.isPending}
-                    />
-
-                    {/* Phase + level */}
-                    <SectionLabel label={t('dose.medication_label')} />
-                    {oralCycle && (
-                      <View style={styles.badgeCard}>
-                        <PhaseBadge
-                          route="oral"
-                          phase={oralCycle.phase}
-                          daysOnMed={oralCycle.daysOnMed}
-                        />
-                      </View>
-                    )}
-                    <MedLevelBanner route="oral" phase={oralCycle?.phase ?? null} />
-
-                    {/* Building / titration educational card */}
-                    {oralCycle?.phase === 'building' && (
-                      <View style={styles.infoCard}>
-                        <Text style={styles.infoTitle}>{t('dose.building_title')}</Text>
-                        <Text style={styles.infoBody}>{t('dose.building_body')}</Text>
-                      </View>
-                    )}
-
-                    {/* Adherence calendar */}
-                    <SectionLabel label={t('dose.calendar_label')} />
-                    <AdherenceCalendar />
-
-                    {/* Reminders */}
-                    <RemindersPanel />
-                  </View>
-                )
-              : (
-                  <View testID="dose-injection">
-                    {/* Cycle */}
-                    <SectionLabel label={t('dose.injection_cycle_label')} />
-                    {injectionCycle
-                      ? (
-                          <>
-                            <View style={styles.badgeCard}>
-                              <PhaseBadge
-                                route="injection"
-                                phase={injectionCycle.phase}
-                                daysSinceInjection={injectionCycle.daysSinceInjection}
-                              />
-                              {injectionCycle.isOverdue
+            : (
+                <View testID="dose-injection">
+                  {/* Cycle */}
+                  <SectionLabel label={t('dose.injection_cycle_label')} />
+                  {injectionCycle
+                    ? (
+                        <>
+                          <View style={styles.badgeCard}>
+                            <PhaseBadge
+                              route="injection"
+                              phase={injectionCycle.phase}
+                              daysSinceInjection={injectionCycle.daysSinceInjection}
+                            />
+                            {injectionCycle.isOverdue
+                              ? (
+                                  <Text style={styles.overdueText}>{t('dose.overdue')}</Text>
+                                )
+                              : injectionCycle.daysUntilNextInjection !== null
                                 ? (
-                                    <Text style={styles.overdueText}>{t('dose.overdue')}</Text>
+                                    <Text style={styles.nextDoseText}>
+                                      {`${t('dose.next_dose_label')}: ${injectionCycle.daysUntilNextInjection}d`}
+                                    </Text>
                                   )
-                                : injectionCycle.daysUntilNextInjection !== null
-                                  ? (
-                                      <Text style={styles.nextDoseText}>
-                                        {`${t('dose.next_dose_label')}: ${injectionCycle.daysUntilNextInjection}d`}
-                                      </Text>
-                                    )
-                                  : null}
-                            </View>
-                            {profile?.lastInjectionDate && (
-                              <InjectionCycleCard
-                                lastInjectionDate={profile.lastInjectionDate}
-                                injectionCycle={injectionCycle}
-                              />
-                            )}
-                          </>
-                        )
-                      : (
-                          <View style={styles.infoCard}>
-                            <Text style={styles.infoTitle}>{t('dose.empty_injection_title')}</Text>
-                            <Text style={styles.infoBody}>{t('dose.empty_injection_body')}</Text>
+                                : null}
                           </View>
-                        )}
+                          {profile?.lastInjectionDate && (
+                            <InjectionCycleCard
+                              lastInjectionDate={profile.lastInjectionDate}
+                              injectionCycle={injectionCycle}
+                            />
+                          )}
+                        </>
+                      )
+                    : (
+                        <View style={styles.infoCard}>
+                          <Text style={styles.infoTitle}>{t('dose.empty_injection_title')}</Text>
+                          <Text style={styles.infoBody}>{t('dose.empty_injection_body')}</Text>
+                        </View>
+                      )}
 
-                    {/* Log a shot */}
+                  {/* Log a shot */}
+                  <ActionRow
+                    testID="dose-log-shot"
+                    icon={<Syringe color={colors.primary} width={20} height={20} />}
+                    title={t('dose.log_shot_title')}
+                    subtitle={t('dose.log_shot_sub')}
+                    onPress={() => { haptics.tap(); router.push('/add-shot'); }}
+                    styles={styles}
+                    colors={colors}
+                  />
+                  {injectionCycle?.phase === 'injection_day' && (
                     <ActionRow
-                      testID="dose-log-shot"
-                      icon={<Syringe color={colors.primary} width={20} height={20} />}
-                      title={t('dose.log_shot_title')}
-                      subtitle={t('dose.log_shot_sub')}
-                      onPress={() => { haptics.tap(); router.push('/add-shot'); }}
+                      icon={<ClipboardCheck color={colors.primary} width={20} height={20} />}
+                      title={t('dose.shot_prep_title')}
+                      subtitle={t('dose.shot_prep_sub')}
+                      onPress={() => { haptics.tap(); router.push('/shot-prep'); }}
                       styles={styles}
                       colors={colors}
                     />
-                    {injectionCycle?.phase === 'injection_day' && (
-                      <ActionRow
-                        icon={<ClipboardCheck color={colors.primary} width={20} height={20} />}
-                        title={t('dose.shot_prep_title')}
-                        subtitle={t('dose.shot_prep_sub')}
-                        onPress={() => { haptics.tap(); router.push('/shot-prep'); }}
-                        styles={styles}
-                        colors={colors}
-                      />
-                    )}
+                  )}
 
-                    {/* Site rotation */}
-                    <SectionLabel label={t('dose.site_rotation_label')} />
-                    <DoseInjectionRotation />
+                  {/* Site rotation */}
+                  <SectionLabel label={t('dose.site_rotation_label')} />
+                  <DoseInjectionRotation />
 
-                    {/* Level */}
-                    <SectionLabel label={t('dose.medication_label')} />
-                    <MedLevelBanner route="injection" phase={injectionCycle?.phase ?? null} />
+                  {/* Level */}
+                  <SectionLabel label={t('dose.medication_label')} />
+                  <MedLevelBanner route="injection" phase={injectionCycle?.phase ?? null} />
 
-                    {/* Adherence calendar */}
-                    <SectionLabel label={t('dose.calendar_label')} />
-                    <AdherenceCalendar />
+                  {/* Adherence calendar */}
+                  <SectionLabel label={t('dose.calendar_label')} />
+                  <AdherenceCalendar />
 
-                    {/* Reminders */}
-                    <RemindersPanel />
-                  </View>
-                )}
+                  {/* Reminders */}
+                  <RemindersPanel />
+                </View>
+              )}
 
           {/* Footer disclaimer */}
           <View style={styles.footer}>
@@ -412,7 +396,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       fontWeight: '600',
     },
 
-    // Info card (building / empty / discontinued)
+    // Info card (building / empty)
     infoCard: {
       backgroundColor: colors.surface,
       borderRadius: radius.lg,

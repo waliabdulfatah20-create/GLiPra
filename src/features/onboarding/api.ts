@@ -30,10 +30,7 @@ export async function saveOnboardingProfile(
     is_pregnant: data.isPregnant ?? false,
     activity_level: data.activityLevel ?? 'moderate',
     dietary_pattern: data.dietaryPattern ?? null,
-    phase:
-      data.medicationStatus === 'maintenance' || data.medicationStatus === 'tapering'
-        ? 'maintenance'
-        : 'weight_loss',
+    phase: 'weight_loss',
     protein_floor_g: data.proteinFloorG ?? null,
     onboarding_completed: true,
   }, { onConflict: 'user_id' });

@@ -1,5 +1,5 @@
 // src/features/food-log/micronutrient-watch-card.tsx
-// Pro-gated card. Direction C design: gradient header, gaps chip, 2x2 tile grid, gap banner.
+// Micronutrient watch card (free). Direction C design: gradient header, gaps chip, 2x2 tile grid, gap banner.
 // Rule 8: DisclaimerBanner tier={2}. Rule 9/10: food-strategy copy only, no condition names.
 
 import type { TFunction } from 'i18next';
@@ -9,9 +9,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
-import { ProGate } from '@/features/subscription/pro-gate';
 
 import { useTheme } from '@/lib/ThemeContext';
 import { useDailyMacros } from './hooks';
@@ -56,8 +55,8 @@ export function MicronutrientWatchCard() {
     { key: 'vitaminDIu', labelKey: 'log.nutrient_vitd', value: vitaminDIu, unit: 'IU' },
   ];
 
-  // Pro path: render the real card only when there's micronutrient data.
-  // When a Pro user hasn't logged any micros yet, render nothing (no empty state).
+  // Render the real card only when there's micronutrient data. When nothing has
+  // been logged yet, render nothing (no empty state) — matches the prior behavior.
   const content = hasMicronutrients
     ? (
         <View style={styles.card}>
@@ -70,9 +69,6 @@ export function MicronutrientWatchCard() {
           >
             <View style={styles.headerTopRow}>
               <Text style={styles.headerTitle}>{t('log.micronutrient_watch')}</Text>
-              <View style={styles.proBadge}>
-                <Text style={styles.proBadgeText}>PRO</Text>
-              </View>
             </View>
             <View style={[styles.gapsChip, gapCount === 0 && styles.gapsChipGood]}>
               <View style={[styles.gapsDot, gapCount === 0 && styles.gapsDotGood]} />
@@ -112,103 +108,7 @@ export function MicronutrientWatchCard() {
       )
     : null;
 
-  return (
-    <ProGate featureName={t('log.micronutrient_watch')} fallback={<MicronutrientUpsell />}>
-      {content}
-    </ProGate>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// MicronutrientUpsell — frosted, locked preview shown to free users.
-// Sample tiles dimmed behind a translucent scrim + "Unlock with Pro" CTA.
-// Tapping anywhere opens the RevenueCat paywall. Sample values are illustrative
-// (labelled "Sample preview") so they aren't mistaken for the user's real data.
-// ---------------------------------------------------------------------------
-
-const SAMPLE_NUTRIENTS: NutrientConfig[] = [
-  { key: 'magnesiumMg', labelKey: 'log.nutrient_magnesium', value: 320, unit: 'mg' },
-  { key: 'zincMg', labelKey: 'log.nutrient_zinc', value: 9, unit: 'mg' },
-  { key: 'ironMg', labelKey: 'log.nutrient_iron', value: 12, unit: 'mg' },
-  { key: 'b12Mcg', labelKey: 'log.nutrient_b12', value: 2.1, unit: 'mcg' },
-  { key: 'vitaminDIu', labelKey: 'log.nutrient_vitd', value: 480, unit: 'IU' },
-];
-
-function openPaywall() {
-  try {
-    const { RevenueCatUI } = require('react-native-purchases-ui');
-    RevenueCatUI.presentPaywallIfNeeded({
-      requiredEntitlementIdentifier: 'GLiPra Pro',
-    });
-  }
-  catch {
-    // Native module not available in Expo Go — silent no-op
-  }
-}
-
-function MicronutrientUpsell() {
-  const { colors, gradients, spacing, radius, shadows } = useTheme();
-  const styles = React.useMemo(
-    () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows],
-  );
-  const { t } = useTranslation();
-
-  return (
-    <Pressable
-      style={styles.card}
-      onPress={openPaywall}
-      accessibilityRole="button"
-      accessibilityLabel={t('log.micronutrient_upsell_cta')}
-    >
-      <LinearGradient
-        colors={[...gradients.hero]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.header}
-      >
-        <View style={styles.headerTopRow}>
-          <Text style={styles.headerTitle}>{t('log.micronutrient_watch')}</Text>
-          <View style={styles.proBadge}>
-            <Text style={styles.proBadgeText}>PRO</Text>
-          </View>
-        </View>
-      </LinearGradient>
-
-      <View style={styles.body}>
-        <View style={styles.previewWrap}>
-          <View style={[styles.grid, styles.sampleGrid]}>
-            {SAMPLE_NUTRIENTS.map(n => (
-              <NutrientTile
-                key={n.key}
-                label={t(n.labelKey)}
-                value={n.value}
-                unit={n.unit}
-                rda={MICRONUTRIENT_RDAS[n.key]}
-                styles={styles}
-                t={t}
-              />
-            ))}
-          </View>
-
-          {/* Frost layer — faded so tiles read faintly through it */}
-          <View style={styles.frost} />
-
-          {/* Scrim content — crisp, full opacity */}
-          <View style={styles.scrimContent}>
-            <Text style={styles.lockIcon}>🔒</Text>
-            <Text style={styles.upsellTitle}>{t('log.micronutrient_upsell_title')}</Text>
-            <Text style={styles.upsellSubtitle}>{t('log.micronutrient_upsell_subtitle')}</Text>
-            <View style={styles.unlockPill}>
-              <Text style={styles.unlockPillText}>{t('log.micronutrient_upsell_cta')}</Text>
-            </View>
-          </View>
-        </View>
-
-        <Text style={styles.sampleLabel}>{t('log.micronutrient_upsell_sample')}</Text>
-      </View>
-    </Pressable>
-  );
+  return content;
 }
 
 type NutrientTileProps = {
@@ -297,18 +197,6 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       fontSize: 14,
       fontWeight: '800',
       color: '#f5f3ff',
-    },
-    proBadge: {
-      backgroundColor: 'rgba(255,255,255,0.20)',
-      borderRadius: radius.full,
-      paddingHorizontal: 8,
-      paddingVertical: 2,
-    },
-    proBadgeText: {
-      fontSize: 8,
-      fontWeight: '800',
-      color: '#f5f3ff',
-      letterSpacing: 0.5,
     },
     gapsChip: {
       flexDirection: 'row',
@@ -426,68 +314,6 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       fontSize: 11,
       color: colors.textDisabled,
       lineHeight: 16,
-    },
-    // ── Upsell (frosted locked preview) ──────────────────────────────────────
-    previewWrap: {
-      position: 'relative',
-    },
-    sampleGrid: {
-      opacity: 0.45,
-      paddingBottom: spacing.md,
-    },
-    frost: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: colors.surface,
-      opacity: 0.82,
-    },
-    scrimContent: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: spacing.lg,
-      gap: spacing.xs,
-    },
-    lockIcon: {
-      fontSize: 26,
-    },
-    upsellTitle: {
-      fontSize: 16,
-      fontWeight: '800',
-      color: colors.textPrimary,
-      textAlign: 'center',
-    },
-    upsellSubtitle: {
-      fontSize: 13,
-      color: colors.textSecondary,
-      textAlign: 'center',
-      lineHeight: 18,
-    },
-    unlockPill: {
-      backgroundColor: colors.primary,
-      borderRadius: radius.full,
-      paddingHorizontal: 20,
-      paddingVertical: 9,
-      marginTop: spacing.xs,
-    },
-    unlockPillText: {
-      color: colors.white,
-      fontSize: 14,
-      fontWeight: '700',
-    },
-    sampleLabel: {
-      fontSize: 10,
-      color: colors.textDisabled,
-      textAlign: 'center',
-      paddingBottom: spacing.sm,
-      marginTop: -spacing.xs,
     },
   });
 }

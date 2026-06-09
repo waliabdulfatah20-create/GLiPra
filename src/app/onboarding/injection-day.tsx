@@ -1,21 +1,14 @@
 import type { GlipraTokens } from '@/theme/tokens';
-import { LinearGradient } from 'expo-linear-gradient';
+import { format } from 'date-fns';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useState } from 'react';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StepProgress } from '@/features/onboarding/components/step-progress';
+import { ChoiceChip } from '@/features/onboarding/components/choice-chip';
+import { OnboardingScaffold } from '@/features/onboarding/components/onboarding-scaffold';
+import { StepFooter } from '@/features/onboarding/components/step-footer';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
-import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 
 type Frequency = 'weekly' | 'biweekly' | 'daily';
@@ -36,10 +29,13 @@ const DAYS: { label: string; value: number }[] = [
   { label: 'Sat', value: 6 },
 ];
 
-/**
- * Auto-format a raw digit string into MM/DD/YYYY as the user types.
- * Strips non-digits first, then inserts slashes at positions 2 and 4.
- */
+const HOURS = Array.from({ length: 24 }, (_, i) => i);
+
+/** 12-hour AM/PM label for an hour 0-23. Stored value stays 24h "HH:00". */
+function hourLabel(h: number): string {
+  return format(new Date(2000, 0, 1, h, 0), 'h:mm a');
+}
+
 function formatDateInput(raw: string): string {
   const digits = raw.replace(/\D/g, '');
   if (digits.length <= 2)
@@ -49,10 +45,6 @@ function formatDateInput(raw: string): string {
   return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`;
 }
 
-/**
- * Convert MM/DD/YYYY display string to ISO YYYY-MM-DD.
- * Returns null if the value is incomplete or invalid.
- */
 function parseMdyToIso(mdy: string): string | null {
   const parts = mdy.split('/');
   if (parts.length !== 3)
@@ -73,41 +65,27 @@ export default function InjectionDayScreen() {
   const formData = useOnboardingStore.use.formData();
   const isOral = formData.administrationRoute === 'oral';
 
-  // ── Injectable state ─────────────────────────────────────────────────────────
   const [frequency, setFrequency] = useState<Frequency | null>(null);
   const [dayOfWeek, setDayOfWeek] = useState<number | null>(null);
   const [lastInjectionDate, setLastInjectionDate] = useState('');
-
-  // ── Oral state ───────────────────────────────────────────────────────────────
-  // doseHour: "HH" string 00-23 (we build HH:mm from this for storage)
-  const HOURS = Array.from({ length: 24 }, (_, i) => i);
   const [doseHour, setDoseHour] = useState<number | null>(null);
   const [startDate, setStartDate] = useState('');
 
-  const { colors, spacing, radius, gradients } = useTheme();
-  const styles = React.useMemo(
-    () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius],
-  );
+  const { colors, spacing, radius } = useTheme();
+  const styles = React.useMemo(() => makeStyles({ colors, spacing, radius }), [colors, spacing, radius]);
 
-  // ── Injectable validation ────────────────────────────────────────────────────
   const needsDayPicker = frequency === 'weekly' || frequency === 'biweekly';
   const isoDate = parseMdyToIso(lastInjectionDate);
   const injCanProceed
-    = frequency !== null
-      && (frequency === 'daily' || dayOfWeek !== null)
-      && isoDate !== null;
+    = frequency !== null && (frequency === 'daily' || dayOfWeek !== null) && isoDate !== null;
 
-  // ── Oral validation ──────────────────────────────────────────────────────────
   const isoStartDate = parseMdyToIso(startDate);
   const oralCanProceed = doseHour !== null && isoStartDate !== null;
-
   const canProceed = isOral ? oralCanProceed : injCanProceed;
 
   const handleNext = () => {
     if (!canProceed)
       return;
-    haptics.medium();
     if (isOral) {
       const hh = String(doseHour).padStart(2, '0');
       setFormData({
@@ -129,182 +107,107 @@ export default function InjectionDayScreen() {
   };
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
-      edges={['top', 'bottom']}
+    <OnboardingScaffold
+      step={{ current: 2, total: 10 }}
+      title={isOral ? 'When do you take your tablet?' : 'When do you inject?'}
+      subtitle={isOral
+        ? 'We use this to send your daily dose reminder and track your progress.'
+        : 'We use this to track your injection cycle and personalize daily guidance.'}
+      footer={(
+        <StepFooter
+          primaryLabel="Next"
+          onPrimary={handleNext}
+          primaryDisabled={!canProceed}
+          secondaryLabel="Back"
+          onSecondary={() => router.back()}
+        />
+      )}
     >
-      <StepProgress current={2} total={10} onDark />
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <LinearGradient
-          colors={gradients.hero}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.heroGradient}
-        >
-          <Text style={styles.heading}>
-            {isOral ? 'When do you take your tablet?' : 'When do you inject?'}
-          </Text>
-          <Text style={styles.subheading}>
-            {isOral
-              ? 'We use this to send your daily dose reminder and track your progress.'
-              : 'We use this to track your injection cycle and personalize daily guidance.'}
-          </Text>
-        </LinearGradient>
+      {isOral
+        ? (
+            <>
+              <Text style={styles.sectionLabel}>PREFERRED DOSE TIME</Text>
+              <Text style={styles.helperText}>
+                Choose the time you plan to take your tablet each morning. Your prescriber may have given you a specific time.
+              </Text>
+              <View style={styles.grid}>
+                {HOURS.map(h => (
+                  <ChoiceChip
+                    key={h}
+                    label={hourLabel(h)}
+                    selected={doseHour === h}
+                    onPress={() => setDoseHour(h)}
+                  />
+                ))}
+              </View>
 
-        {isOral
-          ? (
-              <>
-                {/* Oral: preferred dose hour */}
-                <Text style={styles.sectionLabel}>PREFERRED DOSE TIME</Text>
-                <Text style={styles.helperText}>
-                  Choose the time you plan to take your tablet each morning. Your prescriber may have given you a specific time.
-                </Text>
-                <View style={styles.hoursGrid}>
-                  {HOURS.map((h) => {
-                    const isSelected = doseHour === h;
-                    const label = `${String(h).padStart(2, '0')}:00`;
-                    return (
-                      <Pressable
-                        key={h}
-                        style={[styles.hourPill, isSelected && styles.hourPillSelected]}
-                        onPress={() => setDoseHour(h)}
-                        accessibilityRole="radio"
-                        accessibilityState={{ checked: isSelected }}
-                      >
-                        <Text style={[styles.hourPillText, isSelected && styles.hourPillTextSelected]}>
-                          {label}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
+              <Text style={[styles.sectionLabel, styles.sectionLabelTop]}>DATE YOU STARTED THIS MEDICATION</Text>
+              <TextInput
+                style={[styles.textInput, startDate.length > 0 && isoStartDate === null && styles.textInputError]}
+                value={startDate}
+                onChangeText={text => setStartDate(formatDateInput(text))}
+                placeholder="MM/DD/YYYY"
+                placeholderTextColor={colors.textDisabled}
+                keyboardType="numeric"
+                maxLength={10}
+                accessibilityLabel="Medication start date"
+              />
+              {startDate.length > 0 && isoStartDate === null && (
+                <Text style={styles.errorText}>Enter a valid date (MM/DD/YYYY)</Text>
+              )}
+            </>
+          )
+        : (
+            <>
+              <Text style={styles.sectionLabel}>INJECTION FREQUENCY</Text>
+              <View style={styles.row}>
+                {FREQUENCIES.map(f => (
+                  <ChoiceChip
+                    key={f.id}
+                    label={f.label}
+                    selected={frequency === f.id}
+                    onPress={() => {
+                      setFrequency(f.id);
+                      if (f.id === 'daily')
+                        setDayOfWeek(null);
+                    }}
+                  />
+                ))}
+              </View>
 
-                {/* Oral: start date */}
-                <Text style={[styles.sectionLabel, { marginTop: spacing.lg }]}>
-                  DATE YOU STARTED THIS MEDICATION
-                </Text>
-                <TextInput
-                  style={[
-                    styles.textInput,
-                    startDate.length > 0 && isoStartDate === null && styles.textInputError,
-                  ]}
-                  value={startDate}
-                  onChangeText={text => setStartDate(formatDateInput(text))}
-                  placeholder="MM/DD/YYYY"
-                  placeholderTextColor={colors.textDisabled}
-                  keyboardType="numeric"
-                  maxLength={10}
-                  accessibilityLabel="Medication start date"
-                />
-                {startDate.length > 0 && isoStartDate === null && (
-                  <Text style={styles.errorText}>Enter a valid date (MM/DD/YYYY)</Text>
-                )}
-              </>
-            )
-          : (
-              <>
-                {/* Injectable: frequency selector */}
-                <Text style={styles.sectionLabel}>INJECTION FREQUENCY</Text>
-                <View style={styles.frequencyRow}>
-                  {FREQUENCIES.map((f) => {
-                    const isSelected = frequency === f.id;
-                    return (
-                      <Pressable
-                        key={f.id}
-                        style={[styles.frequencyCard, isSelected && styles.frequencyCardSelected]}
-                        onPress={() => {
-                          setFrequency(f.id);
-                          if (f.id === 'daily')
-                            setDayOfWeek(null);
-                        }}
-                        accessibilityRole="radio"
-                        accessibilityState={{ checked: isSelected }}
-                      >
-                        <Text
-                          style={[
-                            styles.frequencyCardText,
-                            isSelected && styles.frequencyCardTextSelected,
-                          ]}
-                        >
-                          {f.label}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
+              {needsDayPicker && (
+                <>
+                  <Text style={[styles.sectionLabel, styles.sectionLabelTop]}>INJECTION DAY</Text>
+                  <View style={styles.grid}>
+                    {DAYS.map(d => (
+                      <ChoiceChip
+                        key={d.value}
+                        label={d.label}
+                        selected={dayOfWeek === d.value}
+                        onPress={() => setDayOfWeek(d.value)}
+                      />
+                    ))}
+                  </View>
+                </>
+              )}
 
-                {/* Injectable: day-of-week picker */}
-                {needsDayPicker && (
-                  <>
-                    <Text style={[styles.sectionLabel, { marginTop: spacing.lg }]}>
-                      INJECTION DAY
-                    </Text>
-                    <View style={styles.daysRow}>
-                      {DAYS.map((d) => {
-                        const isSelected = dayOfWeek === d.value;
-                        return (
-                          <Pressable
-                            key={d.value}
-                            style={[styles.dayPill, isSelected && styles.dayPillSelected]}
-                            onPress={() => setDayOfWeek(d.value)}
-                            accessibilityRole="radio"
-                            accessibilityState={{ checked: isSelected }}
-                          >
-                            <Text
-                              style={[styles.dayPillText, isSelected && styles.dayPillTextSelected]}
-                            >
-                              {d.label}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
-                    </View>
-                  </>
-                )}
-
-                {/* Injectable: last injection date */}
-                <Text style={[styles.sectionLabel, { marginTop: spacing.lg }]}>
-                  LAST INJECTION DATE
-                </Text>
-                <TextInput
-                  style={[
-                    styles.textInput,
-                    lastInjectionDate.length > 0 && isoDate === null && styles.textInputError,
-                  ]}
-                  value={lastInjectionDate}
-                  onChangeText={text => setLastInjectionDate(formatDateInput(text))}
-                  placeholder="MM/DD/YYYY"
-                  placeholderTextColor={colors.textDisabled}
-                  keyboardType="numeric"
-                  maxLength={10}
-                  accessibilityLabel="Last injection date"
-                />
-                {lastInjectionDate.length > 0 && isoDate === null && (
-                  <Text style={styles.errorText}>Enter a valid date (MM/DD/YYYY)</Text>
-                )}
-              </>
-            )}
-      </ScrollView>
-
-      <View style={styles.footer}>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backButtonText}>Back</Text>
-        </Pressable>
-        <Pressable
-          style={[styles.nextButton, !canProceed && styles.nextButtonDisabled]}
-          onPress={handleNext}
-          disabled={!canProceed}
-        >
-          <Text style={[styles.nextButtonText, !canProceed && styles.nextButtonTextDisabled]}>
-            Next
-          </Text>
-        </Pressable>
-      </View>
-    </SafeAreaView>
+              <Text style={[styles.sectionLabel, styles.sectionLabelTop]}>LAST INJECTION DATE</Text>
+              <TextInput
+                style={[styles.textInput, lastInjectionDate.length > 0 && isoDate === null && styles.textInputError]}
+                value={lastInjectionDate}
+                onChangeText={text => setLastInjectionDate(formatDateInput(text))}
+                placeholder="MM/DD/YYYY"
+                placeholderTextColor={colors.textDisabled}
+                keyboardType="numeric"
+                maxLength={10}
+                accessibilityLabel="Last injection date"
+              />
+              {lastInjectionDate.length > 0 && isoDate === null && (
+                <Text style={styles.errorText}>Enter a valid date (MM/DD/YYYY)</Text>
+              )}
+            </>
+          )}
+    </OnboardingScaffold>
   );
 }
 
@@ -316,91 +219,33 @@ type StyleTokens = {
 
 function makeStyles({ colors, spacing, radius }: StyleTokens) {
   return StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    scroll: {
-      padding: spacing.lg,
-      paddingBottom: spacing.sm,
-    },
-    heroGradient: {
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing.lg,
-      paddingBottom: spacing.xl + spacing.sm,
-      marginTop: -spacing.lg,
-      marginHorizontal: -spacing.lg,
-      marginBottom: spacing.lg,
-    },
-    heading: {
-      fontSize: 24,
-      fontWeight: '700',
-      color: '#ffffff',
-      marginBottom: spacing.sm,
-    },
-    subheading: {
-      fontSize: 15,
-      color: 'rgba(255,255,255,0.8)',
-      lineHeight: 22,
-    },
     sectionLabel: {
       fontSize: 11,
       fontWeight: '700',
       color: colors.textSecondary,
-      letterSpacing: 0.8,
+      letterSpacing: 1,
+      textTransform: 'uppercase',
       marginBottom: spacing.sm,
     },
-    frequencyRow: {
+    sectionLabelTop: {
+      marginTop: spacing.lg,
+    },
+    helperText: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      lineHeight: 20,
+      marginBottom: spacing.md,
+      marginTop: -spacing.xs,
+    },
+    row: {
       flexDirection: 'row',
       gap: spacing.sm,
-    },
-    frequencyCard: {
-      flex: 1,
-      paddingVertical: spacing.md,
-      borderRadius: radius.md,
-      borderWidth: 1.5,
-      borderColor: colors.border,
-      backgroundColor: colors.surface,
-      alignItems: 'center',
-    },
-    frequencyCardSelected: {
-      borderColor: colors.primary,
-      backgroundColor: colors.primaryLight,
-    },
-    frequencyCardText: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: colors.textSecondary,
-    },
-    frequencyCardTextSelected: {
-      color: colors.primary,
-    },
-    daysRow: {
-      flexDirection: 'row',
-      gap: spacing.xs,
       flexWrap: 'wrap',
     },
-    dayPill: {
-      paddingVertical: spacing.sm,
-      paddingHorizontal: spacing.sm,
-      minWidth: 40,
-      borderRadius: radius.full,
-      borderWidth: 1.5,
-      borderColor: colors.border,
-      backgroundColor: colors.surface,
-      alignItems: 'center',
-    },
-    dayPillSelected: {
-      borderColor: colors.primary,
-      backgroundColor: colors.primary,
-    },
-    dayPillText: {
-      fontSize: 13,
-      fontWeight: '600',
-      color: colors.textSecondary,
-    },
-    dayPillTextSelected: {
-      color: colors.white,
+    grid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.xs,
     },
     textInput: {
       backgroundColor: colors.surface,
@@ -419,78 +264,6 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       fontSize: 12,
       color: colors.error,
       marginTop: spacing.xs,
-    },
-    helperText: {
-      fontSize: 13,
-      color: colors.textSecondary,
-      lineHeight: 20,
-      marginBottom: spacing.md,
-    },
-    hoursGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: spacing.xs,
-    },
-    hourPill: {
-      paddingVertical: spacing.sm,
-      paddingHorizontal: spacing.sm,
-      minWidth: 52,
-      borderRadius: radius.md,
-      borderWidth: 1.5,
-      borderColor: colors.border,
-      backgroundColor: colors.surface,
-      alignItems: 'center',
-    },
-    hourPillSelected: {
-      borderColor: colors.primary,
-      backgroundColor: colors.primaryLight,
-    },
-    hourPillText: {
-      fontSize: 12,
-      fontWeight: '600',
-      color: colors.textSecondary,
-    },
-    hourPillTextSelected: {
-      color: colors.primary,
-    },
-    footer: {
-      flexDirection: 'row',
-      padding: spacing.lg,
-      backgroundColor: colors.surface,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-      gap: spacing.sm,
-    },
-    backButton: {
-      flex: 1,
-      paddingVertical: 14,
-      borderRadius: radius.md,
-      borderWidth: 1,
-      borderColor: colors.border,
-      alignItems: 'center',
-    },
-    backButtonText: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: colors.textSecondary,
-    },
-    nextButton: {
-      flex: 2,
-      paddingVertical: 14,
-      borderRadius: radius.md,
-      backgroundColor: colors.primary,
-      alignItems: 'center',
-    },
-    nextButtonDisabled: {
-      backgroundColor: colors.gray200,
-    },
-    nextButtonText: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: colors.white,
-    },
-    nextButtonTextDisabled: {
-      color: colors.textDisabled,
     },
   });
 }

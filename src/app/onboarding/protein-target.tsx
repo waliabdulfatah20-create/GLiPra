@@ -5,12 +5,11 @@ import { useRouter } from 'expo-router';
 import * as React from 'react';
 
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
-import { StepProgress } from '@/features/onboarding/components/step-progress';
+import { OnboardingScaffold } from '@/features/onboarding/components/onboarding-scaffold';
+import { StepFooter } from '@/features/onboarding/components/step-footer';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
-import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 import {
   ACTIVITY_MULTIPLIERS,
@@ -96,129 +95,98 @@ export default function ProteinTargetScreen() {
   const handleNext = () => {
     if (!canProceed || result === null)
       return;
-    haptics.medium();
     setFormData({ proteinFloorG: result.proteinFloorG, proteinFloorAcknowledged: true });
     router.push('/onboarding/import');
   };
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
-      edges={['top', 'bottom']}
+    <OnboardingScaffold
+      step={{ current: 8, total: 10 }}
+      title="Your protein target"
+      subtitle="Based on your body metrics and health information."
+      footer={(
+        <StepFooter
+          primaryLabel="Next"
+          onPrimary={handleNext}
+          primaryDisabled={!canProceed}
+          secondaryLabel="Back"
+          onSecondary={() => router.back()}
+        />
+      )}
     >
-      <StepProgress current={8} total={10} onDark />
-
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      {/* Result card — outer View carries shadow, inner LinearGradient is the visible face */}
+      <View style={styles.resultCardOuter}>
         <LinearGradient
           colors={gradients.hero}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={styles.heroGradient}
+          style={styles.resultCardInner}
         >
-          <Text style={styles.heading}>Your protein target</Text>
-          <Text style={styles.subheading}>
-            Based on your body metrics and health information.
+          {/* ℞ watermark — absolute, faint, top-right */}
+          <Text style={styles.rxWatermark}>℞</Text>
+
+          {/* Hero number */}
+          <Text style={styles.proteinNumber}>
+            {result !== null ? `${result.proteinFloorG}g` : '-'}
           </Text>
+          <Text style={styles.proteinLabel}>daily protein floor</Text>
+
+          {/* Formula breakdown */}
+          {formulaText !== null && (
+            <Text style={styles.formulaLine}>{formulaText}</Text>
+          )}
+
+          {/* Adjustment badges — frosted-glass pills on gradient */}
+          {result !== null
+            && (result.usedIdealBodyWeight
+              || result.cappedByKidneyDisease
+              || result.flooredByPregnancy) && (
+            <View style={styles.badgeRow}>
+              {result.usedIdealBodyWeight && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>Adjusted for BMI</Text>
+                </View>
+              )}
+              {result.cappedByKidneyDisease && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>Kidney-safe limit</Text>
+                </View>
+              )}
+              {result.flooredByPregnancy && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>Pregnancy minimum</Text>
+                </View>
+              )}
+            </View>
+          )}
         </LinearGradient>
-
-        {/* Result card — outer View carries shadow, inner LinearGradient is the visible face */}
-        <View style={styles.resultCardOuter}>
-          <LinearGradient
-            colors={gradients.hero}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.resultCardInner}
-          >
-            {/* ℞ watermark — absolute, faint, top-right */}
-            <Text style={styles.rxWatermark}>℞</Text>
-
-            {/* Hero number */}
-            <Text style={styles.proteinNumber}>
-              {result !== null ? `${result.proteinFloorG}g` : '-'}
-            </Text>
-            <Text style={styles.proteinLabel}>daily protein floor</Text>
-
-            {/* Formula breakdown */}
-            {formulaText !== null && (
-              <Text style={styles.formulaLine}>{formulaText}</Text>
-            )}
-
-            {/* Adjustment badges — frosted-glass pills on gradient */}
-            {result !== null
-              && (result.usedIdealBodyWeight
-                || result.cappedByKidneyDisease
-                || result.flooredByPregnancy) && (
-              <View style={styles.badgeRow}>
-                {result.usedIdealBodyWeight && (
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>Adjusted for BMI</Text>
-                  </View>
-                )}
-                {result.cappedByKidneyDisease && (
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>Kidney-safe limit</Text>
-                  </View>
-                )}
-                {result.flooredByPregnancy && (
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>Pregnancy minimum</Text>
-                  </View>
-                )}
-              </View>
-            )}
-          </LinearGradient>
-        </View>
-
-        {/* Tier-1 disclaimer — same visual weight as result card, Rule 8 */}
-        <DisclaimerBanner tier={1}>
-          <Text style={styles.disclaimerText}>
-            This estimate is based on the information you provided. Inaccurate inputs will produce
-            inaccurate estimates. Always confirm your protein target with your prescriber, especially
-            if you have kidney disease, are pregnant, or have other health conditions.
-          </Text>
-        </DisclaimerBanner>
-
-        {/* Acknowledgment checkbox */}
-        <Pressable
-          style={styles.checkboxRow}
-          onPress={() => setAcknowledged(prev => !prev)}
-          accessibilityRole="checkbox"
-          accessibilityState={{ checked: acknowledged }}
-          accessibilityLabel="I understand this is an estimate. I will confirm with my prescriber."
-        >
-          <View style={[styles.checkbox, acknowledged && styles.checkboxChecked]}>
-            {acknowledged && <Text style={styles.checkmark}>✓</Text>}
-          </View>
-          <Text style={styles.checkboxLabel}>
-            I understand this is an estimate. I will confirm with my prescriber.
-          </Text>
-        </Pressable>
-      </ScrollView>
-
-      <View style={styles.footer}>
-        <Pressable
-          style={styles.backButton}
-          onPress={() => router.back()}
-          accessibilityRole="button"
-        >
-          <Text style={styles.backButtonText}>Back</Text>
-        </Pressable>
-        <Pressable
-          style={[styles.nextButton, !canProceed && styles.nextButtonDisabled]}
-          onPress={handleNext}
-          disabled={!canProceed}
-          accessibilityRole="button"
-        >
-          <Text style={[styles.nextButtonText, !canProceed && styles.nextButtonTextDisabled]}>
-            Next
-          </Text>
-        </Pressable>
       </View>
-    </SafeAreaView>
+
+      {/* Tier-1 disclaimer — same visual weight as result card, Rule 8 */}
+      <DisclaimerBanner tier={1}>
+        <Text style={styles.disclaimerText}>
+          This estimate is based on the information you provided. Inaccurate inputs will produce
+          inaccurate estimates. Always confirm your protein target with your prescriber, especially
+          if you have kidney disease, are pregnant, or have other health conditions.
+        </Text>
+      </DisclaimerBanner>
+
+      {/* Acknowledgment checkbox */}
+      <Pressable
+        style={styles.checkboxRow}
+        onPress={() => setAcknowledged(prev => !prev)}
+        accessibilityRole="checkbox"
+        accessibilityState={{ checked: acknowledged }}
+        accessibilityLabel="I understand this is an estimate. I will confirm with my prescriber."
+      >
+        <View style={[styles.checkbox, acknowledged && styles.checkboxChecked]}>
+          {acknowledged && <Text style={styles.checkmark}>✓</Text>}
+        </View>
+        <Text style={styles.checkboxLabel}>
+          I understand this is an estimate. I will confirm with my prescriber.
+        </Text>
+      </Pressable>
+    </OnboardingScaffold>
   );
 }
 
@@ -231,35 +199,10 @@ type StyleTokens = {
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background },
-    scroll: { flex: 1 },
-    scrollContent: { padding: spacing.lg, paddingBottom: spacing.sm },
-    heroGradient: {
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing.lg,
-      paddingBottom: spacing.xl + spacing.sm,
-      marginTop: -spacing.lg,
-      marginHorizontal: -spacing.lg,
-      marginBottom: spacing.lg,
-    },
-
-    heading: {
-      fontSize: 24,
-      fontWeight: '700',
-      color: '#ffffff',
-      marginBottom: spacing.sm,
-    },
-    subheading: {
-      fontSize: 15,
-      color: 'rgba(255,255,255,0.8)',
-      lineHeight: 22,
-    },
-
     // Outer wrapper — iOS shadow host, opaque background required
     resultCardOuter: {
       borderRadius: radius.xl,
       backgroundColor: colors.surface,
-      marginBottom: spacing.md,
       ...shadows.md,
     },
 
@@ -304,7 +247,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       letterSpacing: 0.2,
     },
 
-    // Frosted-glass badges (unified — replaces badgeNeutral + badgeWarning)
+    // Frosted-glass badges
     badgeRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',
@@ -336,7 +279,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     checkboxRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      marginTop: spacing.lg,
+      marginTop: spacing.sm,
       gap: spacing.sm,
     },
     checkbox: {
@@ -367,38 +310,5 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       color: colors.textPrimary,
       lineHeight: 22,
     },
-
-    // Footer
-    footer: {
-      flexDirection: 'row',
-      padding: spacing.lg,
-      backgroundColor: colors.surface,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-      gap: spacing.sm,
-    },
-    backButton: {
-      flex: 1,
-      paddingVertical: 14,
-      borderRadius: radius.md,
-      borderWidth: 1,
-      borderColor: colors.border,
-      alignItems: 'center',
-    },
-    backButtonText: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: colors.textSecondary,
-    },
-    nextButton: {
-      flex: 2,
-      paddingVertical: 14,
-      borderRadius: radius.md,
-      backgroundColor: colors.primary,
-      alignItems: 'center',
-    },
-    nextButtonDisabled: { backgroundColor: colors.gray200 },
-    nextButtonText: { fontSize: 16, fontWeight: '600', color: colors.white },
-    nextButtonTextDisabled: { color: colors.textDisabled },
   });
 }

@@ -1,17 +1,16 @@
 import type { GlipraTokens } from '@/theme/tokens';
 import type { GLP1MedicationId } from '@/types';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, Text, View } from 'react-native';
 import { useAuthStore } from '@/features/auth/use-auth-store';
 import { saveOnboardingProfile } from '@/features/onboarding/api';
+import { OnboardingScaffold } from '@/features/onboarding/components/onboarding-scaffold';
+import { StepFooter } from '@/features/onboarding/components/step-footer';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { analytics, EVENTS } from '@/lib/analytics';
-import { haptics } from '@/lib/haptics';
 import { notifications } from '@/lib/notifications';
 import { setItem } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
@@ -59,10 +58,10 @@ export default function RevealScreen() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { colors, spacing, radius, shadows, gradients } = useTheme();
+  const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows, gradients],
+    [colors, spacing, radius, shadows],
   );
 
   const medicationLabel
@@ -74,7 +73,6 @@ export default function RevealScreen() {
     = formData.goal !== undefined ? (GOAL_LABELS[formData.goal] ?? 'Not specified') : 'Not specified';
 
   const handleStart = async () => {
-    haptics.medium();
     setLoading(true);
     setErrorMessage(null);
 
@@ -134,82 +132,49 @@ export default function RevealScreen() {
   };
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
-      edges={['top', 'bottom']}
+    <OnboardingScaffold
+      step={{ current: 10, total: 10 }}
+      title="You're all set"
+      subtitle="Here's what GLiPra will do for you every day."
+      footer={(
+        <StepFooter
+          primaryLabel={loading ? 'Setting up your profile…' : 'Start GLiPra →'}
+          onPrimary={() => { void handleStart(); }}
+          primaryDisabled={loading}
+        />
+      )}
     >
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <LinearGradient
-          colors={gradients.hero}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.heroGradient}
-        >
-          {/* Step indicator — no progress bar on final reveal */}
-          <View style={styles.stepBadge}>
-            <Text style={styles.stepBadgeText}>Step 10 of 10</Text>
-          </View>
-
-          <Text style={styles.heading}>You're all set</Text>
-          <Text style={styles.subheading}>Here's what GLiPra will do for you every day.</Text>
-        </LinearGradient>
-
-        {/* Summary cards */}
-        <View style={styles.summarySection}>
-          <SummaryCard
-            label="Your protein floor"
-            value={
-              formData.proteinFloorG !== undefined ? `${formData.proteinFloorG}g/day` : '-'
-            }
-            accent
-          />
-          <SummaryCard label="Your medication" value={medicationLabel} />
-          <SummaryCard label="Your goal" value={goalLabel} />
-        </View>
-
-        {/* What happens next */}
-        <View style={styles.nextSection}>
-          <Text style={styles.nextTitle}>What happens next</Text>
-          {WHAT_HAPPENS_NEXT.map((item, index) => (
-            <View key={index} style={styles.bulletRow}>
-              <View style={styles.bulletDot} />
-              <Text style={styles.bulletText}>{item}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Inline error */}
-        {errorMessage !== null && (
-          <View style={styles.errorBanner}>
-            <Text style={styles.errorText}>{errorMessage}</Text>
-          </View>
-        )}
-      </ScrollView>
-
-      {/* Single full-width CTA — no Back button on final step */}
-      <View style={styles.footer}>
-        <Pressable
-          style={({ pressed }) => [
-            styles.startButton,
-            pressed && styles.startButtonPressed,
-            loading && styles.startButtonLoading,
-          ]}
-          onPress={handleStart}
-          disabled={loading}
-          accessibilityRole="button"
-          accessibilityLabel="Start GLiPra"
-          accessibilityState={{ busy: loading }}
-        >
-          <Text style={styles.startButtonText}>
-            {loading ? 'Setting up your profile…' : 'Start GLiPra →'}
-          </Text>
-        </Pressable>
+      {/* Summary cards */}
+      <View style={styles.summarySection}>
+        <SummaryCard
+          label="Your protein floor"
+          value={
+            formData.proteinFloorG !== undefined ? `${formData.proteinFloorG}g/day` : '-'
+          }
+          accent
+        />
+        <SummaryCard label="Your medication" value={medicationLabel} />
+        <SummaryCard label="Your goal" value={goalLabel} />
       </View>
-    </SafeAreaView>
+
+      {/* What happens next */}
+      <View style={styles.nextSection}>
+        <Text style={styles.nextTitle}>What happens next</Text>
+        {WHAT_HAPPENS_NEXT.map((item, index) => (
+          <View key={index} style={styles.bulletRow}>
+            <View style={styles.bulletDot} />
+            <Text style={styles.bulletText}>{item}</Text>
+          </View>
+        ))}
+      </View>
+
+      {/* Inline error */}
+      {errorMessage !== null && (
+        <View style={styles.errorBanner}>
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        </View>
+      )}
+    </OnboardingScaffold>
   );
 }
 
@@ -287,46 +252,8 @@ function makeSummaryStyles({ colors, spacing, radius, shadows }: StyleTokens) {
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background },
-    scroll: { flex: 1 },
-    scrollContent: { padding: spacing.lg, paddingBottom: spacing.xl },
-    heroGradient: {
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing.lg,
-      paddingBottom: spacing.xl + spacing.sm,
-      marginTop: -spacing.lg,
-      marginHorizontal: -spacing.lg,
-      marginBottom: spacing.lg,
-    },
-
-    stepBadge: {
-      alignSelf: 'flex-start',
-      backgroundColor: 'rgba(255,255,255,0.2)',
-      borderRadius: radius.full,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.xs,
-      marginBottom: spacing.md,
-    },
-    stepBadgeText: {
-      fontSize: 12,
-      fontWeight: '600',
-      color: 'rgba(255,255,255,0.9)',
-    },
-
-    heading: {
-      fontSize: 28,
-      fontWeight: '800',
-      color: '#ffffff',
-      marginBottom: spacing.sm,
-    },
-    subheading: {
-      fontSize: 15,
-      color: 'rgba(255,255,255,0.8)',
-      lineHeight: 22,
-    },
-
     summarySection: {
-      marginBottom: spacing.lg,
+      marginBottom: spacing.md,
     },
 
     // What happens next
@@ -336,7 +263,6 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       borderWidth: 1,
       borderColor: colors.border,
       padding: spacing.md,
-      marginBottom: spacing.lg,
       ...shadows.sm,
     },
     nextTitle: {
@@ -373,37 +299,12 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       borderWidth: 1,
       borderColor: colors.error,
       padding: spacing.md,
-      marginBottom: spacing.sm,
+      marginTop: spacing.sm,
     },
     errorText: {
       fontSize: 14,
       color: colors.error,
       lineHeight: 20,
-    },
-
-    // Footer
-    footer: {
-      padding: spacing.lg,
-      backgroundColor: colors.surface,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-    startButton: {
-      paddingVertical: 16,
-      borderRadius: radius.md,
-      backgroundColor: colors.primary,
-      alignItems: 'center',
-    },
-    startButtonPressed: {
-      backgroundColor: colors.primaryDark,
-    },
-    startButtonLoading: {
-      backgroundColor: colors.gray400,
-    },
-    startButtonText: {
-      fontSize: 17,
-      fontWeight: '700',
-      color: colors.white,
     },
   });
 }

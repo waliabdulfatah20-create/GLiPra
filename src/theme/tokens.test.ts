@@ -15,11 +15,11 @@ describe('lightTokens', () => {
 });
 
 describe('darkTokens', () => {
-  it('background is deep purple-black', () => {
-    expect(darkTokens.colors.background).toBe('#0d0920');
+  it('background is neutral-dark slate (not purple)', () => {
+    expect(darkTokens.colors.background).toBe('#0f1419');
   });
-  it('surface is dark purple card', () => {
-    expect(darkTokens.colors.surface).toBe('#1e1533');
+  it('surface is neutral-dark card', () => {
+    expect(darkTokens.colors.surface).toBe('#1b222e');
   });
   it('isDark is true', () => {
     expect(darkTokens.isDark).toBe(true);
@@ -39,8 +39,8 @@ describe('gradients', () => {
   it('light hero gradient ends at sky blue', () => {
     expect(lightTokens.gradients.hero[2]).toBe('#0284c7');
   });
-  it('dark hero gradient starts with deep purple-black', () => {
-    expect(darkTokens.gradients.hero[0]).toBe('#3b0764');
+  it('dark hero gradient starts with saturated brand purple', () => {
+    expect(darkTokens.gradients.hero[0]).toBe('#5b21b6');
   });
   it('dark hero gradient has 3 stops', () => {
     expect(darkTokens.gradients.hero).toHaveLength(3);

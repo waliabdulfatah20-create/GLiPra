@@ -1,17 +1,14 @@
 import type { GlipraTokens } from '@/theme/tokens';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StepProgress } from '@/features/onboarding/components/step-progress';
+import { OnboardingScaffold } from '@/features/onboarding/components/onboarding-scaffold';
+import { StepFooter } from '@/features/onboarding/components/step-footer';
 import { useOnboardingStore } from '@/features/onboarding/use-onboarding-store';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
-
-type YesNo = boolean;
 
 type SafetyQuestion = {
   id: 'hasKidneyDisease' | 'isPregnant';
@@ -32,27 +29,24 @@ const SAFETY_QUESTIONS: SafetyQuestion[] = [
   },
 ];
 
-type Answers = {
-  hasKidneyDisease: YesNo | undefined;
-  isPregnant: YesNo | undefined;
-};
+type Answers = { hasKidneyDisease: boolean | undefined; isPregnant: boolean | undefined };
 
 export default function SafetyScreen() {
   const router = useRouter();
   const setFormData = useOnboardingStore.use.setFormData();
-
   const [answers, setAnswers] = useState<Answers>({
     hasKidneyDisease: undefined,
     isPregnant: undefined,
   });
 
-  const { colors, spacing, radius, gradients } = useTheme();
+  const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
-    () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius, gradients],
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
   );
 
-  const setAnswer = (id: keyof Answers, value: YesNo) => {
+  const setAnswer = (id: keyof Answers, value: boolean) => {
+    haptics.selection();
     setAnswers(prev => ({ ...prev, [id]: value }));
   };
 
@@ -62,7 +56,6 @@ export default function SafetyScreen() {
   const handleNext = () => {
     if (!canProceed)
       return;
-    haptics.medium();
     setFormData({
       hasKidneyDisease: answers.hasKidneyDisease,
       isPregnant: answers.isPregnant,
@@ -71,92 +64,46 @@ export default function SafetyScreen() {
   };
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: gradients.hero[0] }]}
-      edges={['top', 'bottom']}
+    <OnboardingScaffold
+      step={{ current: 4, total: 10 }}
+      title="Safety check"
+      subtitle="These questions affect your protein target. Answer honestly: your safety depends on it."
+      footer={(
+        <StepFooter
+          primaryLabel="Next"
+          onPrimary={handleNext}
+          primaryDisabled={!canProceed}
+          secondaryLabel="Back"
+          onSecondary={() => router.back()}
+        />
+      )}
     >
-      <StepProgress current={4} total={10} onDark />
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-      >
-        <LinearGradient
-          colors={gradients.hero}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.heroGradient}
-        >
-          <Text style={styles.heading}>Safety check</Text>
-          <Text style={styles.subheading}>
-            These questions affect your protein target calculation. Answer honestly: your safety
-            depends on it.
-          </Text>
-        </LinearGradient>
-
-        {SAFETY_QUESTIONS.map((q) => {
-          const answer = answers[q.id];
-          return (
-            <View key={q.id} style={styles.questionCard}>
-              <Text style={styles.questionText}>{q.question}</Text>
-              <Text style={styles.helperText}>{q.helperText}</Text>
-              <View style={styles.toggleRow}>
+      {SAFETY_QUESTIONS.map((q) => {
+        const answer = answers[q.id];
+        return (
+          <View key={q.id} style={styles.questionCard}>
+            <Text style={styles.questionText}>{q.question}</Text>
+            <Text style={styles.helperText}>{q.helperText}</Text>
+            <View style={styles.toggleRow}>
+              {[true, false].map(val => (
                 <Pressable
-                  style={[
-                    styles.toggleButton,
-                    answer === true && styles.toggleButtonSelected,
-                  ]}
-                  onPress={() => setAnswer(q.id, true)}
+                  key={String(val)}
+                  style={[styles.toggle, answer === val && styles.toggleSelected]}
+                  onPress={() => setAnswer(q.id, val)}
                   accessibilityRole="radio"
-                  accessibilityState={{ checked: answer === true }}
+                  accessibilityState={{ checked: answer === val }}
+                  accessibilityLabel={val ? 'Yes' : 'No'}
                 >
-                  <Text
-                    style={[
-                      styles.toggleButtonText,
-                      answer === true && styles.toggleButtonTextSelected,
-                    ]}
-                  >
-                    Yes
+                  <Text style={[styles.toggleText, answer === val && styles.toggleTextSelected]}>
+                    {val ? 'Yes' : 'No'}
                   </Text>
                 </Pressable>
-                <Pressable
-                  style={[
-                    styles.toggleButton,
-                    answer === false && styles.toggleButtonSelected,
-                  ]}
-                  onPress={() => setAnswer(q.id, false)}
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: answer === false }}
-                >
-                  <Text
-                    style={[
-                      styles.toggleButtonText,
-                      answer === false && styles.toggleButtonTextSelected,
-                    ]}
-                  >
-                    No
-                  </Text>
-                </Pressable>
-              </View>
+              ))}
             </View>
-          );
-        })}
-      </ScrollView>
-
-      <View style={styles.footer}>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backButtonText}>Back</Text>
-        </Pressable>
-        <Pressable
-          style={[styles.nextButton, !canProceed && styles.nextButtonDisabled]}
-          onPress={handleNext}
-          disabled={!canProceed}
-        >
-          <Text style={[styles.nextButtonText, !canProceed && styles.nextButtonTextDisabled]}>
-            Next
-          </Text>
-        </Pressable>
-      </View>
-    </SafeAreaView>
+          </View>
+        );
+      })}
+    </OnboardingScaffold>
   );
 }
 
@@ -164,44 +111,18 @@ type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
 };
 
-function makeStyles({ colors, spacing, radius }: StyleTokens) {
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    scroll: {
-      padding: spacing.lg,
-      paddingBottom: spacing.sm,
-    },
-    heroGradient: {
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing.lg,
-      paddingBottom: spacing.xl + spacing.sm,
-      marginTop: -spacing.lg,
-      marginHorizontal: -spacing.lg,
-      marginBottom: spacing.lg,
-    },
-    heading: {
-      fontSize: 24,
-      fontWeight: '700',
-      color: '#ffffff',
-      marginBottom: spacing.sm,
-    },
-    subheading: {
-      fontSize: 15,
-      color: 'rgba(255,255,255,0.8)',
-      lineHeight: 22,
-    },
     questionCard: {
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
-      borderRadius: radius.md,
+      borderRadius: radius.lg,
       padding: spacing.md,
-      marginBottom: spacing.md,
+      ...shadows.sm,
     },
     questionText: {
       fontSize: 15,
@@ -220,65 +141,26 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       flexDirection: 'row',
       gap: spacing.sm,
     },
-    toggleButton: {
+    toggle: {
       flex: 1,
-      paddingVertical: 10,
-      borderRadius: radius.sm,
+      paddingVertical: 12,
+      borderRadius: radius.md,
       borderWidth: 1.5,
       borderColor: colors.border,
-      backgroundColor: colors.background,
-      alignItems: 'center',
-    },
-    toggleButtonSelected: {
-      borderColor: colors.primary,
-      backgroundColor: colors.primaryLight,
-    },
-    toggleButtonText: {
-      fontSize: 15,
-      fontWeight: '600',
-      color: colors.textSecondary,
-    },
-    toggleButtonTextSelected: {
-      color: colors.primary,
-    },
-    footer: {
-      flexDirection: 'row',
-      padding: spacing.lg,
       backgroundColor: colors.surface,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-      gap: spacing.sm,
-    },
-    backButton: {
-      flex: 1,
-      paddingVertical: 14,
-      borderRadius: radius.md,
-      borderWidth: 1,
-      borderColor: colors.border,
       alignItems: 'center',
     },
-    backButtonText: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: colors.textSecondary,
-    },
-    nextButton: {
-      flex: 2,
-      paddingVertical: 14,
-      borderRadius: radius.md,
+    toggleSelected: {
+      borderColor: colors.primary,
       backgroundColor: colors.primary,
-      alignItems: 'center',
     },
-    nextButtonDisabled: {
-      backgroundColor: colors.gray200,
+    toggleText: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.textPrimary,
     },
-    nextButtonText: {
-      fontSize: 16,
-      fontWeight: '600',
+    toggleTextSelected: {
       color: colors.white,
-    },
-    nextButtonTextDisabled: {
-      color: colors.textDisabled,
     },
   });
 }

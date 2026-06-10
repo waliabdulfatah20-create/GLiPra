@@ -21,6 +21,7 @@ export type TodayProfile = {
   hasKidneyDisease: boolean;
   isPregnant: boolean;
   activityLevel: ActivityLevel;
+  dietaryPattern: string | null;
   createdAt: string | null;
 };
 
@@ -28,7 +29,7 @@ export async function fetchTodayProfile(userId: string): Promise<TodayProfile | 
   const { data, error } = await supabase
     .from('profiles')
     .select(
-      'medication_id, administration_route, protein_floor_g, last_injection_date, injection_day_of_week, medication_start_date, dose_time_local, weight_kg, height_cm, goal_weight_kg, phase, medication_status, has_kidney_disease, is_pregnant, activity_level, created_at',
+      'medication_id, administration_route, protein_floor_g, last_injection_date, injection_day_of_week, medication_start_date, dose_time_local, weight_kg, height_cm, goal_weight_kg, phase, medication_status, has_kidney_disease, is_pregnant, activity_level, dietary_pattern, created_at',
     )
     .eq('user_id', userId)
     .single();
@@ -55,6 +56,7 @@ export async function fetchTodayProfile(userId: string): Promise<TodayProfile | 
     hasKidneyDisease: data.has_kidney_disease ?? false,
     isPregnant: data.is_pregnant ?? false,
     activityLevel: ((data.activity_level as ActivityLevel | null) ?? 'moderate'),
+    dietaryPattern: (data as { dietary_pattern?: string | null }).dietary_pattern ?? null,
     createdAt: data.created_at ?? null,
   };
 }

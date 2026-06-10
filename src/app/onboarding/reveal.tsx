@@ -33,12 +33,6 @@ const MEDICATION_LABELS: Record<GLP1MedicationId, string> = {
   compounded_glp1_gip: 'Compounded GLP-1/GIP',
 };
 
-const GOAL_LABELS: Record<string, string> = {
-  muscle_preservation: 'Preserve muscle',
-  weight_management: 'Lose fat',
-  both: 'Preserve muscle & lose fat',
-};
-
 const WHAT_HAPPENS_NEXT = [
   'Log your meals daily: 30 seconds with voice or barcode',
   'Track protein toward your daily floor',
@@ -68,9 +62,6 @@ export default function RevealScreen() {
     = formData.medicationId !== undefined
       ? MEDICATION_LABELS[formData.medicationId]
       : 'Not specified';
-
-  const goalLabel
-    = formData.goal !== undefined ? (GOAL_LABELS[formData.goal] ?? 'Not specified') : 'Not specified';
 
   const handleStart = async () => {
     setLoading(true);
@@ -133,7 +124,7 @@ export default function RevealScreen() {
 
   return (
     <OnboardingScaffold
-      step={{ current: 10, total: 10 }}
+      step={{ current: 7, total: 7 }}
       title="You're all set"
       subtitle="Here's what GLiPra will do for you every day."
       footer={(
@@ -154,7 +145,6 @@ export default function RevealScreen() {
           accent
         />
         <SummaryCard label="Your medication" value={medicationLabel} />
-        <SummaryCard label="Your goal" value={goalLabel} />
       </View>
 
       {/* What happens next */}

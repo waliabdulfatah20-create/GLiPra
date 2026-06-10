@@ -60,12 +60,12 @@ export default function SafetyScreen() {
       hasKidneyDisease: answers.hasKidneyDisease,
       isPregnant: answers.isPregnant,
     });
-    router.push('/onboarding/dietary');
+    router.push('/onboarding/status');
   };
 
   return (
     <OnboardingScaffold
-      step={{ current: 4, total: 10 }}
+      step={{ current: 4, total: 7 }}
       title="Safety check"
       subtitle="These questions affect your protein target. Answer honestly: your safety depends on it."
       footer={(

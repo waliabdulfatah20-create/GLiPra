@@ -108,7 +108,7 @@ export default function InjectionDayScreen() {
 
   return (
     <OnboardingScaffold
-      step={{ current: 2, total: 10 }}
+      step={{ current: 2, total: 7 }}
       title={isOral ? 'When do you take your tablet?' : 'When do you inject?'}
       subtitle={isOral
         ? 'We use this to send your daily dose reminder and track your progress.'

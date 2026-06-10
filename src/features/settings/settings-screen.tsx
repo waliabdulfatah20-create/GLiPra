@@ -151,6 +151,10 @@ export function SettingsScreen() {
     ? (STATUS_LABELS[profile.medicationStatus] ?? undefined)
     : undefined;
 
+  const dietaryLabel = profile?.dietaryPattern
+    ? t(`dietary.opt_${profile.dietaryPattern}`)
+    : undefined;
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
@@ -193,6 +197,11 @@ export function SettingsScreen() {
             label={t('settings.medication_status')}
             value={currentStatusLabel}
             onPress={() => router.push('/update-status')}
+          />
+          <SettingsRow
+            label={t('settings.dietary_pattern')}
+            value={dietaryLabel}
+            onPress={() => router.push('/dietary-preference')}
             isLast
           />
         </SettingsSection>

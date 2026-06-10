@@ -129,6 +129,22 @@
     "tip": "TIP",
     "warning": "WARNING"
   },
+  "dietary": {
+    "opt_omnivore": "Omnivore",
+    "opt_omnivore_desc": "Eats everything",
+    "opt_other": "Other / Not sure",
+    "opt_other_desc": "We will keep suggestions general",
+    "opt_pescatarian": "Pescatarian",
+    "opt_pescatarian_desc": "Fish + plant-based",
+    "opt_vegan": "Vegan",
+    "opt_vegan_desc": "Plant-based only",
+    "opt_vegetarian": "Vegetarian",
+    "opt_vegetarian_desc": "No meat, eats dairy/eggs",
+    "save": "Save",
+    "saving": "Saving…",
+    "subtitle": "Helps us suggest protein sources that fit your diet.",
+    "title": "Eating style"
+  },
   "dose": {
     "add_shot": "+ Add shot",
     "all_sites_resting": "All sites used within 7 days, rotate with care",
@@ -299,14 +315,6 @@
     "untracked": "Not tracked yet"
   },
   "onboarding": {
-    "appearance_dark": "Dark",
-    "appearance_dark_sub": "Always dark mode",
-    "appearance_light": "Light",
-    "appearance_light_sub": "Always light mode",
-    "appearance_subtitle": "You can change this later in Settings.",
-    "appearance_system": "System",
-    "appearance_system_sub": "Follows your device setting",
-    "appearance_title": "Choose your appearance",
     "language_subtitle": "You can change this later in Settings.",
     "language_title": "Choose your language",
     "message": "Welcome to GLiPra"
@@ -503,6 +511,7 @@
     "appearance_title": "APPEARANCE",
     "body_metrics": "Body Metrics",
     "delete_account": "Delete account",
+    "dietary_pattern": "Eating style",
     "english": "English",
     "export_data": "Export my data",
     "goal_weight": "Goal Weight",
@@ -573,6 +582,8 @@
     "daily_guidance_section": "TODAY'S GUIDANCE",
     "daily_guidance_why": "Why this?",
     "daily_guidance_why_close": "Close",
+    "dietary_nudge_subtitle": "Personalizes your food suggestions",
+    "dietary_nudge_title": "Set your eating style",
     "dose_row_log_shot": "Log today's shot",
     "dose_row_next": "Next dose in {{days}}d",
     "dose_row_overdue": "Overdue, tap to review",

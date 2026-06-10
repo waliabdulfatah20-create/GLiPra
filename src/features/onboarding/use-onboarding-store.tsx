@@ -24,11 +24,7 @@ export type OnboardingFormData = {
   // Step 4 — safety
   hasKidneyDisease?: boolean;
   isPregnant?: boolean;
-  // Step 5 — dietary
-  dietaryPattern?: 'omnivore' | 'vegetarian' | 'vegan' | 'pescatarian' | 'other';
-  // Step 6 — goals
-  goal?: 'muscle_preservation' | 'weight_management' | 'both';
-  // Step 7 — status
+  // Status
   medicationStatus?: 'starting' | 'active';
   activityLevel?: 'sedentary' | 'moderate' | 'active';
   // Step 8 — protein floor (calculated, not user-entered)

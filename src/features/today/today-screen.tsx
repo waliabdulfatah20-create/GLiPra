@@ -33,6 +33,7 @@ import {
   Settings as SettingsIcon,
   Syringe,
   TrendingUp,
+  Utensils,
 } from '@/components/ui/icons';
 import { MilestoneToast } from '@/components/ui/milestone-toast';
 import { TodaySkeleton } from '@/components/ui/today-skeleton';
@@ -453,6 +454,28 @@ export function TodayScreen() {
                       ? t('today.dose_row_next', { days: injectionDoseRow.days ?? 0 })
                       : t(injectionDoseRow.pillKey)}
                   </Text>
+                </View>
+              </View>
+              <Text style={styles.rowChevron}>›</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Eating-style nudge — shown until the user sets their dietary pattern */}
+          {profile && profile.dietaryPattern === null && (
+            <TouchableOpacity
+              style={[styles.actionCard, { borderTopColor: colors.primary }]}
+              onPress={() => { haptics.tap(); router.push('/dietary-preference'); }}
+              activeOpacity={0.75}
+              accessibilityRole="button"
+              accessibilityLabel={t('today.dietary_nudge_title')}
+            >
+              <View style={[styles.actionIconCircle, styles.actionIconCirclePending]}>
+                <Utensils color={colors.primary} width={20} height={20} />
+              </View>
+              <View style={styles.actionTextBlock}>
+                <Text style={styles.actionHeadline}>{t('today.dietary_nudge_title')}</Text>
+                <View style={styles.actionPill}>
+                  <Text style={styles.actionPillText}>{t('today.dietary_nudge_subtitle')}</Text>
                 </View>
               </View>
               <Text style={styles.rowChevron}>›</Text>

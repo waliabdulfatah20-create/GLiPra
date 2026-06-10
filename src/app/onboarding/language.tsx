@@ -22,7 +22,7 @@ export default function LanguageScreen() {
   const handleContinue = () => {
     setItem(LOCAL, selected);
     changeLanguage(selected);
-    router.push('/onboarding/appearance');
+    router.push('/onboarding/medication');
   };
 
   return (

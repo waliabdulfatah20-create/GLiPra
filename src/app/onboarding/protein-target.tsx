@@ -84,12 +84,12 @@ export default function ProteinTargetScreen() {
     if (!canProceed || result === null)
       return;
     setFormData({ proteinFloorG: result.proteinFloorG, proteinFloorAcknowledged: true });
-    router.push('/onboarding/import');
+    router.push('/onboarding/reveal');
   };
 
   return (
     <OnboardingScaffold
-      step={{ current: 8, total: 10 }}
+      step={{ current: 6, total: 7 }}
       title="Your protein target"
       subtitle="Based on your body metrics and health information."
       footer={(

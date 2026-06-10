@@ -45,7 +45,7 @@ export default function StatusScreen() {
 
   return (
     <OnboardingScaffold
-      step={{ current: 7, total: 10 }}
+      step={{ current: 5, total: 7 }}
       title="Where are you in your journey?"
       subtitle="Your protein target is adjusted based on where you are with your medication."
       footer={(

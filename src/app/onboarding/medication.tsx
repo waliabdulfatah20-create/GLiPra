@@ -49,7 +49,7 @@ export default function MedicationScreen() {
 
   return (
     <OnboardingScaffold
-      step={{ current: 1, total: 10 }}
+      step={{ current: 1, total: 7 }}
       title="Which GLP-1 are you on?"
       subtitle="Select your medication. Your guidance is personalized to your specific medication."
       footer={(

@@ -129,6 +129,22 @@
     "tip": "CONSEJO",
     "warning": "ADVERTENCIA"
   },
+  "dietary": {
+    "opt_omnivore": "Omnívoro",
+    "opt_omnivore_desc": "Come de todo",
+    "opt_other": "Otro / No estoy seguro",
+    "opt_other_desc": "Mantendremos las sugerencias generales",
+    "opt_pescatarian": "Pescetariano",
+    "opt_pescatarian_desc": "Pescado y vegetales",
+    "opt_vegan": "Vegano",
+    "opt_vegan_desc": "Solo a base de plantas",
+    "opt_vegetarian": "Vegetariano",
+    "opt_vegetarian_desc": "Sin carne, come lácteos y huevos",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "subtitle": "Nos ayuda a sugerir fuentes de proteína que se ajusten a tu dieta.",
+    "title": "Estilo de alimentación"
+  },
   "dose": {
     "add_shot": "+ Agregar inyección",
     "all_sites_resting": "Todos los sitios usados en los últimos 7 días, rota con cuidado",
@@ -299,14 +315,6 @@
     "untracked": "Aún sin datos"
   },
   "onboarding": {
-    "appearance_dark": "Oscuro",
-    "appearance_dark_sub": "Siempre modo oscuro",
-    "appearance_light": "Claro",
-    "appearance_light_sub": "Siempre modo claro",
-    "appearance_subtitle": "Puedes cambiarlo después en Ajustes.",
-    "appearance_system": "Sistema",
-    "appearance_system_sub": "Sigue la configuración de tu dispositivo",
-    "appearance_title": "Elige tu apariencia",
     "language_subtitle": "Puedes cambiarlo después en Ajustes.",
     "language_title": "Elige tu idioma",
     "message": "Bienvenido a GLiPra"
@@ -503,6 +511,7 @@
     "appearance_title": "APARIENCIA",
     "body_metrics": "Métricas corporales",
     "delete_account": "Eliminar cuenta",
+    "dietary_pattern": "Estilo de alimentación",
     "english": "English",
     "export_data": "Exportar mis datos",
     "goal_weight": "Peso objetivo",
@@ -573,6 +582,8 @@
     "daily_guidance_section": "GUIA DEL DIA",
     "daily_guidance_why": "Por que este consejo?",
     "daily_guidance_why_close": "Cerrar",
+    "dietary_nudge_subtitle": "Personaliza tus sugerencias de comida",
+    "dietary_nudge_title": "Define tu estilo de alimentación",
     "dose_row_log_shot": "Registra tu inyección de hoy",
     "dose_row_next": "Próxima dosis en {{days}}d",
     "dose_row_overdue": "Atrasada, toca para revisar",

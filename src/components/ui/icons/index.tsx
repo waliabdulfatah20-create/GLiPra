@@ -21,4 +21,5 @@ export * from './style';
 export * from './support';
 export * from './syringe';
 export * from './trending-up';
+export * from './utensils';
 export * from './website';

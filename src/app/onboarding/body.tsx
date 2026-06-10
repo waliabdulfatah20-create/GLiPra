@@ -80,7 +80,7 @@ export default function BodyScreen() {
 
   return (
     <OnboardingScaffold
-      step={{ current: 3, total: 10 }}
+      step={{ current: 3, total: 7 }}
       title="About your body"
       subtitle="Used to calculate your personalized protein target. All data stays on your device."
       footer={(

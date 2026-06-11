@@ -2,9 +2,9 @@
  * MedicationCard — jest-expo RTL tests. Queried via testID + the literal Day chip so
  * the assertions don't depend on whether i18n resolves keys or English in the test env.
  */
-import * as React from 'react';
-
 import { router } from 'expo-router';
+
+import * as React from 'react';
 
 import { cleanup, fireEvent, render, screen } from '@/lib/test-utils';
 

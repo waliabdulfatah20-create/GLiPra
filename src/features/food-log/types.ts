@@ -19,7 +19,7 @@ export type FoodLogEntry = {
   zincMg: number | null; // added in migration 012 (GLP-1 watch)
   ironMg: number | null; // added in migration 021 (GLP-1 watch)
   barcodeEan: string | null;
-  source: 'manual' | 'barcode' | 'photo' | 'voice';
+  source: 'manual' | 'barcode' | 'photo' | 'voice' | 'database';
   createdAt: string; // ISO 8601
 };
 
@@ -68,6 +68,14 @@ export type PhotoFoodEntry = {
   magnesiumMg: number | null;
   zincMg: number | null;
   ironMg: number | null;
+};
+
+// ---------------------------------------------------------------------------
+// DatabaseFoodEntry — entry built from a seeded `foods` row (Cascade D).
+// Same shape as PhotoFoodEntry plus the seed's barcode when present.
+// ---------------------------------------------------------------------------
+export type DatabaseFoodEntry = PhotoFoodEntry & {
+  barcodeEan: string | null;
 };
 
 // ---------------------------------------------------------------------------

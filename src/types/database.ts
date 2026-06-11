@@ -287,6 +287,84 @@ export type Database = {
         }
         Relationships: []
       }
+      foods: {
+        Row: {
+          b12_mcg: number | null
+          barcode: string | null
+          brand: string | null
+          calories: number | null
+          carbs_g: number | null
+          created_at: string
+          data_quality: string
+          fat_g: number | null
+          fiber_g: number | null
+          id: string
+          iron_mg: number | null
+          is_glp1_friendly: boolean
+          is_verified: boolean
+          magnesium_mg: number | null
+          name: string
+          name_es: string | null
+          protein_density: number | null
+          protein_g: number
+          serving_description: string
+          serving_size_g: number | null
+          source: string
+          vitamin_d_iu: number | null
+          zinc_mg: number | null
+        }
+        Insert: {
+          b12_mcg?: number | null
+          barcode?: string | null
+          brand?: string | null
+          calories?: number | null
+          carbs_g?: number | null
+          created_at?: string
+          data_quality?: string
+          fat_g?: number | null
+          fiber_g?: number | null
+          id: string
+          iron_mg?: number | null
+          is_glp1_friendly?: boolean
+          is_verified?: boolean
+          magnesium_mg?: number | null
+          name: string
+          name_es?: string | null
+          protein_density?: number | null
+          protein_g: number
+          serving_description: string
+          serving_size_g?: number | null
+          source: string
+          vitamin_d_iu?: number | null
+          zinc_mg?: number | null
+        }
+        Update: {
+          b12_mcg?: number | null
+          barcode?: string | null
+          brand?: string | null
+          calories?: number | null
+          carbs_g?: number | null
+          created_at?: string
+          data_quality?: string
+          fat_g?: number | null
+          fiber_g?: number | null
+          id?: string
+          iron_mg?: number | null
+          is_glp1_friendly?: boolean
+          is_verified?: boolean
+          magnesium_mg?: number | null
+          name?: string
+          name_es?: string | null
+          protein_density?: number | null
+          protein_g?: number
+          serving_description?: string
+          serving_size_g?: number | null
+          source?: string
+          vitamin_d_iu?: number | null
+          zinc_mg?: number | null
+        }
+        Relationships: []
+      }
       injection_logs: {
         Row: {
           created_at: string
@@ -625,7 +703,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       [_ in never]: never

@@ -15,6 +15,7 @@ export * from './pill';
 export * from './plus-circle';
 export * from './progress-path';
 export * from './rate';
+export * from './search';
 export * from './settings';
 export * from './share';
 export * from './style';

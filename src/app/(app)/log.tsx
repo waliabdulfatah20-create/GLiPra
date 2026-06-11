@@ -35,6 +35,8 @@ import {
 } from 'react-native';
 import { AbsorptionWindowNote } from '@/components/log/absorption-window-note';
 import { BarcodeScannerSheet } from '@/components/log/barcode-scanner-sheet';
+import { FoodSearchRow } from '@/components/log/food-search-row';
+import { FoodSearchSheet } from '@/components/log/food-search-sheet';
 import { ManualEntryForm } from '@/components/log/manual-entry-form';
 import { NutritionHeaderRing } from '@/components/log/nutrition-header-ring';
 import { PhotoCaptureButton } from '@/components/log/photo-capture-button';
@@ -60,6 +62,8 @@ export default function LogScreen() {
   const { t } = useTranslation();
   const [mode, setMode] = React.useState<LogMode>('manual');
   const [scannerVisible, setScannerVisible] = React.useState(false);
+  // Seeded foods search sheet (Cascade D) — free, zero AI cost.
+  const [searchVisible, setSearchVisible] = React.useState(false);
   // Holds the captured image until the user fills in optional comment context.
   const [pendingCapture, setPendingCapture] = React.useState<{
     base64: string;
@@ -373,6 +377,10 @@ export default function LogScreen() {
                 when there is no history. */}
             <RecentFoodsRow items={recentItems} onRelog={handleRelog} />
 
+            {/* 3c. Seeded food database search (Cascade D) — pharmacist-curated
+                verified foods, free, zero AI cost. */}
+            <FoodSearchRow onPress={() => setSearchVisible(true)} />
+
             {/* 3b. Absorption window note — shown only for oral users inside the
                 30-min empty-stomach window. Non-blocking, dismissible for the session.
                 Renders null for injection users or when the window is not absorbing. */}
@@ -471,6 +479,13 @@ export default function LogScreen() {
         onProductFound={handleProductFound}
       />
 
+      {/* Seeded foods search sheet (Cascade D) — log mode inserts directly */}
+      <FoodSearchSheet
+        visible={searchVisible}
+        mode="log"
+        onClose={() => setSearchVisible(false)}
+      />
+
       {/* Comment sheet — slides up immediately after capture, before AI call */}
       <PhotoCommentSheet
         visible={!!pendingCapture}
@@ -534,18 +549,15 @@ function FoodLogRow({ entry }: FoodLogRowProps) {
     [colors, spacing, radius],
   );
 
-  const sourceBadgeStyle
-    = entry.source === 'barcode'
-      ? rowStyles.sourceBadgeBarcode
-      : entry.source === 'photo'
-        ? rowStyles.sourceBadgePhoto
-        : rowStyles.sourceBadgeManual;
-  const sourceBadgeTextStyle
-    = entry.source === 'barcode'
-      ? rowStyles.sourceBadgeTextBarcode
-      : entry.source === 'photo'
-        ? rowStyles.sourceBadgeTextPhoto
-        : rowStyles.sourceBadgeTextManual;
+  // Voice shares the manual badge (pre-existing behavior).
+  const badgeBySource = {
+    barcode: { badge: rowStyles.sourceBadgeBarcode, text: rowStyles.sourceBadgeTextBarcode, labelKey: 'log.source_barcode' },
+    photo: { badge: rowStyles.sourceBadgePhoto, text: rowStyles.sourceBadgeTextPhoto, labelKey: 'log.source_ai' },
+    voice: { badge: rowStyles.sourceBadgeManual, text: rowStyles.sourceBadgeTextManual, labelKey: 'log.source_manual' },
+    database: { badge: rowStyles.sourceBadgeDatabase, text: rowStyles.sourceBadgeTextDatabase, labelKey: 'log.source_database' },
+    manual: { badge: rowStyles.sourceBadgeManual, text: rowStyles.sourceBadgeTextManual, labelKey: 'log.source_manual' },
+  } as const;
+  const sourceBadge = badgeBySource[entry.source] ?? badgeBySource.manual;
 
   return (
     <View style={rowStyles.logRow}>
@@ -557,9 +569,9 @@ function FoodLogRow({ entry }: FoodLogRowProps) {
           {entry.servingDescription}
         </Text>
         <View style={rowStyles.logRowBadgeRow}>
-          <View style={[rowStyles.sourceBadge, sourceBadgeStyle]}>
-            <Text style={[rowStyles.sourceBadgeText, sourceBadgeTextStyle]}>
-              {entry.source === 'photo' ? t('log.source_ai') : entry.source === 'barcode' ? t('log.source_barcode') : t('log.source_manual')}
+          <View style={[rowStyles.sourceBadge, sourceBadge.badge]}>
+            <Text style={[rowStyles.sourceBadgeText, sourceBadge.text]}>
+              {t(sourceBadge.labelKey)}
             </Text>
           </View>
           {/* Show carbs + fat inline if available */}
@@ -764,6 +776,11 @@ function makeFoodLogRowStyles({ colors, spacing, radius }: Pick<GlipraTokens, 'c
     sourceBadgeBarcode: {
       backgroundColor: colors.primaryLight,
     },
+    sourceBadgeDatabase: {
+      backgroundColor: colors.gray100,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
     sourceBadgePhoto: {
       backgroundColor: `${colors.primary}18`,
       borderWidth: 1,
@@ -780,6 +797,9 @@ function makeFoodLogRowStyles({ colors, spacing, radius }: Pick<GlipraTokens, 'c
     },
     sourceBadgeTextBarcode: {
       color: colors.primary,
+    },
+    sourceBadgeTextDatabase: {
+      color: colors.textSecondary,
     },
     sourceBadgeTextPhoto: {
       color: colors.primary,

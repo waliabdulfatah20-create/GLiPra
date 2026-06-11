@@ -8,6 +8,7 @@
 //   - On every confirm → the confirmed values are upserted as personal defaults,
 //     so repeat scans of the same food pre-fill with the saved values.
 
+import type { SeededFood } from './food-search';
 import type { RecognitionResult } from './photo-recognition';
 import type { MacroBase, PortionMultiplier as PortionMultiplierValue } from './portion-multiplier-helpers';
 import type { PhotoFoodEntry } from './types';
@@ -27,7 +28,9 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { FoodSearchSheet } from '@/components/log/food-search-sheet';
 import { useTheme } from '@/lib/ThemeContext';
+import { seededFoodToFormPatch, seededFoodToLogEntry } from './food-search';
 import { useConfirmPhotoLog, useUserFoodDefault } from './hooks';
 import { shouldShowLowConfidenceNudge } from './low-confidence-nudge';
 import { bucketToPercent } from './photo-recognition';
@@ -145,7 +148,7 @@ function parseEntry(form: FormState): PhotoFoodEntry {
 // ---------------------------------------------------------------------------
 
 export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
@@ -174,6 +177,21 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
   // on a repeat scan, but can NEVER overwrite in-progress corrections.
   const appliedForResultRef = React.useRef<RecognitionResult | null>(null);
   const userEditedRef = React.useRef(false);
+
+  // "Wrong food?" seeded-database search (Cascade D). Picking a food patches
+  // the form fields; the normal confirm flow then proceeds unchanged, so the
+  // original AI name still drives correction-learning.
+  const [searchVisible, setSearchVisible] = React.useState(false);
+
+  const applyFood = React.useCallback((food: SeededFood) => {
+    // Block the late-resolving personal-defaults effect from clobbering the patch.
+    userEditedRef.current = true;
+    const entry = seededFoodToLogEntry(food, i18n.language);
+    setForm(prev => (prev ? { ...prev, ...seededFoodToFormPatch(food, i18n.language) } : prev));
+    // Rebase the portion multiplier on the seeded food's values at 1x.
+    setAiBase(extractMacroBase(entry));
+    setMultiplier(1);
+  }, [i18n.language]);
 
   // Initialize form when a new recognition result arrives. Re-running when
   // `defaults` resolves later is allowed only if the user hasn't edited yet.
@@ -378,6 +396,15 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
               />
             </FieldRow>
 
+            {/* Wrong food? — search the seeded database and patch the form */}
+            <Pressable
+              onPress={() => setSearchVisible(true)}
+              accessibilityRole="button"
+              accessibilityLabel={t('log.wrong_food_link')}
+            >
+              <Text style={styles.wrongFoodLink}>{t('log.wrong_food_link')}</Text>
+            </Pressable>
+
             <PortionMultiplier
               value={multiplier}
               onChange={handleMultiplierChange}
@@ -498,6 +525,16 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
+
+      {/* Wrong food? seeded-database search — nested inside this Modal's
+          content tree so it stacks correctly on iOS. Select mode patches the
+          form via applyFood; nothing is inserted from here. */}
+      <FoodSearchSheet
+        visible={searchVisible}
+        mode="select"
+        onClose={() => setSearchVisible(false)}
+        onSelect={applyFood}
+      />
     </Modal>
   );
 }
@@ -701,6 +738,13 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       flexWrap: 'wrap',
       gap: spacing.sm,
       marginBottom: spacing.xs,
+    },
+    wrongFoodLink: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.primary,
+      marginTop: 2,
+      marginBottom: spacing.sm,
     },
     textInput: {
       fontSize: 15,

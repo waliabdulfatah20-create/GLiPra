@@ -2,14 +2,16 @@
 // Column names follow the snake_case convention of the database schema.
 
 import type { DietaryContext } from './dietary-context';
+import type { SeededFood } from './food-search';
 import type { RecentFood } from './recent-foods';
-import type { BarcodeFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
+import type { BarcodeFoodEntry, DatabaseFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
 import { endOfDay as getEndOfDay, startOfDay as getStartOfDay } from 'date-fns';
 
 import { z } from 'zod';
 
 import { supabase } from '@/lib/supabase';
 import { buildDietaryContext } from './dietary-context';
+import { rowToSeededFood, sanitizeFoodQuery, seededFoodRowSchema } from './food-search';
 
 // ---------------------------------------------------------------------------
 // Zod schema — validates rows coming out of the database
@@ -31,7 +33,7 @@ const foodLogRowSchema = z.object({
   zinc_mg: z.number().nullable(),
   iron_mg: z.number().nullable(),
   barcode_ean: z.string().nullable(),
-  source: z.enum(['manual', 'barcode', 'photo', 'voice']),
+  source: z.enum(['manual', 'barcode', 'photo', 'voice', 'database']),
   created_at: z.string(),
 });
 
@@ -121,6 +123,71 @@ export async function insertBarcodeFoodLog(
 
   if (error) {
     throw new Error(`insertBarcodeFoodLog failed: ${error.message}`);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// searchFoods (Cascade D)
+// Name search over the seeded pharmacist-curated `foods` table. Local data,
+// zero AI cost. Protein-dense results first. Matches name OR name_es so the
+// Spanish locale finds "yogur".
+// ---------------------------------------------------------------------------
+export async function searchFoods(query: string): Promise<SeededFood[]> {
+  const q = sanitizeFoodQuery(query);
+  if (q.length < 2)
+    return [];
+
+  const { data, error } = await supabase
+    .from('foods')
+    .select(
+      'id, name, name_es, brand, barcode, serving_description, serving_size_g, calories, protein_g, carbs_g, fat_g, fiber_g, b12_mcg, iron_mg, magnesium_mg, vitamin_d_iu, zinc_mg',
+    )
+    .or(`name.ilike.%${q}%,name_es.ilike.%${q}%`)
+    .order('protein_density', { ascending: false })
+    .limit(20);
+
+  if (error) {
+    throw new Error(`searchFoods failed: ${error.message}`);
+  }
+
+  return (data ?? [])
+    .map(row => seededFoodRowSchema.safeParse(row))
+    .filter(result => result.success)
+    .map(result => rowToSeededFood(result.data));
+}
+
+// ---------------------------------------------------------------------------
+// insertDatabaseFoodLog (Cascade D)
+// Insert a log entry sourced from the seeded foods table. Always free.
+// ---------------------------------------------------------------------------
+export async function insertDatabaseFoodLog(
+  userId: string,
+  entry: DatabaseFoodEntry,
+): Promise<void> {
+  const now = new Date().toISOString();
+
+  const { error } = await supabase.from('food_logs').insert({
+    user_id: userId,
+    logged_at: now,
+    name: entry.name,
+    serving_description: entry.servingDescription,
+    protein_g: entry.proteinG,
+    carbs_g: entry.carbsG,
+    fat_g: entry.fatG,
+    fiber_g: entry.fiberG,
+    calories_kcal: entry.caloriesKcal,
+    magnesium_mg: entry.magnesiumMg,
+    zinc_mg: entry.zincMg,
+    b12_mcg: entry.b12Mcg,
+    vitamin_d_iu: entry.vitaminDIu,
+    iron_mg: entry.ironMg,
+    barcode_ean: entry.barcodeEan,
+    source: 'database',
+    created_at: now,
+  });
+
+  if (error) {
+    throw new Error(`insertDatabaseFoodLog failed: ${error.message}`);
   }
 }
 

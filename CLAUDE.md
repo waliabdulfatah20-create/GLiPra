@@ -1,7 +1,7 @@
 # Glipra — Claude Context File
 # Keep this file current. Update rules and decisions when they change.
 # Build history and completed milestones live in PROGRESS.md.
-# Last updated: 2026-05-24
+# Last updated: 2026-06-09
 
 ---
 
@@ -276,7 +276,7 @@ type SubscriptionTier = 'free' | 'pro' | 'founder_lifetime';
 //   unlimited protein history, prescriber visit prep + PDF, linked accounts
 
 // Always free: red-flag escalation, micronutrient watch, barcode scanning, manual food logging,
-//   data export (GDPR), account deletion
+//   food database search (seeded foods table), data export (GDPR), account deletion
 ```
 
 ---

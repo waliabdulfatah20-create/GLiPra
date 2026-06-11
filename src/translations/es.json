@@ -215,6 +215,7 @@
     "view_level": "Ver nivel de medicación"
   },
   "log": {
+    "ai_hero_label": "Registra con IA",
     "all_on_track": "Todos los nutrientes en orden",
     "disclaimer": "Los valores nutricionales son estimaciones basadas en la información que tú o la base de datos de códigos de barras proporcionan. Los valores de fotos de IA son estimaciones, así que siempre verifica con tu médico prescriptor o un dietista registrado.",
     "estimated": "est.",
@@ -238,6 +239,8 @@
     "nutrient_zinc": "Zinc",
     "nutrition_today": "NUTRICIÓN DE HOY",
     "pct_of_goal": "{{pct}}% de la meta",
+    "photo_action": "Foto",
+    "photo_action_sub": "IA de foto",
     "photo_comment_analyze": "Analizar",
     "photo_comment_placeholder": "ej. tazón grande, queso extra, media porción…",
     "photo_comment_skip": "Omitir",
@@ -271,6 +274,8 @@
     "source_manual": "manual",
     "title": "Registro de Nutrición",
     "todays_log": "Registro de hoy",
+    "voice_action": "Hablar",
+    "voice_action_sub": "IA de voz",
     "voice_button_label": "Voz",
     "voice_button_subtitle": "Describe tu comida",
     "voice_cta": "Toca para grabar",

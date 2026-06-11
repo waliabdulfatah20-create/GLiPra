@@ -43,13 +43,21 @@ type VoiceCaptureButtonProps = {
    * Used for the one-time AI data & privacy disclaimer on first tap.
    */
   onBeforeRecord?: () => Promise<boolean>;
+  /**
+   * When true, the button begins recording on mount (skipping the idle hero AND the
+   * in-button Pro gate — the caller already ran the Pro check). Used by AiCaptureHero,
+   * which owns the idle "Speak | Snap" layout + gating.
+   */
+  autoStart?: boolean;
+  /** Called when an auto-started recording bails before capture (permission denied / cancelled). */
+  onClose?: () => void;
 };
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-export function VoiceCaptureButton({ onAudioCaptured, isLoading, onBeforeRecord }: VoiceCaptureButtonProps) {
+export function VoiceCaptureButton({ onAudioCaptured, isLoading, onBeforeRecord, autoStart, onClose }: VoiceCaptureButtonProps) {
   const { t } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const { isPro } = useSubscription();
@@ -97,6 +105,10 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading, onBeforeRecord 
       await stopRecording();
       return;
     }
+
+    // Auto-start in progress (recording not yet live) — ignore taps until it begins.
+    if (autoStart)
+      return;
 
     // Pro gate — show paywall for non-Pro users
     if (!isPro) {
@@ -177,6 +189,36 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading, onBeforeRecord 
     }
   };
 
+  // Auto-start: begin recording on mount when the parent requests it (the Pro gate
+  // already ran upstream). Skips the idle hero. Runs exactly once.
+  const autoStartedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (!autoStart || autoStartedRef.current)
+      return;
+    autoStartedRef.current = true;
+    void (async () => {
+      const permission = await requestRecordingPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert(
+          t('log.voice_permission_denied_title'),
+          t('log.voice_permission_denied_body'),
+          [{ text: 'OK' }],
+        );
+        onClose?.();
+        return;
+      }
+      if (onBeforeRecord) {
+        const ok = await onBeforeRecord();
+        if (!ok) {
+          onClose?.();
+          return;
+        }
+      }
+      await startRecording();
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart]);
+
   // ── Render ────────────────────────────────────────────────────────────────
 
   if (isLoading) {
@@ -188,7 +230,7 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading, onBeforeRecord 
     );
   }
 
-  if (isRecording) {
+  if (isRecording || autoStart) {
     return (
       <Pressable
         style={[styles.button, styles.recordingState]}

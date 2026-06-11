@@ -14,6 +14,7 @@ jest.mock('@/features/subscription/pro-gate', () => ({
   ProGate: ({ children }: { children: React.ReactNode }) => children,
 }));
 jest.mock('@/lib/haptics', () => ({ haptics: { medium: jest.fn() } }));
+jest.mock('@/features/subscription/use-subscription', () => ({ useSubscription: () => ({ isPro: true }) }));
 
 const mockSend = jest.fn();
 

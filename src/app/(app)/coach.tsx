@@ -32,6 +32,7 @@ import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { ArrowRight, ChatBubble } from '@/components/ui/icons';
 import { useAiCoach } from '@/features/ai-coach/hooks';
 import { ProGate } from '@/features/subscription/pro-gate';
+import { useSubscription } from '@/features/subscription/use-subscription';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 
@@ -118,6 +119,7 @@ function MessageBubble({ message }: { message: CoachMessage }) {
 export default function CoachScreen() {
   const { t } = useTranslation();
   const { messages, sendMessage, isLoading } = useAiCoach();
+  const { isPro } = useSubscription();
   const [inputText, setInputText] = useState('');
   const flatListRef = useRef<FlatList<CoachMessage>>(null);
   const { colors, spacing, radius, shadows, gradients } = useTheme();
@@ -185,36 +187,47 @@ export default function CoachScreen() {
           </Text>
         </DisclaimerBanner>
 
-        {/* Message list (welcome bubble is always the first assistant message) */}
-        <FlatList
-          ref={flatListRef}
-          data={listData}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => <MessageBubble message={item} />}
-          contentContainerStyle={styles.messageList}
-          showsVerticalScrollIndicator={false}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
-          ListFooterComponent={isLoading ? <TypingIndicator /> : null}
-        />
+        {/* Message area: a centered welcome (empty) or the conversation list */}
+        {isEmpty
+          ? (
+              <View style={styles.emptyWrap}>
+                <View style={styles.emptyAvatar}>
+                  <ChatBubble color={colors.primary} width={28} height={28} />
+                </View>
+                <Text style={styles.emptyText}>{t('coach.welcome')}</Text>
+                {isPro && (
+                  <View style={styles.chipsRow}>
+                    {suggestions.map(s => (
+                      <Pressable
+                        key={s}
+                        testID="coach-chip"
+                        style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
+                        onPress={() => { void handleSend(s); }}
+                        accessibilityRole="button"
+                        accessibilityLabel={s}
+                      >
+                        <Text style={styles.chipText}>{s}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )
+          : (
+              <FlatList
+                ref={flatListRef}
+                data={listData}
+                keyExtractor={item => item.id}
+                renderItem={({ item }) => <MessageBubble message={item} />}
+                contentContainerStyle={styles.messageList}
+                showsVerticalScrollIndicator={false}
+                onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
+                ListFooterComponent={isLoading ? <TypingIndicator /> : null}
+              />
+            )}
 
         {/* Composer — Pro gated (reading is free; sending is Pro) */}
         <ProGate featureName="AI Nutrition Coach">
-          {isEmpty && (
-            <View style={styles.chipsRow}>
-              {suggestions.map(s => (
-                <Pressable
-                  key={s}
-                  testID="coach-chip"
-                  style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
-                  onPress={() => { void handleSend(s); }}
-                  accessibilityRole="button"
-                  accessibilityLabel={s}
-                >
-                  <Text style={styles.chipText}>{s}</Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
           <View style={styles.inputRow}>
             <TextInput
               style={styles.textInput}
@@ -377,13 +390,36 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       color: colors.textSecondary,
     },
 
+    // Empty state (centered welcome + chips)
+    emptyWrap: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: spacing.xl,
+      gap: spacing.md,
+    },
+    emptyAvatar: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: colors.primaryLight,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    emptyText: {
+      fontSize: 15,
+      color: colors.textPrimary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+
     // Suggestion chips
     chipsRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',
+      justifyContent: 'center',
       gap: spacing.sm,
-      paddingHorizontal: spacing.md,
-      paddingTop: spacing.sm,
+      marginTop: spacing.xs,
     },
     chip: {
       backgroundColor: colors.surface,

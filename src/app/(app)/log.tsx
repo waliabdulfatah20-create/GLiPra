@@ -34,15 +34,14 @@ import {
   View,
 } from 'react-native';
 import { AbsorptionWindowNote } from '@/components/log/absorption-window-note';
+import { AiCaptureHero } from '@/components/log/ai-capture-hero';
 import { BarcodeScannerSheet } from '@/components/log/barcode-scanner-sheet';
 import { FoodSearchRow } from '@/components/log/food-search-row';
 import { FoodSearchSheet } from '@/components/log/food-search-sheet';
 import { ManualEntryForm } from '@/components/log/manual-entry-form';
 import { NutritionHeaderRing } from '@/components/log/nutrition-header-ring';
-import { PhotoCaptureButton } from '@/components/log/photo-capture-button';
 import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
 import { RecentFoodsRow } from '@/components/log/recent-foods-row';
-import { VoiceCaptureButton } from '@/components/log/voice-capture-button';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { AiPrivacyDisclaimerModal } from '@/features/food-log/ai-privacy-disclaimer-modal';
 import { AIReviewSheet } from '@/features/food-log/ai-review-sheet';
@@ -360,16 +359,14 @@ export default function LogScreen() {
               <NutritionHeaderRing consumed={totalProteinToday} floor={proteinFloorG} />
             </View>
 
-            {/* 2. AI logging — voice hero card, then compact photo row (each full-width) */}
-            <VoiceCaptureButton
+            {/* 2. AI logging — voice + photo share one "Log with AI" hero */}
+            <AiCaptureHero
               onAudioCaptured={handleAudioCaptured}
-              isLoading={analyzingSource === 'voice'}
-              onBeforeRecord={handleVoiceBeforeRecord}
-            />
-            <PhotoCaptureButton
               onImageSelected={(base64, mimeType) =>
                 setPendingCapture({ base64, mimeType })}
-              isLoading={analyzingSource === 'photo' || recognizing}
+              isLoadingVoice={analyzingSource === 'voice'}
+              isLoadingPhoto={analyzingSource === 'photo' || recognizing}
+              onBeforeRecord={handleVoiceBeforeRecord}
             />
 
             {/* 3. Recent Foods quick-add — one-tap re-log of staples (free, no AI).

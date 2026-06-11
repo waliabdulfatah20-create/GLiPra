@@ -215,6 +215,7 @@
     "view_level": "View medication level"
   },
   "log": {
+    "ai_hero_label": "Log with AI",
     "all_on_track": "All nutrients on track",
     "disclaimer": "Nutrition values are estimated from the information you or the barcode database provide. AI photo values are estimates, so always verify with your prescriber or a registered dietitian.",
     "estimated": "est.",
@@ -238,6 +239,8 @@
     "nutrient_zinc": "Zinc",
     "nutrition_today": "TODAY'S NUTRITION",
     "pct_of_goal": "{{pct}}% of goal",
+    "photo_action": "Snap",
+    "photo_action_sub": "Photo AI",
     "photo_comment_analyze": "Analyze",
     "photo_comment_placeholder": "e.g. large bowl, extra cheese, half portion…",
     "photo_comment_skip": "Skip",
@@ -271,6 +274,8 @@
     "source_manual": "manual",
     "title": "Nutrition Log",
     "todays_log": "Today's log",
+    "voice_action": "Speak",
+    "voice_action_sub": "Voice AI",
     "voice_button_label": "Voice",
     "voice_button_subtitle": "Speak your meal",
     "voice_cta": "Tap to record",

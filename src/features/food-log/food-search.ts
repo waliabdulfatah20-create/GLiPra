@@ -79,13 +79,14 @@ export function rowToSeededFood(row: SeededFoodRow): SeededFood {
 }
 
 // ---------------------------------------------------------------------------
-// Query sanitizing — `%`, `_`, `,`, `(`, `)` break the supabase-js `.or()`
-// filter parser / ILIKE pattern, so strip them before interpolation.
+// Query sanitizing — `%`, `_`, `,`, `(`, `)`, `"`, and `\` are reserved in the
+// supabase-js `.or()` filter parser / ILIKE value (a trailing `\` is the ILIKE
+// escape char and errors the request), so strip them before interpolation.
 // ---------------------------------------------------------------------------
 
 export function sanitizeFoodQuery(raw: string): string {
   return raw
-    .replace(/[%_,()]/g, ' ')
+    .replace(/[%_,()"\\]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }

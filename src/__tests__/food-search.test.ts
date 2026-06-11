@@ -73,6 +73,10 @@ describe('sanitizeFoodQuery', () => {
     expect(sanitizeFoodQuery('100% whey (vanilla), low_fat')).toBe('100 whey vanilla low fat');
   });
 
+  it('strips double-quotes and backslashes (PostgREST .or() / ILIKE reserved)', () => {
+    expect(sanitizeFoodQuery('"organic" yogurt\\')).toBe('organic yogurt');
+  });
+
   it('collapses whitespace and trims', () => {
     expect(sanitizeFoodQuery('  greek   yogurt  ')).toBe('greek yogurt');
   });

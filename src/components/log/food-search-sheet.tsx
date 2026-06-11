@@ -54,7 +54,9 @@ export function FoodSearchSheet({ visible, mode, onClose, onSelect }: FoodSearch
   const [debouncedQuery, setDebouncedQuery] = React.useState('');
   const [selected, setSelected] = React.useState<SeededFood | null>(null);
 
-  const { results, isLoading } = useSearchFoods(debouncedQuery);
+  // Gate on `visible` so a closed sheet's cached results can't flash on reopen
+  // (an empty query disables the hook via its own length guard).
+  const { results, isLoading } = useSearchFoods(visible ? debouncedQuery : '');
   const { mutate: insertDatabaseLog, isLoading: isLogging } = useInsertDatabaseFoodLog();
 
   // Reset each time the sheet opens.
@@ -78,8 +80,11 @@ export function FoodSearchSheet({ visible, mode, onClose, onSelect }: FoodSearch
     if (!selected || isLogging)
       return;
     if (mode === 'select') {
-      haptics.medium();
-      onSelect?.(selected);
+      // Only act when a handler exists; otherwise close cleanly (no pretense).
+      if (onSelect) {
+        haptics.medium();
+        onSelect(selected);
+      }
       onClose();
       return;
     }

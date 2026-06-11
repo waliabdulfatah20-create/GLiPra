@@ -206,7 +206,8 @@
     "tip_rotate_body": "Use a different spot each time to allow tissue to recover and maintain consistent absorption.",
     "tip_rotate_title": "Rotate every injection",
     "title": "Dose",
-    "today_label": "TODAY'S DOSE"
+    "today_label": "TODAY'S DOSE",
+    "view_level": "View medication level"
   },
   "log": {
     "all_on_track": "All nutrients on track",

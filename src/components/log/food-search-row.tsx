@@ -60,7 +60,7 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       marginHorizontal: spacing.md,
       marginBottom: spacing.sm,
       paddingHorizontal: spacing.md,
-      paddingVertical: spacing.md,
+      paddingVertical: spacing.sm + 4,
       backgroundColor: colors.surface,
       borderRadius: radius.lg,
       ...shadows.sm,

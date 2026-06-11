@@ -15,6 +15,7 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RatingSlider } from '@/components/check-in/rating-slider';
+import { WaterGlass } from '@/components/check-in/water-glass';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { useTodayCheckIn, useUpsertCheckIn } from '@/features/check-in/hooks';
 import { useInsertWeightLog, useWeightLogs } from '@/features/weight/hooks';
@@ -24,21 +25,6 @@ import { kgToLbs, lbsToKg, useWeightUnit } from '@/lib/unit-preference';
 
 const WATER_DROPS = 8; // 8 × 250 ml = 2000 ml max (easy UI)
 const WATER_DROP_ML = 250;
-
-const NAUSEA_EMOJIS: [string, string, string, string, string] = [
-  '😊',
-  '🙂',
-  '😐',
-  '🤢',
-  '🤮',
-];
-const ENERGY_EMOJIS: [string, string, string, string, string] = [
-  '😴',
-  '😔',
-  '😐',
-  '😊',
-  '⚡',
-];
 
 export default function CheckInScreen() {
   const { t } = useTranslation();
@@ -85,10 +71,13 @@ export default function CheckInScreen() {
     ? weightLogs[weightLogs.length - 1].weightKg
     : null;
 
-  function handleDropPress(dropIndex: number) {
-    // Tap filled drop → unfill from that point. Tap empty drop → fill up to that point.
-    const newDrops = waterDrops === dropIndex + 1 ? dropIndex : dropIndex + 1;
-    setWaterDrops(newDrops);
+  function incWater() {
+    haptics.selection();
+    setWaterDrops(d => Math.min(WATER_DROPS, d + 1));
+  }
+  function decWater() {
+    haptics.selection();
+    setWaterDrops(d => Math.max(0, d - 1));
   }
 
   function handleSubmit() {
@@ -143,7 +132,7 @@ export default function CheckInScreen() {
             onChange={setNausea}
             lowLabel={t('checkin.nausea_low')}
             highLabel={t('checkin.nausea_high')}
-            emojis={NAUSEA_EMOJIS}
+            tone="severity"
           />
 
           {/* Energy rating */}
@@ -153,7 +142,7 @@ export default function CheckInScreen() {
             onChange={setEnergy}
             lowLabel={t('checkin.energy_low')}
             highLabel={t('checkin.energy_high')}
-            emojis={ENERGY_EMOJIS}
+            tone="positive"
           />
         </View>
 
@@ -163,26 +152,26 @@ export default function CheckInScreen() {
           <Text style={styles.waterTotal}>
             {t('checkin.water_count', { ml: waterMl, drops: waterDrops, total: WATER_DROPS })}
           </Text>
-          <View style={styles.dropRow}>
-            {Array.from({ length: WATER_DROPS }).map((_, i) => {
-              const filled = i < waterDrops;
-              return (
-                <Pressable
-                  key={i}
-                  style={({ pressed }) => [
-                    styles.dropButton,
-                    filled && styles.dropButtonFilled,
-                    pressed && styles.dropButtonPressed,
-                  ]}
-                  onPress={() => handleDropPress(i)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Glass ${i + 1} of water`}
-                  accessibilityState={{ selected: filled }}
-                >
-                  <Text style={styles.dropEmoji}>{filled ? '💧' : '○'}</Text>
-                </Pressable>
-              );
-            })}
+          <View style={styles.waterRow}>
+            <Pressable
+              style={({ pressed }) => [styles.stepperButton, pressed && styles.stepperButtonPressed]}
+              onPress={decWater}
+              disabled={waterDrops <= 0}
+              accessibilityRole="button"
+              accessibilityLabel="Remove a glass of water"
+            >
+              <Text style={[styles.stepperText, waterDrops <= 0 && styles.stepperTextDisabled]}>−</Text>
+            </Pressable>
+            <WaterGlass filled={waterDrops} total={WATER_DROPS} />
+            <Pressable
+              style={({ pressed }) => [styles.stepperButton, pressed && styles.stepperButtonPressed]}
+              onPress={incWater}
+              disabled={waterDrops >= WATER_DROPS}
+              accessibilityRole="button"
+              accessibilityLabel="Add a glass of water"
+            >
+              <Text style={[styles.stepperText, waterDrops >= WATER_DROPS && styles.stepperTextDisabled]}>+</Text>
+            </Pressable>
           </View>
         </View>
 
@@ -343,28 +332,34 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       color: colors.textSecondary,
       marginBottom: spacing.sm,
     },
-    dropRow: {
+    waterRow: {
       flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: spacing.sm,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.xl,
+      marginTop: spacing.xs,
     },
-    dropButton: {
-      width: 40,
-      height: 40,
-      borderRadius: radius.md,
+    stepperButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: colors.gray100,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
-    dropButtonFilled: {
-      backgroundColor: colors.primaryLight,
+    stepperButtonPressed: {
+      backgroundColor: colors.gray200,
     },
-    dropButtonPressed: {
-      opacity: 0.7,
+    stepperText: {
+      fontSize: 24,
+      lineHeight: 28,
+      fontWeight: '500',
+      color: colors.primary,
     },
-    dropEmoji: {
-      fontSize: 20,
-      color: colors.textSecondary,
+    stepperTextDisabled: {
+      color: colors.textDisabled,
     },
 
     // Weight

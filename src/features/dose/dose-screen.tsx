@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/icons';
 import { TodaySkeleton } from '@/components/ui/today-skeleton';
 import { AdherenceCalendar } from '@/features/dose/adherence-calendar';
+import { MedicationCard } from '@/features/dose/medication-card';
 import { RemindersPanel } from '@/features/dose/reminders-panel';
 import { useLogOralDose, useSetDoseWindowRespected } from '@/features/oral-dose/hooks';
 import { useTodayData } from '@/features/today/hooks';
@@ -149,25 +150,10 @@ export function DoseScreen() {
                     isConfirming={setWindowRespected.isPending}
                   />
 
-                  {/* Phase + level */}
+                  {/* Phase + level — one consolidated medication card */}
                   <SectionLabel label={t('dose.medication_label')} />
                   {oralCycle && (
-                    <View style={styles.badgeCard}>
-                      <PhaseBadge
-                        route="oral"
-                        phase={oralCycle.phase}
-                        daysOnMed={oralCycle.daysOnMed}
-                      />
-                    </View>
-                  )}
-                  <MedLevelBanner route="oral" phase={oralCycle?.phase ?? null} />
-
-                  {/* Building / titration educational card */}
-                  {oralCycle?.phase === 'building' && (
-                    <View style={styles.infoCard}>
-                      <Text style={styles.infoTitle}>{t('dose.building_title')}</Text>
-                      <Text style={styles.infoBody}>{t('dose.building_body')}</Text>
-                    </View>
+                    <MedicationCard phase={oralCycle.phase} daysOnMed={oralCycle.daysOnMed} />
                   )}
 
                   {/* Adherence calendar */}

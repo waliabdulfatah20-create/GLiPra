@@ -206,7 +206,8 @@
     "tip_rotate_body": "Usa un lugar diferente cada vez para que el tejido se recupere y la absorción sea constante.",
     "tip_rotate_title": "Rota en cada inyección",
     "title": "Dosis",
-    "today_label": "DOSIS DE HOY"
+    "today_label": "DOSIS DE HOY",
+    "view_level": "Ver nivel de medicación"
   },
   "log": {
     "all_on_track": "Todos los nutrientes en orden",

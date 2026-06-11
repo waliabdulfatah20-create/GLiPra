@@ -70,6 +70,8 @@ export type GlipraColorTokens = {
   voiceHeroTextMuted: string;
   recordingBg: string;
   recordingWave: string;
+  // Hydration (water intake)
+  water: string;
 };
 
 export type GlipraShadowTokens = {
@@ -215,6 +217,7 @@ export const lightTokens: GlipraTokens = {
     voiceHeroTextMuted: 'rgba(255,255,255,0.65)',
     recordingBg: '#7f1d1d',
     recordingWave: '#fca5a5',
+    water: '#0ea5e9',
   },
 };
 
@@ -313,5 +316,6 @@ export const darkTokens: GlipraTokens = {
     voiceHeroTextMuted: 'rgba(255,255,255,0.65)',
     recordingBg: '#7f1d1d',
     recordingWave: '#fca5a5',
+    water: '#38bdf8',
   },
 };

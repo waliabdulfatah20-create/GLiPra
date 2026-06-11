@@ -105,8 +105,13 @@
     "error": "Unable to get a response. Please try again.",
     "placeholder": "Ask about protein, hydration, or meal timing…",
     "send": "Send",
+    "suggest_appetite": "Easy meals for low appetite",
+    "suggest_protein": "How much protein today?",
+    "suggest_snacks": "High-protein snack ideas",
     "thinking": "Thinking…",
-    "title": "Nutrition Coach"
+    "title": "Nutrition Coach",
+    "trust": "Pharmacist guidelines",
+    "welcome": "Hi! Ask me about protein goals, meal ideas, hydration, and food strategies."
   },
   "common": {
     "back": "← Back",

@@ -1,16 +1,20 @@
 // Route: /coach
 // AI Nutrition Coach screen — registered as a permanent 5th tab in the bottom nav.
-// Free users can read the welcome message; the send input is wrapped in ProGate
-// so unsubscribed users see the Pro upgrade card as a teaser.
+// Free users can read the welcome message; the composer (chips + input) is wrapped in
+// ProGate so unsubscribed users see the Pro upgrade card as a teaser.
 //
 // Rule 8: DisclaimerBanner tier={2} is rendered between the header and message list.
 // Rule 10: Medication keyword blocking is enforced in the edge function, not here.
 //          The UI does not attempt client-side filtering — the server is authoritative.
+//          Suggestion chips are food-only.
 
 import type { CoachMessage } from '@/features/ai-coach/hooks';
 import type { GlipraTokens } from '@/theme/tokens';
+
+import { LinearGradient } from 'expo-linear-gradient';
 import * as React from 'react';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   ActivityIndicator,
@@ -25,39 +29,51 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
+import { ArrowRight, ChatBubble } from '@/components/ui/icons';
 import { useAiCoach } from '@/features/ai-coach/hooks';
 import { ProGate } from '@/features/subscription/pro-gate';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 
 // ---------------------------------------------------------------------------
-// Welcome message — pre-loaded before the user sends anything.
+// Coach avatar — small chat glyph shown beside assistant bubbles.
 // ---------------------------------------------------------------------------
 
-const WELCOME_MESSAGE: CoachMessage = {
-  id: 'welcome',
-  role: 'assistant',
-  content:
-    'Hi! I can help with protein goals, meal ideas, hydration, and food strategies. '
-    + 'What would you like to know?',
-  timestamp: new Date(),
-};
+function CoachAvatar() {
+  const { colors, radius } = useTheme();
+  return (
+    <View
+      style={{
+        width: 28,
+        height: 28,
+        borderRadius: radius.full,
+        backgroundColor: colors.primaryLight,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <ChatBubble color={colors.primary} width={16} height={16} />
+    </View>
+  );
+}
 
 // ---------------------------------------------------------------------------
-// Typing indicator component
+// Typing indicator
 // ---------------------------------------------------------------------------
 
 function TypingIndicator() {
-  const { colors, spacing, radius } = useTheme();
+  const { t } = useTranslation();
+  const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
-    () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius],
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
   );
   return (
-    <View style={styles.typingRow}>
-      <View style={styles.assistantBubble}>
+    <View style={[styles.messageRow, styles.assistantRow]}>
+      <CoachAvatar />
+      <View style={styles.typingBubble}>
         <ActivityIndicator size="small" color={colors.textSecondary} />
-        <Text style={styles.typingText}>Thinking…</Text>
+        <Text style={styles.typingText}>{t('coach.thinking')}</Text>
       </View>
     </View>
   );
@@ -68,19 +84,28 @@ function TypingIndicator() {
 // ---------------------------------------------------------------------------
 
 function MessageBubble({ message }: { message: CoachMessage }) {
-  const { colors, spacing, radius } = useTheme();
+  const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
-    () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius],
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
   );
   const isUser = message.role === 'user';
 
+  if (isUser) {
+    return (
+      <View style={[styles.messageRow, styles.userRow]}>
+        <View style={[styles.bubble, styles.userBubble]}>
+          <Text style={[styles.bubbleText, styles.userBubbleText]}>{message.content}</Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
-    <View style={[styles.messageRow, isUser ? styles.userRow : styles.assistantRow]}>
-      <View style={[styles.bubble, isUser ? styles.userBubble : styles.assistantBubble]}>
-        <Text style={[styles.bubbleText, isUser ? styles.userBubbleText : styles.assistantBubbleText]}>
-          {message.content}
-        </Text>
+    <View style={[styles.messageRow, styles.assistantRow]}>
+      <CoachAvatar />
+      <View style={[styles.bubble, styles.assistantBubble]}>
+        <Text style={[styles.bubbleText, styles.assistantBubbleText]}>{message.content}</Text>
       </View>
     </View>
   );
@@ -91,28 +116,41 @@ function MessageBubble({ message }: { message: CoachMessage }) {
 // ---------------------------------------------------------------------------
 
 export default function CoachScreen() {
+  const { t } = useTranslation();
   const { messages, sendMessage, isLoading } = useAiCoach();
   const [inputText, setInputText] = useState('');
   const flatListRef = useRef<FlatList<CoachMessage>>(null);
-  const { colors, spacing, radius } = useTheme();
+  const { colors, spacing, radius, shadows, gradients } = useTheme();
   const styles = React.useMemo(
-    () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius],
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
   );
 
-  // Combine the welcome message with live messages.
-  const allMessages: CoachMessage[] = [WELCOME_MESSAGE, ...messages];
+  const isEmpty = messages.length === 0;
+  const welcomeMessage: CoachMessage = {
+    id: 'welcome',
+    role: 'assistant',
+    content: t('coach.welcome'),
+    timestamp: new Date(),
+  };
+  const listData: CoachMessage[] = [welcomeMessage, ...messages];
 
-  const handleSend = async () => {
-    const text = inputText.trim();
+  const suggestions = [
+    t('coach.suggest_protein'),
+    t('coach.suggest_snacks'),
+    t('coach.suggest_appetite'),
+  ];
+
+  const handleSend = async (preset?: string) => {
+    const text = (preset ?? inputText).trim();
     if (!text || isLoading)
       return;
 
     haptics.medium();
-    setInputText('');
+    if (!preset)
+      setInputText('');
     await sendMessage(text);
 
-    // Scroll to the bottom after sending.
     setTimeout(() => {
       flatListRef.current?.scrollToEnd({ animated: true });
     }, 100);
@@ -127,13 +165,18 @@ export default function CoachScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
-        {/* Header — tab root, no back button */}
-        <View style={styles.header}>
-          <View style={styles.headerTitles}>
-            <Text style={styles.headerTitle}>Nutrition Coach</Text>
-            <Text style={styles.headerSubtitle}>Powered by pharmacist guidelines</Text>
+        {/* Gradient hero header */}
+        <LinearGradient
+          colors={gradients.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.hero}
+        >
+          <Text style={styles.heroTitle}>{t('coach.title')}</Text>
+          <View style={styles.trustPill}>
+            <Text style={styles.trustPillText}>{t('coach.trust')}</Text>
           </View>
-        </View>
+        </LinearGradient>
 
         {/* Tier-2 disclaimer — Rule 8 */}
         <DisclaimerBanner tier={2}>
@@ -142,10 +185,10 @@ export default function CoachScreen() {
           </Text>
         </DisclaimerBanner>
 
-        {/* Message list */}
+        {/* Message list (welcome bubble is always the first assistant message) */}
         <FlatList
           ref={flatListRef}
-          data={allMessages}
+          data={listData}
           keyExtractor={item => item.id}
           renderItem={({ item }) => <MessageBubble message={item} />}
           contentContainerStyle={styles.messageList}
@@ -154,36 +197,55 @@ export default function CoachScreen() {
           ListFooterComponent={isLoading ? <TypingIndicator /> : null}
         />
 
-        {/* Input row — Pro gated (reading coach messages is free; sending is Pro) */}
+        {/* Composer — Pro gated (reading is free; sending is Pro) */}
         <ProGate featureName="AI Nutrition Coach">
+          {isEmpty && (
+            <View style={styles.chipsRow}>
+              {suggestions.map(s => (
+                <Pressable
+                  key={s}
+                  testID="coach-chip"
+                  style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
+                  onPress={() => { void handleSend(s); }}
+                  accessibilityRole="button"
+                  accessibilityLabel={s}
+                >
+                  <Text style={styles.chipText}>{s}</Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
           <View style={styles.inputRow}>
             <TextInput
               style={styles.textInput}
               value={inputText}
               onChangeText={setInputText}
-              placeholder="Ask about protein, meals, hydration…"
+              placeholder={t('coach.placeholder')}
               placeholderTextColor={colors.textDisabled}
               maxLength={500}
               multiline
               returnKeyType="send"
-              onSubmitEditing={handleSend}
+              onSubmitEditing={() => { void handleSend(); }}
               editable={!isLoading}
               accessibilityLabel="Message input"
             />
             <Pressable
+              testID="coach-send"
               style={({ pressed }) => [
                 styles.sendButton,
                 isSendDisabled && styles.sendButtonDisabled,
                 pressed && !isSendDisabled && styles.sendButtonPressed,
               ]}
-              onPress={handleSend}
+              onPress={() => { void handleSend(); }}
               disabled={isSendDisabled}
               accessibilityRole="button"
-              accessibilityLabel="Send message"
+              accessibilityLabel={t('coach.send')}
             >
-              <Text style={[styles.sendButtonText, isSendDisabled && styles.sendButtonTextDisabled]}>
-                Send
-              </Text>
+              <ArrowRight
+                color={isSendDisabled ? colors.textDisabled : colors.textInverse}
+                width={22}
+                height={22}
+              />
             </Pressable>
           </View>
         </ProGate>
@@ -200,9 +262,10 @@ type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
 };
 
-function makeStyles({ colors, spacing, radius }: StyleTokens) {
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -212,26 +275,32 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       flex: 1,
     },
 
-    // Header
-    header: {
+    // Gradient hero header
+    hero: {
       paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
-      backgroundColor: colors.surface,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.md,
     },
-    headerTitles: {
-      flex: 1,
+    heroTitle: {
+      fontSize: 22,
+      fontWeight: '800',
+      color: '#ffffff',
+      letterSpacing: -0.5,
     },
-    headerTitle: {
-      fontSize: 17,
-      fontWeight: '700',
-      color: colors.textPrimary,
+    trustPill: {
+      alignSelf: 'flex-start',
+      marginTop: spacing.sm,
+      backgroundColor: 'rgba(255,255,255,0.16)',
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.25)',
+      borderRadius: radius.full,
+      paddingHorizontal: 9,
+      paddingVertical: 3,
     },
-    headerSubtitle: {
-      fontSize: 12,
-      color: colors.textSecondary,
-      marginTop: 2,
+    trustPillText: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: '#ffffff',
     },
 
     // Disclaimer
@@ -248,21 +317,24 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       flexGrow: 1,
     },
     messageRow: {
-      marginBottom: spacing.sm,
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      gap: spacing.sm,
+      marginBottom: spacing.md,
     },
     userRow: {
-      alignItems: 'flex-end',
+      justifyContent: 'flex-end',
     },
     assistantRow: {
-      alignItems: 'flex-start',
+      justifyContent: 'flex-start',
     },
 
     // Bubbles
     bubble: {
-      maxWidth: '80%',
+      maxWidth: '78%',
       borderRadius: radius.lg,
       paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
+      paddingVertical: spacing.sm + 2,
     },
     userBubble: {
       backgroundColor: colors.primary,
@@ -273,9 +345,7 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       borderBottomLeftRadius: radius.sm,
       borderWidth: 1,
       borderColor: colors.border,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.xs,
+      ...shadows.sm,
     },
     bubbleText: {
       fontSize: 15,
@@ -289,14 +359,47 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
     },
 
     // Typing indicator
-    typingRow: {
-      alignItems: 'flex-start',
-      marginBottom: spacing.sm,
+    typingBubble: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.lg,
+      borderBottomLeftRadius: radius.sm,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+      ...shadows.sm,
     },
     typingText: {
       fontSize: 13,
       color: colors.textSecondary,
-      marginLeft: spacing.xs,
+    },
+
+    // Suggestion chips
+    chipsRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.sm,
+    },
+    chip: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+    },
+    chipPressed: {
+      backgroundColor: colors.primaryLight,
+    },
+    chipText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.primary,
     },
 
     // Input row
@@ -312,23 +415,22 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
     },
     textInput: {
       flex: 1,
-      minHeight: 40,
+      minHeight: 44,
       maxHeight: 120,
       borderWidth: 1,
       borderColor: colors.border,
-      borderRadius: radius.md,
+      borderRadius: radius.full,
       paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
+      paddingVertical: spacing.sm + 2,
       fontSize: 15,
       color: colors.textPrimary,
       backgroundColor: colors.background,
     },
     sendButton: {
       backgroundColor: colors.primary,
-      borderRadius: radius.md,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
-      height: 40,
+      borderRadius: radius.full,
+      width: 44,
+      height: 44,
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -337,14 +439,6 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
     },
     sendButtonPressed: {
       backgroundColor: colors.primaryDark,
-    },
-    sendButtonText: {
-      fontSize: 15,
-      fontWeight: '600',
-      color: colors.textInverse,
-    },
-    sendButtonTextDisabled: {
-      color: colors.textDisabled,
     },
   });
 }

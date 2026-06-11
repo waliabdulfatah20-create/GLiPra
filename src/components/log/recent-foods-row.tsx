@@ -110,7 +110,8 @@ type StyleTokens = {
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
     container: {
-      marginTop: spacing.sm,
+      marginTop: spacing.lg,
+      marginBottom: spacing.md,
     },
     sectionTitle: {
       fontSize: 11,

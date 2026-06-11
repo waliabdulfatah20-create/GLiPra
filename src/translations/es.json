@@ -105,8 +105,13 @@
     "error": "No se pudo obtener una respuesta. Por favor intenta de nuevo.",
     "placeholder": "Pregunta sobre proteínas, hidratación o tiempos de comida…",
     "send": "Enviar",
+    "suggest_appetite": "Comidas fáciles para poco apetito",
+    "suggest_protein": "¿Cuánta proteína hoy?",
+    "suggest_snacks": "Ideas de snacks con proteína",
     "thinking": "Pensando…",
-    "title": "Entrenador de nutrición"
+    "title": "Entrenador de nutrición",
+    "trust": "Guías del farmacéutico",
+    "welcome": "¡Hola! Pregúntame sobre metas de proteína, ideas de comidas, hidratación y estrategias de alimentación."
   },
   "common": {
     "back": "← Atrás",

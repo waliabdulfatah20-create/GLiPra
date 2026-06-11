@@ -20,6 +20,7 @@ jest.mock('react-native-reanimated', () => {
     },
     useSharedValue: jest.fn(() => ({ value: 0 })),
     useAnimatedStyle: jest.fn(fn => fn()),
+    useAnimatedProps: jest.fn(() => ({})),
     withTiming: jest.fn(value => value),
     withSpring: jest.fn(value => value),
     withDecay: jest.fn(value => value),
@@ -54,7 +55,7 @@ jest.mock('react-native-reanimated', () => {
     SlideInLeft: { duration: jest.fn(() => ({})) },
     SlideInRight: { duration: jest.fn(() => ({})) },
     Layout: {},
-    LinearTransition: {},
+    LinearTransition: { duration: jest.fn(() => ({})) },
     Keyframe: jest.fn(),
   };
 });

@@ -22,9 +22,9 @@ import { CardsCarousel } from '@/components/today/cards-carousel';
 import { ContentCardSheet } from '@/components/today/content-card-sheet';
 import { DailyGuidanceCard } from '@/components/today/daily-guidance-card';
 import { DoseWindowCard } from '@/components/today/dose-window-card';
+import { FuelCard } from '@/components/today/fuel-card';
 import { MuscleScoreCard } from '@/components/today/muscle-score-card';
 import { PharmacistSpotlightCard } from '@/components/today/pharmacist-spotlight-card';
-import { ProteinRing } from '@/components/today/protein-ring';
 import { StreakCard } from '@/components/today/streak-card';
 import {
   ClipboardCheck,
@@ -102,9 +102,6 @@ export function TodayScreen() {
     oralLastDoseId,
     oralLastDoseWindowRespected,
     oralAdherenceStreak,
-    proteinFloorG,
-    proteinConsumedG,
-    readinessCard,
     hourOfDay,
     streak,
     isStreakLoading,
@@ -174,27 +171,6 @@ export function TodayScreen() {
   // Pharmacist spotlight state
   const [sheetCard, setSheetCard] = React.useState<ContentCard | null>(null);
   const [showCarousel, setShowCarousel] = React.useState(false);
-
-  // Readiness score count-up animation — ticks 0 → score over 1.2 s when data arrives
-  const [displayScore, setDisplayScore] = React.useState(0);
-  React.useEffect(() => {
-    if (!readinessCard?.score)
-      return;
-    const target = readinessCard.score;
-    const DURATION_MS = 1200;
-    const STEPS = 36;
-    const stepMs = DURATION_MS / STEPS;
-    let step = 0;
-    const timer = setInterval(() => {
-      step++;
-      const t = step / STEPS;
-      const eased = 1 - (1 - t) ** 3; // ease-out cubic
-      setDisplayScore(Math.round(eased * target));
-      if (step >= STEPS)
-        clearInterval(timer);
-    }, stepMs);
-    return () => clearInterval(timer);
-  }, [readinessCard?.score]);
 
   // Phase-aware spotlight card selection — phase match first, then daily rotation.
   // Route-filtered so oral-only cards never surface for injection users (and v.v.).
@@ -327,94 +303,11 @@ export function TodayScreen() {
         {/* ── Content area — padded, sits below the gradient hero ─ */}
         <View style={styles.contentArea}>
 
-          {/* ── Muscle Preservation Score (hero, the core promise) ── */}
+          {/* ── Today's Fuel (hero): protein + readiness + fiber + micros ── */}
+          <FuelCard />
+
+          {/* ── Muscle Preservation Score (the core promise) ── */}
           <MuscleScoreCard />
-
-          {/* ── Readiness Score ───────────────────────────────────── */}
-          {readinessCard && (
-            <View style={styles.readinessCard}>
-              {/* Headline */}
-              <Text style={styles.readinessHeadline}>{readinessCard.headline}</Text>
-
-              {/* Divider */}
-              <View style={styles.readinessDivider} />
-
-              {/* Factor rows */}
-              {readinessCard.factors.map(factor => (
-                <View key={factor.label} style={styles.readinessFactorRow}>
-                  <View
-                    style={[
-                      styles.readinessFactorDot,
-                      {
-                        backgroundColor:
-                        factor.sentiment === 'positive'
-                          ? colors.success
-                          : factor.delta < -10
-                            ? colors.error
-                            : colors.warning,
-                      },
-                    ]}
-                  />
-                  <Text style={styles.readinessFactorLabel}>{factor.label}</Text>
-                  <Text
-                    style={[
-                      styles.readinessFactorDelta,
-                      {
-                        color:
-                        factor.sentiment === 'positive'
-                          ? colors.success
-                          : factor.delta < -10
-                            ? colors.error
-                            : colors.warning,
-                      },
-                    ]}
-                  >
-                    {factor.delta > 0 ? `+${factor.delta}` : `${factor.delta}`}
-                  </Text>
-                </View>
-              ))}
-
-              {/* Divider */}
-              <View style={styles.readinessDivider} />
-
-              {/* Score row (demoted) */}
-              <View style={styles.readinessScoreRow}>
-                <Text style={styles.readinessScoreLabel}>{t('today.readiness_title')}</Text>
-                <Text style={styles.readinessScore}>{displayScore}</Text>
-                <View style={styles.readinessTrustBadge}>
-                  <Text style={styles.readinessTrustText}>{t('today.readiness_trust')}</Text>
-                </View>
-              </View>
-
-              {/* Tip box */}
-              <View style={styles.readinessTipBox}>
-                <Text style={styles.readinessTipText}>{readinessCard.tip}</Text>
-              </View>
-            </View>
-          )}
-
-          {/* ── Today's Metrics ───────────────────────────────────── */}
-          <SectionLabel label={t('today.metrics_title')} />
-          <View style={styles.metricsRow}>
-            {/* Protein ring — top accent in primary; tap to edit the target */}
-            <TouchableOpacity
-              style={[styles.ringCard, { borderTopColor: colors.primary }]}
-              onPress={() => { haptics.tap(); router.push('/protein-target'); }}
-              activeOpacity={0.85}
-              accessibilityRole="button"
-              accessibilityLabel={t('today.protein_edit_a11y')}
-            >
-              <Text style={styles.cardLabel}>{t('today.protein_label')}</Text>
-              <View style={styles.ringWrapper}>
-                <ProteinRing
-                  proteinConsumedG={proteinConsumedG}
-                  proteinFloorG={proteinFloorG}
-                  size={130}
-                  emptyLabel={t('today.protein_no_target')}
-                />
-              </View>
-            </TouchableOpacity>
-          </View>
 
           {/* ── Daily Actions ─────────────────────────────────────── */}
           <SectionLabel label={t('today.daily_actions')} />
@@ -730,105 +623,6 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       borderColor: 'rgba(255,255,255,0.25)',
     },
 
-    // ── Readiness card ──────────────────────────────────────────
-    readinessCard: {
-      backgroundColor: colors.surface,
-      borderRadius: radius.xl,
-      borderLeftWidth: 3,
-      borderLeftColor: colors.primary,
-      padding: spacing.lg,
-      marginBottom: spacing.md,
-      ...shadows.md,
-    },
-    readinessHeadline: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: colors.textPrimary,
-      marginBottom: spacing.xs,
-    },
-    readinessDivider: {
-      height: 1,
-      backgroundColor: colors.border,
-      alignSelf: 'stretch',
-      marginVertical: spacing.sm,
-    },
-    readinessFactorRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.sm,
-      paddingVertical: 3,
-    },
-    readinessFactorDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-    },
-    readinessFactorLabel: {
-      flex: 1,
-      fontSize: 13,
-      color: colors.textPrimary,
-    },
-    readinessFactorDelta: {
-      fontSize: 13,
-      fontWeight: '700',
-    },
-    readinessScoreRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.sm,
-    },
-    readinessScoreLabel: {
-      fontSize: 12,
-      color: colors.textSecondary,
-      letterSpacing: 0.5,
-      textTransform: 'uppercase',
-      fontWeight: '600',
-    },
-    readinessScore: {
-      fontSize: 24,
-      fontWeight: '800',
-      color: colors.textPrimary,
-    },
-    readinessTrustBadge: {
-      flex: 1,
-      alignItems: 'flex-end',
-    },
-    readinessTrustText: {
-      fontSize: 10,
-      color: colors.textSecondary,
-      fontWeight: '500',
-    },
-    readinessTipBox: {
-      marginTop: spacing.sm,
-      backgroundColor: colors.warningLight,
-      borderLeftWidth: 3,
-      borderLeftColor: colors.warning,
-      borderRadius: radius.sm,
-      padding: spacing.sm,
-    },
-    readinessTipText: {
-      fontSize: 13,
-      color: colors.textPrimary,
-      lineHeight: 18,
-    },
-
-    // ── Metrics row ─────────────────────────────────────────────
-    metricsRow: {
-      flexDirection: 'row',
-      gap: spacing.sm,
-      marginBottom: spacing.md,
-    },
-    ringCard: {
-      flex: 1,
-      backgroundColor: colors.surface,
-      borderRadius: radius.lg,
-      padding: spacing.lg,
-      alignItems: 'center',
-      borderTopWidth: 3,
-      borderWidth: 1,
-      borderColor: colors.border,
-      ...shadows.md,
-    },
     phaseCard: {
       flex: 1,
       backgroundColor: colors.surface,
@@ -841,17 +635,6 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     },
     phaseAccentBg: {
       backgroundColor: colors.primaryLight,
-    },
-    cardLabel: {
-      fontSize: 11,
-      fontWeight: '600',
-      color: colors.textSecondary,
-      letterSpacing: 0.5,
-      textTransform: 'uppercase',
-      marginBottom: spacing.sm,
-    },
-    ringWrapper: {
-      marginTop: spacing.xs,
     },
     nextInjection: {
       fontSize: 12,

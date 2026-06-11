@@ -41,7 +41,7 @@ export function RemindersPanel() {
     [colors, spacing, radius, shadows],
   );
 
-  const { injectionEnabled, proteinEnabled, oralDoseEnabled, isOral, toggle }
+  const { injectionEnabled, proteinEnabled, checkInEnabled, oralDoseEnabled, isOral, toggle }
     = useNotificationSettings();
   const { profile } = useTodayData();
   const updateDoseTimeMutation = useUpdateDoseTime();
@@ -156,6 +156,16 @@ export function RemindersPanel() {
           subtitle={t('settings.notif_protein_subtitle')}
           value={proteinEnabled}
           onToggle={() => { void toggle('daily-protein-nudge'); }}
+        />
+
+        <View style={styles.divider} />
+
+        {/* Daily check-in reminder — shown for both routes */}
+        <NotificationRow
+          label={t('settings.notif_checkin')}
+          subtitle={t('settings.notif_checkin_subtitle')}
+          value={checkInEnabled}
+          onToggle={() => { void toggle('daily-checkin-reminder'); }}
           isLast
         />
       </View>

@@ -35,6 +35,7 @@ function setupOral(overrides: Partial<ReturnType<typeof useNotificationSettings>
   (useNotificationSettings as jest.Mock).mockReturnValue({
     injectionEnabled: false,
     proteinEnabled: true,
+    checkInEnabled: false,
     oralDoseEnabled: true,
     isOral: true,
     toggle: mockToggle,
@@ -54,6 +55,7 @@ function setupInjection() {
   (useNotificationSettings as jest.Mock).mockReturnValue({
     injectionEnabled: true,
     proteinEnabled: true,
+    checkInEnabled: false,
     oralDoseEnabled: false,
     isOral: false,
     toggle: mockToggle,
@@ -130,6 +132,15 @@ describe('reminders panel', () => {
       const proteinSwitch = screen.getByLabelText('settings.notif_protein');
       fireEvent(proteinSwitch, 'valueChange', true);
       expect(mockToggle).toHaveBeenCalledWith('daily-protein-nudge');
+    });
+
+    it('renders the daily check-in toggle and fires daily-checkin-reminder', () => {
+      setupOral();
+      render(<RemindersPanel />);
+      expect(screen.getByText('settings.notif_checkin')).toBeTruthy();
+      const checkinSwitch = screen.getByLabelText('settings.notif_checkin');
+      fireEvent(checkinSwitch, 'valueChange', true);
+      expect(mockToggle).toHaveBeenCalledWith('daily-checkin-reminder');
     });
 
     it('opens time picker when time row is pressed', () => {

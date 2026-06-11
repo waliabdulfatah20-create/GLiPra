@@ -539,6 +539,8 @@
     "logout": "Cerrar sesión",
     "medication_level": "Nivel de medicamento",
     "medication_status": "Estado del GLP-1",
+    "notif_checkin": "Recordatorio de check-in diario",
+    "notif_checkin_subtitle": "Recordatorio a las 9 AM para registrar tus síntomas",
     "notif_injection": "Recordatorio de inyección",
     "notif_injection_subtitle": "8 AM en tu día de dosis",
     "notif_oral_dose": "Recordatorio diario de dosis",

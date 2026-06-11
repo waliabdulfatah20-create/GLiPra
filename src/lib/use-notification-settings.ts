@@ -25,6 +25,7 @@ import { notifications } from './notifications';
 const STORAGE_KEYS: Record<NotificationId, string> = {
   'injection-reminder': 'NOTIF_INJECTION_ENABLED',
   'daily-protein-nudge': 'NOTIF_PROTEIN_ENABLED',
+  'daily-checkin-reminder': 'NOTIF_CHECKIN_ENABLED',
   'oral-dose-reminder': 'NOTIF_ORAL_DOSE_ENABLED',
   // Auto-scheduled on dose log (gated by NOTIF_ORAL_DOSE_ENABLED), not a toggle.
   'oral-absorption-clear': 'NOTIF_ORAL_ABSORPTION_ENABLED',
@@ -33,6 +34,7 @@ const STORAGE_KEYS: Record<NotificationId, string> = {
 export type NotificationSettingsState = {
   injectionEnabled: boolean;
   proteinEnabled: boolean;
+  checkInEnabled: boolean;
   oralDoseEnabled: boolean;
   isOral: boolean;
   toggle: (type: NotificationId) => Promise<void>;
@@ -41,6 +43,7 @@ export type NotificationSettingsState = {
 export function useNotificationSettings(): NotificationSettingsState {
   const [injectionEnabled, setInjectionEnabled] = React.useState(false);
   const [proteinEnabled, setProteinEnabled] = React.useState(false);
+  const [checkInEnabled, setCheckInEnabled] = React.useState(false);
   const [oralDoseEnabled, setOralDoseEnabled] = React.useState(false);
 
   const { data: profile } = useTodayProfile();
@@ -52,10 +55,12 @@ export function useNotificationSettings(): NotificationSettingsState {
     AsyncStorage.multiGet([
       STORAGE_KEYS['injection-reminder'],
       STORAGE_KEYS['daily-protein-nudge'],
+      STORAGE_KEYS['daily-checkin-reminder'],
       STORAGE_KEYS['oral-dose-reminder'],
-    ]).then(([inj, prot, oral]) => {
+    ]).then(([inj, prot, checkin, oral]) => {
       setInjectionEnabled(inj[1] === 'true');
       setProteinEnabled(prot[1] === 'true');
+      setCheckInEnabled(checkin[1] === 'true');
       setOralDoseEnabled(oral[1] === 'true');
     });
   }, []);
@@ -67,7 +72,9 @@ export function useNotificationSettings(): NotificationSettingsState {
           ? injectionEnabled
           : type === 'oral-dose-reminder'
             ? oralDoseEnabled
-            : proteinEnabled;
+            : type === 'daily-checkin-reminder'
+              ? checkInEnabled
+              : proteinEnabled;
       const next = !current;
 
       if (next) {
@@ -104,6 +111,10 @@ export function useNotificationSettings(): NotificationSettingsState {
           if (profile?.doseTimeLocal)
             await notifications.scheduleOralDoseReminder(profile.doseTimeLocal);
         }
+        else if (type === 'daily-checkin-reminder') {
+          // Daily symptom-log nudge at a fixed 9 AM.
+          await notifications.scheduleDailyCheckInReminder();
+        }
         else {
           await notifications.scheduleDailyProteinNudge(profile?.proteinFloorG ?? 100);
         }
@@ -122,10 +133,12 @@ export function useNotificationSettings(): NotificationSettingsState {
         setInjectionEnabled(next);
       else if (type === 'oral-dose-reminder')
         setOralDoseEnabled(next);
+      else if (type === 'daily-checkin-reminder')
+        setCheckInEnabled(next);
       else setProteinEnabled(next);
     },
-    [injectionEnabled, proteinEnabled, oralDoseEnabled, profile, curve],
+    [injectionEnabled, proteinEnabled, checkInEnabled, oralDoseEnabled, profile, curve],
   );
 
-  return { injectionEnabled, proteinEnabled, oralDoseEnabled, isOral, toggle };
+  return { injectionEnabled, proteinEnabled, checkInEnabled, oralDoseEnabled, isOral, toggle };
 }

@@ -85,7 +85,7 @@ export function SettingsScreen() {
   const { t } = useTranslation();
   const { data: profile } = useTodayProfile();
   const { unit: weightUnit } = useWeightUnit();
-  const { injectionEnabled, proteinEnabled, oralDoseEnabled, isOral, toggle } = useNotificationSettings();
+  const { injectionEnabled, proteinEnabled, checkInEnabled, oralDoseEnabled, isOral, toggle } = useNotificationSettings();
   const { colors, spacing, radius } = useTheme();
   const { selectedTheme, setSelectedTheme } = useThemeSelector();
   const styles = React.useMemo(
@@ -230,6 +230,12 @@ export function SettingsScreen() {
             subtitle={t('settings.notif_protein_subtitle')}
             value={proteinEnabled}
             onToggle={() => void toggle('daily-protein-nudge')}
+          />
+          <NotificationRow
+            label={t('settings.notif_checkin')}
+            subtitle={t('settings.notif_checkin_subtitle')}
+            value={checkInEnabled}
+            onToggle={() => void toggle('daily-checkin-reminder')}
             isLast
           />
         </SettingsSection>

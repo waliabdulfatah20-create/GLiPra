@@ -539,6 +539,8 @@
     "logout": "Sign Out",
     "medication_level": "Medication Level",
     "medication_status": "GLP-1 Status",
+    "notif_checkin": "Daily check-in reminder",
+    "notif_checkin_subtitle": "9 AM reminder to log your symptoms",
     "notif_injection": "Injection day reminder",
     "notif_injection_subtitle": "8 AM on your dose day",
     "notif_oral_dose": "Daily dose reminder",

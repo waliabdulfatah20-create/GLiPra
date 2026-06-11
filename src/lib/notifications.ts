@@ -5,6 +5,7 @@
  * Local notifications managed:
  *   'injection-reminder'    — fires at 8 AM on the user's next injection date
  *   'daily-protein-nudge'   — fires every day at 7 PM
+ *   'daily-checkin-reminder'— fires every day at 9 AM to log symptoms
  *   'oral-dose-reminder'    — fires daily at the user's chosen oral-dose time
  *   'oral-absorption-clear' — one-shot 30 min after a logged oral dose
  *
@@ -42,6 +43,7 @@ catch {
 export type NotificationId
   = | 'injection-reminder'
     | 'daily-protein-nudge'
+    | 'daily-checkin-reminder'
     | 'oral-dose-reminder'
     | 'oral-absorption-clear';
 
@@ -133,6 +135,34 @@ async function scheduleDailyProteinNudge(
         title: 'Protein check-in',
         body: `Have you hit your ${Math.round(proteinFloorG)}g protein goal today?`,
         data: { type: 'daily-protein-nudge' },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
+        hour: hourOfDay,
+        minute: 0,
+      },
+    });
+  }
+  catch {
+    // Silent fail
+  }
+}
+
+/**
+ * Schedule (or replace) a repeating daily reminder at `hourOfDay` (default
+ * 9 AM) to nudge the user to do their Daily Check-in (symptoms log).
+ * Copy is general wellness only, never clinical (Rule 8 spirit).
+ */
+async function scheduleDailyCheckInReminder(hourOfDay = 9): Promise<void> {
+  try {
+    await Notifications.cancelScheduledNotificationAsync('daily-checkin-reminder');
+
+    await Notifications.scheduleNotificationAsync({
+      identifier: 'daily-checkin-reminder',
+      content: {
+        title: 'Daily check-in',
+        body: 'How are you feeling today? Take a moment to log your symptoms.',
+        data: { type: 'daily-checkin-reminder' },
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
@@ -246,6 +276,7 @@ export const notifications = {
   requestPermission,
   scheduleInjectionReminder,
   scheduleDailyProteinNudge,
+  scheduleDailyCheckInReminder,
   scheduleOralDoseReminder,
   scheduleAbsorptionClear,
   cancel,

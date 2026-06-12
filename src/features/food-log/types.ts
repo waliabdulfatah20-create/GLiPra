@@ -19,7 +19,7 @@ export type FoodLogEntry = {
   zincMg: number | null; // added in migration 012 (GLP-1 watch)
   ironMg: number | null; // added in migration 021 (GLP-1 watch)
   barcodeEan: string | null;
-  source: 'manual' | 'barcode' | 'photo' | 'voice' | 'database';
+  source: 'manual' | 'barcode' | 'photo' | 'voice' | 'database' | 'supplement';
   createdAt: string; // ISO 8601
 };
 
@@ -76,6 +76,21 @@ export type PhotoFoodEntry = {
 // ---------------------------------------------------------------------------
 export type DatabaseFoodEntry = PhotoFoodEntry & {
   barcodeEan: string | null;
+};
+
+// ---------------------------------------------------------------------------
+// SupplementEntry — a per-nutrient supplement quick-add (source 'supplement').
+// Carries the 5 micronutrient fields (only one set per entry) and NO macros —
+// a supplement is not food. protein_g is written as 0 by insertSupplementLog.
+// ---------------------------------------------------------------------------
+export type SupplementEntry = {
+  name: string;
+  servingDescription: string;
+  magnesiumMg: number | null;
+  zincMg: number | null;
+  b12Mcg: number | null;
+  vitaminDIu: number | null;
+  ironMg: number | null;
 };
 
 // ---------------------------------------------------------------------------

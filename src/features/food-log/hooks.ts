@@ -4,7 +4,7 @@ import type { BarcodeProduct } from './barcode-lookup';
 import type { SeededFood } from './food-search';
 import type { RecognitionResult } from './photo-recognition';
 import type { RecentFood } from './recent-foods';
-import type { BarcodeFoodEntry, DatabaseFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
+import type { BarcodeFoodEntry, DatabaseFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry, SupplementEntry } from './types';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format, subDays } from 'date-fns';
@@ -22,6 +22,7 @@ import {
   insertDatabaseFoodLog,
   insertFoodLog,
   insertPhotoFoodLog,
+  insertSupplementLog,
   relogFoodEntry,
   saveFoodCorrection,
   searchFoods,
@@ -241,6 +242,42 @@ export function useInsertDatabaseFoodLog(): {
         // quick-add row without waiting for staleTime.
         queryClient.invalidateQueries({
           queryKey: foodLogKeys.recent(userId),
+        });
+      }
+    },
+  });
+
+  return {
+    mutate,
+    isLoading: isPending,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// useInsertSupplementLog
+// Inserts a per-nutrient supplement (source 'supplement'). Always free.
+// Invalidates today's logs so the micronutrient totals + watch card refresh.
+// ---------------------------------------------------------------------------
+export function useInsertSupplementLog(): {
+  mutate: (entry: SupplementEntry) => void;
+  isLoading: boolean;
+} {
+  const queryClient = useQueryClient();
+  const session = useAuthStore.use.session();
+  const userId = session?.user.id;
+  const today = format(new Date(), 'yyyy-MM-dd');
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (entry: SupplementEntry) => {
+      if (!userId)
+        throw new Error('Not authenticated');
+      return insertSupplementLog(userId, entry);
+    },
+    onSuccess: () => {
+      analytics.capture(EVENTS.SUPPLEMENT_LOGGED, { source: 'supplement' });
+      if (userId) {
+        queryClient.invalidateQueries({
+          queryKey: foodLogKeys.todayLogs(userId, today),
         });
       }
     },

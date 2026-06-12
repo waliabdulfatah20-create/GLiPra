@@ -9,7 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 
 import { useTheme } from '@/lib/ThemeContext';
@@ -30,7 +30,12 @@ type NutrientConfig = {
   unit: string;
 };
 
-export function MicronutrientWatchCard() {
+type Props = {
+  /** When set, each nutrient tile is a tap target that opens the supplement quick-add. */
+  onAddSupplement?: (key: NutrientKey) => void;
+};
+
+export function MicronutrientWatchCard({ onAddSupplement }: Props = {}) {
   const { colors, gradients, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
@@ -92,6 +97,7 @@ export function MicronutrientWatchCard() {
                   rda={MICRONUTRIENT_RDAS[n.key]}
                   styles={styles}
                   t={t}
+                  onPress={onAddSupplement ? () => onAddSupplement(n.key) : undefined}
                 />
               ))}
             </View>
@@ -118,9 +124,11 @@ type NutrientTileProps = {
   rda: number;
   styles: ReturnType<typeof makeStyles>;
   t: TFunction;
+  /** When set, the tile is a tap target (opens the supplement quick-add). */
+  onPress?: () => void;
 };
 
-function NutrientTile({ label, value, unit, rda, styles, t }: NutrientTileProps) {
+function NutrientTile({ label, value, unit, rda, styles, t, onPress }: NutrientTileProps) {
   const pct = getNutrientPct(value, rda);
   const status: NutrientStatus = getNutrientStatus(value, rda);
   const safe = Number.isFinite(value) ? value : 0;
@@ -137,9 +145,10 @@ function NutrientTile({ label, value, unit, rda, styles, t }: NutrientTileProps)
     red: styles.barFillRed,
   }[status];
 
-  return (
-    <View style={styles.tile}>
+  const inner = (
+    <>
       <View style={[styles.statusDot, dotColorStyle]} />
+      {onPress && <Text style={styles.tilePlus}>+</Text>}
       <Text style={styles.tileName}>{label}</Text>
       <Text style={styles.tileValue}>
         {display}
@@ -160,8 +169,23 @@ function NutrientTile({ label, value, unit, rda, styles, t }: NutrientTileProps)
           ]}
         />
       </View>
-    </View>
+    </>
   );
+
+  if (onPress) {
+    return (
+      <Pressable
+        style={styles.tile}
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={t('log.supplement_sheet_title', { nutrient: label })}
+      >
+        {inner}
+      </Pressable>
+    );
+  }
+
+  return <View style={styles.tile}>{inner}</View>;
 }
 
 type StyleTokens = {
@@ -258,6 +282,15 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     statusDotGreen: { backgroundColor: colors.success },
     statusDotAmber: { backgroundColor: colors.warning },
     statusDotRed: { backgroundColor: colors.error },
+    tilePlus: {
+      position: 'absolute',
+      bottom: 6,
+      right: 9,
+      fontSize: 16,
+      lineHeight: 18,
+      fontWeight: '700',
+      color: colors.primary,
+    },
     tileName: {
       fontSize: 8,
       fontWeight: '600',

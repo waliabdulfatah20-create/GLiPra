@@ -4,7 +4,7 @@
 import type { DietaryContext } from './dietary-context';
 import type { SeededFood } from './food-search';
 import type { RecentFood } from './recent-foods';
-import type { BarcodeFoodEntry, DatabaseFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry } from './types';
+import type { BarcodeFoodEntry, DatabaseFoodEntry, FoodCorrection, FoodLogEntry, ManualFoodEntry, PhotoFoodEntry, SupplementEntry } from './types';
 import { endOfDay as getEndOfDay, startOfDay as getStartOfDay } from 'date-fns';
 
 import { z } from 'zod';
@@ -33,7 +33,7 @@ const foodLogRowSchema = z.object({
   zinc_mg: z.number().nullable(),
   iron_mg: z.number().nullable(),
   barcode_ean: z.string().nullable(),
-  source: z.enum(['manual', 'barcode', 'photo', 'voice', 'database']),
+  source: z.enum(['manual', 'barcode', 'photo', 'voice', 'database', 'supplement']),
   created_at: z.string(),
 });
 
@@ -123,6 +123,43 @@ export async function insertBarcodeFoodLog(
 
   if (error) {
     throw new Error(`insertBarcodeFoodLog failed: ${error.message}`);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// insertSupplementLog
+// Insert a per-nutrient supplement (source 'supplement'). No macros — protein_g
+// is 0 and the other macro columns stay null; exactly one micronutrient column
+// is set. Always free (manual micronutrient logging).
+// ---------------------------------------------------------------------------
+export async function insertSupplementLog(
+  userId: string,
+  entry: SupplementEntry,
+): Promise<void> {
+  const now = new Date().toISOString();
+
+  const { error } = await supabase.from('food_logs').insert({
+    user_id: userId,
+    logged_at: now,
+    name: entry.name,
+    serving_description: entry.servingDescription,
+    protein_g: 0,
+    carbs_g: null,
+    fat_g: null,
+    fiber_g: null,
+    calories_kcal: null,
+    magnesium_mg: entry.magnesiumMg,
+    zinc_mg: entry.zincMg,
+    b12_mcg: entry.b12Mcg,
+    vitamin_d_iu: entry.vitaminDIu,
+    iron_mg: entry.ironMg,
+    barcode_ean: null,
+    source: 'supplement',
+    created_at: now,
+  });
+
+  if (error) {
+    throw new Error(`insertSupplementLog failed: ${error.message}`);
   }
 }
 

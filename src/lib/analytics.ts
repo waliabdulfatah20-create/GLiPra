@@ -27,6 +27,7 @@ export const EVENTS = {
   FOOD_LOGGED_RELOG: 'food_logged_relog', // one-tap re-log from Recent Foods
   FOOD_LOGGED_DATABASE: 'food_logged_database', // seeded foods search (Cascade D)
   PHOTO_RESCANNED: 'photo_rescanned', // review-sheet Rescan — re-ran recognition on the same photo
+  SUPPLEMENT_LOGGED: 'supplement_logged', // per-nutrient supplement quick-add
 
   // Check-in
   CHECKIN_COMPLETED: 'checkin_completed',

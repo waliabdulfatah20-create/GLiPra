@@ -18,10 +18,11 @@
 // DisclaimerBanner tier={2} required per Rule 8 (clinical screen).
 
 import type { BarcodeProduct } from '@/features/food-log/barcode-lookup';
+import type { NutrientKey } from '@/features/food-log/micronutrient-constants';
 import type { RecognitionResult } from '@/features/food-log/photo-recognition';
 import type { RecentFood } from '@/features/food-log/recent-foods';
 
-import type { FoodLogEntry, ManualFoodEntry } from '@/features/food-log/types';
+import type { FoodLogEntry, ManualFoodEntry, SupplementEntry } from '@/features/food-log/types';
 import type { GlipraTokens } from '@/theme/tokens';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as React from 'react';
@@ -43,13 +44,16 @@ import { ManualEntryForm } from '@/components/log/manual-entry-form';
 import { NutritionHeaderRing } from '@/components/log/nutrition-header-ring';
 import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
 import { RecentFoodsRow } from '@/components/log/recent-foods-row';
+import { SupplementPanel } from '@/components/log/supplement-panel';
+import { SupplementQuickAddSheet } from '@/components/log/supplement-quick-add-sheet';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { AiPrivacyDisclaimerModal } from '@/features/food-log/ai-privacy-disclaimer-modal';
 import { AIReviewSheet } from '@/features/food-log/ai-review-sheet';
 import { AnalyzingModal } from '@/features/food-log/analyzing-modal';
 import { DailyMacroCard } from '@/features/food-log/daily-macro-card';
-import { useInsertBarcodeFoodLog, useInsertFoodLog, usePhotoFoodLog, useRecentFoods, useRelogFoodEntry, useTodayFoodLogs } from '@/features/food-log/hooks';
+import { useInsertBarcodeFoodLog, useInsertFoodLog, useInsertSupplementLog, usePhotoFoodLog, useRecentFoods, useRelogFoodEntry, useTodayFoodLogs } from '@/features/food-log/hooks';
 import { MicronutrientWatchCard } from '@/features/food-log/micronutrient-watch-card';
+import { getSupplementNutrient } from '@/features/food-log/supplement';
 import { useAiPrivacyAck } from '@/features/food-log/use-ai-privacy-ack';
 import { transcribeVoice } from '@/features/food-log/voice-recognition';
 import { useTodayData } from '@/features/today/hooks';
@@ -57,7 +61,7 @@ import { analytics, EVENTS } from '@/lib/analytics';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 
-type LogMode = 'manual' | 'barcode';
+type LogMode = 'manual' | 'barcode' | 'supplement';
 
 export default function LogScreen() {
   const { t } = useTranslation();
@@ -65,6 +69,8 @@ export default function LogScreen() {
   const [scannerVisible, setScannerVisible] = React.useState(false);
   // Seeded foods search sheet (Cascade D) — free, zero AI cost.
   const [searchVisible, setSearchVisible] = React.useState(false);
+  // Per-nutrient supplement quick-add — the tapped nutrient (null = sheet closed).
+  const [supplementKey, setSupplementKey] = React.useState<NutrientKey | null>(null);
   // Holds the captured image until the user fills in optional comment context.
   const [pendingCapture, setPendingCapture] = React.useState<{
     base64: string;
@@ -76,6 +82,7 @@ export default function LogScreen() {
   const { mutate: relog } = useRelogFoodEntry();
   const { mutate: insertManual, isLoading: insertingManual } = useInsertFoodLog();
   const { mutate: insertBarcode, isLoading: insertingBarcode } = useInsertBarcodeFoodLog();
+  const { mutate: insertSupplement } = useInsertSupplementLog();
   const {
     recognize,
     pendingResult,
@@ -154,6 +161,14 @@ export default function LogScreen() {
   function handleScannerClose() {
     setScannerVisible(false);
     setMode('manual');
+  }
+
+  // Supplement quick-add — both entry points (watch-card tile + Supplement mode
+  // panel) open the same single-nutrient sheet; the sheet hands back the entry.
+  function handleSupplementAdd(entry: SupplementEntry) {
+    haptics.success();
+    insertSupplement(entry);
+    setSupplementKey(null);
   }
 
   // ── AI Data & Privacy disclaimer ───────────────────────────────────────────
@@ -469,6 +484,23 @@ export default function LogScreen() {
                   {t('log.mode_barcode')}
                 </Text>
               </Pressable>
+
+              <Pressable
+                style={[styles.modeButton, mode === 'supplement' && styles.modeButtonActive]}
+                onPress={() => setMode('supplement')}
+                accessibilityRole="button"
+                accessibilityLabel={t('log.supplement_mode')}
+                accessibilityState={{ selected: mode === 'supplement' }}
+              >
+                <Text
+                  style={[
+                    styles.modeButtonText,
+                    mode === 'supplement' && styles.modeButtonTextActive,
+                  ]}
+                >
+                  {t('log.supplement_mode')}
+                </Text>
+              </Pressable>
             </View>
 
             {/* 5b. Free-logging caption — barcode + manual are never paywalled */}
@@ -482,6 +514,10 @@ export default function LogScreen() {
               />
             )}
 
+            {/* 6c. Supplement quick-add panel (mode === 'supplement') — tap a
+                nutrient to add an amount from your supplement label. Always free. */}
+            {mode === 'supplement' && <SupplementPanel onAdd={setSupplementKey} />}
+
             {/* 6b. Results cluster — daily macro summary + Micronutrient Watch.
                 DailyMacroCard shows only when entries exist; MicronutrientWatchCard
                 self-manages (Pro+data -> grid, Pro+empty -> null, free -> upsell teaser). */}
@@ -494,7 +530,7 @@ export default function LogScreen() {
                 scrollToMicros();
               }}
             >
-              <MicronutrientWatchCard />
+              <MicronutrientWatchCard onAddSupplement={setSupplementKey} />
             </View>
 
             {/* 5. Today's log section header */}
@@ -541,6 +577,14 @@ export default function LogScreen() {
         visible={searchVisible}
         mode="log"
         onClose={() => setSearchVisible(false)}
+      />
+
+      {/* Supplement quick-add sheet — driven by the tapped nutrient (watch-card
+          tile or Supplement-mode panel). One amount per add. */}
+      <SupplementQuickAddSheet
+        nutrient={supplementKey ? getSupplementNutrient(supplementKey) : null}
+        onAdd={handleSupplementAdd}
+        onClose={() => setSupplementKey(null)}
       />
 
       {/* Comment sheet — slides up immediately after capture, before AI call */}
@@ -614,6 +658,7 @@ function FoodLogRow({ entry }: FoodLogRowProps) {
     photo: { badge: rowStyles.sourceBadgePhoto, text: rowStyles.sourceBadgeTextPhoto, labelKey: 'log.source_ai' },
     voice: { badge: rowStyles.sourceBadgeManual, text: rowStyles.sourceBadgeTextManual, labelKey: 'log.source_manual' },
     database: { badge: rowStyles.sourceBadgeDatabase, text: rowStyles.sourceBadgeTextDatabase, labelKey: 'log.source_database' },
+    supplement: { badge: rowStyles.sourceBadgeDatabase, text: rowStyles.sourceBadgeTextDatabase, labelKey: 'log.source_supplement' },
     manual: { badge: rowStyles.sourceBadgeManual, text: rowStyles.sourceBadgeTextManual, labelKey: 'log.source_manual' },
   } as const;
   const sourceBadge = badgeBySource[entry.source] ?? badgeBySource.manual;
@@ -647,20 +692,24 @@ function FoodLogRow({ entry }: FoodLogRowProps) {
         </View>
       </View>
 
-      <View style={rowStyles.logRowRight}>
-        <Text style={rowStyles.logRowProtein}>
-          {entry.proteinG.toFixed(1)}
-          g
-        </Text>
-        <Text style={rowStyles.logRowProteinLabel}>protein</Text>
-        {entry.caloriesKcal != null && (
-          <Text style={rowStyles.logRowCalories}>
-            {entry.caloriesKcal.toFixed(0)}
-            {' '}
-            kcal
+      {/* Supplements carry no macros — the amount reads on the serving line, so
+          the protein column is suppressed (no misleading "0g protein"). */}
+      {entry.source !== 'supplement' && (
+        <View style={rowStyles.logRowRight}>
+          <Text style={rowStyles.logRowProtein}>
+            {entry.proteinG.toFixed(1)}
+            g
           </Text>
-        )}
-      </View>
+          <Text style={rowStyles.logRowProteinLabel}>protein</Text>
+          {entry.caloriesKcal != null && (
+            <Text style={rowStyles.logRowCalories}>
+              {entry.caloriesKcal.toFixed(0)}
+              {' '}
+              kcal
+            </Text>
+          )}
+        </View>
+      )}
     </View>
   );
 }

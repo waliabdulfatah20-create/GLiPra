@@ -64,6 +64,10 @@ export function deriveRecentFoods(
   const byName = new Map<string, RecentFood>();
 
   for (const log of logs) {
+    // Supplements are not foods — they have their own per-nutrient quick-add and
+    // should not appear in the "log again" food bar.
+    if (log.source === 'supplement')
+      continue;
     const key = normalizeFoodName(log.name);
     if (key.length === 0)
       continue;

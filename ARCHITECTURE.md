@@ -819,18 +819,17 @@ dosepath/
 │   │   ├── welcome.tsx
 │   │   └── sign-in.tsx
 │   ├── consent.tsx                       # First-launch consent flow
-│   ├── (onboarding)/
+│   ├── onboarding/
 │   │   ├── _layout.tsx
+│   │   ├── language.tsx                  # Step 0 — language (EN/ES), no step counter
 │   │   ├── medication.tsx                # Step 1 — GLP-1 med + dose (incl. compounded)
 │   │   ├── injection-day.tsx             # Step 2 — injection day / daily
 │   │   ├── body.tsx                      # Step 3 — weight, height, DOB
 │   │   ├── safety.tsx                    # Step 4 — kidney disease, conditions
-│   │   ├── dietary.tsx                   # Step 5 — pattern + allergens
-│   │   ├── goals.tsx                     # Step 6 — muscle preservation / weight / both
-│   │   ├── status.tsx                    # Step 7 — starting / active / tapering / maintenance
-│   │   ├── protein-target.tsx            # Step 8 — protein floor with safety bounds
-│   │   ├── import.tsx                    # Step 9 (optional) — import MFP/Shotsy/Apple Health
-│   │   └── reveal.tsx                    # Step 10 — personalized plan reveal
+│   │   ├── status.tsx                    # Step 5 — starting / active + activity level
+│   │   ├── protein-target.tsx            # Step 6 — protein floor with safety bounds
+│   │   └── reveal.tsx                    # Step 7 — personalized plan reveal
+│   │   # dietary moved to a standalone editor + Settings; goals/import/appearance dropped (session 52)
 │   ├── (tabs)/
 │   │   ├── _layout.tsx
 │   │   ├── today.tsx                     # Readiness Score + protein ring + phase + guidance
@@ -1137,7 +1136,7 @@ dosepath/
 
 ---
 
-## Onboarding Flow — 11 Steps (Language + 10)
+## Onboarding Flow — 8 Steps (Language + 7)
 
 | Step | Screen | Purpose |
 |---|---|---|
@@ -1146,15 +1145,19 @@ dosepath/
 | 2 | injection-day.tsx | Day of week or "daily" |
 | 3 | body.tsx | Weight, height, DOB |
 | 4 | safety.tsx | Kidney disease, pregnancy/lactation — NON-SKIPPABLE |
-| 5 | dietary.tsx | Dietary pattern + allergens + restrictions |
-| 6 | goals.tsx | Muscle preservation / weight / both |
-| 7 | status.tsx | Starting / active / tapering / maintenance — NON-SKIPPABLE |
-| 8 | protein-target.tsx | Protein floor with safety reasoning + disclaimer modal |
-| 9 | import.tsx | Optional — MFP/Shotsy/Apple Health import |
-| 10 | reveal.tsx | Personalized plan reveal |
+| 5 | status.tsx | Starting / active + activity level — NON-SKIPPABLE |
+| 6 | protein-target.tsx | Protein floor with safety reasoning + disclaimer modal |
+| 7 | reveal.tsx | Personalized plan reveal |
 
-Step 0 (language) has no step counter UI — it stands alone before the numbered flow begins.
+Step 0 (language) has no step counter UI — it stands alone before the numbered flow begins;
+steps 1–7 render `step={{ current, total: 7 }}`.
 First-time redirect in (app)/_layout.tsx points to `/onboarding/language`, not `/onboarding/medication`.
+
+**Trimmed in session 52** (`gsd` onboarding redesign): the old `dietary.tsx`, `goals.tsx`,
+`import.tsx`, and `appearance.tsx` steps were removed. Dietary pattern is now collected via a
+standalone editor (a Today nudge + a Settings row), not during onboarding; goals/import/appearance
+were dropped entirely. Session 51 also narrowed `MedicationStatus` to `'starting' | 'active'`
+(tapering + maintenance removed).
 
 ---
 

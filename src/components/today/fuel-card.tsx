@@ -10,6 +10,7 @@
 // Micronutrient Watch card, theme-independent because the gradient reads dark in both).
 
 import type { NutrientStatus } from '@/features/food-log/micronutrient-constants';
+import type { MuscleDisplayFactor } from '@/features/muscle-score/card';
 import type { FiberStatus } from '@/features/today/fuel-card-data';
 import type { GlipraTokens } from '@/theme/tokens';
 
@@ -31,6 +32,7 @@ import { Circle, Svg } from 'react-native-svg';
 import { ProteinRing } from '@/components/today/protein-ring';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { useDailyMacros } from '@/features/food-log/hooks';
+import { useMuscleScore } from '@/features/muscle-score/hooks';
 import { summarizeFiber, summarizeMicros } from '@/features/today/fuel-card-data';
 import { useTodayData } from '@/features/today/hooks';
 import { haptics } from '@/lib/haptics';
@@ -38,14 +40,15 @@ import { useTheme } from '@/lib/ThemeContext';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-// Compact readiness dial rendered on the gradient header (white arc + score).
-function ReadinessDial({ score }: { score: number }) {
+// Compact score dial rendered on the gradient header (white arc + score).
+// Shows "--" when the score is null (not enough data yet).
+function ScoreDial({ score }: { score: number | null }) {
   const size = 60;
   const strokeWidth = 6;
   const r = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * r;
   const center = size / 2;
-  const progress = Math.max(0, Math.min(1, score / 100));
+  const progress = score == null ? 0 : Math.max(0, Math.min(1, score / 100));
 
   const dashOffset = useSharedValue(circumference);
   React.useEffect(() => {
@@ -79,7 +82,9 @@ function ReadinessDial({ score }: { score: number }) {
         />
       </Svg>
       <View style={{ position: 'absolute' }}>
-        <Text style={{ fontSize: 20, fontWeight: '800', color: '#ffffff' }}>{score}</Text>
+        <Text style={{ fontSize: 20, fontWeight: '800', color: '#ffffff' }}>
+          {score == null ? '--' : score}
+        </Text>
       </View>
     </View>
   );
@@ -94,6 +99,7 @@ export function FuelCard() {
   );
 
   const { readinessCard, proteinConsumedG, proteinFloorG, isLoading } = useTodayData();
+  const { card: muscleCard } = useMuscleScore();
   const { fiber, magnesiumMg, zincMg, b12Mcg, vitaminDIu, ironMg, hasMicronutrients }
     = useDailyMacros();
 
@@ -114,9 +120,10 @@ export function FuelCard() {
     : 0;
   const proteinToGo = hasFloor ? Math.max(0, Math.round(proteinFloorG - proteinConsumedG)) : 0;
 
-  const score = readinessCard?.score ?? null;
-  const tip = readinessCard?.tip ?? null;
-  const factors = readinessCard?.factors ?? [];
+  const muscleScore = muscleCard.hasEnoughData ? muscleCard.score : null;
+  const readinessScore = readinessCard?.score ?? null;
+  const tip = muscleCard.tip;
+  const factors = muscleCard.factors;
 
   function fiberColor(status: FiberStatus): string {
     if (status === 'green')
@@ -134,10 +141,14 @@ export function FuelCard() {
     return colors.error;
   }
 
-  function factorColor(sentiment: 'positive' | 'negative', delta: number): string {
-    if (sentiment === 'positive')
+  function muscleFactorColor(factor: MuscleDisplayFactor): string {
+    if (!factor.tracked)
+      return colors.gray300;
+    if (factor.sentiment === 'positive')
       return colors.success;
-    return delta < -10 ? colors.error : colors.warning;
+    if (factor.sentiment === 'negative')
+      return colors.warning;
+    return colors.textSecondary;
   }
 
   return (
@@ -151,20 +162,25 @@ export function FuelCard() {
       >
         <View style={styles.headerRow}>
           <View style={styles.headerLeft}>
-            <Text style={styles.headerLabel}>{t('today.fuel_label')}</Text>
-            {readinessCard && (
-              <Text style={styles.headerHeadline}>{readinessCard.headline}</Text>
-            )}
-            <View style={styles.trustPill}>
-              <Text style={styles.trustPillText}>{t('today.readiness_trust')}</Text>
+            <Text style={styles.headerLabel}>{t('muscle_score.label')}</Text>
+            <Text style={styles.headerHeadline}>{muscleCard.headline}</Text>
+            <View style={styles.pillRow}>
+              <View style={styles.trustPill}>
+                <Text style={styles.trustPillText}>{t('today.readiness_trust')}</Text>
+              </View>
+              {readinessScore != null && (
+                <View style={styles.readinessPill}>
+                  <View style={styles.readinessDot} />
+                  <Text style={styles.readinessPillText}>
+                    {t('today.fuel_readiness_pill', { score: readinessScore })}
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
-          {score != null && (
-            <View style={styles.dialWrap}>
-              <ReadinessDial score={score} />
-              <Text style={styles.dialLabel}>{t('today.readiness_title')}</Text>
-            </View>
-          )}
+          <View style={styles.dialWrap}>
+            <ScoreDial score={muscleScore} />
+          </View>
         </View>
       </LinearGradient>
 
@@ -217,21 +233,16 @@ export function FuelCard() {
               <Animated.View entering={FadeIn.duration(150)} exiting={FadeOut.duration(120)}>
                 <Text style={styles.whyLabel}>{t('today.fuel_why_label')}</Text>
                 {factors.map(factor => (
-                  <View key={factor.label} style={styles.factorRow}>
+                  <View key={factor.id} style={styles.factorRow}>
                     <View
                       style={[
                         styles.factorDot,
-                        { backgroundColor: factorColor(factor.sentiment, factor.delta) },
+                        { backgroundColor: muscleFactorColor(factor) },
                       ]}
                     />
                     <Text style={styles.factorLabel}>{factor.label}</Text>
-                    <Text
-                      style={[
-                        styles.factorDelta,
-                        { color: factorColor(factor.sentiment, factor.delta) },
-                      ]}
-                    >
-                      {factor.delta > 0 ? `+${factor.delta}` : `${factor.delta}`}
+                    <Text style={[styles.factorValue, !factor.tracked && styles.factorValueMuted]}>
+                      {factor.value}
                     </Text>
                   </View>
                 ))}
@@ -363,11 +374,16 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       color: '#ffffff',
       marginTop: 3,
     },
+    pillRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      gap: 6,
+      marginTop: spacing.sm,
+    },
     trustPill: {
       flexDirection: 'row',
-      alignSelf: 'flex-start',
       alignItems: 'center',
-      marginTop: spacing.sm,
       backgroundColor: 'rgba(255,255,255,0.16)',
       borderWidth: 1,
       borderColor: 'rgba(255,255,255,0.25)',
@@ -380,16 +396,30 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       fontWeight: '600',
       color: '#ffffff',
     },
+    readinessPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5,
+      backgroundColor: 'rgba(255,255,255,0.16)',
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.25)',
+      borderRadius: radius.full,
+      paddingHorizontal: 9,
+      paddingVertical: 3,
+    },
+    readinessDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: '#ffffff',
+    },
+    readinessPillText: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: '#ffffff',
+    },
     dialWrap: {
       alignItems: 'center',
-    },
-    dialLabel: {
-      fontSize: 11,
-      fontWeight: '700',
-      letterSpacing: 1,
-      textTransform: 'uppercase',
-      color: 'rgba(255,255,255,0.85)',
-      marginTop: 3,
     },
     body: {
       padding: spacing.lg,
@@ -468,9 +498,15 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       fontSize: 13,
       color: colors.textPrimary,
     },
-    factorDelta: {
+    factorValue: {
       fontSize: 13,
       fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    factorValueMuted: {
+      fontSize: 13,
+      fontWeight: '500',
+      color: colors.textSecondary,
     },
     spotsRow: {
       flexDirection: 'row',

@@ -627,6 +627,7 @@
     "fuel_micros_on_track": "{{count}} de {{total}} en buen nivel",
     "fuel_protein_to_floor": "{{pct}}% del mínimo",
     "fuel_protein_to_go": "Faltan {{grams}} g para proteger tu músculo hoy",
+    "fuel_readiness_pill": "Preparación {{score}}",
     "fuel_why_label": "Qué afecta tu puntuación",
     "fuel_why_toggle": "¿Por qué?",
     "greeting_afternoon": "Buenas tardes",

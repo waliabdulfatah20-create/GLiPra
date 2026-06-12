@@ -627,6 +627,7 @@
     "fuel_micros_on_track": "{{count}} of {{total}} on track",
     "fuel_protein_to_floor": "{{pct}}% to floor",
     "fuel_protein_to_go": "{{grams}} g to go to protect muscle today",
+    "fuel_readiness_pill": "Readiness {{score}}",
     "fuel_why_label": "What's moving your score",
     "fuel_why_toggle": "Why?",
     "greeting_afternoon": "Good afternoon",

@@ -23,7 +23,6 @@ import { ContentCardSheet } from '@/components/today/content-card-sheet';
 import { DailyGuidanceCard } from '@/components/today/daily-guidance-card';
 import { DoseWindowCard } from '@/components/today/dose-window-card';
 import { FuelCard } from '@/components/today/fuel-card';
-import { MuscleScoreCard } from '@/components/today/muscle-score-card';
 import { PharmacistSpotlightCard } from '@/components/today/pharmacist-spotlight-card';
 import { StreakCard } from '@/components/today/streak-card';
 import {
@@ -303,11 +302,8 @@ export function TodayScreen() {
         {/* ── Content area — padded, sits below the gradient hero ─ */}
         <View style={styles.contentArea}>
 
-          {/* ── Today's Fuel (hero): protein + readiness + fiber + micros ── */}
+          {/* ── Muscle Preservation hero: muscle score + protein + readiness + fiber + micros ── */}
           <FuelCard />
-
-          {/* ── Muscle Preservation Score (the core promise) ── */}
-          <MuscleScoreCard />
 
           {/* ── Daily Actions ─────────────────────────────────────── */}
           <SectionLabel label={t('today.daily_actions')} />

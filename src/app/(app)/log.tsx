@@ -53,6 +53,7 @@ import { MicronutrientWatchCard } from '@/features/food-log/micronutrient-watch-
 import { useAiPrivacyAck } from '@/features/food-log/use-ai-privacy-ack';
 import { transcribeVoice } from '@/features/food-log/voice-recognition';
 import { useTodayData } from '@/features/today/hooks';
+import { analytics, EVENTS } from '@/lib/analytics';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 
@@ -168,6 +169,14 @@ export default function LogScreen() {
     | null
   >(null);
   const pendingVoiceResolverRef = React.useRef<((ok: boolean) => void) | null>(null);
+  // Rescan: the last photo sent to recognition, kept alive until the review
+  // sheet closes so "Rescan photo" can re-run on the same bytes with a new
+  // hint. A ref (not state) so it never interacts with the AnalyzingModal's
+  // visibility logic and triggers no re-renders.
+  const lastPhotoRef = React.useRef<{
+    base64: string;
+    mime: 'image/jpeg' | 'image/png' | 'image/webp';
+  } | null>(null);
 
   // ── Analyzing modal state ─────────────────────────────────────────────────
   // Tracks which capture flow is currently being analyzed so a single modal can
@@ -200,6 +209,7 @@ export default function LogScreen() {
     mime: 'image/jpeg' | 'image/png' | 'image/webp',
     comment: string | undefined,
   ) {
+    lastPhotoRef.current = { base64, mime };
     setAnalyzingSource('photo');
     setAnalyzingImage({ base64, mime });
     setAnalyzingError(null);
@@ -315,6 +325,7 @@ export default function LogScreen() {
     setModalComplete(false);
     clearPending();
     setVoiceResult(null);
+    lastPhotoRef.current = null;
   }, [clearPending]);
 
   const handleAnalyzingRetry = React.useCallback(() => {
@@ -343,6 +354,22 @@ export default function LogScreen() {
   function handlePhotoReviewClose() {
     clearPending();
     setModalComplete(false);
+    lastPhotoRef.current = null;
+  }
+
+  // "Rescan photo" from the review sheet — re-run recognition on the same
+  // bytes with an optional new hint. Closes the sheet WITHOUT clearing
+  // lastPhotoRef (not handlePhotoReviewClose) so a second rescan still works.
+  // User-initiated, one AI call per tap; the server-side daily cap applies.
+  function handleRescan(comment?: string) {
+    const photo = lastPhotoRef.current;
+    if (!photo)
+      return;
+    analytics.capture(EVENTS.PHOTO_RESCANNED, { source: 'photo' });
+    clearPending();
+    setModalComplete(false);
+    setAnalyzingComment(comment);
+    runPhotoRecognize(photo.base64, photo.mime, comment);
   }
 
   function handleVoiceReviewClose() {
@@ -552,6 +579,8 @@ export default function LogScreen() {
       <AIReviewSheet
         result={modalComplete && analyzingSource == null ? pendingResult : null}
         onClose={handlePhotoReviewClose}
+        onRescan={handleRescan}
+        rescanInitialComment={analyzingComment}
       />
 
       {/* Voice review sheet — opens AFTER analyzing modal finishes */}

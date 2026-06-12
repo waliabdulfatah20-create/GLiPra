@@ -29,6 +29,7 @@ import {
   View,
 } from 'react-native';
 import { FoodSearchSheet } from '@/components/log/food-search-sheet';
+import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
 import { useTheme } from '@/lib/ThemeContext';
 import { seededFoodToFormPatch, seededFoodToLogEntry } from './food-search';
 import { useConfirmPhotoLog, useUserFoodDefault } from './hooks';
@@ -51,6 +52,14 @@ export type AIReviewSheetProps = {
   onClose: () => void;
   /** Populated on voice entries — the Whisper transcript spoken by the user. */
   transcript?: string;
+  /**
+   * Photo entries only — re-runs recognition on the same photo. Tapping the
+   * Rescan link opens a comment sheet so the user can add a hint first; the
+   * (possibly empty) hint is handed back here.
+   */
+  onRescan?: (comment?: string) => void;
+  /** Pre-fills the rescan comment sheet with the hint from the original scan. */
+  rescanInitialComment?: string;
 };
 
 // ---------------------------------------------------------------------------
@@ -147,7 +156,7 @@ function parseEntry(form: FormState): PhotoFoodEntry {
 // Component
 // ---------------------------------------------------------------------------
 
-export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProps) {
+export function AIReviewSheet({ result, onClose, transcript, onRescan, rescanInitialComment }: AIReviewSheetProps) {
   const { t, i18n } = useTranslation();
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
@@ -182,6 +191,9 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
   // the form fields; the normal confirm flow then proceeds unchanged, so the
   // original AI name still drives correction-learning.
   const [searchVisible, setSearchVisible] = React.useState(false);
+
+  // "Rescan photo" hint sheet — photo entries only (gated on onRescan).
+  const [rescanVisible, setRescanVisible] = React.useState(false);
 
   const applyFood = React.useCallback((food: SeededFood) => {
     // Block the late-resolving personal-defaults effect from clobbering the patch.
@@ -405,6 +417,18 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
               <Text style={styles.wrongFoodLink}>{t('log.wrong_food_link')}</Text>
             </Pressable>
 
+            {/* Rescan photo — re-run the AI on the same photo with an optional
+                new hint. Photo entries only (the voice instance passes no onRescan). */}
+            {onRescan && (
+              <Pressable
+                onPress={() => setRescanVisible(true)}
+                accessibilityRole="button"
+                accessibilityLabel={t('log.rescan_link')}
+              >
+                <Text style={styles.wrongFoodLink}>{t('log.rescan_link')}</Text>
+              </Pressable>
+            )}
+
             <PortionMultiplier
               value={multiplier}
               onChange={handleMultiplierChange}
@@ -535,6 +559,21 @@ export function AIReviewSheet({ result, onClose, transcript }: AIReviewSheetProp
         onClose={() => setSearchVisible(false)}
         onSelect={applyFood}
       />
+
+      {/* Rescan hint sheet — nested inside this Modal's content tree so it
+          stacks correctly on iOS (same pattern as FoodSearchSheet). Analyze
+          hands the hint to onRescan; dismiss keeps the review form intact. */}
+      {onRescan && (
+        <PhotoCommentSheet
+          visible={rescanVisible}
+          initialComment={rescanInitialComment}
+          onAnalyze={(comment) => {
+            setRescanVisible(false);
+            onRescan(comment);
+          }}
+          onDismiss={() => setRescanVisible(false)}
+        />
+      )}
     </Modal>
   );
 }

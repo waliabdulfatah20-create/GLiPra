@@ -26,6 +26,7 @@ export const EVENTS = {
   FOOD_LOGGED_PHOTO: 'food_logged_photo',
   FOOD_LOGGED_RELOG: 'food_logged_relog', // one-tap re-log from Recent Foods
   FOOD_LOGGED_DATABASE: 'food_logged_database', // seeded foods search (Cascade D)
+  PHOTO_RESCANNED: 'photo_rescanned', // review-sheet Rescan — re-ran recognition on the same photo
 
   // Check-in
   CHECKIN_COMPLETED: 'checkin_completed',

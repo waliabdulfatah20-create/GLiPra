@@ -30,9 +30,11 @@ type Props = {
   /** Called when user taps Analyze. `comment` is undefined when skipped. */
   onAnalyze: (comment?: string) => void;
   onDismiss: () => void;
+  /** Pre-fills the input on open — used by the review sheet's Rescan flow. */
+  initialComment?: string;
 };
 
-export function PhotoCommentSheet({ visible, onAnalyze, onDismiss }: Props) {
+export function PhotoCommentSheet({ visible, onAnalyze, onDismiss, initialComment }: Props) {
   const { t } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const styles = React.useMemo(
@@ -41,11 +43,12 @@ export function PhotoCommentSheet({ visible, onAnalyze, onDismiss }: Props) {
   );
   const [comment, setComment] = React.useState('');
 
-  // Reset comment text whenever the sheet opens for a fresh capture.
+  // Reset comment text whenever the sheet opens — empty for a fresh capture,
+  // pre-filled with the previous hint when reopened via Rescan.
   React.useEffect(() => {
     if (visible)
-      setComment('');
-  }, [visible]);
+      setComment(initialComment ?? '');
+  }, [visible, initialComment]);
 
   function handleAnalyze() {
     const trimmed = comment.trim();

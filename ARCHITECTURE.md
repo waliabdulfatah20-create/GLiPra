@@ -1267,9 +1267,13 @@ export function calculateReadinessScore(input: {
 }
 ```
 
-The Readiness Score is the PRIMARY element on Today screen.
-Larger font than the protein ring. One number + one line of contextual guidance.
-Clinically grounded in pharmacokinetics, not a subjective wellness gimmick.
+Historically the Readiness Score was the PRIMARY element on the Today screen. As of
+session 59 (see Decisions Log, 2026-06-11) the **Muscle Preservation Score** is the
+Today hero dial (inside the Fuel card); the Readiness Score is still computed by this
+calculator but is now shown as a compact "Readiness NN" pill within the Fuel hero, and
+its dose/symptom detail continues to drive the Dose tab. Both scores stay clinically
+grounded (readiness in pharmacokinetics; muscle in protein + resistance consistency),
+not subjective wellness gimmicks.
 
 ### Streak Rules
 
@@ -2258,7 +2262,7 @@ export const colors = {
 **Typography:** DM Serif Display (hero, numbers) + DM Sans (all UI text)
 
 **Key Rules:**
-- Readiness Score: minimum 96px on Today screen
+- Today hero score dial: minimum 96px (Muscle Preservation Score as of session 59; was the Readiness Score pre-merge)
 - Protein ring: minimum 200px diameter
 - Buttons: height 56, borderRadius 14
 - Cards: borderRadius 16, subtle border

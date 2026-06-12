@@ -4,6 +4,7 @@
  * asserted via key strings (e.g. 'today.fuel_micros_on_track'); the muscle headline /
  * tip / factor labels + values are literals supplied via the mocked useMuscleScore.
  */
+import { router } from 'expo-router';
 import * as React from 'react';
 
 import { useDailyMacros } from '@/features/food-log/hooks';
@@ -78,6 +79,13 @@ describe('fuel card', () => {
     expect(screen.getByText('muscle_score.label')).toBeTruthy();
     expect(screen.getByText('today.readiness_trust')).toBeTruthy();
     expect(screen.getByText('today.fuel_readiness_pill')).toBeTruthy(); // readiness pill
+  });
+
+  it('deep-links to the Micronutrient Watch when the micros tile is tapped', () => {
+    setup();
+    render(<FuelCard />);
+    fireEvent.press(screen.getByLabelText('today.fuel_micros_label'));
+    expect(router.push).toHaveBeenCalledWith('/log?scrollTo=micros');
   });
 
   it('renders the protein ring values and the to-floor copy', () => {

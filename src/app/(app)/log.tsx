@@ -23,6 +23,7 @@ import type { RecentFood } from '@/features/food-log/recent-foods';
 
 import type { FoodLogEntry, ManualFoodEntry } from '@/features/food-log/types';
 import type { GlipraTokens } from '@/theme/tokens';
+import { router, useLocalSearchParams } from 'expo-router';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -86,6 +87,28 @@ export default function LogScreen() {
     () => makeStyles({ colors, spacing, radius, shadows }),
     [colors, spacing, radius, shadows],
   );
+
+  // ── Deep-link scroll to the Micronutrient Watch ────────────────────────────
+  // The Today Fuel card's Micronutrients tile pushes `/log?scrollTo=micros`. We
+  // capture the micro card's content offset via onLayout and scroll the list to
+  // it, then consume the param (setParams undefined) so a later tab focus does
+  // not re-scroll. microYRef stays 0 when the card is absent (no micros logged),
+  // in which case we leave the user at the top.
+  const { scrollTo } = useLocalSearchParams<{ scrollTo?: string }>();
+  const listRef = React.useRef<FlatList<FoodLogEntry>>(null);
+  const microYRef = React.useRef(0);
+
+  const scrollToMicros = React.useCallback(() => {
+    if (scrollTo !== 'micros' || microYRef.current <= 0)
+      return;
+    listRef.current?.scrollToOffset({
+      offset: Math.max(0, microYRef.current - spacing.lg),
+      animated: true,
+    });
+    router.setParams({ scrollTo: undefined });
+  }, [scrollTo, spacing.lg]);
+
+  React.useEffect(scrollToMicros, [scrollToMicros]);
 
   // ---------------------------------------------------------------------------
   // Handlers
@@ -342,6 +365,7 @@ export default function LogScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <FlatList
+        ref={listRef}
         data={logs}
         keyExtractor={item => item.id}
         ListHeaderComponent={(
@@ -435,7 +459,16 @@ export default function LogScreen() {
                 DailyMacroCard shows only when entries exist; MicronutrientWatchCard
                 self-manages (Pro+data -> grid, Pro+empty -> null, free -> upsell teaser). */}
             {logs.length > 0 && <DailyMacroCard />}
-            <MicronutrientWatchCard />
+            <View
+              onLayout={(e) => {
+                const { y, height } = e.nativeEvent.layout;
+                // height 0 == card rendered null (no micros) -> leave the user at the top.
+                microYRef.current = height > 0 ? y : 0;
+                scrollToMicros();
+              }}
+            >
+              <MicronutrientWatchCard />
+            </View>
 
             {/* 5. Today's log section header */}
             {logs.length > 0 && (

@@ -280,7 +280,7 @@ export function FuelCard() {
 
           <Pressable
             style={styles.tile}
-            onPress={() => { haptics.tap(); router.push('/log'); }}
+            onPress={() => { haptics.tap(); router.push('/log?scrollTo=micros'); }}
             accessibilityRole="button"
             accessibilityLabel={t('today.fuel_micros_label')}
           >

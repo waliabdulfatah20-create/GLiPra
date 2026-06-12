@@ -813,12 +813,14 @@ For PR creation and issue management from Claude.
 
 ```
 dosepath/
-├── app/
+├── app/                                  # = src/app/ (Expo Router file-based routes)
 │   ├── (auth)/
 │   │   ├── _layout.tsx
 │   │   ├── welcome.tsx
-│   │   └── sign-in.tsx
-│   ├── consent.tsx                       # First-launch consent flow
+│   │   ├── sign-in.tsx
+│   │   ├── sign-up.tsx
+│   │   ├── forgot-password.tsx
+│   │   └── consent.tsx                   # First-launch consent flow
 │   ├── onboarding/
 │   │   ├── _layout.tsx
 │   │   ├── language.tsx                  # Step 0 — language (EN/ES), no step counter
@@ -830,39 +832,36 @@ dosepath/
 │   │   ├── protein-target.tsx            # Step 6 — protein floor with safety bounds
 │   │   └── reveal.tsx                    # Step 7 — personalized plan reveal
 │   │   # dietary moved to a standalone editor + Settings; goals/import/appearance dropped (session 52)
-│   ├── (tabs)/
-│   │   ├── _layout.tsx
-│   │   ├── today.tsx                     # Readiness Score + protein ring + phase + guidance
-│   │   ├── log.tsx                       # Logging hub
-│   │   ├── insights.tsx                  # Trends + micronutrients + adherence
-│   │   └── learn.tsx                     # Pharmacist content cards
-│   ├── log-meal/
-│   │   ├── camera.tsx                    # Photo (Pro)
-│   │   ├── barcode.tsx                   # Barcode (Free)
-│   │   ├── voice.tsx                     # Voice/hybrid text
-│   │   ├── search.tsx                    # Manual search
-│   │   └── confirm.tsx                   # Review + confirm
-│   ├── settings/
-│   │   ├── _layout.tsx
-│   │   ├── index.tsx
-│   │   ├── profile.tsx
-│   │   ├── medication.tsx
-│   │   ├── notifications.tsx
-│   │   ├── linked-accounts.tsx
-│   │   ├── data.tsx                      # Export, delete, import
-│   │   ├── language.tsx
-│   │   └── about.tsx                     # Disclaimers, T&C, version
-│   ├── prescriber-visit/
-│   │   ├── new.tsx
-│   │   ├── [id]/prep.tsx
-│   │   └── [id]/report.tsx
-│   ├── share/
-│   │   └── streak.tsx
-│   ├── checkin.tsx
-│   ├── weight.tsx
-│   ├── paywall.tsx
-│   ├── _layout.tsx
-│   └── +not-found.tsx
+│   ├── (app)/                           # Authenticated group — 5 tabs + pushed detail routes
+│   │   ├── _layout.tsx                   # Tabs navigator (GlipraTabBar)
+│   │   ├── index.tsx                     # Tab 1 — Today (Muscle Preservation hero + Fuel card)
+│   │   ├── dose.tsx                      # Tab 2 — Dose hub (route-aware: injection / oral)
+│   │   ├── log.tsx                       # Tab 3 — Nutrition (logging hub)
+│   │   ├── progress.tsx                  # Tab 4 — Progress (trends, muscle-score, adherence)
+│   │   ├── coach.tsx                     # Tab 5 — AI Nutrition Coach
+│   │   ├── check-in.tsx                  # Daily check-in (nausea / energy / water)
+│   │   ├── weight.tsx                    # Log weight
+│   │   ├── goal-weight.tsx               # Edit goal weight
+│   │   ├── add-shot.tsx                  # Log an injection
+│   │   ├── edit-shot.tsx                 # Edit an injection
+│   │   ├── injection-sites.tsx           # Legacy site map (hidden, href:null — old deep links)
+│   │   ├── shot-prep.tsx                 # Shot-day prep checklist
+│   │   ├── medication-level.tsx          # PK level estimator + curve
+│   │   ├── visit-prep.tsx                # Prescriber visit prep + PDF
+│   │   ├── protein-target.tsx            # Protein-target editor (recompute floor)
+│   │   ├── dietary-preference.tsx        # Standalone dietary editor (session 52)
+│   │   ├── resistance.tsx                # Log a resistance session
+│   │   ├── update-status.tsx             # Edit medication status
+│   │   ├── journey.tsx                   # Milestones / journey cards
+│   │   ├── health-import.tsx             # Apple Health / Health Connect import
+│   │   ├── settings.tsx                  # Settings (single screen)
+│   │   ├── paywall.tsx                   # RevenueCat paywall
+│   │   └── legal/
+│   │       ├── privacy-policy.tsx
+│   │       └── terms-of-service.tsx
+│   ├── _layout.tsx                       # Root layout (auth gate + AppState token refresh)
+│   ├── +html.tsx                         # Web HTML shell
+│   └── [...messing].tsx                  # Catch-all (404)
 │
 ├── src/
 │   ├── components/

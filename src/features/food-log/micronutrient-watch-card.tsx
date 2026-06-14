@@ -147,28 +147,34 @@ function NutrientTile({ label, value, unit, rda, styles, t, onPress }: NutrientT
 
   const inner = (
     <>
-      <View style={[styles.statusDot, dotColorStyle]} />
-      {onPress && <Text style={styles.tilePlus}>+</Text>}
-      <Text style={styles.tileName}>{label}</Text>
-      <Text style={styles.tileValue}>
-        {display}
-        <Text style={styles.tileUnit}>
-          {' '}
-          {unit}
+      <View style={styles.tileMain}>
+        <View style={[styles.statusDot, dotColorStyle]} />
+        <Text style={styles.tileName}>{label}</Text>
+        <Text style={styles.tileValue}>
+          {display}
+          <Text style={styles.tileUnit}>
+            {' '}
+            {unit}
+          </Text>
         </Text>
-      </Text>
-      <Text style={styles.tilePct}>
-        {pct >= 100 ? t('log.goal_met') : t('log.pct_of_goal', { pct })}
-      </Text>
-      <View style={styles.barBg}>
-        <View
-          style={[
-            styles.barFill,
-            barColorStyle,
-            { width: `${pct}%` as `${number}%` },
-          ]}
-        />
+        <Text style={styles.tilePct}>
+          {pct >= 100 ? t('log.goal_met') : t('log.pct_of_goal', { pct })}
+        </Text>
+        <View style={styles.barBg}>
+          <View
+            style={[
+              styles.barFill,
+              barColorStyle,
+              { width: `${pct}%` as `${number}%` },
+            ]}
+          />
+        </View>
       </View>
+      {onPress && (
+        <View style={styles.tilePlusCircle}>
+          <Text style={styles.tilePlusText}>+</Text>
+        </View>
+      )}
     </>
   );
 
@@ -266,9 +272,15 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     tile: {
       flex: 1,
       minWidth: '45%',
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
       backgroundColor: colors.gray50,
       borderRadius: radius.md,
       padding: spacing.sm + 2,
+    },
+    tileMain: {
+      flex: 1,
       position: 'relative',
     },
     statusDot: {
@@ -282,12 +294,17 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     statusDotGreen: { backgroundColor: colors.success },
     statusDotAmber: { backgroundColor: colors.warning },
     statusDotRed: { backgroundColor: colors.error },
-    tilePlus: {
-      position: 'absolute',
-      bottom: 6,
-      right: 9,
-      fontSize: 16,
-      lineHeight: 18,
+    tilePlusCircle: {
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      backgroundColor: colors.primaryLight,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    tilePlusText: {
+      fontSize: 18,
+      lineHeight: 20,
       fontWeight: '700',
       color: colors.primary,
     },

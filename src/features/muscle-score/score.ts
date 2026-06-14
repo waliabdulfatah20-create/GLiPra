@@ -10,7 +10,9 @@
  * A user is never penalized for a lever they have not had the chance to track:
  * if a lever has no data yet, its weight re-normalizes onto the tracked lever,
  * so a brand-new protein-logger is not capped at 70 for never having logged a
- * workout. Once a lever HAS data (>= 1 resolved week of resistance), it counts.
+ * workout. Once a lever HAS data it counts; resistance is fed via
+ * `deriveResistanceInput`, which counts the current in-progress week's sessions
+ * (not only resolved past weeks), so logging this week marks resistance tracked.
  *
  * Pure functions only: no Supabase, no React, no Date. Safety-adjacent, so it
  * carries thorough branch tests (named `score.ts`, not `calculator.ts`, to stay

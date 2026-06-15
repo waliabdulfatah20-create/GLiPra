@@ -4,6 +4,7 @@ import * as React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/lib/ThemeContext';
 
+import { presentPaywall } from './present-paywall';
 import { useSubscription } from './use-subscription';
 
 type ProGateProps = {
@@ -44,17 +45,7 @@ export function ProGate({ children, featureName, fallback }: ProGateProps) {
       <Text style={styles.price}>$9.99/month · $79.99/year</Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => {
-          try {
-            const { RevenueCatUI } = require('react-native-purchases-ui');
-            RevenueCatUI.presentPaywallIfNeeded({
-              requiredEntitlementIdentifier: 'GLiPra Pro',
-            });
-          }
-          catch {
-            // Native module not available in Expo Go — silent no-op
-          }
-        }}
+        onPress={() => presentPaywall(featureName)}
         accessibilityRole="button"
         accessibilityLabel="Upgrade to Pro"
       >

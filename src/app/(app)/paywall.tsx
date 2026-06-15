@@ -5,13 +5,14 @@
 // Usage from any screen:
 //   router.push('/paywall');
 
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as React from 'react';
 
 import { PaywallScreen } from '@/features/subscription/paywall-screen';
 
 export default function PaywallRoute() {
   const router = useRouter();
+  const { feature } = useLocalSearchParams<{ feature?: string }>();
 
   function handleDismiss() {
     if (router.canGoBack()) {
@@ -21,7 +22,7 @@ export default function PaywallRoute() {
 
   return (
     <PaywallScreen
-      featureName="GLiPra Pro"
+      featureName={feature ?? 'GLiPra Pro'}
       onDismiss={handleDismiss}
     />
   );

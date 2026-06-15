@@ -23,6 +23,7 @@ import {
 
 import { VoiceCaptureButton } from '@/components/log/voice-capture-button';
 import { Camera, Crown, Microphone } from '@/components/ui/icons';
+import { presentPaywall } from '@/features/subscription/present-paywall';
 import { useSubscription } from '@/features/subscription/use-subscription';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
@@ -34,16 +35,6 @@ type AiCaptureHeroProps = {
   isLoadingPhoto: boolean;
   onBeforeRecord?: () => Promise<boolean>;
 };
-
-function openPaywall() {
-  try {
-    const { RevenueCatUI } = require('react-native-purchases-ui');
-    RevenueCatUI.presentPaywallIfNeeded({ requiredEntitlementIdentifier: 'GLiPra Pro' });
-  }
-  catch {
-    // Native module not available in Expo Go — silent no-op.
-  }
-}
 
 export function AiCaptureHero({
   onAudioCaptured,
@@ -89,7 +80,7 @@ export function AiCaptureHero({
   function handleSpeak() {
     haptics.medium();
     if (!isPro) {
-      openPaywall();
+      presentPaywall('Voice logging');
       return;
     }
     setRecording(true);
@@ -100,7 +91,7 @@ export function AiCaptureHero({
       return;
     haptics.medium();
     if (!isPro) {
-      openPaywall();
+      presentPaywall('AI photo recognition');
       return;
     }
     void launchCamera();

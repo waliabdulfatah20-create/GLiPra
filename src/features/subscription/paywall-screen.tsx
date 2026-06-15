@@ -64,7 +64,6 @@ const PRO_BENEFITS = [
   'Micronutrient watch',
   'Unlimited protein history',
   'Prescriber visit prep & PDF export',
-  'Linked accounts',
 ] as const;
 
 // ---------------------------------------------------------------------------

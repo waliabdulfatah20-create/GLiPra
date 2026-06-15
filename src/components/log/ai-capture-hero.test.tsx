@@ -6,13 +6,16 @@
 import * as ImagePicker from 'expo-image-picker';
 import * as React from 'react';
 
+import { presentPaywall } from '@/features/subscription/present-paywall';
 import { cleanup, fireEvent, render, screen } from '@/lib/test-utils';
 
 import { AiCaptureHero } from './ai-capture-hero';
 
+const mockIsPro = jest.fn(() => true);
 jest.mock('@/features/subscription/use-subscription', () => ({
-  useSubscription: () => ({ isPro: true }),
+  useSubscription: () => ({ isPro: mockIsPro() }),
 }));
+jest.mock('@/features/subscription/present-paywall', () => ({ presentPaywall: jest.fn() }));
 jest.mock('@/lib/haptics', () => ({ haptics: { medium: jest.fn() } }));
 jest.mock('@/components/log/voice-capture-button', () => {
   const ReactLib = require('react');
@@ -44,6 +47,7 @@ describe('ai capture hero', () => {
   afterEach(() => {
     cleanup();
     jest.clearAllMocks();
+    mockIsPro.mockReturnValue(true); // restore default (clearAllMocks keeps impl)
   });
 
   it('renders the Speak and Snap halves plus the PRO pill when idle', () => {
@@ -70,5 +74,21 @@ describe('ai capture hero', () => {
     setup({ isLoadingVoice: true });
     expect(screen.queryByTestId('ai-hero-speak')).toBeNull();
     expect(screen.queryByTestId('voice-recording')).toBeNull();
+  });
+
+  it('opens the paywall (not recording) when a free user taps Speak', () => {
+    mockIsPro.mockReturnValue(false);
+    setup();
+    fireEvent.press(screen.getByTestId('ai-hero-speak'));
+    expect(presentPaywall).toHaveBeenCalledWith('Voice logging');
+    expect(screen.queryByTestId('voice-recording')).toBeNull();
+  });
+
+  it('opens the paywall (no camera) when a free user taps Snap', () => {
+    mockIsPro.mockReturnValue(false);
+    setup();
+    fireEvent.press(screen.getByTestId('ai-hero-snap'));
+    expect(presentPaywall).toHaveBeenCalledWith('AI photo recognition');
+    expect(ImagePicker.requestCameraPermissionsAsync).not.toHaveBeenCalled();
   });
 });

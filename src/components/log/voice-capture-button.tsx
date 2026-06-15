@@ -23,8 +23,7 @@ import {
   Text,
   View,
 } from 'react-native';
-// RevenueCat paywall — same import as photo-capture-button.tsx
-import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
+import { presentPaywall } from '@/features/subscription/present-paywall';
 import { useSubscription } from '@/features/subscription/use-subscription';
 import { haptics } from '@/lib/haptics';
 
@@ -110,19 +109,10 @@ export function VoiceCaptureButton({ onAudioCaptured, isLoading, onBeforeRecord,
     if (autoStart)
       return;
 
-    // Pro gate — show paywall for non-Pro users
+    // Pro gate — open the Upgrade-to-Pro paywall for non-Pro users, then bail.
     if (!isPro) {
-      const result = await RevenueCatUI.presentPaywallIfNeeded({
-        requiredEntitlementIdentifier: 'GLiPra Pro',
-      });
-      // Only PURCHASED and RESTORED are valid fall-throughs — all other outcomes exit.
-      if (
-        result === PAYWALL_RESULT.NOT_PRESENTED
-        || result === PAYWALL_RESULT.CANCELLED
-        || result === PAYWALL_RESULT.ERROR
-      ) {
-        return;
-      }
+      presentPaywall('Voice logging');
+      return;
     }
 
     // Mic permission

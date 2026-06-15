@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useDailyMacros } from '@/features/food-log/hooks';
 import { composeInsight } from '@/features/food-log/pro-insight-helpers';
+import { presentPaywall } from '@/features/subscription/present-paywall';
 import { useSubscription } from '@/features/subscription/use-subscription';
 import { useTodayData } from '@/features/today/hooks';
 import { haptics } from '@/lib/haptics';
@@ -29,18 +30,6 @@ export type ProInsightCardProps = {
   /** Protein in this meal (from the AI review form, live as the user edits). */
   mealProteinG: number;
 };
-
-function openPaywall() {
-  try {
-    const { RevenueCatUI } = require('react-native-purchases-ui');
-    RevenueCatUI.presentPaywallIfNeeded({
-      requiredEntitlementIdentifier: 'GLiPra Pro',
-    });
-  }
-  catch {
-    // Native module not available in Expo Go — silent no-op.
-  }
-}
 
 export function ProInsightCard({ mealProteinG }: ProInsightCardProps) {
   const { t } = useTranslation();
@@ -69,7 +58,7 @@ export function ProInsightCard({ mealProteinG }: ProInsightCardProps) {
       <Pressable
         onPress={() => {
           haptics.tap();
-          openPaywall();
+          presentPaywall('Pro insights');
         }}
         accessibilityRole="button"
         accessibilityLabel={t('pro_insight.teaser')}

@@ -5,6 +5,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { formatDateInput, isNotFuture, parseMdyToIso } from '@/features/medication/date-input';
 import { ChoiceChip } from '@/features/onboarding/components/choice-chip';
 import { OnboardingScaffold } from '@/features/onboarding/components/onboarding-scaffold';
 import { StepFooter } from '@/features/onboarding/components/step-footer';
@@ -36,29 +37,6 @@ function hourLabel(h: number): string {
   return format(new Date(2000, 0, 1, h, 0), 'h:mm a');
 }
 
-function formatDateInput(raw: string): string {
-  const digits = raw.replace(/\D/g, '');
-  if (digits.length <= 2)
-    return digits;
-  if (digits.length <= 4)
-    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`;
-}
-
-function parseMdyToIso(mdy: string): string | null {
-  const parts = mdy.split('/');
-  if (parts.length !== 3)
-    return null;
-  const [mm, dd, yyyy] = parts;
-  if (!mm || !dd || !yyyy || yyyy.length < 4)
-    return null;
-  const iso = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime()))
-    return null;
-  return iso;
-}
-
 export default function InjectionDayScreen() {
   const router = useRouter();
   const setFormData = useOnboardingStore.use.setFormData();
@@ -74,10 +52,13 @@ export default function InjectionDayScreen() {
   const { colors, spacing, radius } = useTheme();
   const styles = React.useMemo(() => makeStyles({ colors, spacing, radius }), [colors, spacing, radius]);
 
+  const todayIso = React.useMemo(() => format(new Date(), 'yyyy-MM-dd'), []);
   const needsDayPicker = frequency === 'weekly' || frequency === 'biweekly';
   const isoDate = parseMdyToIso(lastInjectionDate);
+  // A future last-injection date breaks the cycle phase math, so reject it here.
+  const lastInjectionValid = isoDate !== null && isNotFuture(isoDate, todayIso);
   const injCanProceed
-    = frequency !== null && (frequency === 'daily' || dayOfWeek !== null) && isoDate !== null;
+    = frequency !== null && (frequency === 'daily' || dayOfWeek !== null) && lastInjectionValid;
 
   const isoStartDate = parseMdyToIso(startDate);
   const oralCanProceed = doseHour !== null && isoStartDate !== null;
@@ -193,7 +174,7 @@ export default function InjectionDayScreen() {
 
               <Text style={[styles.sectionLabel, styles.sectionLabelTop]}>LAST INJECTION DATE</Text>
               <TextInput
-                style={[styles.textInput, lastInjectionDate.length > 0 && isoDate === null && styles.textInputError]}
+                style={[styles.textInput, lastInjectionDate.length > 0 && !lastInjectionValid && styles.textInputError]}
                 value={lastInjectionDate}
                 onChangeText={text => setLastInjectionDate(formatDateInput(text))}
                 placeholder="MM/DD/YYYY"
@@ -204,6 +185,9 @@ export default function InjectionDayScreen() {
               />
               {lastInjectionDate.length > 0 && isoDate === null && (
                 <Text style={styles.errorText}>Enter a valid date (MM/DD/YYYY)</Text>
+              )}
+              {isoDate !== null && !lastInjectionValid && (
+                <Text style={styles.errorText}>Enter your most recent injection date, not a future date.</Text>
               )}
             </>
           )}

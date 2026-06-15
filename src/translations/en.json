@@ -95,6 +95,7 @@
     "keep_body": "Your streak, weight history, food logs, muscle score, and your plan all carry over. Only your dose tracking updates to the new medication.",
     "keep_title": "Switching to {{brand}}? You keep everything.",
     "last_injection": "Last injection date",
+    "last_injection_help": "Enter the date of your most recent shot, not a future date.",
     "next": "Next",
     "pick_subtitle": "Pick your current GLP-1. Your guidance updates to match, and everything else stays.",
     "save": "Save medication",

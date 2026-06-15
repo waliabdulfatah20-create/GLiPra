@@ -95,6 +95,7 @@
     "keep_body": "Tu racha, tu historial de peso, tus comidas, tu puntuación muscular y tu plan se conservan. Solo se actualiza el seguimiento de la dosis al nuevo medicamento.",
     "keep_title": "¿Cambias a {{brand}}? Conservas todo.",
     "last_injection": "Fecha de la última inyección",
+    "last_injection_help": "Ingresa la fecha de tu inyección más reciente, no una fecha futura.",
     "next": "Siguiente",
     "pick_subtitle": "Elige tu GLP-1 actual. Tu guía se adapta y todo lo demás se mantiene.",
     "save": "Guardar medicamento",

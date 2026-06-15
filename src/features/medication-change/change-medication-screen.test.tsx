@@ -4,6 +4,7 @@
  * i18n returns keys in the test env, so copy is asserted via key strings; the
  * dose-time chips use real 12-hour labels (not i18n).
  */
+import { format } from 'date-fns';
 import * as React from 'react';
 
 import { useChangeMedication } from '@/features/medication-change/hooks';
@@ -77,5 +78,50 @@ describe('change medication flow', () => {
     fireEvent.press(screen.getByText('change_med.next'));
     expect(screen.getByText('change_med.frequency')).toBeTruthy();
     expect(screen.getByText('change_med.last_injection')).toBeTruthy();
+  });
+
+  it('defaults last-injection to today and saves the injection selection', () => {
+    setup();
+    render(<ChangeMedicationScreen />);
+    fireEvent.press(screen.getByTestId('med-option-tirzepatide_mounjaro'));
+    fireEvent.press(screen.getByText('change_med.next'));
+
+    // Step 2 (injection fork): weekly + a day. last-injection is prefilled with today.
+    fireEvent.press(screen.getByText('change_med.freq_weekly'));
+    fireEvent.press(screen.getByText('Mon'));
+    fireEvent.press(screen.getByText('change_med.next'));
+
+    // Step 3: status + save.
+    fireEvent.press(screen.getByTestId('status-option-starting'));
+    fireEvent.press(screen.getByTestId('change-med-save'));
+
+    expect(mutate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        medicationId: 'tirzepatide_mounjaro',
+        status: 'starting',
+        schedule: expect.objectContaining({
+          route: 'injection',
+          frequency: 'weekly',
+          dayOfWeek: 1,
+          lastInjectionDate: format(new Date(), 'yyyy-MM-dd'),
+        }),
+      }),
+    );
+  });
+
+  it('blocks advancing when the last-injection date is in the future', () => {
+    setup();
+    render(<ChangeMedicationScreen />);
+    fireEvent.press(screen.getByTestId('med-option-tirzepatide_mounjaro'));
+    fireEvent.press(screen.getByText('change_med.next'));
+
+    fireEvent.press(screen.getByText('change_med.freq_weekly'));
+    fireEvent.press(screen.getByText('Mon'));
+    fireEvent.changeText(screen.getByLabelText('change_med.last_injection'), '12/31/2099');
+    fireEvent.press(screen.getByText('change_med.next'));
+
+    // Still on the schedule step — the future date kept the footer disabled.
+    expect(screen.getByText('change_med.frequency')).toBeTruthy();
+    expect(screen.queryByText('change_med.status_q')).toBeNull();
   });
 });

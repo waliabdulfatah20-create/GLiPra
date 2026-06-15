@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
+import { formatDateInput, isNotFuture, parseMdyToIso } from '@/features/medication/date-input';
 import { getMedicationBrand, getMedicationRoute, MEDICATIONS } from '@/features/medication/medications';
 import { ChoiceChip } from '@/features/onboarding/components/choice-chip';
 import { OptionCard } from '@/features/onboarding/components/option-card';
@@ -41,27 +42,6 @@ function hourLabel(h: number): string {
 function dayLabel(v: number): string {
   return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][v] ?? '';
 }
-function formatDateInput(raw: string): string {
-  const digits = raw.replace(/\D/g, '');
-  if (digits.length <= 2)
-    return digits;
-  if (digits.length <= 4)
-    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`;
-}
-function parseMdyToIso(mdy: string): string | null {
-  const parts = mdy.split('/');
-  if (parts.length !== 3)
-    return null;
-  const [mm, dd, yyyy] = parts;
-  if (!mm || !dd || !yyyy || yyyy.length < 4)
-    return null;
-  const iso = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime()))
-    return null;
-  return iso;
-}
 
 export function ChangeMedicationScreen() {
   const { t } = useTranslation();
@@ -70,13 +50,17 @@ export function ChangeMedicationScreen() {
   const styles = React.useMemo(() => makeStyles({ colors, spacing, radius }), [colors, spacing, radius]);
   const { mutate, isLoading, isSuccess } = useChangeMedication();
 
+  // Today as ISO + MM/DD/YYYY — used to default the last-injection field and to
+  // reject a future last-injection date (which would break the cycle phase math).
+  const todayIso = React.useMemo(() => format(new Date(), 'yyyy-MM-dd'), []);
+
   const [step, setStep] = React.useState<1 | 2 | 3>(1);
   const [medId, setMedId] = React.useState<GLP1MedicationId | null>(null);
 
   // Schedule (injection)
   const [frequency, setFrequency] = React.useState<Frequency | null>(null);
   const [dayOfWeek, setDayOfWeek] = React.useState<number | null>(null);
-  const [lastInjectionDate, setLastInjectionDate] = React.useState('');
+  const [lastInjectionDate, setLastInjectionDate] = React.useState(() => format(new Date(), 'MM/dd/yyyy'));
   // Schedule (oral)
   const [doseHour, setDoseHour] = React.useState<number | null>(null);
   const [startDate, setStartDate] = React.useState('');
@@ -101,9 +85,11 @@ export function ChangeMedicationScreen() {
   const needsDayPicker = frequency === 'weekly' || frequency === 'biweekly';
   const isoLast = parseMdyToIso(lastInjectionDate);
   const isoStart = parseMdyToIso(startDate);
+  // A future last-injection date poisons the cycle phase math, so it is invalid.
+  const lastInjectionValid = isoLast !== null && isNotFuture(isoLast, todayIso);
   const scheduleValid = isOral
     ? doseHour !== null && isoStart !== null
-    : frequency !== null && (frequency === 'daily' || dayOfWeek !== null) && isoLast !== null;
+    : frequency !== null && (frequency === 'daily' || dayOfWeek !== null) && lastInjectionValid;
 
   function handleSave() {
     if (!medId || status === null || isLoading)
@@ -123,7 +109,7 @@ export function ChangeMedicationScreen() {
       });
     }
     else {
-      if (!frequency || !isoLast)
+      if (!frequency || isoLast === null || !lastInjectionValid)
         return;
       mutate({
         medicationId: medId,
@@ -220,7 +206,7 @@ export function ChangeMedicationScreen() {
             )}
             <Text style={[styles.sectionLabel, styles.sectionLabelTop]}>{t('change_med.last_injection')}</Text>
             <TextInput
-              style={[styles.textInput, lastInjectionDate.length > 0 && isoLast === null && styles.textInputError]}
+              style={[styles.textInput, lastInjectionDate.length > 0 && !lastInjectionValid && styles.textInputError]}
               value={lastInjectionDate}
               onChangeText={text => setLastInjectionDate(formatDateInput(text))}
               placeholder="MM/DD/YYYY"
@@ -229,6 +215,7 @@ export function ChangeMedicationScreen() {
               maxLength={10}
               accessibilityLabel={t('change_med.last_injection')}
             />
+            <Text style={styles.helperText}>{t('change_med.last_injection_help')}</Text>
           </>
         )}
 
@@ -334,6 +321,12 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       color: colors.textPrimary,
     },
     textInputError: { borderColor: colors.error },
+    helperText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: spacing.xs,
+      lineHeight: 17,
+    },
     reassureCard: {
       backgroundColor: colors.successLight,
       borderRadius: radius.md,

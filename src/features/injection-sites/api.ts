@@ -1,6 +1,7 @@
 import type { SiteCode } from './constants';
 
 import type { InjectionLog } from './types';
+import { format } from 'date-fns';
 import { supabase } from '@/lib/supabase';
 
 export type InjectionLogInput = {
@@ -50,15 +51,17 @@ export async function insertInjectionLog(
     return null;
 
   // Keep profiles.last_injection_date in sync so the injection-phase banner
-  // on the Today screen reflects real shots. Only update if this shot is more
-  // recent than the stored value (guards against overwriting when back-filling
-  // an older shot).
+  // on the Today screen reflects real shots. Update when this shot is more recent
+  // than the stored value (so back-filling an older shot can't clobber it) OR when
+  // the stored value is in the FUTURE — a future date is never a real injection and
+  // poisons the cycle phase math ("Day -1"), so a real shot must heal it.
   const injectedDate = input.injectedAt.slice(0, 10); // YYYY-MM-DD
+  const todayIso = format(new Date(), 'yyyy-MM-dd');
   await supabase
     .from('profiles')
     .update({ last_injection_date: injectedDate })
     .eq('user_id', userId)
-    .or(`last_injection_date.is.null,last_injection_date.lt.${injectedDate}`);
+    .or(`last_injection_date.is.null,last_injection_date.lt.${injectedDate},last_injection_date.gt.${todayIso}`);
 
   return data as unknown as InjectionLog;
 }
@@ -92,11 +95,12 @@ export async function updateInjectionLog(
     return null;
 
   const injectedDate = input.injectedAt.slice(0, 10);
+  const todayIso = format(new Date(), 'yyyy-MM-dd');
   await supabase
     .from('profiles')
     .update({ last_injection_date: injectedDate })
     .eq('user_id', userId)
-    .or(`last_injection_date.is.null,last_injection_date.lt.${injectedDate}`);
+    .or(`last_injection_date.is.null,last_injection_date.lt.${injectedDate},last_injection_date.gt.${todayIso}`);
 
   return data as unknown as InjectionLog;
 }

@@ -9,6 +9,7 @@
 
 import type { GlipraTokens } from '@/theme/tokens';
 import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -21,6 +22,7 @@ import {
 } from 'react-native';
 
 import { VoiceCaptureButton } from '@/components/log/voice-capture-button';
+import { Camera, Crown, Microphone } from '@/components/ui/icons';
 import { useSubscription } from '@/features/subscription/use-subscription';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
@@ -51,11 +53,11 @@ export function AiCaptureHero({
   onBeforeRecord,
 }: AiCaptureHeroProps) {
   const { t } = useTranslation();
-  const { colors, spacing, radius } = useTheme();
+  const { colors, gradients, spacing, radius, shadows } = useTheme();
   const { isPro } = useSubscription();
   const styles = React.useMemo(
-    () => makeStyles({ colors, spacing, radius }),
-    [colors, spacing, radius],
+    () => makeStyles({ colors, spacing, radius, shadows }),
+    [colors, spacing, radius, shadows],
   );
   const [recording, setRecording] = React.useState(false);
 
@@ -107,9 +109,16 @@ export function AiCaptureHero({
   // Loading (transcribing voice / recognizing photo) — full-width spinner card.
   if (isLoadingVoice || isLoadingPhoto) {
     return (
-      <View style={[styles.card, styles.loadingCard]}>
-        <ActivityIndicator color={colors.white} size="small" />
-        <Text style={styles.loadingText}>{t('log.voice_processing')}</Text>
+      <View style={styles.card}>
+        <LinearGradient
+          colors={gradients.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.gradient, styles.loadingInner]}
+        >
+          <ActivityIndicator color={colors.white} size="small" />
+          <Text style={styles.loadingText}>{t('log.voice_processing')}</Text>
+        </LinearGradient>
       </View>
     );
   }
@@ -133,36 +142,48 @@ export function AiCaptureHero({
   // Idle — the combined "Log with AI" card with two equal halves.
   return (
     <View style={styles.card}>
-      <View style={styles.headerRow}>
-        <Text style={styles.heroLabel}>{t('log.ai_hero_label')}</Text>
-        <View style={styles.proPill}>
-          <Text style={styles.proPillText}>PRO</Text>
+      <LinearGradient
+        colors={gradients.hero}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.gradient}
+      >
+        <View style={styles.headerRow}>
+          <Text style={styles.heroLabel}>{t('log.ai_hero_label')}</Text>
+          <View style={styles.proPill}>
+            <Crown color={colors.white} width={12} height={12} />
+            <Text style={styles.proPillText}>PRO</Text>
+          </View>
         </View>
-      </View>
-      <View style={styles.halvesRow}>
-        <Pressable
-          testID="ai-hero-speak"
-          style={({ pressed }) => [styles.half, pressed && styles.halfPressed]}
-          onPress={handleSpeak}
-          accessibilityRole="button"
-          accessibilityLabel={t('log.voice_action')}
-        >
-          <Text style={styles.halfIcon}>🎙</Text>
-          <Text style={styles.halfTitle}>{t('log.voice_action')}</Text>
-          <Text style={styles.halfSub}>{t('log.voice_action_sub')}</Text>
-        </Pressable>
-        <Pressable
-          testID="ai-hero-snap"
-          style={({ pressed }) => [styles.half, pressed && styles.halfPressed]}
-          onPress={handleSnap}
-          accessibilityRole="button"
-          accessibilityLabel={t('log.photo_action')}
-        >
-          <Text style={styles.halfIcon}>📷</Text>
-          <Text style={styles.halfTitle}>{t('log.photo_action')}</Text>
-          <Text style={styles.halfSub}>{t('log.photo_action_sub')}</Text>
-        </Pressable>
-      </View>
+        <View style={styles.halvesRow}>
+          <Pressable
+            testID="ai-hero-speak"
+            style={({ pressed }) => [styles.half, pressed && styles.halfPressed]}
+            onPress={handleSpeak}
+            accessibilityRole="button"
+            accessibilityLabel={t('log.voice_action')}
+          >
+            <View style={styles.iconChip}>
+              <Microphone color={colors.white} width={25} height={25} />
+            </View>
+            <Text style={styles.halfTitle}>{t('log.voice_action')}</Text>
+            <Text style={styles.halfSub}>{t('log.voice_action_sub')}</Text>
+          </Pressable>
+          <Pressable
+            testID="ai-hero-snap"
+            style={({ pressed }) => [styles.half, pressed && styles.halfPressed]}
+            onPress={handleSnap}
+            accessibilityRole="button"
+            accessibilityLabel={t('log.photo_action')}
+          >
+            <View style={styles.iconChip}>
+              <Camera color={colors.white} width={25} height={25} />
+            </View>
+            <Text style={styles.halfTitle}>{t('log.photo_action')}</Text>
+            <Text style={styles.halfSub}>{t('log.photo_action_sub')}</Text>
+          </Pressable>
+        </View>
+      </LinearGradient>
     </View>
   );
 }
@@ -171,24 +192,27 @@ type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
+  shadows: GlipraTokens['shadows'];
 };
 
-function makeStyles({ colors, spacing, radius }: StyleTokens) {
+function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
   return StyleSheet.create({
     card: {
-      backgroundColor: colors.voiceHeroBg,
       borderRadius: radius.lg,
       marginHorizontal: spacing.md,
       marginBottom: spacing.sm,
+      overflow: 'hidden',
+      ...shadows.md,
+    },
+    gradient: {
       paddingVertical: spacing.md,
       paddingHorizontal: spacing.md,
     },
-    loadingCard: {
+    loadingInner: {
       minHeight: 120,
       alignItems: 'center',
       justifyContent: 'center',
       gap: spacing.xs,
-      opacity: 0.85,
     },
     loadingText: {
       fontSize: 11,
@@ -199,28 +223,31 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      marginBottom: spacing.sm,
+      marginBottom: spacing.md,
     },
     heroLabel: {
       fontSize: 11,
       fontWeight: '700',
-      letterSpacing: 1,
+      letterSpacing: 1.4,
       textTransform: 'uppercase',
-      color: colors.voiceHeroTextMuted,
+      color: 'rgba(255,255,255,0.92)',
     },
     proPill: {
-      backgroundColor: colors.voiceHeroBadgeBg,
-      borderColor: colors.voiceHeroBadgeBorder,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      backgroundColor: 'rgba(255,255,255,0.22)',
+      borderColor: 'rgba(255,255,255,0.4)',
       borderWidth: 1,
       borderRadius: radius.full,
-      paddingHorizontal: 9,
+      paddingHorizontal: 10,
       paddingVertical: 3,
     },
     proPillText: {
       color: colors.white,
       fontSize: 10,
       fontWeight: '800',
-      letterSpacing: 0.5,
+      letterSpacing: 0.6,
     },
     halvesRow: {
       flexDirection: 'row',
@@ -228,20 +255,26 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
     },
     half: {
       flex: 1,
-      backgroundColor: 'rgba(255,255,255,0.06)',
+      backgroundColor: 'rgba(255,255,255,0.13)',
       borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.12)',
+      borderColor: 'rgba(255,255,255,0.24)',
       borderRadius: radius.md,
-      paddingVertical: spacing.lg,
+      paddingVertical: spacing.md,
       paddingHorizontal: spacing.sm,
       alignItems: 'center',
       gap: spacing.xs,
     },
     halfPressed: {
-      backgroundColor: 'rgba(255,255,255,0.12)',
+      backgroundColor: 'rgba(255,255,255,0.22)',
     },
-    halfIcon: {
-      fontSize: 26,
+    iconChip: {
+      width: 54,
+      height: 54,
+      borderRadius: 27,
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 2,
     },
     halfTitle: {
       fontSize: 15,
@@ -250,7 +283,7 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
     },
     halfSub: {
       fontSize: 11,
-      color: colors.voiceHeroTextMuted,
+      color: 'rgba(255,255,255,0.82)',
     },
   });
 }

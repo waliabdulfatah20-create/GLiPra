@@ -46,10 +46,11 @@ describe('ai capture hero', () => {
     jest.clearAllMocks();
   });
 
-  it('renders the Speak and Snap halves when idle', () => {
+  it('renders the Speak and Snap halves plus the PRO pill when idle', () => {
     setup();
     expect(screen.getByTestId('ai-hero-speak')).toBeTruthy();
     expect(screen.getByTestId('ai-hero-snap')).toBeTruthy();
+    expect(screen.getByText('PRO')).toBeTruthy();
   });
 
   it('flips to the recording view when Speak is tapped (Pro)', () => {

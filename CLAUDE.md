@@ -273,7 +273,7 @@ type SubscriptionTier = 'free' | 'pro' | 'founder_lifetime';
 // Founder Lifetime = $149 one-time (first 500 users)
 
 // Locked to Pro: AI photo recognition, voice logging (fully gated — no free tier), daily AI guidance,
-//   unlimited protein history, prescriber visit prep + PDF, linked accounts
+//   unlimited protein history, prescriber visit prep + PDF
 
 // Always free: red-flag escalation, micronutrient watch, barcode scanning, manual food logging,
 //   food database search (seeded foods table), data export (GDPR), account deletion

@@ -57,6 +57,25 @@ describe('oral technique card', () => {
   });
 });
 
+describe('goal-weight nutrition card', () => {
+  const card = getActiveCards().find(c => c.id === 'goal-weight-nutrition');
+
+  it('exists as a universal tier-2 education card', () => {
+    expect(card).toBeDefined();
+    expect(card?.route).toBeUndefined();
+    expect(card?.tier).toBe(2);
+    expect(card?.cardType).toBe('education');
+  });
+
+  it('no card claims the deleted "maintenance mode" feature', () => {
+    const allCopy = CONTENT_CARDS
+      .map(c => `${c.title} ${c.keyTakeaway} ${c.body}`)
+      .join(' ')
+      .toLowerCase();
+    expect(allCopy).not.toContain('maintenance mode');
+  });
+});
+
 describe('content card invariants', () => {
   it('has unique ids', () => {
     const ids = CONTENT_CARDS.map(c => c.id);

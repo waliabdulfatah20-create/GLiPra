@@ -301,6 +301,17 @@ export const CONTENT_CARDS: ContentCard[] = [
     sortOrder: 24,
   },
   {
+    id: 'goal-weight-nutrition',
+    title: 'Nutrition When You Reach Your Goal',
+    keyTakeaway: 'At your goal weight, protein stays non-negotiable: it protects the muscle you built.',
+    body:
+      'Reaching your goal weight means shifting focus from losing to protecting. Protein stays just as important, because muscle still needs regular stimulus and a steady supply of amino acids to hold on to what you worked for. Keep protein forward at every meal and keep up resistance training a couple of times a week. As your goals change, talk with your prescriber about the right calorie and overall nutrition plan for staying where you are. This transition is a success worth maintaining.',
+    cardType: 'education',
+    medicationIds: [],
+    tier: 2,
+    sortOrder: 25,
+  },
+  {
     id: 'oral-empty-stomach',
     title: 'Oral GLP-1: The Empty-Stomach Rule',
     keyTakeaway: 'Take it on an empty stomach with a small sip of water, then wait 30 minutes before anything else.',

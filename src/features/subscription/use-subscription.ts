@@ -49,7 +49,16 @@ const ENTITLEMENT_ID = 'GLiPra Pro';
  * flag — this lets us enable real AI in dev (EXPO_PUBLIC_USE_MOCK_AI=false) while
  * Pro stays unlocked. Never true in preview/production (real entitlement check runs).
  */
-const IS_DEV_FORCE_PRO = process.env.EXPO_PUBLIC_APP_ENV === 'development';
+/**
+ * True only in development builds. Extracted as a pure, exported predicate so the
+ * prod-safe gating can be unit-tested without the native module — a regression
+ * guard ensuring production/preview never force-enable Pro.
+ */
+export function isDevForcePro(appEnv = process.env.EXPO_PUBLIC_APP_ENV): boolean {
+  return appEnv === 'development';
+}
+
+const IS_DEV_FORCE_PRO = isDevForcePro();
 
 // ---------------------------------------------------------------------------
 // react-native-purchases availability guard

@@ -1,7 +1,8 @@
 // PaywallScreen — full-screen modal shown when a user tries to access a Pro feature.
 //
-// Product IDs must match exactly what is configured in RevenueCat + App Store /
-// Google Play:
+// Premium look: a gradient hero (crown + pharmacist pill), SVG benefit icons, and
+// three price tiers with Annual featured as best value. Product IDs must match
+// what is configured in RevenueCat + App Store / Google Play:
 //   monthly   → $9.99/month
 //   yearly    → $79.99/year
 //   lifetime  → $149 one-time (first 500 users)
@@ -9,7 +10,9 @@
 // When react-native-purchases is NOT installed (Expo Go / pre-native build),
 // all purchase buttons are disabled and show an explanatory label.
 
+import type { SvgProps } from 'react-native-svg';
 import type { GlipraTokens } from '@/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import {
@@ -23,6 +26,15 @@ import {
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  Activity,
+  Bolt,
+  Camera,
+  ClipboardCheck,
+  Crown,
+  Microphone,
+  TrendingUp,
+} from '@/components/ui/icons';
 import { analytics, EVENTS } from '@/lib/analytics';
 import { useTheme } from '@/lib/ThemeContext';
 
@@ -54,17 +66,19 @@ const PRODUCT_ANNUAL = 'yearly';
 const PRODUCT_LIFETIME = 'lifetime';
 
 // ---------------------------------------------------------------------------
-// Pro benefits list
+// Pro benefits — each paired with an SVG line icon
 // ---------------------------------------------------------------------------
 
-const PRO_BENEFITS = [
-  'AI photo food recognition (50/day)',
-  'Voice logging (unlimited)',
-  'Daily AI nutrition guidance',
-  'Micronutrient watch',
-  'Unlimited protein history',
-  'Prescriber visit prep & PDF export',
-] as const;
+type IconCmp = React.ComponentType<SvgProps>;
+
+const PRO_BENEFITS: { Icon: IconCmp; label: string }[] = [
+  { Icon: Camera, label: 'AI photo food recognition (50/day)' },
+  { Icon: Microphone, label: 'Voice logging (unlimited)' },
+  { Icon: Bolt, label: 'Daily AI nutrition guidance' },
+  { Icon: Activity, label: 'Micronutrient watch' },
+  { Icon: TrendingUp, label: 'Unlimited protein history' },
+  { Icon: ClipboardCheck, label: 'Prescriber visit prep & PDF export' },
+];
 
 // ---------------------------------------------------------------------------
 // Props
@@ -81,7 +95,7 @@ export type PaywallScreenProps = {
 // ---------------------------------------------------------------------------
 
 export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
-  const { colors, spacing, radius, shadows } = useTheme();
+  const { colors, gradients, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
     () => makeStyles({ colors, spacing, radius, shadows }),
     [colors, spacing, radius, shadows],
@@ -149,15 +163,18 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
   const isAnyPurchasing = purchasingId !== null;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={styles.headerRow}>
-          <View style={styles.dismissPlaceholder} />
-          <Text style={styles.headerTitle}>Upgrade to Pro</Text>
+        {/* Gradient hero */}
+        <LinearGradient
+          colors={gradients.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.hero}
+        >
           <Pressable
             onPress={onDismiss}
             style={styles.dismissButton}
@@ -166,189 +183,186 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
           >
             <Text style={styles.dismissText}>✕</Text>
           </Pressable>
-        </View>
 
-        {/* Value prop */}
-        <View style={styles.valueCard}>
-          <Text style={styles.featureHighlight}>
+          <View style={styles.crownChip}>
+            <Crown color={colors.white} width={30} height={30} />
+          </View>
+          <Text style={styles.heroTitle}>
             Unlock
             {' '}
             {featureName}
             {' '}
             and all Pro features
           </Text>
-          <Text style={styles.pharmacistBadge}>
-            Designed by a licensed pharmacist
-          </Text>
-        </View>
-
-        {/* Benefits list */}
-        <View style={styles.benefitsCard}>
-          <Text style={styles.benefitsTitle}>What you get with Pro</Text>
-          {PRO_BENEFITS.map(benefit => (
-            <View key={benefit} style={styles.benefitRow}>
-              <Text style={styles.benefitCheck}>✓</Text>
-              <Text style={styles.benefitText}>{benefit}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Pricing buttons */}
-        <PurchaseButton
-          label="$9.99 / month"
-          sublabel={null}
-          productId={PRODUCT_MONTHLY}
-          isDisabled={!PURCHASES_AVAILABLE || isAnyPurchasing}
-          isLoading={purchasingId === PRODUCT_MONTHLY}
-          onPress={handlePurchase}
-          style="primary"
-        />
-
-        <PurchaseButton
-          label="$79.99 / year"
-          sublabel="Save 33%"
-          productId={PRODUCT_ANNUAL}
-          isDisabled={!PURCHASES_AVAILABLE || isAnyPurchasing}
-          isLoading={purchasingId === PRODUCT_ANNUAL}
-          onPress={handlePurchase}
-          style="primary"
-        />
-
-        <PurchaseButton
-          label="$149 Lifetime"
-          sublabel="First 500 users only"
-          productId={PRODUCT_LIFETIME}
-          isDisabled={!PURCHASES_AVAILABLE || isAnyPurchasing}
-          isLoading={purchasingId === PRODUCT_LIFETIME}
-          onPress={handlePurchase}
-          style="secondary"
-        />
-
-        {/* Unavailability notice for Expo Go */}
-        {!PURCHASES_AVAILABLE && (
-          <View style={styles.stubNotice}>
-            <Text style={styles.stubNoticeText}>
-              In-app purchases are available in the full app build.
-              Purchases are not available in Expo Go.
-            </Text>
+          <View style={styles.pharmacistPill}>
+            <Text style={styles.pharmacistPillText}>DESIGNED BY A LICENSED PHARMACIST</Text>
           </View>
-        )}
+        </LinearGradient>
 
-        {/* Restore + dismiss links */}
-        <Pressable
-          onPress={handleRestore}
-          disabled={!PURCHASES_AVAILABLE}
-          style={({ pressed }) => [
-            styles.textLink,
-            pressed && styles.textLinkPressed,
-            !PURCHASES_AVAILABLE && styles.textLinkDisabled,
-          ]}
-          accessibilityRole="button"
-          accessibilityLabel="Restore purchases"
-        >
-          <Text
-            style={[
-              styles.textLinkLabel,
-              !PURCHASES_AVAILABLE && styles.textLinkLabelDisabled,
+        <View style={styles.bodyPad}>
+          {/* Benefits */}
+          <View style={styles.benefitsCard}>
+            <Text style={styles.benefitsTitle}>What you get with Pro</Text>
+            {PRO_BENEFITS.map(({ Icon, label }) => (
+              <View key={label} style={styles.benefitRow}>
+                <View style={styles.benefitIconChip}>
+                  <Icon color={colors.success} width={15} height={15} />
+                </View>
+                <Text style={styles.benefitText}>{label}</Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Price tiers — Annual featured */}
+          <PriceTier
+            label="Annual"
+            price="$79.99"
+            unit="/yr"
+            badge="BEST VALUE · SAVE 33%"
+            featured
+            productId={PRODUCT_ANNUAL}
+            isDisabled={!PURCHASES_AVAILABLE || isAnyPurchasing}
+            isLoading={purchasingId === PRODUCT_ANNUAL}
+            onPress={handlePurchase}
+          />
+          <PriceTier
+            label="Monthly"
+            price="$9.99"
+            unit="/mo"
+            badge={null}
+            featured={false}
+            productId={PRODUCT_MONTHLY}
+            isDisabled={!PURCHASES_AVAILABLE || isAnyPurchasing}
+            isLoading={purchasingId === PRODUCT_MONTHLY}
+            onPress={handlePurchase}
+          />
+          <PriceTier
+            label="Lifetime"
+            price="$149"
+            unit=""
+            badge="FIRST 500 USERS"
+            featured={false}
+            productId={PRODUCT_LIFETIME}
+            isDisabled={!PURCHASES_AVAILABLE || isAnyPurchasing}
+            isLoading={purchasingId === PRODUCT_LIFETIME}
+            onPress={handlePurchase}
+          />
+
+          {/* Unavailability notice for Expo Go */}
+          {!PURCHASES_AVAILABLE && (
+            <View style={styles.stubNotice}>
+              <Text style={styles.stubNoticeText}>
+                In-app purchases are available in the full app build.
+                Purchases are not available in Expo Go.
+              </Text>
+            </View>
+          )}
+
+          {/* Restore + dismiss links */}
+          <Pressable
+            onPress={handleRestore}
+            disabled={!PURCHASES_AVAILABLE}
+            style={({ pressed }) => [
+              styles.textLink,
+              pressed && styles.textLinkPressed,
+              !PURCHASES_AVAILABLE && styles.textLinkDisabled,
             ]}
+            accessibilityRole="button"
+            accessibilityLabel="Restore purchases"
           >
-            Restore purchases
-          </Text>
-        </Pressable>
+            <Text
+              style={[
+                styles.textLinkLabel,
+                !PURCHASES_AVAILABLE && styles.textLinkLabelDisabled,
+              ]}
+            >
+              Restore purchases
+            </Text>
+          </Pressable>
 
-        <Pressable
-          onPress={onDismiss}
-          style={({ pressed }) => [
-            styles.textLink,
-            pressed && styles.textLinkPressed,
-          ]}
-          accessibilityRole="button"
-          accessibilityLabel="Maybe later"
-        >
-          <Text style={[styles.textLinkLabel, styles.maybeLaterText]}>
-            Maybe later
-          </Text>
-        </Pressable>
+          <Pressable
+            onPress={onDismiss}
+            style={({ pressed }) => [
+              styles.textLink,
+              pressed && styles.textLinkPressed,
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Maybe later"
+          >
+            <Text style={[styles.textLinkLabel, styles.maybeLaterText]}>
+              Maybe later
+            </Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 // ---------------------------------------------------------------------------
-// PurchaseButton sub-component
+// PriceTier sub-component
 // ---------------------------------------------------------------------------
 
-type PurchaseButtonProps = {
+type PriceTierProps = {
   label: string;
-  sublabel: string | null;
+  price: string;
+  unit: string;
+  badge: string | null;
+  featured: boolean;
   productId: string;
   isDisabled: boolean;
   isLoading: boolean;
   onPress: (productId: string) => void;
-  style: 'primary' | 'secondary';
 };
 
-function PurchaseButton({
+function PriceTier({
   label,
-  sublabel,
+  price,
+  unit,
+  badge,
+  featured,
   productId,
   isDisabled,
   isLoading,
   onPress,
-  style,
-}: PurchaseButtonProps) {
-  const { colors, spacing, radius, shadows } = useTheme();
+}: PriceTierProps) {
+  const { colors, spacing, radius } = useTheme();
   const styles = React.useMemo(
-    () => makeStyles({ colors, spacing, radius, shadows }),
-    [colors, spacing, radius, shadows],
+    () => makeStyles({ colors, spacing, radius, shadows: undefined }),
+    [colors, spacing, radius],
   );
-  const isPrimary = style === 'primary';
 
   return (
     <Pressable
       onPress={() => onPress(productId)}
       disabled={isDisabled}
       style={({ pressed }) => [
-        styles.purchaseButton,
-        isPrimary ? styles.purchaseButtonPrimary : styles.purchaseButtonSecondary,
-        isDisabled && styles.purchaseButtonDisabled,
-        pressed && !isDisabled && styles.purchaseButtonPressed,
+        styles.tier,
+        featured ? styles.tierFeatured : styles.tierPlain,
+        pressed && !isDisabled && styles.tierPressed,
+        isDisabled && styles.tierDisabled,
       ]}
       accessibilityRole="button"
-      accessibilityLabel={
-        isDisabled ? `${label}: available in full app build` : label
-      }
+      accessibilityLabel={isDisabled ? `${label} ${price}: available in full app build` : `${label} ${price}`}
     >
+      {badge && (
+        <View style={[styles.tierBadge, featured ? styles.tierBadgeFeatured : styles.tierBadgePlain]}>
+          <Text style={[styles.tierBadgeText, featured ? styles.tierBadgeTextFeatured : styles.tierBadgeTextPlain]}>
+            {badge}
+          </Text>
+        </View>
+      )}
       {isLoading
         ? (
-            <ActivityIndicator
-              size="small"
-              color={isPrimary ? colors.white : colors.primary}
-            />
+            <ActivityIndicator size="small" color={colors.primary} />
           )
         : (
-            <View style={styles.purchaseButtonContent}>
-              <Text
-                style={[
-                  styles.purchaseButtonLabel,
-                  isPrimary
-                    ? styles.purchaseButtonLabelPrimary
-                    : styles.purchaseButtonLabelSecondary,
-                  isDisabled && styles.purchaseButtonLabelDisabled,
-                ]}
-              >
-                {isDisabled ? `${label}: available in full app` : label}
+            <View style={styles.tierRow}>
+              <Text style={styles.tierLabel}>{label}</Text>
+              <Text style={styles.tierPrice}>
+                {price}
+                <Text style={styles.tierUnit}>{unit}</Text>
               </Text>
-              {sublabel && (
-                <Text
-                  style={[
-                    styles.purchaseButtonSublabel,
-                    isDisabled && styles.purchaseButtonLabelDisabled,
-                  ]}
-                >
-                  {sublabel}
-                </Text>
-              )}
             </View>
           )}
     </Pressable>
@@ -363,7 +377,7 @@ type StyleTokens = {
   colors: GlipraTokens['colors'];
   spacing: GlipraTokens['spacing'];
   radius: GlipraTokens['radius'];
-  shadows: GlipraTokens['shadows'];
+  shadows: GlipraTokens['shadows'] | undefined;
 };
 
 function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
@@ -373,66 +387,67 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       backgroundColor: colors.background,
     },
     scroll: {
-      padding: spacing.lg,
       paddingBottom: spacing.xxl,
-      gap: spacing.md,
     },
 
-    // Header
-    headerRow: {
-      flexDirection: 'row',
+    // Gradient hero
+    hero: {
+      paddingTop: spacing.xxl,
+      paddingBottom: spacing.lg,
+      paddingHorizontal: spacing.lg,
       alignItems: 'center',
-      justifyContent: 'space-between',
-      marginBottom: spacing.xs,
-    },
-    dismissPlaceholder: {
-      width: 32,
-    },
-    headerTitle: {
-      fontSize: 22,
-      fontWeight: '700',
-      color: colors.textPrimary,
-      textAlign: 'center',
-      flex: 1,
+      position: 'relative',
     },
     dismissButton: {
+      position: 'absolute',
+      top: spacing.lg,
+      right: spacing.md,
       width: 32,
       height: 32,
       borderRadius: radius.full,
-      backgroundColor: colors.gray100,
+      backgroundColor: 'rgba(255,255,255,0.18)',
       alignItems: 'center',
       justifyContent: 'center',
     },
     dismissText: {
       fontSize: 14,
-      color: colors.textSecondary,
+      color: colors.white,
       fontWeight: '600',
+    },
+    crownChip: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.sm,
+    },
+    heroTitle: {
+      fontSize: 20,
+      fontWeight: '800',
+      color: colors.white,
+      textAlign: 'center',
+      lineHeight: 27,
+    },
+    pharmacistPill: {
+      marginTop: spacing.sm,
+      backgroundColor: 'rgba(255,255,255,0.18)',
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.md,
+      paddingVertical: 5,
+    },
+    pharmacistPillText: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: colors.white,
+      letterSpacing: 0.6,
     },
 
-    // Value card
-    valueCard: {
-      backgroundColor: colors.primaryLight,
-      borderRadius: radius.lg,
-      padding: spacing.lg,
-      borderWidth: 1,
-      borderColor: `${colors.primary}40`,
-      gap: spacing.sm,
-      alignItems: 'center',
-    },
-    featureHighlight: {
-      fontSize: 17,
-      fontWeight: '700',
-      color: colors.primaryDark,
-      textAlign: 'center',
-      lineHeight: 24,
-    },
-    pharmacistBadge: {
-      fontSize: 12,
-      fontWeight: '600',
-      color: colors.primary,
-      textAlign: 'center',
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
+    bodyPad: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.lg,
+      gap: spacing.md,
     },
 
     // Benefits
@@ -441,26 +456,28 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       borderRadius: radius.lg,
       padding: spacing.md,
       gap: spacing.sm,
-      ...shadows.sm,
+      ...(shadows ? shadows.sm : {}),
     },
     benefitsTitle: {
-      fontSize: 13,
+      fontSize: 11,
       fontWeight: '700',
       color: colors.textSecondary,
       textTransform: 'uppercase',
-      letterSpacing: 0.5,
+      letterSpacing: 0.8,
       marginBottom: spacing.xs / 2,
     },
     benefitRow: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       gap: spacing.sm,
     },
-    benefitCheck: {
-      fontSize: 14,
-      color: colors.success,
-      fontWeight: '700',
-      lineHeight: 20,
+    benefitIconChip: {
+      width: 26,
+      height: 26,
+      borderRadius: 13,
+      backgroundColor: colors.successLight,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     benefitText: {
       fontSize: 14,
@@ -469,54 +486,74 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       flex: 1,
     },
 
-    // Purchase buttons
-    purchaseButton: {
+    // Price tiers
+    tier: {
       borderRadius: radius.lg,
       paddingVertical: spacing.md,
       paddingHorizontal: spacing.lg,
-      alignItems: 'center',
-      justifyContent: 'center',
       minHeight: 56,
-      ...shadows.sm,
+      justifyContent: 'center',
     },
-    purchaseButtonPrimary: {
-      backgroundColor: colors.primary,
-    },
-    purchaseButtonSecondary: {
+    tierPlain: {
+      borderWidth: 1,
+      borderColor: colors.border,
       backgroundColor: colors.surface,
+    },
+    tierFeatured: {
       borderWidth: 2,
       borderColor: colors.primary,
+      backgroundColor: colors.primaryLight,
     },
-    purchaseButtonDisabled: {
-      backgroundColor: colors.gray200,
-      borderColor: colors.gray200,
-      shadowOpacity: 0,
-      elevation: 0,
-    },
-    purchaseButtonPressed: {
+    tierPressed: {
       opacity: 0.85,
     },
-    purchaseButtonContent: {
-      alignItems: 'center',
-      gap: 2,
+    tierDisabled: {
+      opacity: 0.6,
     },
-    purchaseButtonLabel: {
+    tierRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      justifyContent: 'space-between',
+    },
+    tierLabel: {
       fontSize: 16,
       fontWeight: '700',
+      color: colors.textPrimary,
     },
-    purchaseButtonLabelPrimary: {
+    tierPrice: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textPrimary,
+    },
+    tierUnit: {
+      fontSize: 12,
+      fontWeight: '500',
+      color: colors.textSecondary,
+    },
+    tierBadge: {
+      position: 'absolute',
+      top: -9,
+      left: spacing.md,
+      borderRadius: radius.full,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 2,
+    },
+    tierBadgeFeatured: {
+      backgroundColor: colors.primary,
+    },
+    tierBadgePlain: {
+      backgroundColor: colors.gray200,
+    },
+    tierBadgeText: {
+      fontSize: 9,
+      fontWeight: '800',
+      letterSpacing: 0.5,
+    },
+    tierBadgeTextFeatured: {
       color: colors.white,
     },
-    purchaseButtonLabelSecondary: {
-      color: colors.primary,
-    },
-    purchaseButtonLabelDisabled: {
-      color: colors.textDisabled,
-    },
-    purchaseButtonSublabel: {
-      fontSize: 12,
-      color: colors.successLight,
-      fontWeight: '500',
+    tierBadgeTextPlain: {
+      color: colors.textSecondary,
     },
 
     // Stub notice

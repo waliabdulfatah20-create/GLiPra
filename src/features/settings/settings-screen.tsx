@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DeleteAccountModal } from '@/features/account/components/delete-account-modal';
 import { useDeleteAccount, useExportData } from '@/features/account/hooks';
 import { useAuthStore } from '@/features/auth/use-auth-store';
+import { getMedicationBrand } from '@/features/medication/medications';
 import { useTodayProfile } from '@/features/today/hooks';
 import { analytics, EVENTS } from '@/lib/analytics';
 import { haptics } from '@/lib/haptics';
@@ -155,6 +156,10 @@ export function SettingsScreen() {
     ? t(`dietary.opt_${profile.dietaryPattern}`)
     : undefined;
 
+  const medicationBrand = profile?.medicationId
+    ? getMedicationBrand(profile.medicationId)
+    : undefined;
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
@@ -193,6 +198,11 @@ export function SettingsScreen() {
 
         {/* ── Preferences ───────────────────────────────────────────── */}
         <SettingsSection title={t('settings.preferences')}>
+          <SettingsRow
+            label={t('settings.change_medication')}
+            value={medicationBrand}
+            onPress={() => router.push('/change-medication')}
+          />
           <SettingsRow
             label={t('settings.medication_status')}
             value={currentStatusLabel}

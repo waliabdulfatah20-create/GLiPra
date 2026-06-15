@@ -45,6 +45,9 @@ export const EVENTS = {
   ORAL_DOSE_LOGGED: 'oral_dose_logged',
   ORAL_WINDOW_CONFIRMED: 'oral_window_confirmed', // user answered the empty-stomach confirm
 
+  // Medication / route switch (churn prevention — doctor changed the prescription)
+  MEDICATION_CHANGED: 'medication_changed',
+
   // AI Coach
   COACH_MESSAGE_SENT: 'coach_message_sent',
   COACH_MESSAGE_BLOCKED: 'coach_message_blocked', // keyword blocklist triggered

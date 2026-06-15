@@ -242,6 +242,19 @@ export function DoseScreen() {
                 </View>
               )}
 
+          {/* Switched medications? — route switch (oral <-> injection) without losing
+              progress or subscription. Shown on both routes. */}
+          <TouchableOpacity
+            style={styles.switchMedLink}
+            onPress={() => router.push('/change-medication')}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={t('dose.switched_medications')}
+            testID="dose-switched-medications"
+          >
+            <Text style={styles.switchMedText}>{t('dose.switched_medications')}</Text>
+          </TouchableOpacity>
+
           {/* Footer disclaimer */}
           <View style={styles.footer}>
             <DisclaimerBanner tier={2}>
@@ -359,6 +372,16 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     },
     footer: {
       marginTop: spacing.lg,
+    },
+    switchMedLink: {
+      marginTop: spacing.lg,
+      paddingVertical: spacing.sm,
+      alignItems: 'center',
+    },
+    switchMedText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.primary,
     },
 
     // Badge card

@@ -4,6 +4,7 @@
 // Rule 8: DisclaimerBanner tier={1} — this is a clinical screen.
 
 import type { GlipraTokens } from '@/theme/tokens';
+import { format, parseISO } from 'date-fns';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import {
@@ -18,6 +19,8 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
+import { useMedicationHistory } from '@/features/medication-change/hooks';
+import { getMedicationBrand } from '@/features/medication/medications';
 import { ProGate, useSubscription } from '@/features/subscription';
 import {
   useGeneratePdf,
@@ -98,6 +101,7 @@ export default function VisitPrepScreen() {
   } = useVisitPrep();
   const { generate, isLoading: isPdfLoading, error: pdfError } = useGeneratePdf();
   const { isPro } = useSubscription();
+  const { history: medChanges } = useMedicationHistory();
 
   const { colors, spacing, radius, shadows } = useTheme();
   const styles = React.useMemo(
@@ -291,6 +295,19 @@ export default function VisitPrepScreen() {
                 />
               </SectionCard>
             )}
+
+        {/* Medication changes — switch history (oral <-> injection, dose changes) */}
+        {medChanges.length > 0 && (
+          <SectionCard label="MEDICATION CHANGES">
+            {medChanges.map(c => (
+              <DataRow
+                key={c.id}
+                name={format(parseISO(c.changedAt), 'MMM d, yyyy')}
+                value={`${getMedicationBrand(c.fromMedicationId) || 'Unknown'} → ${getMedicationBrand(c.toMedicationId)}`}
+              />
+            ))}
+          </SectionCard>
+        )}
 
         {/* Symptoms card */}
         <SectionCard label="RECENT SYMPTOMS (last 7 check-ins)">

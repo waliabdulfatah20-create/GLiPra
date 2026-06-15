@@ -32,7 +32,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const appConfig: ExpoConfig = {
     ...config,
     name: Env.EXPO_PUBLIC_NAME,
-    description: `${Env.EXPO_PUBLIC_NAME} Mobile App`,
+    description:
+      'Glipra is a GLP-1 nutrition companion designed by a licensed pharmacist. Track protein to protect muscle while GLP-1 does its job, log meals by photo or voice, watch key micronutrients, and prepare for prescriber visits.',
     owner: EXPO_ACCOUNT_OWNER,
     scheme: Env.EXPO_PUBLIC_SCHEME,
     slug: 'glipra',
@@ -133,6 +134,36 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           microphonePermission:
             'Glipra uses the microphone so you can log meals by voice.',
+        },
+      ],
+      // Camera is used for barcode scanning (expo-camera CameraView) and food
+      // photos (expo-image-picker launchCameraAsync). Both inject the same
+      // NSCameraUsageDescription. No photo-library access (photosPermission:false)
+      // and no camera mic/video, so the unused photo + audio permissions are dropped.
+      [
+        'expo-camera',
+        {
+          cameraPermission: 'Glipra uses the camera to scan barcodes and recognize food.',
+          microphonePermission: false,
+          recordAudioAndroid: false,
+        },
+      ],
+      [
+        'expo-image-picker',
+        {
+          cameraPermission: 'Glipra uses the camera to recognize food from photos.',
+          photosPermission: false,
+        },
+      ],
+      // Pin Android compile/target SDK to 36 for the Google Play 2026 gate.
+      // minSdk 26 stays handled by the withGradleProperties plugin below.
+      [
+        'expo-build-properties',
+        {
+          android: {
+            compileSdkVersion: 36,
+            targetSdkVersion: 36,
+          },
         },
       ],
     ],

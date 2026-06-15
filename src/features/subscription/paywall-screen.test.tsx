@@ -21,8 +21,15 @@ describe('paywall screen', () => {
   it('renders the hero headline and all three price tiers', () => {
     render(<PaywallScreen featureName="AI photo recognition" onDismiss={noop} />);
     expect(screen.getByText(/Unlock/)).toBeTruthy();
-    expect(screen.getByText('$79.99', { exact: false })).toBeTruthy();
-    expect(screen.getByText('$9.99', { exact: false })).toBeTruthy();
-    expect(screen.getByText('$149', { exact: false })).toBeTruthy();
+    expect(screen.getByText('Annual')).toBeTruthy();
+    expect(screen.getByText('Monthly')).toBeTruthy();
+    expect(screen.getByText('Lifetime')).toBeTruthy();
+  });
+
+  it('shows the auto-renew disclosure and Terms / Privacy links', () => {
+    render(<PaywallScreen featureName="AI photo recognition" onDismiss={noop} />);
+    expect(screen.getByText(/auto-renewing subscriptions/)).toBeTruthy();
+    expect(screen.getByLabelText('Terms of Use')).toBeTruthy();
+    expect(screen.getByLabelText('Privacy Policy')).toBeTruthy();
   });
 });

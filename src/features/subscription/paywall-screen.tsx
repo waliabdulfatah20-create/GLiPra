@@ -13,11 +13,13 @@
 import type { SvgProps } from 'react-native-svg';
 import type { GlipraTokens } from '@/theme/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -161,6 +163,12 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
   }, [onDismiss]);
 
   const isAnyPurchasing = purchasingId !== null;
+  const storeAccount = Platform.OS === 'ios' ? 'Apple ID' : 'Google Play';
+  const disclosure
+    = `Monthly and annual plans are auto-renewing subscriptions. Your ${storeAccount} account is `
+      + `charged at confirmation and renews at $9.99/month or $79.99/year unless cancelled at least `
+      + `24 hours before the current period ends. Manage or cancel anytime in your ${storeAccount} `
+      + `account settings. Lifetime is a one-time purchase, not a subscription.`;
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -247,6 +255,26 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
             isLoading={purchasingId === PRODUCT_LIFETIME}
             onPress={handlePurchase}
           />
+
+          {/* Auto-renew disclosure + legal links (Apple 3.1.2 / Google Play) */}
+          <Text style={styles.disclosure}>{disclosure}</Text>
+          <View style={styles.legalRow}>
+            <Pressable
+              onPress={() => router.push('/legal/terms-of-service')}
+              accessibilityRole="link"
+              accessibilityLabel="Terms of Use"
+            >
+              <Text style={styles.legalLink}>Terms of Use</Text>
+            </Pressable>
+            <Text style={styles.legalDot}>·</Text>
+            <Pressable
+              onPress={() => router.push('/legal/privacy-policy')}
+              accessibilityRole="link"
+              accessibilityLabel="Privacy Policy"
+            >
+              <Text style={styles.legalLink}>Privacy Policy</Text>
+            </Pressable>
+          </View>
 
           {/* Unavailability notice for Expo Go */}
           {!PURCHASES_AVAILABLE && (
@@ -553,6 +581,30 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       color: colors.white,
     },
     tierBadgeTextPlain: {
+      color: colors.textSecondary,
+    },
+
+    // Auto-renew disclosure + legal links
+    disclosure: {
+      fontSize: 11,
+      color: colors.textSecondary,
+      lineHeight: 16,
+      textAlign: 'center',
+      marginTop: spacing.xs,
+    },
+    legalRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.sm,
+    },
+    legalLink: {
+      fontSize: 12,
+      color: colors.primary,
+      fontWeight: '500',
+    },
+    legalDot: {
+      fontSize: 12,
       color: colors.textSecondary,
     },
 

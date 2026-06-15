@@ -27,7 +27,7 @@ export async function saveOnboardingProfile(
     goal_weight_kg: data.goalWeightKg ?? null,
     bmi,
     has_kidney_disease: data.hasKidneyDisease ?? false,
-    is_pregnant: data.isPregnant ?? false,
+    is_pregnant: false,
     activity_level: data.activityLevel ?? 'moderate',
     dietary_pattern: null,
     phase: 'weight_loss',

@@ -23,7 +23,6 @@ function makeInput(overrides: Partial<ProteinInput> = {}): ProteinInput {
     heightCm: 170,
     bmi: 24,
     hasKidneyDisease: false,
-    isPregnant: false,
     phase: 'weight_loss',
     activityLevel: 'sedentary',
     ...overrides,
@@ -38,7 +37,6 @@ describe('normal cases — no conditions, BMI < 35', () => {
     expect(result.proteinFloorG).toBe(84.0);
     expect(result.usedIdealBodyWeight).toBe(false);
     expect(result.cappedByKidneyDisease).toBe(false);
-    expect(result.flooredByPregnancy).toBe(false);
     expect(result.baseWeightUsedKg).toBe(70);
   });
 
@@ -117,31 +115,6 @@ describe('kidney disease cap', () => {
   });
 });
 
-// ─── Pregnancy floor ─────────────────────────────────────────────────────────
-
-describe('pregnancy floor', () => {
-  it('floors result to 80 g when pregnant and calculation is below 80', () => {
-    // Very low weight to force sub-80 result: 50 kg, sedentary = 60 g < 80
-    const result = calculateProteinFloor(
-      makeInput({ isPregnant: true, weightKg: 50, activityLevel: 'sedentary' }),
-    );
-    expect(result.flooredByPregnancy).toBe(true);
-    expect(result.proteinFloorG).toBeGreaterThanOrEqual(80);
-  });
-
-  it('does not set flooredByPregnancy when result already exceeds 80', () => {
-    // 70 kg × 1.2 = 84 g > 80 → no pregnancy floor needed
-    const result = calculateProteinFloor(makeInput({ isPregnant: true }));
-    expect(result.flooredByPregnancy).toBe(false);
-    expect(result.proteinFloorG).toBe(84.0);
-  });
-
-  it('is not pregnant — flooredByPregnancy is false', () => {
-    const result = calculateProteinFloor(makeInput({ isPregnant: false, weightKg: 50 }));
-    expect(result.flooredByPregnancy).toBe(false);
-  });
-});
-
 // ─── Maintenance phase multiplier ─────────────────────────────────────────────
 
 describe('maintenance phase', () => {
@@ -185,30 +158,6 @@ describe('absolute floor (50 g)', () => {
       }),
     );
     expect(result.proteinFloorG).toBe(ABSOLUTE_FLOOR_G);
-  });
-});
-
-// ─── Combined conditions ──────────────────────────────────────────────────────
-
-describe('kidney disease + pregnancy together', () => {
-  it('applies kidney cap first, then pregnancy floor wins when cap result < 80', () => {
-    // 70 kg, kidney cap = 56 g < 80 → pregnancy floor applies
-    const result = calculateProteinFloor(
-      makeInput({ hasKidneyDisease: true, isPregnant: true }),
-    );
-    expect(result.cappedByKidneyDisease).toBe(true);
-    expect(result.flooredByPregnancy).toBe(true);
-    expect(result.proteinFloorG).toBeGreaterThanOrEqual(80);
-  });
-
-  it('kidney cap above 80 prevents pregnancy floor from firing', () => {
-    // 110 kg, kidney cap = 88 g > 80 → no pregnancy floor
-    const result = calculateProteinFloor(
-      makeInput({ weightKg: 110, bmi: 30, hasKidneyDisease: true, isPregnant: true }),
-    );
-    expect(result.cappedByKidneyDisease).toBe(true);
-    expect(result.flooredByPregnancy).toBe(false);
-    expect(result.proteinFloorG).toBe(88.0);
   });
 });
 
@@ -258,12 +207,11 @@ describe('rounding to 1 decimal place', () => {
 // ─── Return shape completeness ─────────────────────────────────────────────────
 
 describe('result shape', () => {
-  it('always returns all five required fields', () => {
+  it('always returns all four required fields', () => {
     const result = calculateProteinFloor(makeInput());
     expect(result).toHaveProperty('proteinFloorG');
     expect(result).toHaveProperty('baseWeightUsedKg');
     expect(result).toHaveProperty('usedIdealBodyWeight');
     expect(result).toHaveProperty('cappedByKidneyDisease');
-    expect(result).toHaveProperty('flooredByPregnancy');
   });
 });

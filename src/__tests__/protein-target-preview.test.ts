@@ -7,7 +7,6 @@ const BASE = {
   heightCm: 175,
   activityLevel: 'moderate' as const,
   hasKidneyDisease: false,
-  isPregnant: false,
   phase: 'weight_loss' as const,
 };
 
@@ -40,7 +39,6 @@ describe('previewProteinFloor', () => {
     expect(r!.baseWeightUsedKg).toBe(80);
     expect(r!.usedIdealBodyWeight).toBe(false);
     expect(r!.cappedByKidneyDisease).toBe(false);
-    expect(r!.flooredByPregnancy).toBe(false);
   });
 
   it('uses ideal body weight when BMI > 35 (high weight, short height)', () => {
@@ -64,18 +62,5 @@ describe('previewProteinFloor', () => {
     expect(r).not.toBeNull();
     // 80 × 1.4 × 0.9 = 100.8g
     expect(r!.proteinFloorG).toBe(100.8);
-  });
-
-  it('applies the pregnancy floor (80g minimum) when the computed value is lower', () => {
-    // Low weight + kidney cap pushes below 80; pregnancy raises it back to 80.
-    const r = previewProteinFloor({
-      ...BASE,
-      weightKg: 55,
-      hasKidneyDisease: true,
-      isPregnant: true,
-    });
-    expect(r).not.toBeNull();
-    expect(r!.flooredByPregnancy).toBe(true);
-    expect(r!.proteinFloorG).toBe(80);
   });
 });

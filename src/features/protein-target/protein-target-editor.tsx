@@ -1,7 +1,7 @@
 // Protein-target editor — reachable from Settings > Body Metrics and by tapping
 // the Today protein ring. Re-collects the body inputs, recomputes the protein
 // floor live via the Rule-4 calculateProteinFloor (through previewProteinFloor),
-// and persists weight/height/bmi/activity/kidney/pregnancy/protein_floor_g.
+// and persists weight/height/bmi/activity/kidney/protein_floor_g.
 //
 // Rule 5 + Rule 8: shows the Tier-1 inaccurate-inputs disclaimer (verbatim from
 // onboarding) plus an acknowledgment that gates Save. Does NOT edit phase (that
@@ -78,7 +78,6 @@ export function ProteinTargetEditor() {
   const [inText, setInText] = React.useState('');
   const [activityLevel, setActivityLevel] = React.useState<ActivityLevel | null>(null);
   const [hasKidneyDisease, setHasKidneyDisease] = React.useState(false);
-  const [isPregnant, setIsPregnant] = React.useState(false);
   const [acknowledged, setAcknowledged] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
   const [hydrated, setHydrated] = React.useState(false);
@@ -105,7 +104,6 @@ export function ProteinTargetEditor() {
     }
     setActivityLevel(profile.activityLevel ?? 'moderate');
     setHasKidneyDisease(profile.hasKidneyDisease);
-    setIsPregnant(profile.isPregnant);
     setHydrated(true);
   }, [hydrated, profile, weightLoaded, heightLoaded, weightUnit, isMetricHeight]);
 
@@ -157,7 +155,6 @@ export function ProteinTargetEditor() {
     heightCm,
     activityLevel,
     hasKidneyDisease,
-    isPregnant,
     phase: 'weight_loss',
   });
 
@@ -180,7 +177,6 @@ export function ProteinTargetEditor() {
         bmi,
         activity_level: activityLevel,
         has_kidney_disease: hasKidneyDisease,
-        is_pregnant: isPregnant,
         protein_floor_g: result.proteinFloorG,
       })
       .eq('user_id', session.user.id);
@@ -312,7 +308,7 @@ export function ProteinTargetEditor() {
             })}
           </View>
 
-          {/* Kidney + pregnancy toggles */}
+          {/* Kidney toggle */}
           <View style={styles.toggleRow}>
             <Text style={styles.toggleLabel}>{t('protein_target.kidney_label')}</Text>
             <Switch
@@ -321,16 +317,6 @@ export function ProteinTargetEditor() {
               trackColor={{ false: colors.border, true: colors.primary }}
               thumbColor={colors.white}
               accessibilityLabel={t('protein_target.kidney_label')}
-            />
-          </View>
-          <View style={styles.toggleRow}>
-            <Text style={styles.toggleLabel}>{t('protein_target.pregnancy_label')}</Text>
-            <Switch
-              value={isPregnant}
-              onValueChange={setIsPregnant}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.white}
-              accessibilityLabel={t('protein_target.pregnancy_label')}
             />
           </View>
 
@@ -342,16 +328,13 @@ export function ProteinTargetEditor() {
                     {`${result.proteinFloorG}g`}
                   </Text>
                   <Text style={styles.resultLabel}>{t('protein_target.result_label')}</Text>
-                  {(result.usedIdealBodyWeight || result.cappedByKidneyDisease || result.flooredByPregnancy) && (
+                  {(result.usedIdealBodyWeight || result.cappedByKidneyDisease) && (
                     <View style={styles.badgeRow}>
                       {result.usedIdealBodyWeight && (
                         <View style={styles.badge}><Text style={styles.badgeText}>{t('protein_target.badge_bmi')}</Text></View>
                       )}
                       {result.cappedByKidneyDisease && (
                         <View style={styles.badge}><Text style={styles.badgeText}>{t('protein_target.badge_kidney')}</Text></View>
-                      )}
-                      {result.flooredByPregnancy && (
-                        <View style={styles.badge}><Text style={styles.badgeText}>{t('protein_target.badge_pregnancy')}</Text></View>
                       )}
                     </View>
                   )}

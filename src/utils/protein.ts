@@ -23,7 +23,6 @@ export type ProteinInput = {
   heightCm: number;
   bmi: number;
   hasKidneyDisease: boolean;
-  isPregnant: boolean;
   phase: Phase;
   activityLevel: ActivityLevel;
 };
@@ -37,8 +36,6 @@ export type ProteinResult = {
   usedIdealBodyWeight: boolean;
   /** True when the kidney-disease cap reduced the calculated value. */
   cappedByKidneyDisease: boolean;
-  /** True when the pregnancy minimum raised the final value to at least 80 g. */
-  flooredByPregnancy: boolean;
 };
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────
@@ -74,9 +71,8 @@ function devineIdealBodyWeightKg(heightCm: number): number {
  *  2. Apply activity-level multiplier (g/kg).
  *  3. Cap at kidney-disease limit if applicable.
  *  4. Apply maintenance-phase multiplier if applicable.
- *  5. Apply pregnancy floor if applicable (80 g minimum).
- *  6. Clamp to [ABSOLUTE_FLOOR_G, ABSOLUTE_CEILING_G].
- *  7. Round to 1 decimal place.
+ *  5. Clamp to [ABSOLUTE_FLOOR_G, ABSOLUTE_CEILING_G].
+ *  6. Round to 1 decimal place.
  */
 export function calculateProteinFloor(input: ProteinInput): ProteinResult {
   const {
@@ -84,7 +80,6 @@ export function calculateProteinFloor(input: ProteinInput): ProteinResult {
     heightCm,
     bmi,
     hasKidneyDisease,
-    isPregnant,
     phase,
     activityLevel,
   } = input;
@@ -111,17 +106,10 @@ export function calculateProteinFloor(input: ProteinInput): ProteinResult {
     proteinG = proteinG * MAINTENANCE_MULTIPLIER;
   }
 
-  // Step 5 — pregnancy floor (80 g minimum, applied after phase multiplier)
-  const PREGNANCY_FLOOR_G = 80;
-  const flooredByPregnancy = isPregnant && proteinG < PREGNANCY_FLOOR_G;
-  if (flooredByPregnancy) {
-    proteinG = PREGNANCY_FLOOR_G;
-  }
-
-  // Step 6 — absolute clamp
+  // Step 5 — absolute clamp
   proteinG = Math.max(ABSOLUTE_FLOOR_G, Math.min(ABSOLUTE_CEILING_G, proteinG));
 
-  // Step 7 — round to 1 decimal
+  // Step 6 — round to 1 decimal
   const proteinFloorG = Math.round(proteinG * 10) / 10;
 
   return {
@@ -129,6 +117,5 @@ export function calculateProteinFloor(input: ProteinInput): ProteinResult {
     baseWeightUsedKg,
     usedIdealBodyWeight,
     cappedByKidneyDisease,
-    flooredByPregnancy,
   };
 }

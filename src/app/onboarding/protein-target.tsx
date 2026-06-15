@@ -31,13 +31,12 @@ export default function ProteinTargetScreen() {
   );
 
   const result = useMemo<ProteinResult | null>(() => {
-    const { weightKg, heightCm, hasKidneyDisease, isPregnant, activityLevel } = formData;
+    const { weightKg, heightCm, hasKidneyDisease, activityLevel } = formData;
 
     if (
       weightKg === undefined
       || heightCm === undefined
       || hasKidneyDisease === undefined
-      || isPregnant === undefined
       || activityLevel === undefined
     ) {
       return null;
@@ -50,16 +49,14 @@ export default function ProteinTargetScreen() {
       heightCm,
       bmi,
       hasKidneyDisease,
-      isPregnant,
       phase: 'weight_loss',
       activityLevel,
     });
   }, [formData]);
 
-  // Formula line: "82.5 kg × 1.6 g/kg" — hidden when floored by pregnancy
-  // (pregnancy minimum 80g doesn't fit a weight × multiplier explanation)
+  // Formula line: "82.5 kg × 1.6 g/kg"
   const formulaText = React.useMemo(() => {
-    if (!result || !formData.activityLevel || result.flooredByPregnancy)
+    if (!result || !formData.activityLevel)
       return null;
 
     const activityMultiplier = ACTIVITY_MULTIPLIERS[formData.activityLevel];
@@ -127,8 +124,7 @@ export default function ProteinTargetScreen() {
           {/* Adjustment badges — frosted-glass pills on gradient */}
           {result !== null
             && (result.usedIdealBodyWeight
-              || result.cappedByKidneyDisease
-              || result.flooredByPregnancy) && (
+              || result.cappedByKidneyDisease) && (
             <View style={styles.badgeRow}>
               {result.usedIdealBodyWeight && (
                 <View style={styles.badge}>
@@ -138,11 +134,6 @@ export default function ProteinTargetScreen() {
               {result.cappedByKidneyDisease && (
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>Kidney-safe limit</Text>
-                </View>
-              )}
-              {result.flooredByPregnancy && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>Pregnancy minimum</Text>
                 </View>
               )}
             </View>
@@ -155,7 +146,7 @@ export default function ProteinTargetScreen() {
         <Text style={styles.disclaimerText}>
           This estimate is based on the information you provided. Inaccurate inputs will produce
           inaccurate estimates. Always confirm your protein target with your prescriber, especially
-          if you have kidney disease, are pregnant, or have other health conditions.
+          if you have kidney disease or other health conditions.
         </Text>
       </DisclaimerBanner>
 

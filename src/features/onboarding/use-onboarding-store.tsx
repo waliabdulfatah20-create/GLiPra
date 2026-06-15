@@ -23,7 +23,6 @@ export type OnboardingFormData = {
   goalWeightKg?: number;
   // Step 4 — safety
   hasKidneyDisease?: boolean;
-  isPregnant?: boolean;
   // Status
   medicationStatus?: 'starting' | 'active';
   activityLevel?: 'sedentary' | 'moderate' | 'active';

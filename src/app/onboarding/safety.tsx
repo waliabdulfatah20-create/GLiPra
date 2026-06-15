@@ -11,7 +11,7 @@ import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 
 type SafetyQuestion = {
-  id: 'hasKidneyDisease' | 'isPregnant';
+  id: 'hasKidneyDisease';
   question: string;
   helperText: string;
 };
@@ -22,21 +22,15 @@ const SAFETY_QUESTIONS: SafetyQuestion[] = [
     question: 'Do you have kidney disease or reduced kidney function?',
     helperText: 'Includes CKD, dialysis, or any condition affecting your kidneys',
   },
-  {
-    id: 'isPregnant',
-    question: 'Are you currently pregnant?',
-    helperText: 'Including early pregnancy',
-  },
 ];
 
-type Answers = { hasKidneyDisease: boolean | undefined; isPregnant: boolean | undefined };
+type Answers = { hasKidneyDisease: boolean | undefined };
 
 export default function SafetyScreen() {
   const router = useRouter();
   const setFormData = useOnboardingStore.use.setFormData();
   const [answers, setAnswers] = useState<Answers>({
     hasKidneyDisease: undefined,
-    isPregnant: undefined,
   });
 
   const { colors, spacing, radius, shadows } = useTheme();
@@ -50,15 +44,13 @@ export default function SafetyScreen() {
     setAnswers(prev => ({ ...prev, [id]: value }));
   };
 
-  const canProceed
-    = answers.hasKidneyDisease !== undefined && answers.isPregnant !== undefined;
+  const canProceed = answers.hasKidneyDisease !== undefined;
 
   const handleNext = () => {
     if (!canProceed)
       return;
     setFormData({
       hasKidneyDisease: answers.hasKidneyDisease,
-      isPregnant: answers.isPregnant,
     });
     router.push('/onboarding/status');
   };
@@ -67,7 +59,7 @@ export default function SafetyScreen() {
     <OnboardingScaffold
       step={{ current: 4, total: 7 }}
       title="Safety check"
-      subtitle="These questions affect your protein target. Answer honestly: your safety depends on it."
+      subtitle="This affects your protein target. Answer honestly: your safety depends on it."
       footer={(
         <StepFooter
           primaryLabel="Next"

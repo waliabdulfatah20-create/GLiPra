@@ -45,7 +45,6 @@ const COMPLETE_PROFILE = {
   heightCm: 175,
   activityLevel: 'moderate' as const,
   hasKidneyDisease: false,
-  isPregnant: false,
   phase: 'weight_loss' as const,
   medicationStatus: 'active' as const,
   proteinFloorG: 112,
@@ -101,7 +100,7 @@ describe('protein target editor', () => {
     expect(supabase.from).toHaveBeenCalledWith('profiles');
     const updateFn = (supabase.from as jest.Mock).mock.results.at(-1)!.value.update as jest.Mock;
     expect(updateFn).toHaveBeenCalledWith(
-      expect.objectContaining({ protein_floor_g: 112, has_kidney_disease: false, is_pregnant: false }),
+      expect.objectContaining({ protein_floor_g: 112, has_kidney_disease: false }),
     );
   });
 

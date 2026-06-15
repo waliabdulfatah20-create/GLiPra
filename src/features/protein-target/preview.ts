@@ -15,7 +15,6 @@ export type ProteinPreviewInputs = {
   heightCm: number | null;
   activityLevel: ActivityLevel | null;
   hasKidneyDisease: boolean;
-  isPregnant: boolean;
   phase: Phase;
 };
 
@@ -43,7 +42,6 @@ export function previewProteinFloor(i: ProteinPreviewInputs): ProteinResult | nu
     heightCm: i.heightCm,
     bmi,
     hasKidneyDisease: i.hasKidneyDisease,
-    isPregnant: i.isPregnant,
     phase: i.phase,
     activityLevel: i.activityLevel,
   });

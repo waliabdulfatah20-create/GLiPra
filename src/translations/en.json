@@ -420,6 +420,18 @@
     "dose_missed": "Back on Track Today",
     "steady_state": "At Steady State"
   },
+  "permissions": {
+    "camera_b1": "We use the camera to take a photo of your food or scan a barcode.",
+    "camera_b2": "Photos are used only to recognize the food. We do not open your photo library.",
+    "camera_b3": "The camera runs only while you are on this screen. It is never used in the background.",
+    "camera_title": "Allow camera access",
+    "continue": "Continue",
+    "mic_b1": "We use the microphone so you can describe your meal out loud.",
+    "mic_b2": "Audio is used only to turn your words into a food log. It is not shared with anyone.",
+    "mic_b3": "The microphone runs only while you are recording. It is never used in the background.",
+    "microphone_title": "Allow microphone access",
+    "not_now": "Not now"
+  },
   "portion_multiplier": {
     "label": "Adjust portion",
     "pill_a11y": "{{label}} portion",

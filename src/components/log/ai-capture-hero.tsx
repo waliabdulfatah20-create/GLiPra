@@ -7,6 +7,7 @@
 // Reuses VoiceCaptureButton (recorder untouched) via its `autoStart` prop, and the
 // photo camera-launch logic from the old PhotoCaptureButton.
 
+import type { PermissionKind } from '@/features/permissions/use-permission-disclosure';
 import type { GlipraTokens } from '@/theme/tokens';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -23,6 +24,8 @@ import {
 
 import { VoiceCaptureButton } from '@/components/log/voice-capture-button';
 import { Camera, Crown, Microphone } from '@/components/ui/icons';
+import { PermissionDisclosureModal } from '@/components/ui/permission-disclosure-modal';
+import { usePermissionDisclosure } from '@/features/permissions/use-permission-disclosure';
 import { presentPaywall } from '@/features/subscription/present-paywall';
 import { useSubscription } from '@/features/subscription/use-subscription';
 import { haptics } from '@/lib/haptics';
@@ -51,6 +54,35 @@ export function AiCaptureHero({
     [colors, spacing, radius, shadows],
   );
   const [recording, setRecording] = React.useState(false);
+
+  // Prominent permission disclosure (Google Play): show a one-time rationale
+  // BEFORE the OS camera/mic prompt fires. `gate` runs the action immediately if
+  // already seen, else opens the disclosure and runs it only on Continue.
+  const { hasSeen, markSeen } = usePermissionDisclosure();
+  const [disclosure, setDisclosure] = React.useState<
+    { kind: PermissionKind; onProceed: () => void } | null
+  >(null);
+
+  function gate(kind: PermissionKind, onProceed: () => void) {
+    if (hasSeen(kind)) {
+      onProceed();
+      return;
+    }
+    setDisclosure({ kind, onProceed });
+  }
+
+  function handleDisclosureContinue() {
+    if (!disclosure)
+      return;
+    void markSeen(disclosure.kind);
+    const proceed = disclosure.onProceed;
+    setDisclosure(null);
+    proceed();
+  }
+
+  function handleDisclosureCancel() {
+    setDisclosure(null);
+  }
 
   async function launchCamera() {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
@@ -83,7 +115,7 @@ export function AiCaptureHero({
       presentPaywall('Voice logging');
       return;
     }
-    setRecording(true);
+    gate('microphone', () => setRecording(true));
   }
 
   function handleSnap() {
@@ -94,7 +126,7 @@ export function AiCaptureHero({
       presentPaywall('AI photo recognition');
       return;
     }
-    void launchCamera();
+    gate('camera', () => void launchCamera());
   }
 
   // Loading (transcribing voice / recognizing photo) — full-width spinner card.
@@ -132,50 +164,59 @@ export function AiCaptureHero({
 
   // Idle — the combined "Log with AI" card with two equal halves.
   return (
-    <View style={styles.card}>
-      <LinearGradient
-        colors={gradients.hero}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.gradient}
-      >
-        <View style={styles.headerRow}>
-          <Text style={styles.heroLabel}>{t('log.ai_hero_label')}</Text>
-          <View style={styles.proPill}>
-            <Crown color={colors.white} width={12} height={12} />
-            <Text style={styles.proPillText}>PRO</Text>
+    <>
+      <View style={styles.card}>
+        <LinearGradient
+          colors={gradients.hero}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradient}
+        >
+          <View style={styles.headerRow}>
+            <Text style={styles.heroLabel}>{t('log.ai_hero_label')}</Text>
+            <View style={styles.proPill}>
+              <Crown color={colors.white} width={12} height={12} />
+              <Text style={styles.proPillText}>PRO</Text>
+            </View>
           </View>
-        </View>
-        <View style={styles.halvesRow}>
-          <Pressable
-            testID="ai-hero-speak"
-            style={({ pressed }) => [styles.half, pressed && styles.halfPressed]}
-            onPress={handleSpeak}
-            accessibilityRole="button"
-            accessibilityLabel={t('log.voice_action')}
-          >
-            <View style={styles.iconChip}>
-              <Microphone color={colors.white} width={25} height={25} />
-            </View>
-            <Text style={styles.halfTitle}>{t('log.voice_action')}</Text>
-            <Text style={styles.halfSub}>{t('log.voice_action_sub')}</Text>
-          </Pressable>
-          <Pressable
-            testID="ai-hero-snap"
-            style={({ pressed }) => [styles.half, pressed && styles.halfPressed]}
-            onPress={handleSnap}
-            accessibilityRole="button"
-            accessibilityLabel={t('log.photo_action')}
-          >
-            <View style={styles.iconChip}>
-              <Camera color={colors.white} width={25} height={25} />
-            </View>
-            <Text style={styles.halfTitle}>{t('log.photo_action')}</Text>
-            <Text style={styles.halfSub}>{t('log.photo_action_sub')}</Text>
-          </Pressable>
-        </View>
-      </LinearGradient>
-    </View>
+          <View style={styles.halvesRow}>
+            <Pressable
+              testID="ai-hero-speak"
+              style={({ pressed }) => [styles.half, pressed && styles.halfPressed]}
+              onPress={handleSpeak}
+              accessibilityRole="button"
+              accessibilityLabel={t('log.voice_action')}
+            >
+              <View style={styles.iconChip}>
+                <Microphone color={colors.white} width={25} height={25} />
+              </View>
+              <Text style={styles.halfTitle}>{t('log.voice_action')}</Text>
+              <Text style={styles.halfSub}>{t('log.voice_action_sub')}</Text>
+            </Pressable>
+            <Pressable
+              testID="ai-hero-snap"
+              style={({ pressed }) => [styles.half, pressed && styles.halfPressed]}
+              onPress={handleSnap}
+              accessibilityRole="button"
+              accessibilityLabel={t('log.photo_action')}
+            >
+              <View style={styles.iconChip}>
+                <Camera color={colors.white} width={25} height={25} />
+              </View>
+              <Text style={styles.halfTitle}>{t('log.photo_action')}</Text>
+              <Text style={styles.halfSub}>{t('log.photo_action_sub')}</Text>
+            </Pressable>
+          </View>
+        </LinearGradient>
+      </View>
+
+      <PermissionDisclosureModal
+        visible={disclosure != null}
+        kind={disclosure?.kind ?? 'camera'}
+        onContinue={handleDisclosureContinue}
+        onCancel={handleDisclosureCancel}
+      />
+    </>
   );
 }
 

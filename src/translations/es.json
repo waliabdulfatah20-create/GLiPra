@@ -420,6 +420,18 @@
     "dose_missed": "Retoma hoy tu rutina",
     "steady_state": "En nivel estable"
   },
+  "permissions": {
+    "camera_b1": "Usamos la cámara para tomar una foto de tu comida o escanear un código de barras.",
+    "camera_b2": "Las fotos se usan solo para reconocer la comida. No abrimos tu galería de fotos.",
+    "camera_b3": "La cámara funciona solo mientras estás en esta pantalla. Nunca se usa en segundo plano.",
+    "camera_title": "Permitir acceso a la cámara",
+    "continue": "Continuar",
+    "mic_b1": "Usamos el micrófono para que puedas describir tu comida en voz alta.",
+    "mic_b2": "El audio se usa solo para convertir tus palabras en un registro de comida. No se comparte con nadie.",
+    "mic_b3": "El micrófono funciona solo mientras estás grabando. Nunca se usa en segundo plano.",
+    "microphone_title": "Permitir acceso al micrófono",
+    "not_now": "Ahora no"
+  },
   "portion_multiplier": {
     "label": "Ajustar porción",
     "pill_a11y": "Porción {{label}}",

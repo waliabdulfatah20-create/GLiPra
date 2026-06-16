@@ -16,7 +16,20 @@ jest.mock('@/features/subscription/use-subscription', () => ({
   useSubscription: () => ({ isPro: mockIsPro() }),
 }));
 jest.mock('@/features/subscription/present-paywall', () => ({ presentPaywall: jest.fn() }));
-jest.mock('@/lib/haptics', () => ({ haptics: { medium: jest.fn() } }));
+jest.mock('@/lib/haptics', () => ({ haptics: { medium: jest.fn(), tap: jest.fn() } }));
+
+// Permission disclosure: default to "already seen" so the gate passes straight
+// through (existing tests assert the OS prompt / recording directly). Individual
+// tests flip mockHasSeen to false to exercise the disclosure.
+const mockHasSeen = jest.fn((_kind: string) => true);
+const mockMarkSeen = jest.fn();
+jest.mock('@/features/permissions/use-permission-disclosure', () => ({
+  usePermissionDisclosure: () => ({
+    isLoading: false,
+    hasSeen: mockHasSeen,
+    markSeen: mockMarkSeen,
+  }),
+}));
 jest.mock('@/components/log/voice-capture-button', () => {
   const ReactLib = require('react');
   const { Text } = require('react-native');
@@ -48,6 +61,7 @@ describe('ai capture hero', () => {
     cleanup();
     jest.clearAllMocks();
     mockIsPro.mockReturnValue(true); // restore default (clearAllMocks keeps impl)
+    mockHasSeen.mockReturnValue(true); // restore default: disclosure already seen
   });
 
   it('renders the Speak and Snap halves plus the PRO pill when idle', () => {
@@ -90,5 +104,49 @@ describe('ai capture hero', () => {
     fireEvent.press(screen.getByTestId('ai-hero-snap'));
     expect(presentPaywall).toHaveBeenCalledWith('AI photo recognition');
     expect(ImagePicker.requestCameraPermissionsAsync).not.toHaveBeenCalled();
+  });
+
+  it('shows the camera disclosure on first Snap, not the OS prompt', () => {
+    mockHasSeen.mockReturnValue(false);
+    setup();
+    fireEvent.press(screen.getByTestId('ai-hero-snap'));
+    expect(screen.getByTestId('permission-disclosure')).toBeTruthy();
+    expect(ImagePicker.requestCameraPermissionsAsync).not.toHaveBeenCalled();
+  });
+
+  it('continuing the camera disclosure marks it seen and launches the camera', () => {
+    mockHasSeen.mockReturnValue(false);
+    setup();
+    fireEvent.press(screen.getByTestId('ai-hero-snap'));
+    fireEvent.press(screen.getByTestId('perm-disclosure-continue'));
+    expect(mockMarkSeen).toHaveBeenCalledWith('camera');
+    expect(ImagePicker.requestCameraPermissionsAsync).toHaveBeenCalled();
+  });
+
+  it('cancelling the disclosure does nothing', () => {
+    mockHasSeen.mockReturnValue(false);
+    setup();
+    fireEvent.press(screen.getByTestId('ai-hero-snap'));
+    fireEvent.press(screen.getByTestId('perm-disclosure-cancel'));
+    expect(mockMarkSeen).not.toHaveBeenCalled();
+    expect(ImagePicker.requestCameraPermissionsAsync).not.toHaveBeenCalled();
+    expect(screen.getByTestId('ai-hero-snap')).toBeTruthy();
+  });
+
+  it('shows the mic disclosure on first Speak and does not mount the recorder', () => {
+    mockHasSeen.mockReturnValue(false);
+    setup();
+    fireEvent.press(screen.getByTestId('ai-hero-speak'));
+    expect(screen.getByTestId('permission-disclosure')).toBeTruthy();
+    expect(screen.queryByTestId('voice-recording')).toBeNull();
+  });
+
+  it('continuing the mic disclosure flips to the recording view', () => {
+    mockHasSeen.mockReturnValue(false);
+    setup();
+    fireEvent.press(screen.getByTestId('ai-hero-speak'));
+    fireEvent.press(screen.getByTestId('perm-disclosure-continue'));
+    expect(mockMarkSeen).toHaveBeenCalledWith('microphone');
+    expect(screen.getByTestId('voice-recording')).toBeTruthy();
   });
 });

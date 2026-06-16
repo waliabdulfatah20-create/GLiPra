@@ -14,6 +14,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { PermissionDisclosureBody } from '@/components/ui/permission-disclosure-body';
 import { lookupBarcode } from '@/features/food-log/barcode-lookup';
 import {
   useBarcodeCorrectionLookup,
@@ -281,9 +282,7 @@ export function BarcodeScannerSheet({
         {/* Permission denied */}
         {permission && !permission.granted && (
           <View style={styles.permissionContent}>
-            <Text style={styles.permissionText}>
-              Camera access is required to scan barcodes.
-            </Text>
+            <PermissionDisclosureBody kind="camera" />
             {permission.canAskAgain
               ? (
                   <Pressable

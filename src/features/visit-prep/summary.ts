@@ -2,7 +2,10 @@
 // route-aware branching (injection vs oral) is unit-testable. Used by the
 // visit-prep hooks/screen and mirrored by the PDF edge function.
 
-import { differenceInCalendarDays, parseISO } from 'date-fns';
+import type { MedicationChangeRecord } from '@/features/medication-change/api';
+import { differenceInCalendarDays, format, parseISO } from 'date-fns';
+
+import { getMedicationBrand } from '@/features/medication/medications';
 
 /** Convert internal medication ID to a display name for the screen + PDF. */
 export function medicationIdToName(id: string | undefined | null): string | null {
@@ -62,4 +65,20 @@ export function daysSinceLastDose(
   if (!takenAtIso)
     return null;
   return differenceInCalendarDays(parseISO(todayIso), parseISO(takenAtIso));
+}
+
+/**
+ * Display-ready row for one medication switch, as rendered in the visit-prep
+ * PDF. Single source of truth for the row text — mirrors the on-screen
+ * MEDICATION CHANGES card so the exported PDF matches the screen exactly.
+ * `from` falls back to 'Unknown' (a first medication has no prior); `to`
+ * falls back to its raw id via getMedicationBrand.
+ */
+export function medicationChangeToPdfRow(
+  change: MedicationChangeRecord,
+): { date: string; transition: string } {
+  return {
+    date: format(parseISO(change.changedAt), 'MMM d, yyyy'),
+    transition: `${getMedicationBrand(change.fromMedicationId) || 'Unknown'} -> ${getMedicationBrand(change.toMedicationId)}`,
+  };
 }

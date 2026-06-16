@@ -2,6 +2,7 @@
 // Assembles the last-4-weeks data summary, provides AI question generation,
 // and a PDF generation mutation.
 
+import type { MedicationChangeRecord } from '@/features/medication-change/api';
 import type { AdministrationRoute } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { format, subDays } from 'date-fns';
@@ -13,6 +14,7 @@ import { useTodayData } from '@/features/today/hooks';
 import {
   daysSinceLastDose,
   injectionPhaseLabel,
+  medicationChangeToPdfRow,
   medicationIdToName,
   oralPhaseLabel,
 } from '@/features/visit-prep/summary';
@@ -249,7 +251,10 @@ export function useVisitPrep(): UseVisitPrepResult {
 // ---------------------------------------------------------------------------
 
 export type GeneratePdfResult = {
-  generate: (data: VisitPrepData) => Promise<string | null>;
+  generate: (
+    data: VisitPrepData,
+    medicationChanges?: MedicationChangeRecord[],
+  ) => Promise<string | null>;
   isLoading: boolean;
   error: string | null;
 };
@@ -258,7 +263,10 @@ export function useGeneratePdf(): GeneratePdfResult {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const generate = async (data: VisitPrepData): Promise<string | null> => {
+  const generate = async (
+    data: VisitPrepData,
+    medicationChanges?: MedicationChangeRecord[],
+  ): Promise<string | null> => {
     setIsLoading(true);
     setError(null);
 
@@ -266,6 +274,10 @@ export function useGeneratePdf(): GeneratePdfResult {
       const visitDate = format(new Date(), 'yyyy-MM-dd');
 
       const isOral = data.administrationRoute === 'oral';
+
+      // Switch history (oral <-> injection, dose changes) — mirror the on-screen
+      // MEDICATION CHANGES card in the PDF. Omitted when there are no switches.
+      const medChangeRows = (medicationChanges ?? []).map(medicationChangeToPdfRow);
 
       const body = {
         visitDate,
@@ -278,6 +290,7 @@ export function useGeneratePdf(): GeneratePdfResult {
           avgNausea: data.avgNausea ?? undefined,
           avgEnergy: data.avgEnergy ?? undefined,
           hasRedFlags: false, // Placeholder until red-flag history query is wired
+          ...(medChangeRows.length > 0 ? { medicationChanges: medChangeRows } : {}),
           // Route-specific clinical signal
           ...(isOral
             ? {

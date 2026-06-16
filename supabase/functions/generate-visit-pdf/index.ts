@@ -32,6 +32,11 @@ const PatientDataSchema = z.object({
   doseAdherenceStreakDays: z.number().optional(),
   daysSinceLastDose: z.number().optional(),
   medicationName: z.string().optional(),
+  // Switch history (oral <-> injection, dose/brand changes) — display-ready rows
+  // built client-side from medication_changes, mirroring the on-screen card.
+  medicationChanges: z
+    .array(z.object({ date: z.string(), transition: z.string() }))
+    .optional(),
   avgNausea: z.number().optional(),
   avgEnergy: z.number().optional(),
   hasRedFlags: z.boolean(),
@@ -48,6 +53,11 @@ const InputSchema = z.object({
 
 const DAILY_LIMIT = 5;
 const FUNCTION_NAME = 'generate-visit-pdf';
+
+// The PDF is a single fixed A4 page (no pagination). Switches are rare, so this
+// cap is a safety net against vertical overflow rather than an expected trim;
+// any rows beyond it are summarised in a trailing "+ N earlier changes" line.
+const MAX_PDF_CHANGES = 6;
 
 const PRESCRIBER_QUESTIONS_INJECTION = [
   'Is my current dose appropriate for my weight?',
@@ -305,6 +315,32 @@ serve(async (req: Request) => {
       curY = drawDataRow(page, regularFont, boldFont, 'Medication:', medicationStr, curY, margin);
       curY = drawDataRow(page, regularFont, boldFont, 'Current phase:', phaseStr, curY, margin);
       curY = drawDataRow(page, regularFont, boldFont, 'Days since injection:', daysStr, curY, margin);
+      curY -= 10;
+    }
+
+    // --- Medication Changes — switch history (mirrors the on-screen card) ---
+    const medicationChanges = patientData.medicationChanges ?? [];
+    if (medicationChanges.length > 0) {
+      curY = drawSectionHeading(page, boldFont, 'MEDICATION CHANGES', curY, width, margin);
+      curY -= 4;
+
+      const shown = medicationChanges.slice(0, MAX_PDF_CHANGES);
+      for (const change of shown) {
+        curY = drawDataRow(page, regularFont, boldFont, change.date, change.transition, curY, margin);
+      }
+
+      const remaining = medicationChanges.length - shown.length;
+      if (remaining > 0) {
+        curY = drawDataRow(
+          page,
+          regularFont,
+          boldFont,
+          '',
+          `+ ${remaining} earlier change${remaining === 1 ? '' : 's'}`,
+          curY,
+          margin,
+        );
+      }
       curY -= 10;
     }
 

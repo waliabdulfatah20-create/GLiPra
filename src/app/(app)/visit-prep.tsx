@@ -126,7 +126,7 @@ export default function VisitPrepScreen() {
     if (!isPro)
       return;
 
-    const pdfBase64 = await generate(data);
+    const pdfBase64 = await generate(data, medChanges);
 
     if (!pdfBase64) {
       Alert.alert(
@@ -164,7 +164,7 @@ export default function VisitPrepScreen() {
       'PDF Ready',
       `PDF generated successfully.\nBase64 length: ${pdfBase64.length} chars.\n\nSharing is not available on this device.`,
     );
-  }, [data, generate, pdfError, isPro]);
+  }, [data, generate, pdfError, isPro, medChanges]);
 
   if (data.isLoading) {
     return (

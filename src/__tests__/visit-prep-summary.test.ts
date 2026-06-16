@@ -1,10 +1,24 @@
+import type { MedicationChangeRecord } from '@/features/medication-change/api';
 import { describe, expect, it } from 'vitest';
 import {
   daysSinceLastDose,
   injectionPhaseLabel,
+  medicationChangeToPdfRow,
   medicationIdToName,
   oralPhaseLabel,
 } from '@/features/visit-prep/summary';
+
+function makeChange(over: Partial<MedicationChangeRecord>): MedicationChangeRecord {
+  return {
+    id: 'c1',
+    changedAt: '2026-06-01T10:00:00',
+    fromMedicationId: 'semaglutide_ozempic',
+    fromRoute: 'injection',
+    toMedicationId: 'tirzepatide_mounjaro',
+    toRoute: 'injection',
+    ...over,
+  };
+}
 
 describe('medicationIdToName', () => {
   it('maps injection medication ids', () => {
@@ -67,5 +81,34 @@ describe('daysSinceLastDose', () => {
   it('returns null when there is no dose on record', () => {
     expect(daysSinceLastDose(null, '2026-06-06')).toBeNull();
     expect(daysSinceLastDose(undefined, '2026-06-06')).toBeNull();
+  });
+});
+
+describe('medicationChangeToPdfRow', () => {
+  it('formats the date and an injection-to-injection brand transition', () => {
+    expect(medicationChangeToPdfRow(makeChange({}))).toEqual({
+      date: 'Jun 1, 2026',
+      transition: 'Ozempic -> Mounjaro',
+    });
+  });
+
+  it('renders an injection-to-oral switch', () => {
+    expect(
+      medicationChangeToPdfRow(
+        makeChange({ toMedicationId: 'semaglutide_rybelsus', toRoute: 'oral' }),
+      ).transition,
+    ).toBe('Ozempic -> Rybelsus / Oral Wegovy');
+  });
+
+  it('shows Unknown when there is no prior medication (first switch)', () => {
+    expect(
+      medicationChangeToPdfRow(makeChange({ fromMedicationId: null, fromRoute: null })).transition,
+    ).toBe('Unknown -> Mounjaro');
+  });
+
+  it('falls back to the raw id for an unknown target medication', () => {
+    expect(
+      medicationChangeToPdfRow(makeChange({ toMedicationId: 'some_new_med' })).transition,
+    ).toBe('Ozempic -> some_new_med');
   });
 });

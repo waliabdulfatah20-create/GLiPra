@@ -29,7 +29,6 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
-  Activity,
   Bolt,
   Camera,
   ClipboardCheck,
@@ -77,7 +76,6 @@ const PRO_BENEFITS: { Icon: IconCmp; label: string }[] = [
   { Icon: Camera, label: 'AI photo food recognition (50/day)' },
   { Icon: Microphone, label: 'Voice logging (unlimited)' },
   { Icon: Bolt, label: 'Daily AI nutrition guidance' },
-  { Icon: Activity, label: 'Micronutrient watch' },
   { Icon: TrendingUp, label: 'Unlimited protein history' },
   { Icon: ClipboardCheck, label: 'Prescriber visit prep & PDF export' },
 ];

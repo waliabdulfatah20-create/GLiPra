@@ -7,7 +7,7 @@ import Env from 'env';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, Linking, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DeleteAccountModal } from '@/features/account/components/delete-account-modal';
@@ -78,6 +78,12 @@ const STATUS_LABELS: Record<string, string> = {
   active: 'Active',
 };
 
+// Support contact (store blocker B15). The web page is the primary destination;
+// email is the always-works fallback. legal@glipra.com is the existing inbox
+// already named in the privacy policy.
+const SUPPORT_URL = 'https://glipra.com/support';
+const SUPPORT_EMAIL = 'legal@glipra.com';
+
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export function SettingsScreen() {
@@ -136,6 +142,31 @@ export function SettingsScreen() {
     analytics.capture(EVENTS.ACCOUNT_DELETED);
     setDeleteVisible(false);
     await signOut();
+  };
+
+  const handleSupportPage = async () => {
+    try {
+      await Linking.openURL(SUPPORT_URL);
+    }
+    catch {
+      Alert.alert(t('settings.contact_support'), `${SUPPORT_URL}`);
+    }
+  };
+
+  const handleSupportEmail = async () => {
+    const subject = encodeURIComponent(t('settings.support_email_subject'));
+    const body = encodeURIComponent(
+      t('settings.support_email_body', {
+        version: Env.EXPO_PUBLIC_VERSION,
+        platform: `${Platform.OS} ${Platform.Version}`,
+      }),
+    );
+    try {
+      await Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`);
+    }
+    catch {
+      Alert.alert(t('settings.email_us'), SUPPORT_EMAIL);
+    }
   };
 
   const goalWeightValue
@@ -289,6 +320,20 @@ export function SettingsScreen() {
         {/* ── Language ──────────────────────────────────────────────── */}
         <SettingsSection title={t('settings.language')}>
           <LanguagePicker />
+        </SettingsSection>
+
+        {/* ── Support ───────────────────────────────────────────────── */}
+        <SettingsSection title={t('settings.support')}>
+          <SettingsRow
+            label={t('settings.contact_support')}
+            onPress={handleSupportPage}
+          />
+          <SettingsRow
+            label={t('settings.email_us')}
+            value={SUPPORT_EMAIL}
+            onPress={handleSupportEmail}
+            isLast
+          />
         </SettingsSection>
 
         {/* ── About ─────────────────────────────────────────────────── */}

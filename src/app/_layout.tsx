@@ -1,16 +1,18 @@
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import { ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import * as Linking from 'expo-linking';
+import { router, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import * as React from 'react';
 import { useEffect } from 'react';
 import { AppState, StyleSheet, useColorScheme } from 'react-native';
-import FlashMessage from 'react-native-flash-message';
+import FlashMessage, { showMessage } from 'react-native-flash-message';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { useThemeConfig } from '@/components/ui/use-theme-config';
 
+import { parseAuthRedirect } from '@/features/auth/deep-link';
 import { hydrateAuth, setSession } from '@/features/auth/use-auth-store';
 import { analytics } from '@/lib/analytics';
 import { APIProvider } from '@/lib/api';
@@ -87,12 +89,68 @@ export default function RootLayout() {
     };
   }, []);
 
+  // Auth deep links (password recovery + email confirmation). Supabase implicit
+  // links carry tokens in the URL fragment; parseAuthRedirect extracts them, we
+  // set the session (which drives onAuthStateChange above), and route recovery
+  // links to the reset-password screen. Expired/invalid links flash and bounce
+  // to sign-in.
+  useEffect(() => {
+    let mounted = true;
+
+    async function handleAuthUrl(url: string | null) {
+      const result = parseAuthRedirect(url);
+      if (!mounted || !result)
+        return;
+
+      if (result.kind === 'error') {
+        showMessage({
+          message: 'That link has expired or is invalid. Please request a new one.',
+          type: 'warning',
+        });
+        router.replace('/(auth)/sign-in');
+        return;
+      }
+
+      const { error } = await supabase.auth.setSession({
+        access_token: result.accessToken,
+        refresh_token: result.refreshToken,
+      });
+      if (!mounted)
+        return;
+      if (error) {
+        showMessage({
+          message: 'That link has expired or is invalid. Please request a new one.',
+          type: 'warning',
+        });
+        router.replace('/(auth)/sign-in');
+        return;
+      }
+
+      if (result.type === 'recovery')
+        router.replace('/reset-password');
+    }
+
+    Linking.getInitialURL().then((url) => {
+      if (mounted)
+        void handleAuthUrl(url);
+    });
+    const linkSub = Linking.addEventListener('url', ({ url }) => {
+      void handleAuthUrl(url);
+    });
+
+    return () => {
+      mounted = false;
+      linkSub.remove();
+    };
+  }, []);
+
   return (
     <Providers>
       <Stack>
         <Stack.Screen name="(app)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        <Stack.Screen name="reset-password" options={{ headerShown: false }} />
       </Stack>
     </Providers>
   );

@@ -3,6 +3,7 @@
 // Callers handle errors uniformly — no throws escape this module.
 
 import * as AppleAuthentication from 'expo-apple-authentication';
+import * as Linking from 'expo-linking';
 
 import { supabase } from '@/lib/supabase';
 
@@ -18,7 +19,14 @@ export async function signUpWithEmail(
   email: string,
   password: string,
 ): Promise<{ error: string | null; needsEmailConfirmation: boolean; userId?: string }> {
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  // emailRedirectTo lets the confirmation link reopen the app (the root deep-link
+  // handler exchanges the tokens). createURL builds the correct per-env scheme
+  // (glipra:// / glipra.preview://). Manual sign-in remains the fallback.
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: Linking.createURL('/') },
+  });
   if (error)
     return { error: error.message, needsEmailConfirmation: false };
   const needsEmailConfirmation = data.session === null;
@@ -50,7 +58,8 @@ export async function signInWithApple(): Promise<{ error: string | null }> {
 
 export async function sendPasswordResetEmail(email: string): Promise<{ error: string | null }> {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'dosepath://reset-password',
+    // Env-aware: glipra://reset-password / glipra.preview://reset-password.
+    redirectTo: Linking.createURL('reset-password'),
   });
   return { error: error?.message ?? null };
 }

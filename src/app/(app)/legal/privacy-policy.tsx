@@ -14,7 +14,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     heading: '3. How We Use Your Information',
-    body: 'We use your information to:\n\n• Create and manage your account\n• Calculate your protein floor and daily nutrition targets\n• Track your injection cycle and estimate medication levels\n• Generate AI-assisted meal analyses when you use the photo feature (meal photos are transmitted to our servers, analyzed, and not used to train AI models)\n• Send injection reminders and phase-based guidance\n• Display progress charts and streak history\n• Identify symptoms that may warrant prescriber follow-up\n• Improve the Service using aggregated, de-identified analytics\n• Comply with applicable law\n\nAI prompts contain only anonymized, non-identifying context. We never send your name, email address, or other identifying information to our AI providers.',
+    body: 'We use your information to:\n\n• Create and manage your account\n• Calculate your protein floor and daily nutrition targets\n• Track your injection cycle and estimate medication levels\n• Generate AI-assisted meal analyses when you use the photo feature (meal photos are transmitted to our servers, analyzed, and not used to train AI models)\n• Send injection reminders and phase-based guidance\n• Display progress charts and streak history\n• Identify symptoms that may warrant prescriber follow-up\n• Improve the Service using aggregated, de-identified analytics\n• Comply with applicable law\n\nAI prompts contain only anonymized, non-identifying context. We never send your name, email address, or other identifying information to OpenAI, our third-party AI provider.',
   },
   {
     heading: '4. How We Share Your Information',

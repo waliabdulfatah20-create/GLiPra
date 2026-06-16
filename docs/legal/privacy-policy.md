@@ -112,9 +112,9 @@ We use your symptom logs to generate **symptom-escalation notices** — automate
 
 ### 6.3 AI Features
 
-When you use the meal-photo analysis feature, your meal photo is transmitted to our servers and processed using third-party AI services (see Section 10 — Subprocessors). We do not use your meal photos to train AI models. Photos are retained only as long as necessary to deliver the analysis result.
+When you use the meal-photo or voice analysis feature, your photo or voice recording is transmitted to our servers and then to **OpenAI** (our third-party AI provider, located in the United States) for analysis (see our Subprocessor List below). We do not use your photos or recordings to train AI models, and OpenAI does not use them to train its models. Photos and recordings are retained only as long as necessary to deliver the analysis result.
 
-When you use the AI guidance or coaching features, we transmit **anonymized, non-identifying** context to our AI provider. We never include your name, email address, or other identifying information in AI prompts.
+When you use the AI guidance or coaching features, we transmit **anonymized, non-identifying** context to **OpenAI**. We never include your name, email address, or other identifying information in AI prompts.
 
 ### 6.4 Product Improvement
 

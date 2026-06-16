@@ -355,7 +355,8 @@
     "peak_suppression_headline": "Supresión máxima: apetito bien controlado",
     "peak_suppression_pill": "Prioridad alta de proteína",
     "recovery_window_headline": "Ventana de recuperación: el apetito puede volver",
-    "recovery_window_pill": "Aumenta la frecuencia de comidas si es necesario"
+    "recovery_window_pill": "Aumenta la frecuencia de comidas si es necesario",
+    "steady_state_eta": "Estado estable unos {{days}} días después de empezar"
   },
   "med_banner_oral": {
     "building_headline": "Subiendo al estado estable",

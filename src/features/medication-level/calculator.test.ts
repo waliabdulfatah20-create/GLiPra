@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  daysToSteadyState,
   estimateLevel,
   FALLBACK_HALF_LIFE,
   generateLevelCurve,
   generateSteadyStateCurve,
   HALF_LIVES,
+  STEADY_STATE_HALF_LIVES,
 } from './calculator';
 
 // ---------------------------------------------------------------------------
@@ -391,5 +393,34 @@ describe('generateSteadyStateCurve', () => {
     // With 5 doses at 0, 7, 14, 21, 28 days prior, total is sum of their decay
     // Day 0 dose contributes 1.0 (full), others contribute decayed amounts
     expect(todayPt!.levelMg).toBeGreaterThan(1.0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// daysToSteadyState — ~5 half-lives, educational titration context
+// ---------------------------------------------------------------------------
+
+describe('daysToSteadyState', () => {
+  it('is 5 half-lives, rounded, for each known medication', () => {
+    for (const [medId, halfLife] of Object.entries(HALF_LIVES)) {
+      expect(daysToSteadyState(medId)).toBe(Math.round(STEADY_STATE_HALF_LIVES * halfLife));
+    }
+  });
+
+  it('returns the expected day counts for the common medications', () => {
+    expect(daysToSteadyState('semaglutide_ozempic')).toBe(35); // 7d half-life
+    expect(daysToSteadyState('tirzepatide_mounjaro')).toBe(25); // 5d
+    expect(daysToSteadyState('dulaglutide_trulicity')).toBe(23); // 4.5d -> 22.5 -> 23
+    expect(daysToSteadyState('orforglipron')).toBe(6); // 1.1d -> 5.5 -> 6
+    expect(daysToSteadyState('liraglutide_saxenda')).toBe(3); // 0.5d -> 2.5 -> 3
+  });
+
+  it('falls back to the default half-life for an unknown medication', () => {
+    expect(daysToSteadyState('not_a_real_med')).toBe(Math.round(STEADY_STATE_HALF_LIVES * FALLBACK_HALF_LIFE));
+    expect(daysToSteadyState('not_a_real_med')).toBe(35);
+  });
+
+  it('falls back to the default half-life when medicationId is null', () => {
+    expect(daysToSteadyState(null)).toBe(35);
   });
 });

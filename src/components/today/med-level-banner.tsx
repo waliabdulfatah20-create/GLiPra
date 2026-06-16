@@ -5,7 +5,9 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { MedLevelSparkline } from '@/components/medication-level/med-level-sparkline';
 import { Activity } from '@/components/ui/icons';
+import { daysToSteadyState } from '@/features/medication-level/calculator';
 import { useMedicationLevelCurve } from '@/features/medication-level/hooks';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
@@ -28,7 +30,7 @@ export function MedLevelBanner({ route, phase }: MedLevelBannerProps) {
     () => makeStyles({ colors, spacing, radius, shadows }),
     [colors, spacing, radius, shadows],
   );
-  const { curve, isLoading } = useMedicationLevelCurve();
+  const { curve, isLoading, todayOffset, medicationId } = useMedicationLevelCurve();
 
   const isOral = route === 'oral';
   const namespace = isOral ? 'med_banner_oral' : 'med_banner';
@@ -92,6 +94,16 @@ export function MedLevelBanner({ route, phase }: MedLevelBannerProps) {
         </View>
         <Text style={styles.chevron}>›</Text>
       </View>
+
+      {/* Inline PK sparkline + titration ETA — preview of the full /medication-level chart */}
+      {curve.length >= 2 && (
+        <View style={styles.sparklineWrap}>
+          <MedLevelSparkline curve={curve} todayOffset={todayOffset} height={52} />
+          <Text style={styles.etaCaption}>
+            {t('med_banner.steady_state_eta', { days: daysToSteadyState(medicationId) })}
+          </Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 }
@@ -154,6 +166,14 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       fontSize: 22,
       color: colors.textDisabled,
       fontWeight: '300',
+    },
+    sparklineWrap: {
+      gap: 2,
+    },
+    etaCaption: {
+      fontSize: 11,
+      fontWeight: '500',
+      color: colors.textSecondary,
     },
   });
 }

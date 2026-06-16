@@ -20,6 +20,23 @@ export const HALF_LIVES: Record<string, number> = {
 
 export const FALLBACK_HALF_LIFE = 7; // days
 
+// Steady state is reached after ~5 half-lives (>97% of plateau). This is a property
+// of the medication, not a personalized countdown.
+export const STEADY_STATE_HALF_LIVES = 5;
+
+/**
+ * Days for the medication to reach steady state after starting it. Educational
+ * titration context, not a dose recommendation. Falls back to the default
+ * half-life for an unknown or null medication.
+ *
+ * @param medicationId - GLP-1 medication identifier (or null)
+ * @returns whole days to steady state
+ */
+export function daysToSteadyState(medicationId: GLP1MedicationId | string | null): number {
+  const halfLife = (medicationId != null ? HALF_LIVES[medicationId] : undefined) ?? FALLBACK_HALF_LIFE;
+  return Math.round(STEADY_STATE_HALF_LIVES * halfLife);
+}
+
 /**
  * Estimate the medication level at a given point in time using first-order elimination.
  * Formula: doseMg * 0.5^(daysSinceInjection / halfLife)

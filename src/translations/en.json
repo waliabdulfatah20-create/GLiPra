@@ -355,7 +355,8 @@
     "peak_suppression_headline": "Peak suppression: appetite well-controlled",
     "peak_suppression_pill": "High protein priority",
     "recovery_window_headline": "Recovery window: appetite may return",
-    "recovery_window_pill": "Increase meal frequency if needed"
+    "recovery_window_pill": "Increase meal frequency if needed",
+    "steady_state_eta": "Steady state about {{days}} days after starting"
   },
   "med_banner_oral": {
     "building_headline": "Building to steady state",

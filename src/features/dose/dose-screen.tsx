@@ -242,6 +242,18 @@ export function DoseScreen() {
                 </View>
               )}
 
+          {/* Prep for your visit — prescriber visit summary. Shown on both routes
+              (also reachable from Settings). */}
+          <ActionRow
+            testID="dose-visit-prep"
+            icon={<ClipboardCheck color={colors.primary} width={20} height={20} />}
+            title={t('dose.visit_prep_title')}
+            subtitle={t('dose.visit_prep_sub')}
+            onPress={() => { haptics.tap(); router.push('/visit-prep'); }}
+            styles={styles}
+            colors={colors}
+          />
+
           {/* Switched medications? — route switch (oral <-> injection) without losing
               progress or subscription. Shown on both routes. */}
           <TouchableOpacity

@@ -254,7 +254,9 @@
     "tip_rotate_title": "Rotate every injection",
     "title": "Dose",
     "today_label": "TODAY'S DOSE",
-    "view_level": "View medication level"
+    "view_level": "View medication level",
+    "visit_prep_sub": "Prescriber visit summary",
+    "visit_prep_title": "Prep for your visit"
   },
   "log": {
     "ai_hero_label": "Log with AI",

@@ -254,7 +254,9 @@
     "tip_rotate_title": "Rota en cada inyección",
     "title": "Dosis",
     "today_label": "DOSIS DE HOY",
-    "view_level": "Ver nivel de medicación"
+    "view_level": "Ver nivel de medicación",
+    "visit_prep_sub": "Resumen para la visita al prescriptor",
+    "visit_prep_title": "Prepárate para tu visita"
   },
   "log": {
     "ai_hero_label": "Registra con IA",

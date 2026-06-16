@@ -51,6 +51,7 @@ export const EVENTS = {
   // AI Coach
   COACH_MESSAGE_SENT: 'coach_message_sent',
   COACH_MESSAGE_BLOCKED: 'coach_message_blocked', // keyword blocklist triggered
+  MEAL_IDEAS_REQUESTED: 'meal_ideas_requested', // properties: { mealType } only (Rule 2)
 
   // Subscription
   PAYWALL_VIEWED: 'paywall_viewed',

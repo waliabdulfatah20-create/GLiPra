@@ -9,6 +9,7 @@
 //          Suggestion chips are food-only.
 
 import type { CoachMessage } from '@/features/ai-coach/hooks';
+import type { MealType } from '@/features/meal-ideas/context';
 import type { GlipraTokens } from '@/theme/tokens';
 
 import { LinearGradient } from 'expo-linear-gradient';
@@ -22,6 +23,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -31,6 +33,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { ArrowRight, ChatBubble } from '@/components/ui/icons';
 import { useAiCoach } from '@/features/ai-coach/hooks';
+import { useMealIdeas } from '@/features/meal-ideas/hooks';
+import { MealIdeasCard } from '@/features/meal-ideas/meal-ideas-card';
 import { ProGate } from '@/features/subscription/pro-gate';
 import { useSubscription } from '@/features/subscription/use-subscription';
 import { haptics } from '@/lib/haptics';
@@ -119,6 +123,7 @@ function MessageBubble({ message }: { message: CoachMessage }) {
 export default function CoachScreen() {
   const { t } = useTranslation();
   const { messages, sendMessage, isLoading } = useAiCoach();
+  const { result: mealIdeas, request: requestMealIdeas, isLoading: mealIdeasLoading } = useMealIdeas();
   const { isPro } = useSubscription();
   const [inputText, setInputText] = useState('');
   const flatListRef = useRef<FlatList<CoachMessage>>(null);
@@ -142,6 +147,20 @@ export default function CoachScreen() {
     t('coach.suggest_snacks'),
     t('coach.suggest_appetite'),
   ];
+
+  const mealChips: { type: MealType; label: string }[] = [
+    { type: 'breakfast', label: t('coach.meal_ideas_breakfast') },
+    { type: 'lunch', label: t('coach.meal_ideas_lunch') },
+    { type: 'dinner', label: t('coach.meal_ideas_dinner') },
+    { type: 'snack', label: t('coach.meal_ideas_snack') },
+  ];
+
+  const handleMealIdeas = (type: MealType) => {
+    if (mealIdeasLoading)
+      return;
+    haptics.medium();
+    void requestMealIdeas(type);
+  };
 
   const handleSend = async (preset?: string) => {
     const text = (preset ?? inputText).trim();
@@ -190,28 +209,66 @@ export default function CoachScreen() {
         {/* Message area: a centered welcome (empty) or the conversation list */}
         {isEmpty
           ? (
-              <View style={styles.emptyWrap}>
+              <ScrollView
+                style={styles.emptyScroll}
+                contentContainerStyle={styles.emptyScrollContent}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+              >
                 <View style={styles.emptyAvatar}>
                   <ChatBubble color={colors.primary} width={28} height={28} />
                 </View>
                 <Text style={styles.emptyText}>{t('coach.welcome')}</Text>
                 {isPro && (
-                  <View style={styles.chipsRow}>
-                    {suggestions.map(s => (
-                      <Pressable
-                        key={s}
-                        testID="coach-chip"
-                        style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
-                        onPress={() => { void handleSend(s); }}
-                        accessibilityRole="button"
-                        accessibilityLabel={s}
-                      >
-                        <Text style={styles.chipText}>{s}</Text>
-                      </Pressable>
-                    ))}
-                  </View>
+                  <>
+                    <View style={styles.chipsRow}>
+                      {suggestions.map(s => (
+                        <Pressable
+                          key={s}
+                          testID="coach-chip"
+                          style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
+                          onPress={() => { void handleSend(s); }}
+                          accessibilityRole="button"
+                          accessibilityLabel={s}
+                        >
+                          <Text style={styles.chipText}>{s}</Text>
+                        </Pressable>
+                      ))}
+                    </View>
+
+                    {/* Meal ideas — on-demand, Pro. Educational ideas, not a plan. */}
+                    <Text style={styles.mealIdeasLabel}>{t('coach.meal_ideas_label')}</Text>
+                    <View style={styles.chipsRow}>
+                      {mealChips.map(c => (
+                        <Pressable
+                          key={c.type}
+                          testID="meal-idea-chip"
+                          style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
+                          onPress={() => handleMealIdeas(c.type)}
+                          disabled={mealIdeasLoading}
+                          accessibilityRole="button"
+                          accessibilityLabel={c.label}
+                        >
+                          <Text style={styles.chipText}>{c.label}</Text>
+                        </Pressable>
+                      ))}
+                    </View>
+
+                    {mealIdeasLoading && (
+                      <View style={styles.mealLoadingRow}>
+                        <ActivityIndicator size="small" color={colors.primary} />
+                        <Text style={styles.typingText}>{t('coach.meal_ideas_loading')}</Text>
+                      </View>
+                    )}
+
+                    {mealIdeas && !mealIdeasLoading && (
+                      <View style={styles.mealCardWrap}>
+                        <MealIdeasCard result={mealIdeas} />
+                      </View>
+                    )}
+                  </>
                 )}
-              </View>
+              </ScrollView>
             )
           : (
               <FlatList
@@ -390,13 +447,35 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       color: colors.textSecondary,
     },
 
-    // Empty state (centered welcome + chips)
-    emptyWrap: {
+    // Empty state (centered welcome + chips + meal ideas) — scrollable so the
+    // meal-ideas card can grow past the viewport.
+    emptyScroll: {
       flex: 1,
+    },
+    emptyScrollContent: {
+      flexGrow: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: spacing.xl,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.lg,
       gap: spacing.md,
+    },
+    mealIdeasLabel: {
+      fontSize: 11,
+      fontWeight: '700',
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+      color: colors.textSecondary,
+      marginTop: spacing.sm,
+    },
+    mealLoadingRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    mealCardWrap: {
+      alignSelf: 'stretch',
+      marginTop: spacing.xs,
     },
     emptyAvatar: {
       width: 56,

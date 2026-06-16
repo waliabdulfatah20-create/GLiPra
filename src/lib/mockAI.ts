@@ -58,6 +58,15 @@ export const MOCK_COACH_REPLY
     + 'options: Greek yogurt, cottage cheese, eggs, or a whey shake. Aim for 25-30g per '
     + 'sitting across 3-4 small meals, and pair protein with fluids to stay hydrated.';
 
+export const MOCK_MEAL_IDEAS = {
+  ideas: [
+    { name: 'Greek yogurt and berries', description: 'Creamy, protein-dense, and easy on a low appetite. A spoon of nut butter adds staying power.', approxProteinG: 18 },
+    { name: 'Cheesy scrambled eggs', description: 'Soft and gentle. Fold in spinach or a little cheese for extra protein.', approxProteinG: 16 },
+    { name: 'Cottage cheese bowl', description: 'Top with fruit for sweet or tomato and pepper for savory. Quick and high in protein.', approxProteinG: 20 },
+  ],
+  note: 'A few ideas to help you reach your protein target. Adjust portions to your appetite.',
+} as const;
+
 export const MOCK_MEAL_TEXT_PARSE = {
   foods: [
     { name: 'Scrambled eggs', protein_g: 18, calories: 210, serving_description: '3 large eggs' },

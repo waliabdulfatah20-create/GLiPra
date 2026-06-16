@@ -10,6 +10,9 @@ import { useAiCoach } from '@/features/ai-coach/hooks';
 import { cleanup, fireEvent, render, screen } from '@/lib/test-utils';
 
 jest.mock('@/features/ai-coach/hooks');
+jest.mock('@/features/meal-ideas/hooks', () => ({
+  useMealIdeas: () => ({ result: null, request: jest.fn(), isLoading: false, error: null }),
+}));
 jest.mock('@/features/subscription/pro-gate', () => ({
   ProGate: ({ children }: { children: React.ReactNode }) => children,
 }));

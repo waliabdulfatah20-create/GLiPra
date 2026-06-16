@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { signInWithEmail } from '@/features/auth/api';
+import { signInWithApple, signInWithEmail } from '@/features/auth/api';
 import { SignInForm } from '@/features/auth/components/sign-in-form';
 import { useTheme } from '@/lib/ThemeContext';
 
@@ -25,6 +25,14 @@ export default function SignInScreen() {
     // On success, onAuthStateChange fires → setSession → (auth) layout redirects to (app)/
   };
 
+  const handleApple = async () => {
+    setApiError(null);
+    const { error } = await signInWithApple();
+    if (error) {
+      setApiError(error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
@@ -32,7 +40,7 @@ export default function SignInScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <SignInForm onSubmit={handleSubmit} apiError={apiError} />
+        <SignInForm onSubmit={handleSubmit} apiError={apiError} onApplePress={handleApple} />
       </ScrollView>
     </SafeAreaView>
   );

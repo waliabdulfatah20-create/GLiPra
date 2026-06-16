@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { signUpWithEmail } from '@/features/auth/api';
+import { signInWithApple, signUpWithEmail } from '@/features/auth/api';
 import { SignUpForm } from '@/features/auth/components/sign-up-form';
 import { setOnboardingData } from '@/features/onboarding/use-onboarding-store';
 import { useTheme } from '@/lib/ThemeContext';
@@ -36,6 +36,14 @@ export default function SignUpScreen() {
     // onAuthStateChange fires → setSession → (auth) layout redirects to (app)/
   };
 
+  const handleApple = async () => {
+    setApiError(null);
+    const { error } = await signInWithApple();
+    if (error) {
+      setApiError(error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
@@ -43,7 +51,7 @@ export default function SignUpScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <SignUpForm onSubmit={handleSubmit} apiError={apiError} />
+        <SignUpForm onSubmit={handleSubmit} apiError={apiError} onApplePress={handleApple} />
       </ScrollView>
     </SafeAreaView>
   );

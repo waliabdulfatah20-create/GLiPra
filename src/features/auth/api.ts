@@ -43,10 +43,19 @@ export async function signInWithApple(): Promise<{ error: string | null }> {
     });
     const { error } = await supabase.auth.signInWithIdToken({
       provider: 'apple',
-
       token: credential.identityToken!,
     });
-    return { error: error?.message ?? null };
+    if (error)
+      return { error: error.message };
+    // Fire-and-forget: hand the one-time authorizationCode to the server so it can
+    // store the Apple refresh token for revocation on account deletion (H10). Never
+    // fail sign-in on this; the edge function no-ops until Apple is configured (#87).
+    if (credential.authorizationCode) {
+      void supabase.functions
+        .invoke('apple-link', { body: { authorizationCode: credential.authorizationCode } })
+        .catch(() => {});
+    }
+    return { error: null };
   }
   catch (e: any) {
     // User tapped Cancel — not an error

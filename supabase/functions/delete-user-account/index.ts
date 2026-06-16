@@ -11,6 +11,7 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
+import { getAppleConfig, revokeToken } from '../_shared/apple.ts';
 import { corsHeaders } from '../_shared/cors.ts';
 
 serve(async (req: Request) => {
@@ -49,6 +50,26 @@ serve(async (req: Request) => {
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
+
+    // 3b. Best-effort: revoke the user's Sign in with Apple grant before deleting
+    //     (App Store 5.1.1(v)). Gated on Apple config; never blocks deletion — if
+    //     revoke fails we log and proceed. The token row is removed by the cascade.
+    const appleConfig = getAppleConfig();
+    if (appleConfig) {
+      try {
+        const { data: tokenRow } = await serviceSupabase
+          .from('apple_oauth_tokens')
+          .select('refresh_token')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (tokenRow?.refresh_token)
+          await revokeToken(appleConfig, tokenRow.refresh_token);
+      }
+      catch (revokeErr: unknown) {
+        const msg = revokeErr instanceof Error ? revokeErr.message : String(revokeErr);
+        console.error('apple revoke during deletion failed (continuing):', msg);
+      }
+    }
 
     const { error: deleteError } = await serviceSupabase.auth.admin.deleteUser(user.id);
 

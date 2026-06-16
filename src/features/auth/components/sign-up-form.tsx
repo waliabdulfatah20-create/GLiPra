@@ -34,6 +34,7 @@ const schema = z.object({
 export type SignUpFormProps = {
   onSubmit: (data: { email: string; password: string }) => Promise<void>;
   apiError?: string | null;
+  onApplePress?: () => void;
 };
 
 type PasswordStrength = 'weak' | 'medium' | 'strong';
@@ -91,7 +92,7 @@ function PasswordStrengthBar({ password }: { password: string }) {
   );
 }
 
-export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
+export function SignUpForm({ onSubmit, apiError, onApplePress }: SignUpFormProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const { colors } = useTheme();
@@ -217,13 +218,14 @@ export function SignUpForm({ onSubmit, apiError }: SignUpFormProps) {
         )}
       />
 
+      {/* Full SIWA also needs the Supabase Apple provider configured at enrollment (#87). */}
       {appleAvailable && (
         <AppleAuthentication.AppleAuthenticationButton
           buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP}
           buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
           cornerRadius={14}
           style={styles.appleButton}
-          onPress={() => {}}
+          onPress={onApplePress ?? (() => {})}
         />
       )}
 

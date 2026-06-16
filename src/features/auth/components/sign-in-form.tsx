@@ -33,9 +33,10 @@ const schema = z.object({
 export type SignInFormProps = {
   onSubmit: (data: { email: string; password: string }) => Promise<void>;
   apiError?: string | null;
+  onApplePress?: () => void;
 };
 
-export function SignInForm({ onSubmit, apiError }: SignInFormProps) {
+export function SignInForm({ onSubmit, apiError, onApplePress }: SignInFormProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const { colors } = useTheme();
@@ -170,14 +171,15 @@ export function SignInForm({ onSubmit, apiError }: SignInFormProps) {
         )}
       />
 
-      {/* Apple Sign In — hidden in Expo Go (isAvailable returns false) */}
+      {/* Apple Sign In — hidden in Expo Go (isAvailable returns false). Full SIWA
+          also needs the Supabase Apple provider configured at enrollment (#87). */}
       {appleAvailable && (
         <AppleAuthentication.AppleAuthenticationButton
           buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
           buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
           cornerRadius={14}
           style={styles.appleButton}
-          onPress={() => {}}
+          onPress={onApplePress ?? (() => {})}
         />
       )}
 

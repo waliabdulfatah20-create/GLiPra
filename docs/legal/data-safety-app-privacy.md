@@ -23,7 +23,7 @@
 | Email address | `auth.users` | No | Yes | Account, transactional email (Supabase Auth mailer) |
 | Password | `auth.users` (hashed) | No | Yes | Account security |
 | Height, starting weight, activity level, goal weight | `profiles` | Yes (health) | Yes | App functionality (protein/nutrition targets) |
-| Dietary pattern, allergens | `profiles` | Yes (health) | Yes | App functionality |
+| Dietary pattern | `profiles` | Yes (health) | Yes | App functionality |
 | Medication type, dose, route, injection day, last-injection date, dose time, medication status | `profiles` | Yes (health) | Yes | App functionality (injection cycle, reminders) |
 | Kidney-disease flag | `profiles` | Yes (health) | Yes | App functionality (renal-protective protein cap) |
 | Injection logs (date, site, medication, pain level, notes) | `injection_logs` | Yes (health) | Yes | App functionality |

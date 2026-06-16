@@ -41,7 +41,6 @@ const InputSchema = z.object({
   // Rule 2: categorical preferences only — never identifying. Only constraining
   // diets are ever sent by the client (omnivore/other add no signal).
   dietaryPattern: z.enum(['vegetarian', 'vegan', 'pescatarian']).optional(),
-  allergens: z.array(z.string().max(40)).max(20).optional(),
 });
 
 const OutputSchema = z.object({
@@ -103,7 +102,6 @@ const MODEL = 'gpt-4o';
 function buildSystemPrompt(
   recentCorrections?: Array<{ originalName: string; correctedName: string }>,
   dietaryPattern?: 'vegetarian' | 'vegan' | 'pescatarian',
-  allergens?: string[],
 ): string {
   let prompt
     = 'You are a nutrition analysis assistant for a GLP-1 medication companion app. '
@@ -151,12 +149,6 @@ function buildSystemPrompt(
         + 'identification consistent with that diet (for example, a burger is more likely a '
         + 'plant-based patty, and "milk" is more likely a plant milk). Do not override clear '
         + 'visual evidence; only use this to break ties.';
-  }
-
-  if (allergens && allergens.length > 0) {
-    prompt
-      += ` The user avoids these allergens: ${allergens.join(', ')}. Factor this in when an `
-        + 'identification is ambiguous, but still report what the food actually appears to be.';
   }
 
   return prompt;
@@ -243,7 +235,7 @@ serve(async (req: Request) => {
       );
     }
 
-    const { imageBase64, mimeType, recentCorrections, userComment, dietaryPattern, allergens } = inputParse.data;
+    const { imageBase64, mimeType, recentCorrections, userComment, dietaryPattern } = inputParse.data;
 
     // 5. Call OpenAI GPT-4o with the image.
     //    Rule 2: The prompt contains NO user-identifying information.
@@ -258,7 +250,7 @@ serve(async (req: Request) => {
       messages: [
         {
           role: 'system',
-          content: buildSystemPrompt(recentCorrections, dietaryPattern, allergens),
+          content: buildSystemPrompt(recentCorrections, dietaryPattern),
         },
         {
           role: 'user',

@@ -357,8 +357,8 @@ export async function getRecentCorrections(
 
 // ---------------------------------------------------------------------------
 // getUserDietaryContext
-// Fetch the user's dietary pattern + allergens to bias photo recognition.
-// Rule 2: categorical preferences only — never user identity. Returns null
+// Fetch the user's dietary pattern to bias photo recognition.
+// Rule 2: categorical preference only — never user identity. Returns null
 // when there is nothing useful to send (see buildDietaryContext).
 // ---------------------------------------------------------------------------
 export async function getUserDietaryContext(
@@ -366,7 +366,7 @@ export async function getUserDietaryContext(
 ): Promise<DietaryContext | null> {
   const { data, error } = await supabase
     .from('profiles')
-    .select('dietary_pattern, allergens')
+    .select('dietary_pattern')
     .eq('user_id', userId)
     .single();
 
@@ -375,7 +375,6 @@ export async function getUserDietaryContext(
 
   return buildDietaryContext(
     (data as { dietary_pattern?: string | null }).dietary_pattern ?? null,
-    (data as { allergens?: string[] | null }).allergens ?? null,
   );
 }
 

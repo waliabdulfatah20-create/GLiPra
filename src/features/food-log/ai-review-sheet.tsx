@@ -30,6 +30,7 @@ import {
 } from 'react-native';
 import { FoodSearchSheet } from '@/components/log/food-search-sheet';
 import { PhotoCommentSheet } from '@/components/log/photo-comment-sheet';
+import { DisclaimerBanner } from '@/components/ui/disclaimer-banner';
 import { useTheme } from '@/lib/ThemeContext';
 import { seededFoodToFormPatch, seededFoodToLogEntry } from './food-search';
 import { useConfirmPhotoLog, useUserFoodDefault } from './hooks';
@@ -350,6 +351,14 @@ export function AIReviewSheet({ result, onClose, transcript, onRescan, rescanIni
           <Text style={styles.headerSubtitle}>
             Edit any field before logging. Corrections improve future scans.
           </Text>
+
+          {/* Tier-2 disclaimer — Rule 8. AI macro estimates are not clinical
+              advice; the user should verify and confirm with their prescriber. */}
+          <DisclaimerBanner tier={2}>
+            <Text style={styles.disclaimerText}>
+              AI-generated estimate, not medical advice. Confirm with your prescriber.
+            </Text>
+          </DisclaimerBanner>
 
           {/* Low-confidence nudge — appears below ~55% to push the user to
               verify protein + serving before logging. Microcopy, not clinical. */}
@@ -748,6 +757,11 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       color: colors.textSecondary,
       lineHeight: 18,
       marginBottom: spacing.md,
+    },
+    disclaimerText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 17,
     },
     nudgeBanner: {
       backgroundColor: colors.warningLight,

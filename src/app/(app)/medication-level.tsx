@@ -241,7 +241,9 @@ export default function MedicationLevelScreen() {
               <Text style={styles.disclaimerText}>
                 Estimated based on half-life. Actual levels vary by individual
                 metabolism, body composition, and other factors. Not a substitute
-                for serum drug level testing.
+                for serum drug level testing. This is an estimate, not a dose
+                recommendation. Do not change your dose based on it. Only your
+                prescriber can adjust your medication.
               </Text>
             </DisclaimerBanner>
 
@@ -269,7 +271,9 @@ export default function MedicationLevelScreen() {
               <Text style={styles.disclaimerText}>
                 Estimated based on half-life. Actual levels vary by individual
                 metabolism, body composition, and other factors. Not a substitute
-                for serum drug level testing.
+                for serum drug level testing. This is an estimate, not a dose
+                recommendation. Do not change your dose based on it. Only your
+                prescriber can adjust your medication.
               </Text>
             </DisclaimerBanner>
           </>

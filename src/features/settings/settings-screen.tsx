@@ -344,6 +344,12 @@ export function SettingsScreen() {
           <SettingsRow label={t('settings.terms')} onPress={() => router.push('/legal/terms-of-service')} isLast />
         </SettingsSection>
 
+        {/* Non-affiliation + trademark footnote. Kept as inline English copy
+            (no i18n key) so the legal wording stays a single controlled string. */}
+        <Text style={styles.legalFootnote}>
+          GLiPra is not affiliated with or endorsed by any medication manufacturer. All drug names are trademarks of their respective owners.
+        </Text>
+
         {/* ── Account ───────────────────────────────────────────────── */}
         <SettingsSection title={t('settings.account')}>
           <SettingsRow
@@ -399,6 +405,14 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
     },
     bottomSpacer: {
       height: spacing.xl,
+    },
+    legalFootnote: {
+      fontSize: 11,
+      lineHeight: 16,
+      color: colors.textSecondary,
+      marginHorizontal: spacing.xs,
+      marginTop: spacing.xs,
+      marginBottom: spacing.md,
     },
 
     // ── Appearance toggle ────────────────────────────────────────

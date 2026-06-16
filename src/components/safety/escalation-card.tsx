@@ -16,7 +16,7 @@ const COPY = {
   label: 'Important',
   // Rule 9: No condition names, no pattern types — locked generic copy only
   body: 'You\'ve logged symptoms that may need medical attention. Please contact your prescriber today.',
-  callPrescriber: 'Call Prescriber',
+  nextStep: 'Call your prescriber today. If your symptoms feel severe or you think this may be an emergency, call 911.',
   dismiss: 'Dismiss',
   footer: 'This is a symptom pattern alert, not a diagnosis.',
 } as const;
@@ -55,20 +55,11 @@ export function EscalationCard({ detection: _detection, onDismiss }: EscalationC
         </DisclaimerBanner>
       </View>
 
-      {/* Action buttons — side by side */}
-      <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={[styles.button, styles.primaryButton]}
-          disabled
-          accessibilityRole="button"
-          accessibilityLabel={COPY.callPrescriber}
-          accessibilityHint="Call prescriber feature coming soon"
-        >
-          <Text style={[styles.buttonText, styles.primaryButtonText]}>
-            {COPY.callPrescriber}
-          </Text>
-        </TouchableOpacity>
+      {/* Actionable next-step guidance — plain text, no false affordance */}
+      <Text style={styles.nextStep}>{COPY.nextStep}</Text>
 
+      {/* Dismiss action */}
+      <View style={styles.buttonRow}>
         <TouchableOpacity
           style={[styles.button, styles.secondaryButton]}
           onPress={onDismiss}
@@ -134,6 +125,13 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       lineHeight: 18,
       color: colors.textPrimary,
     },
+    nextStep: {
+      fontSize: 14,
+      lineHeight: 20,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: spacing.md,
+    },
     buttonRow: {
       flexDirection: 'row',
       gap: spacing.sm,
@@ -147,19 +145,12 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       alignItems: 'center',
       justifyContent: 'center',
     },
-    primaryButton: {
-      backgroundColor: colors.primary,
-      opacity: 0.5, // disabled state
-    },
     secondaryButton: {
       backgroundColor: colors.gray200,
     },
     buttonText: {
       fontSize: 14,
       fontWeight: '600',
-    },
-    primaryButtonText: {
-      color: colors.white,
     },
     secondaryButtonText: {
       color: colors.textPrimary,

@@ -76,7 +76,6 @@ We process your personal information on the following bases:
 | Usage data | Screens viewed, features used, time in app, crash logs | No |
 | Analytics identifiers | Anonymous device identifier (not your name or email) | No |
 | IP address | Collected at account creation and login | No |
-| Push notification tokens | Used to send you reminders and alerts | No |
 
 ### 5.3 Information from Third-Party Integrations (with your permission)
 
@@ -153,7 +152,6 @@ Key subprocessors include:
 - **Apple / Google** — app distribution, payment processing, and push notifications (see their privacy policies)
 - **PostHog** — product analytics (U.S.)
 - **Sentry** — crash reporting and error monitoring (U.S.)
-- **Resend** — transactional email delivery (U.S.)
 - **RevenueCat** — subscription entitlement management (U.S.)
 
 ### 7.2 Legal Requirements

@@ -10,7 +10,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     heading: '2. Information We Collect',
-    body: 'We collect information you provide directly:\n\n• Account information: name, email address, password\n• Health profile: height, starting weight, activity level, health goals\n• Medication data: GLP-1 medication type, dosage strength, injection schedule\n• Injection logs: date, time, injection site, dose administered\n• Weight logs: date and weight measurement\n• Symptom logs: reported symptoms and severity\n• Meal data: food items, meal photos, nutritional estimates\n• Notes: free-text notes you add to logs\n\nWe also collect automatically:\n\n• Device information (model, OS version, app version)\n• Usage data (screens viewed, features used, crash logs)\n• Anonymous analytics identifiers: not your name or email\n• Push notification tokens\n\nWe do not collect your payment card details (handled by Apple or Google) or your precise GPS location.',
+    body: 'We collect information you provide directly:\n\n• Account information: name, email address, password\n• Health profile: height, starting weight, activity level, health goals\n• Medication data: GLP-1 medication type, dosage strength, injection schedule\n• Injection logs: date, time, injection site, dose administered\n• Weight logs: date and weight measurement\n• Symptom logs: reported symptoms and severity\n• Meal data: food items, meal photos, nutritional estimates\n• Notes: free-text notes you add to logs\n\nWe also collect automatically:\n\n• Device information (model, OS version, app version)\n• Usage data (screens viewed, features used, crash logs)\n• Anonymous analytics identifiers: not your name or email\n\nWe do not collect your payment card details (handled by Apple or Google) or your precise GPS location.',
   },
   {
     heading: '3. How We Use Your Information',
@@ -18,7 +18,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     heading: '4. How We Share Your Information',
-    body: 'We do not sell your personal information. We do not share your information for third-party advertising.\n\nWe share data only with service providers (subprocessors) who help us operate the Service under written data processing agreements, including:\n\n• Supabase: database, authentication, storage (US)\n• OpenAI: AI meal analysis and guidance, anonymized prompts only (US)\n• RevenueCat: subscription management (US)\n• PostHog: product analytics, no health data (US)\n• Sentry: crash reporting, no health data (US)\n• Resend: transactional email (US)\n• Apple / Google: app distribution and payments\n\nWe may also disclose information when required by law, in connection with a business transfer, or with your explicit consent.',
+    body: 'We do not sell your personal information. We do not share your information for third-party advertising.\n\nWe share data only with service providers (subprocessors) who help us operate the Service under written data processing agreements, including:\n\n• Supabase: database, authentication, storage (US)\n• OpenAI: AI meal analysis and guidance, anonymized prompts only (US)\n• RevenueCat: subscription management (US)\n• PostHog: product analytics, no health data (US)\n• Sentry: crash reporting, no health data (US)\n• Apple / Google: app distribution and payments\n\nWe may also disclose information when required by law, in connection with a business transfer, or with your explicit consent.',
   },
   {
     heading: '5. Data Retention',

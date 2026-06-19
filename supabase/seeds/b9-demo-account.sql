@@ -57,7 +57,7 @@ VALUES (
   'weight_loss',
   120,
   75.0,                                            -- ~165 lbs goal
-  'high_protein',
+  'omnivore',
   false,
   true
 )

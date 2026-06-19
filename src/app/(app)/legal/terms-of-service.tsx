@@ -6,7 +6,7 @@ import { LegalDocScreen } from '@/components/legal/LegalDocScreen';
 const SECTIONS: LegalSection[] = [
   {
     heading: '1. Who We Are',
-    body: 'GLiPra is a mobile application operated by Leonava, a Texas company. GLiPra provides GLP-1 medication companion features including nutrition tracking, weight logging, injection-cycle tracking, and educational pharmacist content.\n\nLegal and privacy inquiries: legal@glipra.com',
+    body: 'GLiPra is a mobile application operated by PHARMSTRONG, a Texas company. GLiPra provides GLP-1 medication companion features including nutrition tracking, weight logging, injection-cycle tracking, and educational pharmacist content.\n\nLegal and privacy inquiries: legal@glipra.com',
   },
   {
     heading: '2. Acceptance of Terms',
@@ -26,7 +26,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     heading: '6. User Content',
-    body: 'You retain ownership of content you submit (meal photos, notes, logs). By submitting content you grant Leonava a worldwide, non-exclusive, royalty-free license to host, store, process, and display your content solely to provide and improve the Service. This license terminates when you delete the content or your account.\n\nWhen you use the photo meal-analysis feature, your meal photo is transmitted to our servers and processed using third-party AI services. We do not use your meal photos to train AI models.',
+    body: 'You retain ownership of content you submit (meal photos, notes, logs). By submitting content you grant PHARMSTRONG a worldwide, non-exclusive, royalty-free license to host, store, process, and display your content solely to provide and improve the Service. This license terminates when you delete the content or your account.\n\nWhen you use the photo meal-analysis feature, your meal photo is transmitted to our servers and processed using third-party AI services. We do not use your meal photos to train AI models.',
   },
   {
     heading: '7. Acceptable Use',
@@ -34,7 +34,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     heading: '8. Intellectual Property',
-    body: 'All software, design, text, graphics, logos, and other materials in the Service are owned by Leonava or its licensors. You receive a limited, non-exclusive, non-transferable, revocable license to use the Service for personal, non-commercial use. Nothing in these Terms transfers any intellectual property rights to you.',
+    body: 'All software, design, text, graphics, logos, and other materials in the Service are owned by PHARMSTRONG or its licensors. You receive a limited, non-exclusive, non-transferable, revocable license to use the Service for personal, non-commercial use. Nothing in these Terms transfers any intellectual property rights to you.',
   },
   {
     heading: '9. Disclaimer of Warranties',
@@ -46,7 +46,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     heading: '11. Indemnification',
-    body: 'You agree to indemnify and hold harmless Leonava and its officers, directors, employees, agents, and licensors from claims, liabilities, damages, and fees (including reasonable attorneys\' fees) arising out of your violation of these Terms, your User Content, or your use of the Service in violation of applicable law.',
+    body: 'You agree to indemnify and hold harmless PHARMSTRONG and its officers, directors, employees, agents, and licensors from claims, liabilities, damages, and fees (including reasonable attorneys\' fees) arising out of your violation of these Terms, your User Content, or your use of the Service in violation of applicable law.',
   },
   {
     heading: '12. Termination',
@@ -66,7 +66,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     heading: '16. General Provisions',
-    body: 'These Terms, together with the Privacy Policy and any in-app disclosures, constitute the entire agreement between you and Leonava. If any provision is found unenforceable it will be modified to the minimum extent necessary. You may not assign your rights without our written consent. We may assign our rights without restriction.',
+    body: 'These Terms, together with the Privacy Policy and any in-app disclosures, constitute the entire agreement between you and PHARMSTRONG. If any provision is found unenforceable it will be modified to the minimum extent necessary. You may not assign your rights without our written consent. We may assign our rights without restriction.',
   },
 ];
 

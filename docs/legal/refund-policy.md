@@ -1,6 +1,6 @@
 # Refund Policy
 
-**GLiPra** — a product of **Leonava** (a Texas company)
+**GLiPra** — a product of **PHARMSTRONG** (a Texas company)
 **Effective date:** [DATE]
 **Last updated:** [DATE]
 
@@ -10,9 +10,9 @@
 
 ## 1. Overview
 
-GLiPra subscriptions are purchased and managed through the **Apple App Store** (iOS) or **Google Play Store** (Android). Because all billing is handled by Apple or Google, **refund eligibility and processing is governed by their respective policies** — not by Leonava directly.
+GLiPra subscriptions are purchased and managed through the **Apple App Store** (iOS) or **Google Play Store** (Android). Because all billing is handled by Apple or Google, **refund eligibility and processing is governed by their respective policies** — not by PHARMSTRONG directly.
 
-Leonava does not have access to your payment card details and cannot process refunds.
+PHARMSTRONG does not have access to your payment card details and cannot process refunds.
 
 ---
 
@@ -29,7 +29,7 @@ All purchases made through the Apple App Store are subject to **Apple's refund p
 
 Apple reviews refund requests at their sole discretion. Common qualifying reasons include accidental purchase, technical issues that prevented use, and charges after cancellation that Apple determines to be billing errors.
 
-Leonava cannot approve, deny, or accelerate Apple refund decisions.
+PHARMSTRONG cannot approve, deny, or accelerate Apple refund decisions.
 
 **Apple's refund policy:** [apple.com/legal/internet-services/itunes/us/terms.html](https://www.apple.com/legal/internet-services/itunes/us/terms.html) (see "In-App Purchases" section).
 
@@ -48,7 +48,7 @@ All purchases made through Google Play are subject to **Google's refund policies
 
 Google may issue refunds within **48 hours** of an initial purchase. After 48 hours, refund eligibility is determined by Google at their discretion.
 
-Leonava cannot approve, deny, or accelerate Google refund decisions.
+PHARMSTRONG cannot approve, deny, or accelerate Google refund decisions.
 
 **Google's refund policy:** [support.google.com/googleplay/answer/2479637](https://support.google.com/googleplay/answer/2479637)
 
@@ -87,7 +87,7 @@ If GLiPra offers a free trial period, you will not be charged during the trial. 
 
 ## 7. Pricing Changes
 
-If Leonava changes subscription pricing, we will provide at least **30 days' notice** before the change takes effect. Continued use of the subscription after the notice period constitutes acceptance of the new price.
+If PHARMSTRONG changes subscription pricing, we will provide at least **30 days' notice** before the change takes effect. Continued use of the subscription after the notice period constitutes acceptance of the new price.
 
 ---
 

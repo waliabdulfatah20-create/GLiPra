@@ -6,7 +6,7 @@ import { LegalDocScreen } from '@/components/legal/LegalDocScreen';
 const SECTIONS: LegalSection[] = [
   {
     heading: '1. Who We Are',
-    body: 'GLiPra is operated by Leonava, a Texas company. We are the controller of the personal information described in this Privacy Policy.\n\nPrivacy inquiries and data requests: legal@glipra.com',
+    body: 'GLiPra is operated by PHARMSTRONG, a Texas company. We are the controller of the personal information described in this Privacy Policy.\n\nPrivacy inquiries and data requests: legal@glipra.com',
   },
   {
     heading: '2. Information We Collect',

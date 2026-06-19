@@ -1,6 +1,6 @@
 # Terms of Service
 
-**GLiPra** — a product of **Leonava** (a Texas company)
+**GLiPra** — a product of **PHARMSTRONG** (a Texas company)
 **Effective date:** [DATE]
 **Last updated:** [DATE]
 
@@ -14,7 +14,7 @@
 
 ## 1. Who We Are
 
-GLiPra is a mobile application operated by **Leonava**, a Texas company ("Company," "we," "us," or "our"). GLiPra provides GLP-1 medication companion features including nutrition tracking, weight logging, injection-cycle tracking, and educational pharmacist content.
+GLiPra is a mobile application operated by **PHARMSTRONG**, a Texas company ("Company," "we," "us," or "our"). GLiPra provides GLP-1 medication companion features including nutrition tracking, weight logging, injection-cycle tracking, and educational pharmacist content.
 
 Our registered address and legal notices address is: **[REGISTERED ADDRESS]**
 Legal and privacy inquiries: **[LEGAL@GLIPRA.COM]**
@@ -93,7 +93,7 @@ You may submit meal photos, notes, and other content to the Service ("User Conte
 
 ### 6.2 License to Us
 
-By submitting User Content you grant Leonava a worldwide, non-exclusive, royalty-free, sublicensable license to host, store, process, and display your User Content solely to provide and improve the Service. This license terminates when you delete the content or your account, subject to reasonable retention periods described in our Privacy Policy.
+By submitting User Content you grant PHARMSTRONG a worldwide, non-exclusive, royalty-free, sublicensable license to host, store, process, and display your User Content solely to provide and improve the Service. This license terminates when you delete the content or your account, subject to reasonable retention periods described in our Privacy Policy.
 
 ### 6.3 Prohibited Content
 
@@ -125,7 +125,7 @@ You agree not to:
 
 ## 8. Intellectual Property
 
-All software, design, text, graphics, logos, and other materials in the Service (excluding User Content) are owned by Leonava or its licensors and are protected by applicable intellectual property laws. You receive a limited, non-exclusive, non-transferable, revocable license to use the Service for your personal, non-commercial use.
+All software, design, text, graphics, logos, and other materials in the Service (excluding User Content) are owned by PHARMSTRONG or its licensors and are protected by applicable intellectual property laws. You receive a limited, non-exclusive, non-transferable, revocable license to use the Service for your personal, non-commercial use.
 
 Nothing in these Terms transfers any intellectual property rights to you.
 
@@ -173,7 +173,7 @@ The Service collects health-related information as described in our Privacy Poli
 
 ## 13. Indemnification
 
-You agree to indemnify, defend, and hold harmless Leonava and its officers, directors, employees, agents, and licensors from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, and fees (including reasonable attorneys' fees) arising out of or relating to:
+You agree to indemnify, defend, and hold harmless PHARMSTRONG and its officers, directors, employees, agents, and licensors from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, and fees (including reasonable attorneys' fees) arising out of or relating to:
 
 - Your violation of these Terms.
 - Your User Content.
@@ -250,7 +250,7 @@ You may opt out of this arbitration agreement by sending written notice to [LEGA
 
 ## 18. General Provisions
 
-**Entire Agreement.** These Terms, together with the Privacy Policy and any in-app disclosures, constitute the entire agreement between you and Leonava regarding the Service and supersede all prior agreements.
+**Entire Agreement.** These Terms, together with the Privacy Policy and any in-app disclosures, constitute the entire agreement between you and PHARMSTRONG regarding the Service and supersede all prior agreements.
 
 **Severability.** If any provision of these Terms is found unenforceable, that provision will be modified to the minimum extent necessary to make it enforceable, and all other provisions remain in full force.
 
@@ -266,7 +266,7 @@ You may opt out of this arbitration agreement by sending written notice to [LEGA
 
 ---
 
-*GLiPra is a product of Leonava. These Terms do not create any agency, partnership, joint venture, or employment relationship between you and Leonava.*
+*GLiPra is a product of PHARMSTRONG. These Terms do not create any agency, partnership, joint venture, or employment relationship between you and PHARMSTRONG.*
 
 ---
 

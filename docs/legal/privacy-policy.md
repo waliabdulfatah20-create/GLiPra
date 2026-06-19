@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**GLiPra** — a product of **Leonava** (a Texas company)
+**GLiPra** — a product of **PHARMSTRONG** (a Texas company)
 **Effective date:** [DATE]
 **Last updated:** [DATE]
 
@@ -14,7 +14,7 @@
 
 ## 1. Who We Are and How to Contact Us
 
-GLiPra is a mobile application operated by **Leonava**, a Texas company ("Company," "we," "us," or "our").
+GLiPra is a mobile application operated by **PHARMSTRONG**, a Texas company ("Company," "we," "us," or "our").
 
 **Registered address:** [REGISTERED ADDRESS]
 **Privacy inquiries and data requests:** [LEGAL@GLIPRA.COM]
@@ -160,7 +160,7 @@ We may disclose your information when required to do so by law, regulation, cour
 
 ### 7.3 Business Transfers
 
-If Leonava is acquired, merges, or transfers substantially all of its assets, your personal information may be transferred as part of that transaction. We will notify you via in-app notice or email before your information is subject to a different privacy policy.
+If PHARMSTRONG is acquired, merges, or transfers substantially all of its assets, your personal information may be transferred as part of that transaction. We will notify you via in-app notice or email before your information is subject to a different privacy policy.
 
 ### 7.4 With Your Consent
 
@@ -351,7 +351,7 @@ We aim to respond to all privacy inquiries within **30 days**.
 
 ---
 
-*GLiPra is a product of Leonava. Leonava is the sole controller of personal information processed through the Service.*
+*GLiPra is a product of PHARMSTRONG. PHARMSTRONG is the sole controller of personal information processed through the Service.*
 
 ---
 

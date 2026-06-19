@@ -1,6 +1,6 @@
 # Subprocessor List
 
-**GLiPra** — a product of **Leonava** (a Texas company)
+**GLiPra** — a product of **PHARMSTRONG** (a Texas company)
 **Effective date:** [DATE]
 **Last updated:** [DATE]
 
@@ -8,7 +8,7 @@
 
 ---
 
-Leonava uses the following third-party subprocessors ("subprocessors") to operate GLiPra. Each subprocessor processes personal information on our behalf, subject to written data processing agreements that restrict their use of your data to performing services for us.
+PHARMSTRONG uses the following third-party subprocessors ("subprocessors") to operate GLiPra. Each subprocessor processes personal information on our behalf, subject to written data processing agreements that restrict their use of your data to performing services for us.
 
 This list is updated whenever we add, change, or remove a subprocessor. Material changes are announced via in-app notification at least **30 days** before the change takes effect.
 
@@ -92,4 +92,4 @@ For questions about our subprocessors, their data processing agreements, or to r
 
 ---
 
-> **ATTORNEY REVIEW REQUIRED.** This is a first draft. Key areas: (1) Verify current DPA terms with each subprocessor — especially OpenAI, Supabase, and RevenueCat for health data; (2) Confirm OpenAI API data retention and training-opt-out settings are enabled in the Leonava account; (3) Washington WMHMD Act may require explicit authorization for sharing health data with subprocessors — verify consent flow is sufficient; (4) Review whether any subprocessors are located outside the U.S. (relevant if future GDPR scope arises); (5) Add any additional subprocessors introduced during development (e.g., CDN, logging, feature-flag providers).
+> **ATTORNEY REVIEW REQUIRED.** This is a first draft. Key areas: (1) Verify current DPA terms with each subprocessor — especially OpenAI, Supabase, and RevenueCat for health data; (2) Confirm OpenAI API data retention and training-opt-out settings are enabled in the PHARMSTRONG account; (3) Washington WMHMD Act may require explicit authorization for sharing health data with subprocessors — verify consent flow is sufficient; (4) Review whether any subprocessors are located outside the U.S. (relevant if future GDPR scope arises); (5) Add any additional subprocessors introduced during development (e.g., CDN, logging, feature-flag providers).

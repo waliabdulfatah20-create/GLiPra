@@ -1,6 +1,6 @@
 # Medical Disclaimer
 
-**GLiPra** — a product of **Leonava** (a Texas company)
+**GLiPra** — a product of **PHARMSTRONG** (a Texas company)
 **Effective date:** [DATE]
 **Last updated:** [DATE]
 
@@ -20,7 +20,7 @@ Nothing in the Service constitutes, and nothing should be understood as constitu
 
 ## 2. No Healthcare Provider Relationship
 
-**Use of GLiPra does not create a physician-patient, pharmacist-patient, or any other healthcare provider relationship between you and Leonava, or between you and any individual who contributed to the development of the app.**
+**Use of GLiPra does not create a physician-patient, pharmacist-patient, or any other healthcare provider relationship between you and PHARMSTRONG, or between you and any individual who contributed to the development of the app.**
 
 GLiPra is designed by a licensed pharmacist but:
 - Is not your pharmacist.
@@ -84,7 +84,7 @@ Certain features of GLiPra use artificial intelligence to generate responses, nu
 - Is not a substitute for professional medical or nutritional advice.
 - May not account for your complete medical history, current medications, or individual health circumstances.
 
-Leonava does not warrant the accuracy, completeness, or suitability of AI-generated content for your individual situation.
+PHARMSTRONG does not warrant the accuracy, completeness, or suitability of AI-generated content for your individual situation.
 
 ---
 
@@ -107,7 +107,7 @@ You are solely responsible for your healthcare decisions. By using GLiPra, you a
 - You will not use the app as a substitute for professional medical advice.
 - You will consult a qualified healthcare provider for any health concerns.
 - You understand that the app provides general wellness support tools, not clinical care.
-- Leonava is not responsible for any health outcome, clinical complication, or medical event arising from your use of or reliance on the Service.
+- PHARMSTRONG is not responsible for any health outcome, clinical complication, or medical event arising from your use of or reliance on the Service.
 
 ---
 

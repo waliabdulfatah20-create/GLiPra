@@ -4,7 +4,7 @@
 // three price tiers with Annual featured as best value. Product IDs must match
 // what is configured in RevenueCat + App Store / Google Play:
 //   monthly   → $9.99/month
-//   yearly    → $79.99/year
+//   yearly    → $49.99/year
 //   lifetime  → $149 one-time (first 500 users)
 //
 // When react-native-purchases is NOT installed (Expo Go / pre-native build),
@@ -164,7 +164,7 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
   const storeAccount = Platform.OS === 'ios' ? 'Apple ID' : 'Google Play';
   const disclosure
     = `Monthly and annual plans are auto-renewing subscriptions. Your ${storeAccount} account is `
-      + `charged at confirmation and renews at $9.99/month or $79.99/year unless cancelled at least `
+      + `charged at confirmation and renews at $9.99/month or $49.99/year unless cancelled at least `
       + `24 hours before the current period ends. Manage or cancel anytime in your ${storeAccount} `
       + `account settings. Lifetime is a one-time purchase, not a subscription.`;
 
@@ -222,9 +222,10 @@ export function PaywallScreen({ featureName, onDismiss }: PaywallScreenProps) {
           {/* Price tiers — Annual featured */}
           <PriceTier
             label="Annual"
-            price="$79.99"
+            price="$49.99"
             unit="/yr"
-            badge="BEST VALUE · SAVE 33%"
+            sub="$4.17/mo, billed annually"
+            badge="BEST VALUE · SAVE 58%"
             featured
             productId={PRODUCT_ANNUAL}
             isDisabled={!PURCHASES_AVAILABLE || isAnyPurchasing}
@@ -333,6 +334,8 @@ type PriceTierProps = {
   label: string;
   price: string;
   unit: string;
+  /** Optional per-month framing shown under the price (e.g. annual tier). */
+  sub?: string;
   badge: string | null;
   featured: boolean;
   productId: string;
@@ -345,6 +348,7 @@ function PriceTier({
   label,
   price,
   unit,
+  sub,
   badge,
   featured,
   productId,
@@ -383,13 +387,16 @@ function PriceTier({
             <ActivityIndicator size="small" color={colors.primary} />
           )
         : (
-            <View style={styles.tierRow}>
-              <Text style={styles.tierLabel}>{label}</Text>
-              <Text style={styles.tierPrice}>
-                {price}
-                <Text style={styles.tierUnit}>{unit}</Text>
-              </Text>
-            </View>
+            <>
+              <View style={styles.tierRow}>
+                <Text style={styles.tierLabel}>{label}</Text>
+                <Text style={styles.tierPrice}>
+                  {price}
+                  <Text style={styles.tierUnit}>{unit}</Text>
+                </Text>
+              </View>
+              {sub ? <Text style={styles.tierSub}>{sub}</Text> : null}
+            </>
           )}
     </Pressable>
   );
@@ -555,6 +562,12 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       fontSize: 12,
       fontWeight: '500',
       color: colors.textSecondary,
+    },
+    tierSub: {
+      fontSize: 12,
+      fontWeight: '500',
+      color: colors.textSecondary,
+      marginTop: 2,
     },
     tierBadge: {
       position: 'absolute',

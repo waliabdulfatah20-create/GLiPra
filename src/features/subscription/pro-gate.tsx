@@ -60,7 +60,7 @@ export function ProGate({ children, featureName, fallback }: ProGateProps) {
           {' '}
           is available on GLiPra Pro
         </Text>
-        <Text style={styles.price}>$9.99/month · $79.99/year</Text>
+        <Text style={styles.price}>$9.99/month · $49.99/year</Text>
         <Pressable
           onPress={() => presentPaywall(featureName)}
           accessibilityRole="button"

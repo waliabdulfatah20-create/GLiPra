@@ -42,7 +42,7 @@ iOS TestFlight + App Store. Created 2026-05-30.
 - [ ] Under **Agreements, Tax, and Banking**: accept the **Paid Apps agreement** and fill tax/banking — IAP will not work until this is "Active".
 - [ ] Create the subscription products RevenueCat expects:
   - Pro Monthly — $9.99/month
-  - Pro Annual — $79.99/year
+  - Pro Annual — $49.99/year
   - Founder Lifetime — $149 one-time (non-consumable; first 500 users)
   - Entitlement identifier in code: **`glipra_pro`** (see `src/features/subscription/`).
 

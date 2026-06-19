@@ -269,7 +269,7 @@ Never hand-edit `src/types/database.ts`. Always regenerate after schema changes.
 ```ts
 type SubscriptionTier = 'free' | 'pro' | 'founder_lifetime';
 // RevenueCat entitlement: 'GLiPra Pro' (exact dashboard identifier; matches use-subscription.ts ENTITLEMENT_ID)
-// Pro = $9.99/month or $79.99/year
+// Pro = $9.99/month or $49.99/year
 // Founder Lifetime = $149 one-time (first 500 users)
 
 // Locked to Pro: AI photo recognition, voice logging (fully gated — no free tier), daily AI guidance,

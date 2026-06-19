@@ -41,6 +41,27 @@ export type Database = {
         }
         Relationships: []
       }
+      apple_oauth_tokens: {
+        Row: {
+          created_at: string
+          refresh_token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          refresh_token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          refresh_token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       barcode_corrections: {
         Row: {
           barcode_ean: string
@@ -401,6 +422,42 @@ export type Database = {
         }
         Relationships: []
       }
+      medication_changes: {
+        Row: {
+          changed_at: string
+          created_at: string
+          from_medication_id: string | null
+          from_route: string | null
+          id: string
+          notes: string | null
+          to_medication_id: string
+          to_route: string
+          user_id: string
+        }
+        Insert: {
+          changed_at?: string
+          created_at?: string
+          from_medication_id?: string | null
+          from_route?: string | null
+          id?: string
+          notes?: string | null
+          to_medication_id: string
+          to_route: string
+          user_id: string
+        }
+        Update: {
+          changed_at?: string
+          created_at?: string
+          from_medication_id?: string | null
+          from_route?: string | null
+          id?: string
+          notes?: string | null
+          to_medication_id?: string
+          to_route?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       oral_dose_logs: {
         Row: {
           created_at: string
@@ -432,7 +489,6 @@ export type Database = {
         Row: {
           activity_level: string
           administration_route: string
-          allergens: string[] | null
           bmi: number | null
           created_at: string
           dietary_pattern: string | null
@@ -444,7 +500,6 @@ export type Database = {
           height_cm: number | null
           id: string
           injection_day_of_week: number | null
-          is_pregnant: boolean
           last_injection_date: string | null
           medication_id: string
           medication_start_date: string | null
@@ -459,7 +514,6 @@ export type Database = {
         Insert: {
           activity_level?: string
           administration_route?: string
-          allergens?: string[] | null
           bmi?: number | null
           created_at?: string
           dietary_pattern?: string | null
@@ -471,7 +525,6 @@ export type Database = {
           height_cm?: number | null
           id?: string
           injection_day_of_week?: number | null
-          is_pregnant?: boolean
           last_injection_date?: string | null
           medication_id?: string
           medication_start_date?: string | null
@@ -486,7 +539,6 @@ export type Database = {
         Update: {
           activity_level?: string
           administration_route?: string
-          allergens?: string[] | null
           bmi?: number | null
           created_at?: string
           dietary_pattern?: string | null
@@ -498,7 +550,6 @@ export type Database = {
           height_cm?: number | null
           id?: string
           injection_day_of_week?: number | null
-          is_pregnant?: boolean
           last_injection_date?: string | null
           medication_id?: string
           medication_start_date?: string | null

@@ -215,22 +215,20 @@ export function SettingsScreen() {
         </SettingsSection>
 
         {/* ── Health & tracking ─────────────────────────────────────── */}
-        {/* Health Import is hidden in production until the HealthKit entitlement
-            ships (B1 deferred) — no native HealthKit config in prod, so the
-            feature must not be reachable for store review. Visible in dev/preview. */}
+        {/* Health Import is now shown in all environments (B1, session 89): the
+            HealthKit usage strings + entitlement (iOS) and Health Connect
+            permissions (Android) ship in app.config.ts. iOS reads activate once
+            Apple enrollment (#87) configures the App ID HealthKit capability. */}
         <SettingsSection title={t('settings.health')}>
           <SettingsRow
             label={t('settings.visit_prep')}
             onPress={() => router.push('/visit-prep')}
-            isLast={process.env.EXPO_PUBLIC_APP_ENV === 'production'}
           />
-          {process.env.EXPO_PUBLIC_APP_ENV !== 'production' && (
-            <SettingsRow
-              label={t('settings.health_import')}
-              onPress={() => router.push('/health-import')}
-              isLast
-            />
-          )}
+          <SettingsRow
+            label={t('settings.health_import')}
+            onPress={() => router.push('/health-import')}
+            isLast
+          />
         </SettingsSection>
 
         {/* ── Preferences ───────────────────────────────────────────── */}

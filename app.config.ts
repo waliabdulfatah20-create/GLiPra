@@ -66,6 +66,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         backgroundColor: '#5b21b6',
       },
       package: Env.EXPO_PUBLIC_PACKAGE,
+      // Health Connect read permissions (B1). react-native-health-connect reads
+      // Weight + Steps; the data types the app reads must be declared here. The
+      // <queries> for the Health Connect package ships in the library manifest
+      // (auto-merged) and the rationale intent-filter is added by the
+      // react-native-health-connect config plugin below.
+      permissions: [
+        'android.permission.health.READ_STEPS',
+        'android.permission.health.READ_WEIGHT',
+      ],
       // minSdkVersion 26 (required by react-native-health-link / Health Connect)
       // is applied via the withGradleProperties plugin at the end of this file —
       // the inline android.minSdkVersion field is not reliably honored by Expo.
@@ -155,6 +164,24 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           photosPermission: false,
         },
       ],
+      // HealthKit (iOS) via react-native-health (B1). Read-only: the app reads
+      // Weight + Steps to fill in the weight trend + activity context, never
+      // writes. The plugin injects NSHealthShareUsageDescription +
+      // NSHealthUpdateUsageDescription and the com.apple.developer.healthkit
+      // entitlement (EAS auto-syncs the App ID HealthKit capability at build).
+      [
+        'react-native-health',
+        {
+          healthSharePermission:
+            'Glipra reads your weight and step history from Apple Health to fill in your weight trend and activity context. Your health data is read-only and is never shared.',
+          healthUpdatePermission:
+            'Glipra does not write to Apple Health. Your records are only read, never modified.',
+        },
+      ],
+      // Health Connect (Android) via react-native-health-connect (B1). Adds the
+      // androidx.health permissions-rationale intent-filter; the read-permission
+      // declarations live in android.permissions above.
+      'react-native-health-connect',
       // Pin Android compile/target SDK to 36 for the Google Play 2026 gate.
       // minSdk 26 stays handled by the withGradleProperties plugin below.
       [

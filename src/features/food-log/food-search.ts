@@ -29,6 +29,7 @@ export const seededFoodRowSchema = z.object({
   fiber_g: z.number().nullable(),
   b12_mcg: z.number().nullable(),
   iron_mg: z.number().nullable(),
+  calcium_mg: z.number().nullable(),
   magnesium_mg: z.number().nullable(),
   vitamin_d_iu: z.number().nullable(),
   zinc_mg: z.number().nullable(),
@@ -51,6 +52,7 @@ export type SeededFood = {
   fiberG: number | null;
   b12Mcg: number | null;
   ironMg: number | null;
+  calciumMg: number | null;
   magnesiumMg: number | null;
   vitaminDIu: number | null;
   zincMg: number | null;
@@ -72,6 +74,7 @@ export function rowToSeededFood(row: SeededFoodRow): SeededFood {
     fiberG: row.fiber_g,
     b12Mcg: row.b12_mcg,
     ironMg: row.iron_mg,
+    calciumMg: row.calcium_mg,
     magnesiumMg: row.magnesium_mg,
     vitaminDIu: row.vitamin_d_iu,
     zincMg: row.zinc_mg,
@@ -120,6 +123,7 @@ export function seededFoodToLogEntry(food: SeededFood, locale: string | undefine
     magnesiumMg: food.magnesiumMg,
     zincMg: food.zincMg,
     ironMg: food.ironMg,
+    calciumMg: food.calciumMg,
     barcodeEan: food.barcode,
   };
 }
@@ -142,6 +146,7 @@ export function seededFoodToFormPatch(food: SeededFood, locale: string | undefin
   magnesiumMg: string;
   zincMg: string;
   ironMg: string;
+  calciumMg: string;
 } {
   return {
     name: seededFoodDisplayName(food, locale),
@@ -156,5 +161,6 @@ export function seededFoodToFormPatch(food: SeededFood, locale: string | undefin
     magnesiumMg: food.magnesiumMg != null ? Math.round(food.magnesiumMg).toString() : '',
     zincMg: food.zincMg != null ? food.zincMg.toFixed(1) : '',
     ironMg: food.ironMg != null ? food.ironMg.toFixed(1) : '',
+    calciumMg: food.calciumMg != null ? Math.round(food.calciumMg).toString() : '',
   };
 }

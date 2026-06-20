@@ -39,6 +39,7 @@ export type MacroBase = {
   magnesiumMg: number | null;
   zincMg: number | null;
   ironMg: number | null;
+  calciumMg: number | null;
 };
 
 /**
@@ -56,6 +57,7 @@ export type MacroFormStrings = {
   magnesiumMg: string;
   zincMg: string;
   ironMg: string;
+  calciumMg: string;
 };
 
 type MacroKey = keyof MacroBase;
@@ -76,6 +78,7 @@ const INTEGER_FIELDS: ReadonlySet<MacroKey> = new Set([
   'caloriesKcal',
   'vitaminDIu',
   'magnesiumMg',
+  'calciumMg',
 ]);
 
 /**
@@ -111,6 +114,7 @@ export function scaleMacros(base: MacroBase, multiplier: number): MacroFormStrin
     magnesiumMg: '',
     zincMg: '',
     ironMg: '',
+    calciumMg: '',
   };
 
   for (const k of Object.keys(out) as MacroKey[]) {

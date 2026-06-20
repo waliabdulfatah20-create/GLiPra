@@ -40,26 +40,27 @@ export function summarizeFiber(grams: number, target: number = FIBER_TARGET_G): 
   return { grams: safe, target: safeTarget, pct, status };
 }
 
-// Fixed display order for the 5 micronutrient dots: B12, Vitamin D, Magnesium, Zinc, Iron.
+// Fixed display order for the 6 micronutrient dots: B12, Vitamin D, Magnesium, Zinc, Iron, Calcium.
 export const MICRO_ORDER: readonly NutrientKey[] = [
   'b12Mcg',
   'vitaminDIu',
   'magnesiumMg',
   'zincMg',
   'ironMg',
+  'calciumMg',
 ] as const;
 
 export type MicroDot = { key: NutrientKey; status: NutrientStatus };
 
 export type MicroSummary = {
-  statuses: MicroDot[]; // length 5, in MICRO_ORDER
+  statuses: MicroDot[]; // length 6, in MICRO_ORDER
   onTrack: number; // count of 'green' (>= 80% of RDA)
-  total: number; // 5
+  total: number; // 6
   hasMicros: boolean; // false when nothing has been logged yet
 };
 
 /**
- * Summarize the 5 tracked micronutrients into per-nutrient status + an on-track count.
+ * Summarize the 6 tracked micronutrients into per-nutrient status + an on-track count.
  * Reuses the watch card's status bands so the dots match the Nutrition screen.
  */
 export function summarizeMicros(data: MicronutrientData, hasMicros: boolean): MicroSummary {

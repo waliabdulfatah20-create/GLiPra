@@ -11,6 +11,10 @@ export const MICRONUTRIENT_RDAS = {
   // skews female; iron + hair thinning is a top concern). 8 mg is the men /
   // post-menopausal value. Single RDA for v1 (no sex field). Pharmacist to confirm.
   ironMg: 18,
+  // Calcium: 1200 mg = the protective IOM RDA (women 51+ / men 71+). Rapid GLP-1
+  // weight loss carries a documented bone-density risk, so we use the higher
+  // at-risk value rather than the 1000 mg adult-19-50 baseline. Pharmacist to confirm.
+  calciumMg: 1200,
 } as const;
 
 export type NutrientKey = keyof typeof MICRONUTRIENT_RDAS;
@@ -51,6 +55,7 @@ const NUTRIENT_LABELS: Record<NutrientKey, string> = {
   magnesiumMg: 'Magnesium',
   zincMg: 'Zinc',
   ironMg: 'Iron',
+  calciumMg: 'Calcium',
 };
 
 const NUTRIENT_FOOD_TIPS: Record<NutrientKey, string> = {
@@ -59,6 +64,7 @@ const NUTRIENT_FOOD_TIPS: Record<NutrientKey, string> = {
   magnesiumMg: 'nuts, seeds, or leafy greens',
   zincMg: 'beef, pumpkin seeds, or lentils',
   ironMg: 'lean red meat, lentils, spinach, or fortified cereals',
+  calciumMg: 'dairy, fortified plant milk, tofu, leafy greens, or canned fish with bones',
 };
 
 /**

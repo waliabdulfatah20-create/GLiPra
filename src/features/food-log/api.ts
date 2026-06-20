@@ -32,6 +32,7 @@ const foodLogRowSchema = z.object({
   magnesium_mg: z.number().nullable(),
   zinc_mg: z.number().nullable(),
   iron_mg: z.number().nullable(),
+  calcium_mg: z.number().nullable(),
   barcode_ean: z.string().nullable(),
   source: z.enum(['manual', 'barcode', 'photo', 'voice', 'database', 'supplement']),
   created_at: z.string(),
@@ -54,6 +55,7 @@ function rowToEntry(row: z.infer<typeof foodLogRowSchema>): FoodLogEntry {
     magnesiumMg: row.magnesium_mg,
     zincMg: row.zinc_mg,
     ironMg: row.iron_mg,
+    calciumMg: row.calcium_mg,
     barcodeEan: row.barcode_ean,
     source: row.source,
     createdAt: row.created_at,
@@ -116,6 +118,7 @@ export async function insertBarcodeFoodLog(
     b12_mcg: entry.b12Mcg,
     vitamin_d_iu: entry.vitaminDIu,
     iron_mg: entry.ironMg,
+    calcium_mg: entry.calciumMg,
     barcode_ean: entry.barcodeEan,
     source: 'barcode',
     created_at: now,
@@ -153,6 +156,7 @@ export async function insertSupplementLog(
     b12_mcg: entry.b12Mcg,
     vitamin_d_iu: entry.vitaminDIu,
     iron_mg: entry.ironMg,
+    calcium_mg: entry.calciumMg,
     barcode_ean: null,
     source: 'supplement',
     created_at: now,
@@ -177,7 +181,7 @@ export async function searchFoods(query: string): Promise<SeededFood[]> {
   const { data, error } = await supabase
     .from('foods')
     .select(
-      'id, name, name_es, brand, barcode, serving_description, serving_size_g, calories, protein_g, carbs_g, fat_g, fiber_g, b12_mcg, iron_mg, magnesium_mg, vitamin_d_iu, zinc_mg',
+      'id, name, name_es, brand, barcode, serving_description, serving_size_g, calories, protein_g, carbs_g, fat_g, fiber_g, b12_mcg, iron_mg, calcium_mg, magnesium_mg, vitamin_d_iu, zinc_mg',
     )
     .or(`name.ilike.%${q}%,name_es.ilike.%${q}%`)
     .order('protein_density', { ascending: false })
@@ -218,6 +222,7 @@ export async function insertDatabaseFoodLog(
     b12_mcg: entry.b12Mcg,
     vitamin_d_iu: entry.vitaminDIu,
     iron_mg: entry.ironMg,
+    calcium_mg: entry.calciumMg,
     barcode_ean: entry.barcodeEan,
     source: 'database',
     created_at: now,
@@ -253,6 +258,7 @@ export async function insertPhotoFoodLog(
     magnesium_mg: entry.magnesiumMg,
     zinc_mg: entry.zincMg,
     iron_mg: entry.ironMg,
+    calcium_mg: entry.calciumMg,
     barcode_ean: null,
     source: 'photo',
     created_at: now,
@@ -292,6 +298,7 @@ export async function relogFoodEntry(
     magnesium_mg: item.magnesiumMg,
     zinc_mg: item.zincMg,
     iron_mg: item.ironMg,
+    calcium_mg: item.calciumMg,
     barcode_ean: item.barcodeEan,
     source: item.source,
     created_at: now,
@@ -403,6 +410,7 @@ export async function upsertFoodDefault(
       magnesium_mg: entry.magnesiumMg,
       zinc_mg: entry.zincMg,
       iron_mg: entry.ironMg,
+      calcium_mg: entry.calciumMg,
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'user_id,food_name_key' },
@@ -426,7 +434,7 @@ export async function getFoodDefault(
   const { data, error } = await supabase
     .from('user_food_defaults')
     .select(
-      'serving_description, protein_g, carbs_g, fat_g, calories_kcal, fiber_g, b12_mcg, vitamin_d_iu, magnesium_mg, zinc_mg, iron_mg',
+      'serving_description, protein_g, carbs_g, fat_g, calories_kcal, fiber_g, b12_mcg, vitamin_d_iu, magnesium_mg, zinc_mg, iron_mg, calcium_mg',
     )
     .eq('user_id', userId)
     .eq('food_name_key', foodNameKey.toLowerCase().trim())
@@ -448,6 +456,7 @@ export async function getFoodDefault(
     magnesiumMg: data.magnesium_mg,
     zincMg: data.zinc_mg,
     ironMg: data.iron_mg,
+    calciumMg: data.calcium_mg,
   };
 }
 
@@ -480,7 +489,7 @@ export async function fetchFoodLogsInRange(
     .select(
       'id, user_id, logged_at, name, serving_description, '
       + 'protein_g, carbs_g, fat_g, fiber_g, calories_kcal, '
-      + 'b12_mcg, vitamin_d_iu, magnesium_mg, zinc_mg, iron_mg, '
+      + 'b12_mcg, vitamin_d_iu, magnesium_mg, zinc_mg, iron_mg, calcium_mg, '
       + 'barcode_ean, source, created_at',
     )
     .eq('user_id', userId)
@@ -520,7 +529,7 @@ export async function fetchTodayFoodLogs(
     .select(
       'id, user_id, logged_at, name, serving_description, '
       + 'protein_g, carbs_g, fat_g, fiber_g, calories_kcal, '
-      + 'b12_mcg, vitamin_d_iu, magnesium_mg, zinc_mg, iron_mg, '
+      + 'b12_mcg, vitamin_d_iu, magnesium_mg, zinc_mg, iron_mg, calcium_mg, '
       + 'barcode_ean, source, created_at',
     )
     .eq('user_id', userId)

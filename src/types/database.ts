@@ -249,6 +249,7 @@ export type Database = {
         Row: {
           b12_mcg: number | null
           barcode_ean: string | null
+          calcium_mg: number | null
           calories_kcal: number | null
           carbs_g: number | null
           created_at: string
@@ -269,6 +270,7 @@ export type Database = {
         Insert: {
           b12_mcg?: number | null
           barcode_ean?: string | null
+          calcium_mg?: number | null
           calories_kcal?: number | null
           carbs_g?: number | null
           created_at?: string
@@ -289,6 +291,7 @@ export type Database = {
         Update: {
           b12_mcg?: number | null
           barcode_ean?: string | null
+          calcium_mg?: number | null
           calories_kcal?: number | null
           carbs_g?: number | null
           created_at?: string
@@ -313,6 +316,7 @@ export type Database = {
           b12_mcg: number | null
           barcode: string | null
           brand: string | null
+          calcium_mg: number | null
           calories: number | null
           carbs_g: number | null
           created_at: string
@@ -338,6 +342,7 @@ export type Database = {
           b12_mcg?: number | null
           barcode?: string | null
           brand?: string | null
+          calcium_mg?: number | null
           calories?: number | null
           carbs_g?: number | null
           created_at?: string
@@ -363,6 +368,7 @@ export type Database = {
           b12_mcg?: number | null
           barcode?: string | null
           brand?: string | null
+          calcium_mg?: number | null
           calories?: number | null
           carbs_g?: number | null
           created_at?: string
@@ -650,6 +656,7 @@ export type Database = {
       user_food_defaults: {
         Row: {
           b12_mcg: number | null
+          calcium_mg: number | null
           calories_kcal: number | null
           carbs_g: number | null
           fat_g: number | null
@@ -667,6 +674,7 @@ export type Database = {
         }
         Insert: {
           b12_mcg?: number | null
+          calcium_mg?: number | null
           calories_kcal?: number | null
           carbs_g?: number | null
           fat_g?: number | null
@@ -684,6 +692,7 @@ export type Database = {
         }
         Update: {
           b12_mcg?: number | null
+          calcium_mg?: number | null
           calories_kcal?: number | null
           carbs_g?: number | null
           fat_g?: number | null

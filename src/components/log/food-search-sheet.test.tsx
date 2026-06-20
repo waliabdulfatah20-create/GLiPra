@@ -32,6 +32,7 @@ const FOOD: SeededFood = {
   fiberG: 0,
   b12Mcg: 1.3,
   ironMg: 0.1,
+  calciumMg: 270,
   magnesiumMg: 27,
   vitaminDIu: 0,
   zincMg: 1.2,

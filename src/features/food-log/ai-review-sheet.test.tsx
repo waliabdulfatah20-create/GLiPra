@@ -35,6 +35,7 @@ const RESULT: RecognitionResult = {
   magnesiumMg: null,
   zincMg: null,
   ironMg: null,
+  calciumMg: null,
   confidence: 'high',
   confidencePercent: 85,
 };

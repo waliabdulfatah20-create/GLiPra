@@ -10,7 +10,7 @@ import {
 
 // Builds a MicronutrientData object, defaulting every nutrient to 0.
 function micros(overrides: Partial<MicronutrientData> = {}): MicronutrientData {
-  return { magnesiumMg: 0, zincMg: 0, b12Mcg: 0, vitaminDIu: 0, ironMg: 0, ...overrides };
+  return { magnesiumMg: 0, zincMg: 0, b12Mcg: 0, vitaminDIu: 0, ironMg: 0, calciumMg: 0, ...overrides };
 }
 
 describe('fiber target constant', () => {
@@ -68,15 +68,15 @@ describe('summarizeFiber', () => {
 });
 
 describe('summarizeMicros', () => {
-  it('returns 5 red dots and onTrack 0 when nothing is logged', () => {
+  it('returns 6 red dots and onTrack 0 when nothing is logged', () => {
     const r = summarizeMicros(micros(), false);
-    expect(r.total).toBe(5);
+    expect(r.total).toBe(6);
     expect(r.onTrack).toBe(0);
     expect(r.hasMicros).toBe(false);
     expect(r.statuses.every(s => s.status === 'red')).toBe(true);
   });
 
-  it('orders the dots B12, Vitamin D, Magnesium, Zinc, Iron', () => {
+  it('orders the dots B12, Vitamin D, Magnesium, Zinc, Iron, Calcium', () => {
     const r = summarizeMicros(micros(), true);
     expect(r.statuses.map(s => s.key)).toEqual([
       'b12Mcg',
@@ -84,18 +84,19 @@ describe('summarizeMicros', () => {
       'magnesiumMg',
       'zincMg',
       'ironMg',
+      'calciumMg',
     ]);
-    expect(MICRO_ORDER).toEqual(['b12Mcg', 'vitaminDIu', 'magnesiumMg', 'zincMg', 'ironMg']);
+    expect(MICRO_ORDER).toEqual(['b12Mcg', 'vitaminDIu', 'magnesiumMg', 'zincMg', 'ironMg', 'calciumMg']);
   });
 
   it('counts only green nutrients as on track', () => {
-    // b12 100% green, vitD 100% green, mg 100% green, zinc 45% red, iron 50% amber
+    // b12 100% green, vitD 100% green, mg 100% green, zinc 45% red, iron 50% amber, calcium 0% red
     const r = summarizeMicros(
       micros({ b12Mcg: 2.4, vitaminDIu: 600, magnesiumMg: 420, zincMg: 5, ironMg: 9 }),
       true,
     );
     expect(r.onTrack).toBe(3);
-    expect(r.statuses.map(s => s.status)).toEqual(['green', 'green', 'green', 'red', 'amber']);
+    expect(r.statuses.map(s => s.status)).toEqual(['green', 'green', 'green', 'red', 'amber', 'red']);
     expect(r.hasMicros).toBe(true);
   });
 

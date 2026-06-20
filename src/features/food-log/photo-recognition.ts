@@ -42,6 +42,7 @@ export type RecognitionResult = {
   magnesiumMg: number | null;
   zincMg: number | null;
   ironMg: number | null;
+  calciumMg: number | null;
   /** Bucketed confidence — kept for backward-compat. */
   confidence: 'high' | 'medium' | 'low';
   /**
@@ -92,6 +93,7 @@ function adaptMockToResult(): RecognitionResult {
     magnesiumMg: mock.magnesium_mg,
     zincMg: mock.zinc_mg,
     ironMg: mock.iron_mg,
+    calciumMg: mock.calcium_mg,
     confidence,
     confidencePercent: Math.round(mock.confidence * 100),
   };

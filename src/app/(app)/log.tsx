@@ -155,6 +155,7 @@ export default function LogScreen() {
       b12Mcg: product.b12Mcg,
       vitaminDIu: product.vitaminDIu,
       ironMg: product.ironMg,
+      calciumMg: product.calciumMg,
     });
   }
 

@@ -218,7 +218,7 @@ export function FoodSearchSheet({ visible, mode, onClose, onSelect }: FoodSearch
                     {/* GLP-1 Watch micros (only when present) */}
                     {(selected.b12Mcg !== null || selected.vitaminDIu !== null
                       || selected.magnesiumMg !== null || selected.zincMg !== null
-                      || selected.ironMg !== null) && (
+                      || selected.ironMg !== null || selected.calciumMg !== null) && (
                       <View style={styles.microGrid}>
                         {selected.b12Mcg !== null && (
                           <MacroCell label={t('log.nutrient_b12')} value={`${selected.b12Mcg} mcg`} styles={styles} micro />
@@ -234,6 +234,9 @@ export function FoodSearchSheet({ visible, mode, onClose, onSelect }: FoodSearch
                         )}
                         {selected.ironMg !== null && (
                           <MacroCell label={t('log.nutrient_iron')} value={`${selected.ironMg} mg`} styles={styles} micro />
+                        )}
+                        {selected.calciumMg !== null && (
+                          <MacroCell label={t('log.nutrient_calcium')} value={`${Math.round(selected.calciumMg)} mg`} styles={styles} micro />
                         )}
                       </View>
                     )}

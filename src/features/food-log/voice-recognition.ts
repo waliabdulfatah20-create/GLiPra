@@ -25,6 +25,7 @@ const VOICE_FALLBACK: RecognitionResult = {
   magnesiumMg: null,
   zincMg: null,
   ironMg: null,
+  calciumMg: null,
   confidence: 'low',
 };
 

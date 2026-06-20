@@ -25,6 +25,7 @@ export const SUPPLEMENT_NUTRIENTS: SupplementNutrient[] = [
   { key: 'magnesiumMg', labelKey: 'log.nutrient_magnesium', name: 'Magnesium', unit: 'mg', rda: MICRONUTRIENT_RDAS.magnesiumMg },
   { key: 'zincMg', labelKey: 'log.nutrient_zinc', name: 'Zinc', unit: 'mg', rda: MICRONUTRIENT_RDAS.zincMg },
   { key: 'ironMg', labelKey: 'log.nutrient_iron', name: 'Iron', unit: 'mg', rda: MICRONUTRIENT_RDAS.ironMg },
+  { key: 'calciumMg', labelKey: 'log.nutrient_calcium', name: 'Calcium', unit: 'mg', rda: MICRONUTRIENT_RDAS.calciumMg },
   { key: 'b12Mcg', labelKey: 'log.nutrient_b12', name: 'Vitamin B12', unit: 'mcg', rda: MICRONUTRIENT_RDAS.b12Mcg },
   { key: 'vitaminDIu', labelKey: 'log.nutrient_vitd', name: 'Vitamin D', unit: 'IU', rda: MICRONUTRIENT_RDAS.vitaminDIu },
 ];
@@ -40,6 +41,7 @@ const EMPTY_MICROS: Record<NutrientKey, number | null> = {
   b12Mcg: null,
   vitaminDIu: null,
   ironMg: null,
+  calciumMg: null,
 };
 
 /** mcg keeps one decimal (B12 doses are tiny); mg/IU round to a whole number. */

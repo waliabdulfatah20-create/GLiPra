@@ -80,6 +80,7 @@ type FormState = {
   magnesiumMg: string;
   zincMg: string;
   ironMg: string;
+  calciumMg: string;
 };
 
 function resultToForm(r: RecognitionResult): FormState {
@@ -96,6 +97,7 @@ function resultToForm(r: RecognitionResult): FormState {
     magnesiumMg: r.magnesiumMg != null ? Math.round(r.magnesiumMg).toString() : '',
     zincMg: r.zincMg != null ? r.zincMg.toFixed(1) : '',
     ironMg: r.ironMg != null ? r.ironMg.toFixed(1) : '',
+    calciumMg: r.calciumMg != null ? Math.round(r.calciumMg).toString() : '',
   };
 }
 
@@ -113,6 +115,7 @@ function defaultsToForm(d: PhotoFoodEntry): FormState {
     magnesiumMg: d.magnesiumMg != null ? Math.round(d.magnesiumMg).toString() : '',
     zincMg: d.zincMg != null ? d.zincMg.toFixed(1) : '',
     ironMg: d.ironMg != null ? d.ironMg.toFixed(1) : '',
+    calciumMg: d.calciumMg != null ? Math.round(d.calciumMg).toString() : '',
   };
 }
 
@@ -132,6 +135,7 @@ function extractMacroBase(src: RecognitionResult | (PhotoFoodEntry & { name: str
     magnesiumMg: src.magnesiumMg,
     zincMg: src.zincMg,
     ironMg: src.ironMg,
+    calciumMg: src.calciumMg,
   };
 }
 
@@ -150,6 +154,7 @@ function parseEntry(form: FormState): PhotoFoodEntry {
     magnesiumMg: form.magnesiumMg !== '' ? Math.max(0, Number.parseFloat(form.magnesiumMg) || 0) : null,
     zincMg: form.zincMg !== '' ? Math.max(0, Number.parseFloat(form.zincMg) || 0) : null,
     ironMg: form.ironMg !== '' ? Math.max(0, Number.parseFloat(form.ironMg) || 0) : null,
+    calciumMg: form.calciumMg !== '' ? Math.max(0, Number.parseFloat(form.calciumMg) || 0) : null,
   };
 }
 
@@ -245,6 +250,7 @@ export function AIReviewSheet({ result, onClose, transcript, onRescan, rescanIni
       'magnesiumMg',
       'zincMg',
       'ironMg',
+      'calciumMg',
     ]),
     [],
   );
@@ -312,7 +318,7 @@ export function AIReviewSheet({ result, onClose, transcript, onRescan, rescanIni
 
   const hasMicroData
     = form
-      && (form.b12Mcg !== '' || form.vitaminDIu !== '' || form.magnesiumMg !== '' || form.zincMg !== '' || form.ironMg !== '');
+      && (form.b12Mcg !== '' || form.vitaminDIu !== '' || form.magnesiumMg !== '' || form.zincMg !== '' || form.ironMg !== '' || form.calciumMg !== '');
 
   if (!result || !form)
     return null;
@@ -519,6 +525,12 @@ export function AIReviewSheet({ result, onClose, transcript, onRescan, rescanIni
                     unit="mg"
                     value={form.ironMg}
                     onChangeText={v => handleField('ironMg', v)}
+                  />
+                  <MacroInput
+                    label="Calcium"
+                    unit="mg"
+                    value={form.calciumMg}
+                    onChangeText={v => handleField('calciumMg', v)}
                   />
                 </View>
               </>

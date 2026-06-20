@@ -36,6 +36,7 @@ export const MOCK_MEAL_RECOGNITION = {
   magnesium_mg: 58,
   zinc_mg: 1.1,
   iron_mg: 1.3,
+  calcium_mg: 120,
   confidence: 0.87,
   /**
    * Numeric percent equivalent — same value as `confidence * 100`, kept
@@ -90,6 +91,7 @@ export const MOCK_VOICE_PARSE: RecognitionResult = {
   magnesiumMg: null,
   zincMg: 1.5,
   ironMg: 2.1,
+  calciumMg: 250,
   confidence: 'medium',
   confidencePercent: 65,
 };

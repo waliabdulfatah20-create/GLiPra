@@ -25,6 +25,7 @@ const ROW: SeededFoodRow = {
   fiber_g: 0,
   b12_mcg: 1.3,
   iron_mg: 0.1,
+  calcium_mg: 270,
   magnesium_mg: 27,
   vitamin_d_iu: 0,
   zinc_mg: 1.2,
@@ -121,6 +122,7 @@ describe('seededFoodToLogEntry', () => {
       magnesiumMg: 27,
       zincMg: 1.2,
       ironMg: 0.1,
+      calciumMg: 270,
       barcodeEan: null,
     });
   });
@@ -143,6 +145,7 @@ describe('seededFoodToFormPatch', () => {
     expect(patch.magnesiumMg).toBe('27');
     expect(patch.zincMg).toBe('1.2');
     expect(patch.ironMg).toBe('0.1');
+    expect(patch.calciumMg).toBe('270');
   });
 
   it('maps nulls to empty strings', () => {

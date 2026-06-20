@@ -560,6 +560,7 @@ export function useDailyMacros(): {
   magnesiumMg: number;
   zincMg: number;
   ironMg: number;
+  calciumMg: number;
   hasMicronutrients: boolean;
   isLoading: boolean;
 } {
@@ -577,13 +578,15 @@ export function useDailyMacros(): {
       magnesiumMg: acc.magnesiumMg + (log.magnesiumMg ?? 0),
       zincMg: acc.zincMg + (log.zincMg ?? 0),
       ironMg: acc.ironMg + (log.ironMg ?? 0),
+      calciumMg: acc.calciumMg + (log.calciumMg ?? 0),
       hasMicronutrients:
         acc.hasMicronutrients
         || log.b12Mcg != null
         || log.vitaminDIu != null
         || log.magnesiumMg != null
         || log.zincMg != null
-        || log.ironMg != null,
+        || log.ironMg != null
+        || log.calciumMg != null,
     }),
     {
       protein: 0,
@@ -596,6 +599,7 @@ export function useDailyMacros(): {
       magnesiumMg: 0,
       zincMg: 0,
       ironMg: 0,
+      calciumMg: 0,
       hasMicronutrients: false,
     },
   );

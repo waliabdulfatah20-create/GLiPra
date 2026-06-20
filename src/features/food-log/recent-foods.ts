@@ -40,6 +40,7 @@ export type RecentFood = {
   magnesiumMg: number | null;
   zincMg: number | null;
   ironMg: number | null;
+  calciumMg: number | null;
   barcodeEan: string | null;
   source: FoodLogEntry['source'];
   /** How many times this food appears in the window (frequency). */
@@ -88,6 +89,7 @@ export function deriveRecentFoods(
         magnesiumMg: log.magnesiumMg,
         zincMg: log.zincMg,
         ironMg: log.ironMg,
+        calciumMg: log.calciumMg,
         barcodeEan: log.barcodeEan,
         source: log.source,
         count: 1,
@@ -111,6 +113,7 @@ export function deriveRecentFoods(
       existing.magnesiumMg = log.magnesiumMg;
       existing.zincMg = log.zincMg;
       existing.ironMg = log.ironMg;
+      existing.calciumMg = log.calciumMg;
       existing.barcodeEan = log.barcodeEan;
       existing.source = log.source;
       existing.lastLoggedAt = log.loggedAt;

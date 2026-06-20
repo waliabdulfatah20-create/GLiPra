@@ -100,7 +100,7 @@ export function FuelCard() {
 
   const { readinessCard, proteinConsumedG, proteinFloorG, isLoading } = useTodayData();
   const { card: muscleCard } = useMuscleScore();
-  const { fiber, magnesiumMg, zincMg, b12Mcg, vitaminDIu, ironMg, hasMicronutrients }
+  const { fiber, magnesiumMg, zincMg, b12Mcg, vitaminDIu, ironMg, calciumMg, hasMicronutrients }
     = useDailyMacros();
 
   const [expanded, setExpanded] = React.useState(false);
@@ -110,7 +110,7 @@ export function FuelCard() {
 
   const fiberSummary = summarizeFiber(fiber);
   const microSummary = summarizeMicros(
-    { magnesiumMg, zincMg, b12Mcg, vitaminDIu, ironMg },
+    { magnesiumMg, zincMg, b12Mcg, vitaminDIu, ironMg, calciumMg },
     hasMicronutrients,
   );
 

@@ -21,6 +21,7 @@ describe('supplement quick-add helpers', () => {
     expect(entry!.zincMg).toBeNull();
     expect(entry!.b12Mcg).toBeNull();
     expect(entry!.ironMg).toBeNull();
+    expect(entry!.calciumMg).toBeNull();
     expect(entry!.name).toBe('Vitamin D');
     expect(entry!.servingDescription).toBe('2000 IU');
   });
@@ -28,6 +29,8 @@ describe('supplement quick-add helpers', () => {
   it('rounds mg/IU to whole numbers and B12 (mcg) to one decimal', () => {
     expect(buildSupplementEntry('magnesiumMg', 399.6)!.magnesiumMg).toBe(400);
     expect(buildSupplementEntry('magnesiumMg', 399.6)!.servingDescription).toBe('400 mg');
+    expect(buildSupplementEntry('calciumMg', 599.6)!.calciumMg).toBe(600);
+    expect(buildSupplementEntry('calciumMg', 599.6)!.servingDescription).toBe('600 mg');
     expect(buildSupplementEntry('b12Mcg', 2.46)!.b12Mcg).toBe(2.5);
     expect(buildSupplementEntry('b12Mcg', 2.46)!.servingDescription).toBe('2.5 mcg');
   });
@@ -53,6 +56,7 @@ describe('supplement quick-add helpers', () => {
       b12Mcg: null,
       vitaminDIu: null,
       ironMg: null,
+      calciumMg: null,
     })).toBeNull();
   });
 });

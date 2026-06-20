@@ -17,6 +17,7 @@ const FULL_BASE = {
   magnesiumMg: 60,
   zincMg: 3.5,
   ironMg: 2.5,
+  calciumMg: 300,
 };
 
 const SPARSE_BASE = {
@@ -30,6 +31,7 @@ const SPARSE_BASE = {
   magnesiumMg: null,
   zincMg: null,
   ironMg: null,
+  calciumMg: null,
 };
 
 describe('scaleMacros — multiplier = 1', () => {
@@ -49,6 +51,7 @@ describe('scaleMacros — multiplier = 1', () => {
     expect(out.caloriesKcal).toBe('432');
     expect(out.vitaminDIu).toBe('40');
     expect(out.magnesiumMg).toBe('60');
+    expect(out.calciumMg).toBe('300');
   });
 });
 

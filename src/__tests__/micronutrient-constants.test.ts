@@ -46,8 +46,8 @@ describe('getNutrientStatus', () => {
 });
 
 describe('getGapCount', () => {
-  const noGaps = { magnesiumMg: 420, zincMg: 11, b12Mcg: 2.4, vitaminDIu: 600, ironMg: 18 };
-  const twoGaps = { magnesiumMg: 190, zincMg: 11, b12Mcg: 0.4, vitaminDIu: 600, ironMg: 18 };
+  const noGaps = { magnesiumMg: 420, zincMg: 11, b12Mcg: 2.4, vitaminDIu: 600, ironMg: 18, calciumMg: 1200 };
+  const twoGaps = { magnesiumMg: 190, zincMg: 11, b12Mcg: 0.4, vitaminDIu: 600, ironMg: 18, calciumMg: 1200 };
 
   it('returns 0 when all at goal', () => {
     expect(getGapCount(noGaps)).toBe(0);
@@ -59,16 +59,20 @@ describe('getGapCount', () => {
     expect(getGapCount({ ...noGaps, ironMg: 8 })).toBe(1); // 8/18 = 44%
     expect(getGapCount({ ...noGaps, ironMg: 9 })).toBe(0); // 9/18 = 50%, not a gap
   });
+  it('counts calcium as a gap when below 50% of its 1200 mg RDA', () => {
+    expect(getGapCount({ ...noGaps, calciumMg: 500 })).toBe(1); // 500/1200 = 42%
+    expect(getGapCount({ ...noGaps, calciumMg: 600 })).toBe(0); // 600/1200 = 50%, not a gap
+  });
   it('does not count nutrients at exactly 50%', () => {
     expect(getGapCount({ ...noGaps, magnesiumMg: 210 })).toBe(0);
   });
-  it('counts all 5 when all are zero', () => {
-    expect(getGapCount({ magnesiumMg: 0, zincMg: 0, b12Mcg: 0, vitaminDIu: 0, ironMg: 0 })).toBe(5);
+  it('counts all 6 when all are zero', () => {
+    expect(getGapCount({ magnesiumMg: 0, zincMg: 0, b12Mcg: 0, vitaminDIu: 0, ironMg: 0, calciumMg: 0 })).toBe(6);
   });
 });
 
 describe('getGapBannerText', () => {
-  const noGaps = { magnesiumMg: 420, zincMg: 11, b12Mcg: 2.4, vitaminDIu: 600, ironMg: 18 };
+  const noGaps = { magnesiumMg: 420, zincMg: 11, b12Mcg: 2.4, vitaminDIu: 600, ironMg: 18, calciumMg: 1200 };
 
   it('returns null when no gaps', () => {
     expect(getGapBannerText(noGaps)).toBeNull();
@@ -82,12 +86,16 @@ describe('getGapBannerText', () => {
     const text = getGapBannerText({ ...noGaps, ironMg: 2 });
     expect(text).toContain('Iron');
   });
+  it('names Calcium when calcium is the gap', () => {
+    const text = getGapBannerText({ ...noGaps, calciumMg: 200 });
+    expect(text).toContain('Calcium');
+  });
   it('does not contain forbidden condition names', () => {
-    const text = getGapBannerText({ ...noGaps, ironMg: 2 }) ?? '';
+    const text = getGapBannerText({ ...noGaps, ironMg: 2, calciumMg: 200 }) ?? '';
     expect(text).not.toMatch(/deficiency|anemia|rickets|osteo/i);
   });
   it('handles multiple gaps — names both and includes tips for each', () => {
-    const text = getGapBannerText({ magnesiumMg: 0, zincMg: 0, b12Mcg: 0, vitaminDIu: 0, ironMg: 0 });
+    const text = getGapBannerText({ magnesiumMg: 0, zincMg: 0, b12Mcg: 0, vitaminDIu: 0, ironMg: 0, calciumMg: 0 });
     expect(typeof text).toBe('string');
     expect(text).not.toBeNull();
     // Should name the top 2 gap nutrients
@@ -102,5 +110,6 @@ describe('mICRONUTRIENT_RDAS', () => {
     expect(MICRONUTRIENT_RDAS.b12Mcg).toBe(2.4);
     expect(MICRONUTRIENT_RDAS.vitaminDIu).toBe(600);
     expect(MICRONUTRIENT_RDAS.ironMg).toBe(18);
+    expect(MICRONUTRIENT_RDAS.calciumMg).toBe(1200);
   });
 });

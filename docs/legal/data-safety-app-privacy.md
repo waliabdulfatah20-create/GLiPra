@@ -39,7 +39,7 @@
 | Usage data (screens viewed, features used) | PostHog | No | No (anonymous device ID) | Analytics |
 | IP address | Supabase (auth/login) | No | Yes | Security, fraud prevention |
 | Crash logs / diagnostics | Sentry | No | No (PII stripped) | Diagnostics |
-| Apple Health / Google Health Connect: weight, steps, active energy | Read-only, on device | Yes (health) | Yes | App functionality; **optional**, read-only, never written back |
+| Apple Health / Google Health Connect: weight, steps | Read-only, on device | Yes (health) | Yes | App functionality; **optional**, read-only, never written back (manifest declares only READ_WEIGHT + READ_STEPS) |
 
 **Subprocessors that receive data:** Supabase (primary store), OpenAI (meal photo + anonymized
 prompts, not used for training), PostHog (anonymized analytics), Sentry (crash, no health/PII),
@@ -66,7 +66,7 @@ OpenAI are **processed ephemerally** (deleted within 24h, not used to train mode
 | Personal info → User IDs | Yes | No | — | Required | Account management |
 | Financial info → Purchase history | Yes | No | — | Optional | App functionality (subscription) |
 | Health & fitness → Health info | Yes | No | — | Required* | App functionality |
-| Health & fitness → Fitness info (steps/energy via Health Connect) | Yes | No | — | Optional | App functionality |
+| Health & fitness → Fitness info (steps via Health Connect) | Yes | No | — | Optional | App functionality |
 | Photos and videos → Photos (meal photos) | Yes | No | **Ephemeral** (24h) | Optional | App functionality (AI analysis) |
 | App activity → App interactions | Yes | No | — | Optional | Analytics |
 | App activity → Other user-generated content (notes) | Yes | No | — | Optional | App functionality |
@@ -77,9 +77,9 @@ OpenAI are **processed ephemerally** (deleted within 24h, not used to train mode
 \* "Required" = needed to deliver the core nutrition/injection features; the user enters it
 during onboarding. Health Connect import is optional.
 
-**Health apps declaration (Play):** The app reads weight, step count, and active energy from
-Health Connect (read-only, with permission) to support nutrition and activity tracking. It
-never writes data back. (Per-type Health Connect justification is tracked separately as B11.)
+**Health apps declaration (Play):** The app reads weight and step count from Health Connect
+(read-only, with permission) to support nutrition and activity tracking. It never writes data
+back. (Per-type Health Connect justification + form answers: `docs/store/health-connect-declaration.md`, B11.)
 
 ---
 

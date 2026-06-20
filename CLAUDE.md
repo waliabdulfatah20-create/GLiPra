@@ -443,3 +443,4 @@ Bad: "It's not working" — Good: paste the exact error output.
 - Write AI feature code that could loop or retry without a rate limit check
 - Suggest upgrading Supabase, EAS, or PostHog before the free tier is actually hit
 - Use em dashes in any user-facing copy
+- Fold cardio (or anything else) into the Muscle Preservation Score. The score is permanently 70% protein + 30% resistance. Cardio is a SECONDARY tracker (`cardio_logs`, migration 029) that never enters the score; it only drives an educational interference warning when weekly cardio outpaces weekly resistance.

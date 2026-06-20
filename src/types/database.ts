@@ -98,6 +98,36 @@ export type Database = {
         }
         Relationships: []
       }
+      cardio_logs: {
+        Row: {
+          created_at: string
+          duration_min: number | null
+          id: string
+          notes: string | null
+          performed_at: string
+          session_type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_min?: number | null
+          id?: string
+          notes?: string | null
+          performed_at: string
+          session_type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_min?: number | null
+          id?: string
+          notes?: string | null
+          performed_at?: string
+          session_type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       content_cards: {
         Row: {
           body: string

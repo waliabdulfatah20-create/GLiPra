@@ -26,6 +26,7 @@ import { FuelCard } from '@/components/today/fuel-card';
 import { PharmacistSpotlightCard } from '@/components/today/pharmacist-spotlight-card';
 import { StreakCard } from '@/components/today/streak-card';
 import {
+  Activity,
   ClipboardCheck,
   Dumbbell,
   ProgressPath,
@@ -37,6 +38,7 @@ import {
 import { MilestoneToast } from '@/components/ui/milestone-toast';
 import { TodaySkeleton } from '@/components/ui/today-skeleton';
 import { useAuthStore } from '@/features/auth/use-auth-store';
+import { useCardioInterference, useCardioWeekly } from '@/features/cardio/hooks';
 import { markRedFlagTriggered } from '@/features/check-in/api';
 import { useTodayCheckIn } from '@/features/check-in/hooks';
 import { getActiveCardsForRoute } from '@/features/content-cards/data';
@@ -132,6 +134,10 @@ export function TodayScreen() {
   const { frequency: resistanceWeekly } = useResistanceWeekly();
   const resistanceMet
     = resistanceWeekly.currentWeekSessions >= resistanceWeekly.weeklyTarget;
+  // Cardio is a SECONDARY tracker — it never enters the muscle score. The
+  // interference flag warns when weekly cardio outpaces weekly resistance.
+  const { frequency: cardioWeekly } = useCardioWeekly();
+  const cardioInterferes = useCardioInterference();
 
   const session = useAuthStore.use.session();
   const userId = session?.user.id;
@@ -463,6 +469,34 @@ export function TodayScreen() {
             <Text style={styles.rowChevron}>›</Text>
           </TouchableOpacity>
 
+          {/* Cardio — a SECONDARY tracker (muted accent so muscle stays #1).
+              Never enters the muscle score; shows an interference hint when
+              this week's cardio outpaces resistance. */}
+          <TouchableOpacity
+            style={[styles.actionCard, { borderTopColor: colors.border }]}
+            onPress={() => { haptics.tap(); router.push('/cardio'); }}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel={t('today.cardio_title')}
+          >
+            <View style={[styles.actionIconCircle, styles.actionIconCirclePending]}>
+              <Activity color={colors.textSecondary} width={20} height={20} />
+            </View>
+            <View style={styles.actionTextBlock}>
+              <Text style={styles.actionHeadline}>{t('today.cardio_title')}</Text>
+              <View style={[styles.actionPill, cardioInterferes && styles.actionPillWarn]}>
+                <Text style={[styles.actionPillText, cardioInterferes && styles.actionPillWarnText]}>
+                  {cardioInterferes
+                    ? t('today.cardio_interference_hint')
+                    : cardioWeekly.currentWeekSessions > 0
+                      ? t('today.cardio_subtitle', { sessions: cardioWeekly.currentWeekSessions })
+                      : t('today.cardio_cta')}
+                </Text>
+              </View>
+            </View>
+            <Text style={styles.rowChevron}>›</Text>
+          </TouchableOpacity>
+
           {/* Streak — only once a streak is active (no empty-state nag) */}
           {!isStreakLoading && (streak?.currentStreak ?? 0) > 0 && (
             <StreakCard
@@ -762,6 +796,12 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     },
     actionPillTextDone: {
       color: colors.success,
+    },
+    actionPillWarn: {
+      backgroundColor: colors.warningLight,
+    },
+    actionPillWarnText: {
+      color: colors.warning,
     },
     actionIconCircle: {
       width: 40,

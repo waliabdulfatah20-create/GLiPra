@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GLiPra - GLP-1 nutrition, built by a pharmacist</title>
-  <meta name="description" content="GLiPra is the GLP-1 nutrition companion built by a licensed pharmacist. Protein targets that protect lean mass, guidance that follows your injection cycle, and clinical safety built in." />
+  <meta name="description" content="The GLP-1 nutrition companion built by a licensed pharmacist. Protein targets that protect lean mass, injection-cycle guidance, and clinical safety built in." />
+  <meta name="author" content="Wali Abdul, PharmD" />
   <link rel="canonical" href="https://glipra.com/" />
   <meta name="theme-color" content="#5b21b6" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -13,13 +14,147 @@
   <!-- Open Graph / social -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://glipra.com/" />
+  <meta property="og:site_name" content="GLiPra" />
+  <meta property="og:locale" content="en_US" />
   <meta property="og:title" content="GLiPra - GLP-1 nutrition, built by a pharmacist" />
   <meta property="og:description" content="Protein targets that protect lean mass, guidance that follows your injection cycle, and clinical safety built in. Built by a licensed pharmacist." />
-  <meta property="og:image" content="https://glipra.com/assets/og-image.svg" />
+  <meta property="og:image" content="https://glipra.com/assets/og-image.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="GLiPra - GLP-1 nutrition, built by a pharmacist" />
   <meta name="twitter:description" content="Protein targets that protect lean mass, injection-cycle-aware guidance, clinical safety. Built by a licensed pharmacist." />
-  <meta name="twitter:image" content="https://glipra.com/assets/og-image.svg" />
+  <meta name="twitter:image" content="https://glipra.com/assets/og-image.png" />
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://glipra.com/#organization",
+        "name": "GLiPra",
+        "alternateName": "Glipra",
+        "url": "https://glipra.com/",
+        "logo": "https://glipra.com/assets/glipra-icon-small.svg",
+        "description": "GLP-1 nutrition companion built by a licensed pharmacist.",
+        "founder": { "@id": "https://glipra.com/#founder" }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://glipra.com/#website",
+        "url": "https://glipra.com/",
+        "name": "GLiPra",
+        "publisher": { "@id": "https://glipra.com/#organization" },
+        "inLanguage": "en-US"
+      },
+      {
+        "@type": "Person",
+        "@id": "https://glipra.com/#founder",
+        "name": "Wali Abdul",
+        "honorificSuffix": "PharmD",
+        "jobTitle": "Licensed pharmacist and founder",
+        "worksFor": { "@id": "https://glipra.com/#organization" }
+      },
+      {
+        "@type": "MobileApplication",
+        "@id": "https://glipra.com/#app",
+        "name": "GLiPra",
+        "operatingSystem": "iOS, Android",
+        "applicationCategory": "HealthApplication",
+        "description": "A GLP-1 nutrition companion that sets a personalized protein floor, adapts guidance to your injection cycle, and watches for symptoms that may need medical attention.",
+        "publisher": { "@id": "https://glipra.com/#organization" },
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "Free",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          {
+            "@type": "Offer",
+            "name": "Pro Monthly",
+            "price": "9.99",
+            "priceCurrency": "USD"
+          },
+          {
+            "@type": "Offer",
+            "name": "Pro Annual",
+            "price": "49.99",
+            "priceCurrency": "USD"
+          },
+          {
+            "@type": "Offer",
+            "name": "Founder Lifetime",
+            "price": "149",
+            "priceCurrency": "USD"
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://glipra.com/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is GLiPra free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, generously. Manual, barcode, and database food logging, your protein floor and Muscle Score, injection-cycle and oral dose tracking, resistance logging, the micronutrient watch, red-flag safety escalation, and data export are all free. GLiPra Pro ($9.99/mo or $49.99/yr) adds AI photo recognition, voice logging, daily AI guidance, an unlimited AI nutrition coach, unlimited history, and prescriber visit prep PDF export."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does the AI coach answer medication questions?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. The AI nutrition coach is scoped to food and nutrition only (protein, fiber, hydration, meal strategies). It does not answer dosing, drug-interaction, or symptom questions, and it points you to your prescriber or pharmacist for those."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does GLiPra replace my doctor or pharmacist?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. GLiPra helps you track and understand your nutrition between visits. It is educational and is not medical advice. All clinical decisions should involve your prescriber."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which medications does GLiPra support?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Injectables: Ozempic, Wegovy, Mounjaro, Zepbound, Saxenda, Victoza, Trulicity, and compounded GLP-1s. Oral tablets: Rybelsus and orforglipron. GLiPra adapts to your route automatically."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does injection-cycle guidance work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Log your injection day, and GLiPra maps where you are across five phases (injection day, peak suppression, adjustment, recovery window, overdue) and adapts your protein targets and guidance to each. On an oral GLP-1, it tracks your daily dose window and adherence instead."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Will it be on iPhone and Android?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. GLiPra launches on both the App Store and Google Play. The full app is available in English and Spanish. Join the waitlist and we will notify you for your device."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is my health data private?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Your data is encrypted in transit and at rest and isolated per user. We never sell your data, AI prompts contain only anonymized context (never your name or email), and you can export or delete your account at any time. See our Privacy Policy."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <link rel="stylesheet" href="/assets/site.css" />
   <style>
@@ -160,7 +295,7 @@
     <div class="wrap nav-inner">
       <a href="/" class="logo" aria-label="GLiPra home">
         <img class="logo-mark" src="/assets/glipra-icon-small.svg" alt="" />
-        <span class="logo-word">Glipra</span>
+        <span class="logo-word">GLiPra</span>
       </a>
       <a href="#waitlist" class="btn btn-primary btn-sm">Join the waitlist</a>
     </div>
@@ -452,7 +587,7 @@
     <div class="wrap footer-inner">
       <a href="/" class="logo logo--on-dark" aria-label="GLiPra home">
         <img class="logo-mark" src="/assets/glipra-icon-small.svg" alt="" />
-        <span class="logo-word">Glipra</span>
+        <span class="logo-word">GLiPra</span>
       </a>
       <p class="footer-disclaimer">
         GLiPra is an educational and tracking app for general wellness. It is not medical advice, diagnosis, or

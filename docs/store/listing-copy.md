@@ -17,21 +17,21 @@
 
 **English (verbatim from ARCHITECTURE.md master disclaimer):**
 
-> Glipra is an educational and tracking application for general wellness purposes. Information
+> GLiPra is an educational and tracking application for general wellness purposes. Information
 > provided, including AI-generated suggestions and content articles, is for educational purposes
-> only and is not medical advice, diagnosis, or treatment. Although Glipra was designed by a
-> licensed pharmacist, your use of Glipra does not establish a pharmacist-patient relationship
-> or any professional medical relationship. Glipra is not a substitute for professional medical
+> only and is not medical advice, diagnosis, or treatment. Although GLiPra was designed by a
+> licensed pharmacist, your use of GLiPra does not establish a pharmacist-patient relationship
+> or any professional medical relationship. GLiPra is not a substitute for professional medical
 > advice. Always seek the advice of your prescriber or qualified healthcare provider. If you
 > think you may have a medical emergency, call 911.
 
 **Spanish:**
 
-> Glipra es una aplicación educativa y de seguimiento con fines de bienestar general. La
+> GLiPra es una aplicación educativa y de seguimiento con fines de bienestar general. La
 > información proporcionada, incluidas las sugerencias generadas por IA y los artículos de
 > contenido, es solo para fines educativos y no constituye consejo médico, diagnóstico ni
-> tratamiento. Aunque Glipra fue diseñada por un farmacéutico con licencia, tu uso de Glipra no
-> establece una relación farmacéutico-paciente ni ninguna relación médica profesional. Glipra no
+> tratamiento. Aunque GLiPra fue diseñada por un farmacéutico con licencia, tu uso de GLiPra no
+> establece una relación farmacéutico-paciente ni ninguna relación médica profesional. GLiPra no
 > sustituye el consejo médico profesional. Busca siempre el consejo de tu prescriptor o de un
 > profesional de la salud calificado. Si crees que puedes tener una emergencia médica, llama al 911.
 
@@ -87,11 +87,11 @@
 > visit prep with PDF export.
 >
 > IMPORTANT
-> Glipra is an educational and tracking application for general wellness purposes. Information
+> GLiPra is an educational and tracking application for general wellness purposes. Information
 > provided, including AI-generated suggestions and content articles, is for educational purposes
-> only and is not medical advice, diagnosis, or treatment. Although Glipra was designed by a
-> licensed pharmacist, your use of Glipra does not establish a pharmacist-patient relationship
-> or any professional medical relationship. Glipra is not a substitute for professional medical
+> only and is not medical advice, diagnosis, or treatment. Although GLiPra was designed by a
+> licensed pharmacist, your use of GLiPra does not establish a pharmacist-patient relationship
+> or any professional medical relationship. GLiPra is not a substitute for professional medical
 > advice. Always seek the advice of your prescriber or qualified healthcare provider. If you
 > think you may have a medical emergency, call 911.
 
@@ -122,11 +122,11 @@
 > preparación para visitas con exportación a PDF.
 >
 > IMPORTANTE
-> Glipra es una aplicación educativa y de seguimiento con fines de bienestar general. La
+> GLiPra es una aplicación educativa y de seguimiento con fines de bienestar general. La
 > información proporcionada, incluidas las sugerencias generadas por IA y los artículos de
 > contenido, es solo para fines educativos y no constituye consejo médico, diagnóstico ni
-> tratamiento. Aunque Glipra fue diseñada por un farmacéutico con licencia, tu uso de Glipra no
-> establece una relación farmacéutico-paciente ni ninguna relación médica profesional. Glipra no
+> tratamiento. Aunque GLiPra fue diseñada por un farmacéutico con licencia, tu uso de GLiPra no
+> establece una relación farmacéutico-paciente ni ninguna relación médica profesional. GLiPra no
 > sustituye el consejo médico profesional. Busca siempre el consejo de tu prescriptor o de un
 > profesional de la salud calificado. Si crees que puedes tener una emergencia médica, llama al 911.
 

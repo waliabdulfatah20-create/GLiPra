@@ -1,4 +1,4 @@
-# Glipra — Claude Context File
+# GLiPra — Claude Context File
 # Keep this file current. Update rules and decisions when they change.
 # Build history and completed milestones live in PROGRESS.md.
 # Last updated: 2026-06-09
@@ -7,7 +7,7 @@
 
 ## What This App Is
 
-**Glipra** — A GLP-1 nutrition companion app built by a licensed pharmacist.
+**GLiPra** — A GLP-1 nutrition companion app built by a licensed pharmacist.
 Core promise: "We make sure you don't lose muscle while GLP-1 does its job."
 
 Target user: Adults on Ozempic, Wegovy, Mounjaro, Zepbound, Saxenda, Trulicity,
@@ -379,7 +379,7 @@ On Continue: `changeLanguage(selected)` + persist → navigate to `/onboarding/m
 ## Session Startup Prompt
 
 ```
-Read CLAUDE.md. I'm building Glipra — a GLP-1 nutrition app built by a licensed
+Read CLAUDE.md. I'm building GLiPra — a GLP-1 nutrition app built by a licensed
 pharmacist. Today I want to work on [FEATURE NAME].
 
 Before writing any code:

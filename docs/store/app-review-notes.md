@@ -1,4 +1,4 @@
-# App Review Notes - Glipra
+# App Review Notes - GLiPra
 
 _Paste this text into App Store Connect > App Information > Review Information > Notes._
 _Update the [PLACEHOLDERS] before submitting._
@@ -10,13 +10,13 @@ _Update the [PLACEHOLDERS] before submitting._
 Email: reviewer@glipra.com
 Password: GlipraReview2025!
 
-This account has a pre-populated profile (8 weeks on Wegovy, weight trend, injection history, food logs) and a Glipra Pro subscription granted via RevenueCat promotional entitlement so all Pro features are accessible without an in-app purchase.
+This account has a pre-populated profile (8 weeks on Wegovy, weight trend, injection history, food logs) and a GLiPra Pro subscription granted via RevenueCat promotional entitlement so all Pro features are accessible without an in-app purchase.
 
 ---
 
 ## App Overview
 
-Glipra is a GLP-1 nutrition companion designed by a licensed pharmacist. It helps adults on GLP-1 medications (Ozempic, Wegovy, Mounjaro, Zepbound, Saxenda, and others) protect muscle mass through protein tracking, injection-cycle-aware nutrition guidance, and weekly prescriber visit preparation.
+GLiPra is a GLP-1 nutrition companion designed by a licensed pharmacist. It helps adults on GLP-1 medications (Ozempic, Wegovy, Mounjaro, Zepbound, Saxenda, and others) protect muscle mass through protein tracking, injection-cycle-aware nutrition guidance, and weekly prescriber visit preparation.
 
 The app is nutrition and habit tracking only. It does not diagnose, prescribe, or provide medication dosing advice. Every clinical screen carries a visible disclaimer and defers to the user's prescriber.
 
@@ -63,7 +63,7 @@ Open the app and sign in with the demo credentials above. The app lands on the T
 
 ## Subscription / IAP
 
-The demo account has Glipra Pro granted via RevenueCat promotional entitlement, so no purchase is required to review Pro features.
+The demo account has GLiPra Pro granted via RevenueCat promotional entitlement, so no purchase is required to review Pro features.
 
 To test the paywall and purchase flow:
 1. Create a new account (any email, no pre-seeded data).
@@ -80,13 +80,13 @@ IAP product IDs:
 
 ## Health Content Notes
 
-**Pharmacist credential**: Glipra was designed by Wali Abdul, PharmD, a licensed pharmacist in [STATE]. The "Designed by a licensed pharmacist" claim refers to the pharmacist who authored the app's nutrition guidelines, content cards, and safety logic. The claim does not represent a clinical relationship with the user or constitute pharmaceutical services.
+**Pharmacist credential**: GLiPra was designed by Wali Abdul, PharmD, a licensed pharmacist in [STATE]. The "Designed by a licensed pharmacist" claim refers to the pharmacist who authored the app's nutrition guidelines, content cards, and safety logic. The claim does not represent a clinical relationship with the user or constitute pharmaceutical services.
 
 **Medical disclaimer**: Every screen touching clinical content displays a visible disclaimer. Tier-1 disclaimers (AI output, protein floor, medication content) use a modal on first view. Tier-2 disclaimers (educational content, side effects) use a persistent footer. All clinical content directs users to their prescriber for medical decisions.
 
 **Escalation / safety**: The red-flag detector monitors check-in symptoms for patterns requiring prescriber attention. When triggered, it shows the EscalationCard with the locked copy: "You've logged symptoms that may need medical attention. Please contact your prescriber today." No medical condition names are shown to users.
 
-**HealthKit** (iOS only): Glipra reads Weight and Steps from HealthKit to supplement manual entries (read-only, no writes). The Health Import screen explains what data is read and why before requesting permission.
+**HealthKit** (iOS only): GLiPra reads Weight and Steps from HealthKit to supplement manual entries (read-only, no writes). The Health Import screen explains what data is read and why before requesting permission.
 
 **AI features**: All AI calls go through Supabase edge functions to OpenAI. No user PII is included in prompts. The AI Nutrition Coach is scoped to food topics only and cannot answer medication questions.
 
@@ -94,13 +94,13 @@ IAP product IDs:
 
 ## Claim Substantiation
 
-Glipra makes no diagnostic or treatment claims. Every score and estimate in the app is an educational approximation computed from user-provided inputs and population-level research, and every clinical screen carries a visible disclaimer (Tier-1 modal on first view; Tier-2 footer) that defers the decision to the user's prescriber.
+GLiPra makes no diagnostic or treatment claims. Every score and estimate in the app is an educational approximation computed from user-provided inputs and population-level research, and every clinical screen carries a visible disclaimer (Tier-1 modal on first view; Tier-2 footer) that defers the decision to the user's prescriber.
 
 - **The one population statistic** ("up to 40% of weight lost on GLP-1s can be lean muscle") is cited on the website to the STEP 1 trial (Wilding et al., NEJM 2021) and SURMOUNT-1 (Jastreboff et al., NEJM 2022), and explicitly discloses individual variation and that no specific outcome is guaranteed.
 - **Protein floor** is a deterministic estimate from the user's weight, activity, and kidney-disease flag (standard g/kg activity multipliers, a 0.8 g/kg renal-protective cap, and a 50-200 g hard clamp), shown with a "confirm with your prescriber" disclaimer.
 - **Medication-level curve** is a relative pharmacokinetic estimate from published per-drug elimination half-lives (first-order decay). It is labeled educational timing only, is not the user's actual serum level, and is shown with a "not a dose recommendation, do not adjust your dose" disclaimer.
 - **Muscle Preservation Score and Readiness Score** are 0-100 adherence/check-in indicators (protein and resistance-training consistency; phase and self-reported symptoms). Each states it is not a measurement of actual muscle mass or a medical assessment.
-- **Pharmacist credential** ("designed by a licensed pharmacist," founder Wali Abdul, PharmD) denotes authorship of the app's guidelines, content, and safety logic. The in-app and store disclaimer states that use of Glipra does not establish a pharmacist-patient or any professional medical relationship.
+- **Pharmacist credential** ("designed by a licensed pharmacist," founder Wali Abdul, PharmD) denotes authorship of the app's guidelines, content, and safety logic. The in-app and store disclaimer states that use of GLiPra does not establish a pharmacist-patient or any professional medical relationship.
 
 A full claim-by-claim substantiation record (each claim, its source file, its methodology or citation, and its disclaimer) is maintained internally and available on request.
 

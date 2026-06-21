@@ -15,12 +15,12 @@
 ## What the app does with Health Connect
 
 The Health Import screen (`src/app/(app)/health-import.tsx`, reached from Settings > Health Import)
-lets the user **optionally** connect Health Connect. Access is **read-only** - Glipra never writes
+lets the user **optionally** connect Health Connect. Access is **read-only** - GLiPra never writes
 to Health Connect. A one-time permissions-rationale screen (the `androidx.health` intent-filter
 added by the `react-native-health-connect` plugin) explains the use before the OS permission
 prompt.
 
-| Permission | Health Connect data type | What Glipra does with it | User-visible feature |
+| Permission | Health Connect data type | What GLiPra does with it | User-visible feature |
 |---|---|---|---|
 | `READ_WEIGHT` | Weight | Imports up to 90 days of weight readings (90-day dedup, EWMA smoothing) so the user does not have to re-enter weights they already recorded elsewhere. | The Progress-tab weight-trend chart + the "Import Weight History" action on the Health Import screen. |
 | `READ_STEPS` | Steps | Reads today's step count to provide light activity-level context. | The "STEPS TODAY" tile on the Health Import screen. |
@@ -30,7 +30,7 @@ prompt.
 ## Per-data-type justification (declaration form)
 
 **Weight (`READ_WEIGHT`) - core, strongly justified.**
-> Glipra is a GLP-1 nutrition companion. Weight is read from Health Connect, with the user's
+> GLiPra is a GLP-1 nutrition companion. Weight is read from Health Connect, with the user's
 > permission, to populate the in-app weight-trend chart so the user can track their progress
 > without manually re-entering readings their scale or another app already wrote to Health
 > Connect. The data is read-only, stored in the user's own account, never written back to Health
@@ -39,7 +39,7 @@ prompt.
 **Steps (`READ_STEPS`) - secondary; this is the type Google scrutinizes most. Two options:**
 
 - **Option A - keep + justify (use this wording if you keep Steps):**
-  > Glipra reads the day's step count from Health Connect, with the user's permission, to give the
+  > GLiPra reads the day's step count from Health Connect, with the user's permission, to give the
   > user light activity-level context alongside their nutrition tracking (shown on the Health
   > Import screen). It is read-only, never written back, and never used for advertising or shared
   > with third parties.
@@ -64,7 +64,7 @@ prompt.
   activity context). Not for advertising, not for any secondary purpose.
 - **Is Health Connect data shared with third parties?** No.
 - **Is Health Connect data sold?** No.
-- **Where is it stored?** In the user's own Glipra account (Supabase, RLS-isolated). Weight
+- **Where is it stored?** In the user's own GLiPra account (Supabase, RLS-isolated). Weight
   readings imported by the user are stored like any manually logged weight; the step count is
   transient (read for display, not persisted as Health Connect data).
 - **Can users delete it?** Yes - in-app account deletion removes all account data; the user can

@@ -33,7 +33,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ...config,
     name: Env.EXPO_PUBLIC_NAME,
     description:
-      'Glipra is a GLP-1 nutrition companion designed by a licensed pharmacist. Track protein to protect muscle while GLP-1 does its job, log meals by photo or voice, watch key micronutrients, and prepare for prescriber visits.',
+      'GLiPra is a GLP-1 nutrition companion designed by a licensed pharmacist. Track protein to protect muscle while GLP-1 does its job, log meals by photo or voice, watch key micronutrients, and prepare for prescriber visits.',
     owner: EXPO_ACCOUNT_OWNER,
     scheme: Env.EXPO_PUBLIC_SCHEME,
     slug: 'glipra',
@@ -142,7 +142,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         'expo-audio',
         {
           microphonePermission:
-            'Glipra uses the microphone so you can log meals by voice.',
+            'GLiPra uses the microphone so you can log meals by voice.',
         },
       ],
       // Camera is used for barcode scanning (expo-camera CameraView) and food
@@ -152,7 +152,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         'expo-camera',
         {
-          cameraPermission: 'Glipra uses the camera to scan barcodes and recognize food.',
+          cameraPermission: 'GLiPra uses the camera to scan barcodes and recognize food.',
           microphonePermission: false,
           recordAudioAndroid: false,
         },
@@ -160,7 +160,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         'expo-image-picker',
         {
-          cameraPermission: 'Glipra uses the camera to recognize food from photos.',
+          cameraPermission: 'GLiPra uses the camera to recognize food from photos.',
           photosPermission: false,
         },
       ],
@@ -173,9 +173,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         'react-native-health',
         {
           healthSharePermission:
-            'Glipra reads your weight and step history from Apple Health to fill in your weight trend and activity context. Your health data is read-only and is never shared.',
+            'GLiPra reads your weight and step history from Apple Health to fill in your weight trend and activity context. Your health data is read-only and is never shared.',
           healthUpdatePermission:
-            'Glipra does not write to Apple Health. Your records are only read, never modified.',
+            'GLiPra does not write to Apple Health. Your records are only read, never modified.',
         },
       ],
       // Health Connect (Android) via react-native-health-connect (B1). Adds the

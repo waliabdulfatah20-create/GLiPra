@@ -1,7 +1,7 @@
-# Glipra - Efficacy-Claim Methodology and Substantiation
+# GLiPra - Efficacy-Claim Methodology and Substantiation
 
 > **DRAFT - REQUIRES ATTORNEY REVIEW BEFORE PUBLICATION (#89).**
-> This is an internal substantiation record for the claims Glipra makes to users. It backs the
+> This is an internal substantiation record for the claims GLiPra makes to users. It backs the
 > concise "Claim Substantiation" section in `app-review-notes.md` (what Apple's reviewer reads)
 > and the locked store/legal copy. It is not shipped in the app. Keep it in sync with the source
 > files it cites.
@@ -11,7 +11,7 @@
 
 ## Framing
 
-Every number Glipra shows a user is an **educational approximation** computed from user-provided
+Every number GLiPra shows a user is an **educational approximation** computed from user-provided
 inputs and population-level research. None of them is a clinical measurement, a diagnosis, or a
 medical recommendation. Every clinical surface carries a visible disclaimer (Tier-1 modal on first
 view for AI output / protein floor / medication content; Tier-2 footer for educational content) and
@@ -33,7 +33,7 @@ Spanish (`src/translations/es.json`); only the English is reproduced here.
 targets that protect lean mass..." and "Every GLP-1 app tracks calories. None of them protect your
 muscle." (`docs/index.html`).
 
-**Methodology / basis:** This is a behavioral-support claim, not a physiological guarantee. Glipra
+**Methodology / basis:** This is a behavioral-support claim, not a physiological guarantee. GLiPra
 acts on the two levers the user actually controls - protein intake and resistance training - and
 the marketing copy is careful to say the app helps the user "stay on top of" protein, not that it
 prevents any outcome.
@@ -62,7 +62,7 @@ This is the single quantitative population claim in the product; it is attribute
 peer-reviewed NEJM trials and is presented as a general risk ("up to," "can be"), not a prediction
 about the individual user.
 
-**We do NOT claim:** "clinically proven" to do anything, or that Glipra changes this percentage.
+**We do NOT claim:** "clinically proven" to do anything, or that GLiPra changes this percentage.
 
 ---
 
@@ -194,11 +194,11 @@ says to follow the prescriber's schedule.
 
 **Claim (verbatim):** "Designed by a licensed pharmacist"; "pharmacist-authored content."
 
-**Basis:** Glipra's founder is Wali Abdul, PharmD, a licensed pharmacist (founder bio public on
+**Basis:** GLiPra's founder is Wali Abdul, PharmD, a licensed pharmacist (founder bio public on
 `docs/index.html`). The credential refers to the pharmacist who authored the app's nutrition
 guidelines, content cards, and safety logic.
 
-**Bound by:** the B10 master disclaimer (§9) states use of Glipra "does not establish a
+**Bound by:** the B10 master disclaimer (§9) states use of GLiPra "does not establish a
 pharmacist-patient relationship or any professional medical relationship." CLAUDE.md liability rule
 2 controls this language.
 
@@ -210,11 +210,11 @@ pharmacist."
 
 ## 9. Master disclaimer (B10) - shown verbatim in-app and in the store listing
 
-> Glipra is an educational and tracking application for general wellness purposes. Information
+> GLiPra is an educational and tracking application for general wellness purposes. Information
 > provided, including AI-generated suggestions and content articles, is for educational purposes
-> only and is not medical advice, diagnosis, or treatment. Although Glipra was designed by a
-> licensed pharmacist, your use of Glipra does not establish a pharmacist-patient relationship
-> or any professional medical relationship. Glipra is not a substitute for professional medical
+> only and is not medical advice, diagnosis, or treatment. Although GLiPra was designed by a
+> licensed pharmacist, your use of GLiPra does not establish a pharmacist-patient relationship
+> or any professional medical relationship. GLiPra is not a substitute for professional medical
 > advice. Always seek the advice of your prescriber or qualified healthcare provider. If you
 > think you may have a medical emergency, call 911.
 

@@ -13,7 +13,12 @@ const EXPO_ACCOUNT_OWNER = 'waliabdul';
 const EAS_PROJECT_ID = '046b4b41-452b-4b54-94ae-9ab38736222c';
 
 const appIconBadgeConfig: AppIconBadgeConfig = {
-  enabled: Env.EXPO_PUBLIC_APP_ENV !== 'production',
+  // Disabled 2026-06-22: app-icon-badge's jimp image step started failing EAS
+  // prebuild (withAndroidDangerousBaseMod: "Unrecognised filter type - 20") after
+  // an EAS build-image change, breaking every dev/preview build. The badge is only
+  // a cosmetic env/version overlay on the icon. Re-enable once app-icon-badge/jimp
+  // is fixed or pinned to a working version.
+  enabled: false,
   badges: [
     {
       text: Env.EXPO_PUBLIC_APP_ENV,

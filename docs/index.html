@@ -156,6 +156,9 @@
   }
   </script>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/site.css" />
   <style>
     /* ── index-only layout ─────────────────────────────────────────── */
@@ -171,7 +174,7 @@
     @media (min-width: 920px) { .hero-grid { grid-template-columns: 1.15fr 0.85fr; } }
     .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28); color: #fff; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 6px 14px; border-radius: 999px; margin-bottom: 22px; }
     .hero-eyebrow::before { content: ''; width: 7px; height: 7px; background: #c4f0e0; border-radius: 50%; box-shadow: 0 0 0 4px rgba(196,240,224,0.25); }
-    .hero h1 { font-size: clamp(2.1rem, 5.2vw, 3.4rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 18px; }
+    .hero h1 { font-size: clamp(2.1rem, 5.2vw, 3.4rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.035em; margin-bottom: 18px; font-family: var(--font-heading); }
     .hero-sub { font-size: clamp(1rem, 2.2vw, 1.18rem); color: rgba(255,255,255,0.9); line-height: 1.65; max-width: 540px; margin-bottom: 28px; }
     .hero-form { display: flex; gap: 10px; flex-wrap: wrap; max-width: 470px; }
     .hero-form input[type="email"] { flex: 1; min-width: 210px; padding: 14px 16px; border-radius: var(--radius-sm); border: 1.5px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.12); color: #fff; font-size: 0.95rem; font-family: var(--font); outline: none; }
@@ -179,10 +182,10 @@
     .hero-form input:focus { border-color: #fff; background: rgba(255,255,255,0.18); }
     .hero-form .btn-light { background: #fff; color: var(--violet-dark); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
     .hero-form .btn-light:hover { background: #f5f0ff; }
-    .form-trust { margin-top: 12px; font-size: 0.8rem; color: rgba(255,255,255,0.7); }
+    .form-trust { margin-top: 12px; font-size: 0.8rem; color: rgba(255,255,255,0.85); }
     .hero-success { display: none; align-items: center; gap: 8px; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 14px 18px; border-radius: var(--radius-sm); font-size: 0.95rem; max-width: 470px; }
     .hero-success.visible { display: flex; }
-    .hero-stat { display: inline-flex; align-items: center; gap: 11px; margin-top: 26px; background: rgba(0,0,0,0.16); border: 1px solid rgba(255,255,255,0.18); padding: 11px 15px; border-radius: var(--radius-sm); }
+    .hero-stat { display: inline-flex; align-items: center; gap: 14px; margin-top: 26px; border-left: 3px solid rgba(196,181,253,0.6); padding: 8px 0 8px 16px; }
     .hero-stat .n { font-size: 1.05rem; font-weight: 800; color: #fff; }
     .hero-stat .d { font-size: 0.78rem; color: rgba(255,255,255,0.8); max-width: 280px; line-height: 1.4; }
 
@@ -286,6 +289,28 @@
     .footnotes { background: var(--cream); border-top: 1px solid var(--border); padding: 26px 0; }
     .footnotes p { max-width: var(--max-w); margin: 0 auto 10px; padding: 0 22px; font-size: 0.73rem; color: var(--text-3); line-height: 1.6; }
     .footnotes p:last-child { margin-bottom: 0; }
+
+    /* Bento feature grid */
+    .bento-grid { display: grid; gap: 18px; grid-template-columns: 1fr; }
+    @media (min-width: 880px) {
+      .bento-grid { grid-template-columns: repeat(6, 1fr); }
+      .bento-featured { grid-column: span 4; border-top: 3px solid var(--violet); }
+      .bento-span2 { grid-column: span 2; }
+      .bento-span3 { grid-column: span 2; }
+      .bento-full { grid-column: span 6; }
+    }
+    .bento-featured h3 { font-size: 1.18rem; }
+
+    /* Pricing 3-col */
+    @media (min-width: 820px) { .price-grid-3 { grid-template-columns: 1fr 1fr 1fr; } }
+    .price-grid-3 { display: grid; gap: 20px; align-items: start; }
+
+    /* Phase hover */
+    .phase { transition: border-color .15s, background .15s; }
+    .phase:hover { border-color: rgba(196,181,253,0.45); background: rgba(109,40,217,0.12); }
+
+    /* Section heading font */
+    .section-head h2, .price-card h3, .bio h3, .step h3 { font-family: var(--font-heading); }
   </style>
 </head>
 <body>
@@ -319,9 +344,10 @@
 
         <form class="hero-form" id="hero-form" novalidate>
           <label for="hero-email" class="sr-only">Email address</label>
-          <input type="email" id="hero-email" name="email" placeholder="you@example.com" autocomplete="email" required />
+          <input type="email" id="hero-email" name="email" placeholder="you@example.com" autocomplete="email" required aria-describedby="hero-email-error" />
           <button type="submit" class="btn btn-light">Join the waitlist</button>
         </form>
+        <p class="form-error" id="hero-email-error" aria-live="polite" hidden>Please enter a valid email address.</p>
         <div class="hero-success" id="hero-success" role="status" aria-live="polite">
           You are on the list. We will email you when GLiPra launches.
         </div>
@@ -378,33 +404,33 @@
         <h2>Built for the GLP-1 journey, not retrofitted to it.</h2>
         <p>Every feature is grounded in clinical reality, by a pharmacist who dispensed these medications.</p>
       </div>
-      <div class="cards cards-3b">
-        <div class="card">
+      <div class="bento-grid">
+        <div class="card bento-featured">
           <div class="card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
           <h3>Personalized protein floor</h3>
           <p>A daily protein minimum calculated to your body, activity, and phase, with a renal-protective cap and a clear inaccurate-inputs warning.</p>
         </div>
-        <div class="card">
+        <div class="card bento-span2">
           <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg></div>
           <h3>Muscle Preservation Score</h3>
           <p>One number that blends your protein consistency with your resistance training, so you can see if you are actually protecting lean mass.</p>
         </div>
-        <div class="card">
+        <div class="card bento-span2">
           <div class="card-icon"><svg viewBox="0 0 24 24"><path d="m18 2 4 4"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/></svg></div>
           <h3>Injection-cycle aware</h3>
           <p>Guidance that adapts to where you are across five phases of your weekly or biweekly cycle. Oral GLP-1 users get a daily dose window instead.</p>
         </div>
-        <div class="card">
+        <div class="card bento-span2">
           <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
           <h3>Clinical safety, free<span class="free-tag">Free</span></h3>
           <p>Symptom check-ins quietly watch for patterns that may need attention and prompt you to contact your prescriber. Never paywalled.</p>
         </div>
-        <div class="card">
+        <div class="card bento-span2">
           <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
           <h3>Log a meal in seconds</h3>
           <p>Snap a photo or speak it (Pro), scan a barcode, or search a pharmacist-curated food database. Protein and key micronutrients, captured fast.</p>
         </div>
-        <div class="card">
+        <div class="card bento-full">
           <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
           <h3>Prescriber visit prep<span class="pro-chip">Pro</span></h3>
           <p>Turn weeks of data into a shareable summary for your next appointment: weight trend, protein, symptoms, and any medication changes. Export it as a PDF with Pro.</p>
@@ -467,7 +493,7 @@
         <h2>Generous free tier. Pro when you want the AI.</h2>
         <p>Safety and the core toolkit are always free. Pro adds the AI conveniences.</p>
       </div>
-      <div class="price-grid">
+      <div class="price-grid-3">
         <div class="price-card">
           <h3>Free</h3>
           <div class="amt">$0</div>
@@ -496,8 +522,19 @@
             <li>Prescriber visit prep PDF export</li>
           </ul>
         </div>
+        <div class="price-card founder-card">
+          <span class="price-badge price-badge--amber">First 500</span>
+          <h3>Lifetime</h3>
+          <div class="amt">$149<small> one-time</small></div>
+          <div class="sub">Full Pro, forever. No subscription ever.</div>
+          <ul class="feat">
+            <li>Everything in Pro, permanently</li>
+            <li>All future Pro features included</li>
+            <li>Founding member status</li>
+            <li>Reserve your spot from the waitlist</li>
+          </ul>
+        </div>
       </div>
-      <p class="founder-line"><strong>Founder lifetime: $149 one-time</strong> for the first 500 members. Full Pro, forever, no subscription. Reserve your spot from the waitlist.</p>
     </div>
   </section>
 
@@ -567,9 +604,10 @@
       <p>Join the waitlist and be first in when GLiPra launches.</p>
       <form class="hero-form" id="footer-form" novalidate>
         <label for="footer-email" class="sr-only">Email address</label>
-        <input type="email" id="footer-email" name="email" placeholder="you@example.com" autocomplete="email" required />
+        <input type="email" id="footer-email" name="email" placeholder="you@example.com" autocomplete="email" required aria-describedby="footer-email-error" />
         <button type="submit" class="btn btn-light">Join the waitlist</button>
       </form>
+      <p class="form-error" id="footer-email-error" aria-live="polite" hidden>Please enter a valid email address.</p>
       <div class="hero-success" id="footer-success" role="status" aria-live="polite">
         You are on the list. We will email you when GLiPra launches.
       </div>
@@ -616,23 +654,55 @@
       }).then(function (r) { return r.ok; }).catch(function () { return false; });
     }
 
-    function handleEmailForm(formId, successId, source) {
+    function handleEmailForm(formId, successId, errorId, source) {
       var form = document.getElementById(formId);
       var success = document.getElementById(successId);
+      var errorEl = document.getElementById(errorId);
       if (!form) return;
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         var input = form.querySelector('input[type="email"]');
+        var btn = form.querySelector('button[type="submit"]');
         var val = (input.value || '').trim();
-        if (!val || val.indexOf('@') === -1) { input.style.borderColor = '#fca5a5'; input.focus(); return; }
-        submitEmail(val, source).then(function () {
-          form.style.display = 'none';
-          success.classList.add('visible');
+
+        if (!val || val.indexOf('@') === -1) {
+          input.classList.add('input-error');
+          if (errorEl) { errorEl.hidden = false; }
+          input.focus();
+          return;
+        }
+
+        input.classList.remove('input-error');
+        if (errorEl) { errorEl.hidden = true; }
+
+        var originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+
+        submitEmail(val, source).then(function (ok) {
+          if (ok) {
+            form.style.display = 'none';
+            if (errorEl) { errorEl.hidden = true; }
+            success.classList.add('visible');
+          } else {
+            btn.disabled = false;
+            btn.textContent = originalText;
+            if (errorEl) {
+              errorEl.textContent = 'Something went wrong. Please try again.';
+              errorEl.hidden = false;
+            }
+          }
         });
       });
+
+      var input = form.querySelector('input[type="email"]');
+      input.addEventListener('input', function () {
+        input.classList.remove('input-error');
+        if (errorEl) { errorEl.hidden = true; }
+      });
     }
-    handleEmailForm('hero-form', 'hero-success', 'hero');
-    handleEmailForm('footer-form', 'footer-success', 'footer');
+    handleEmailForm('hero-form', 'hero-success', 'hero-email-error', 'hero');
+    handleEmailForm('footer-form', 'footer-success', 'footer-email-error', 'footer');
 
     function toggleFaq(btn) {
       var item = btn.closest('.faq-item');

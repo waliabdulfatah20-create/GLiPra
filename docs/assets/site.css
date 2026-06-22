@@ -36,7 +36,8 @@
   --shadow-sm: 0 1px 3px rgba(40, 22, 90, 0.06);
   --shadow:    0 8px 28px rgba(40, 22, 90, 0.08);
   --shadow-lg: 0 20px 50px rgba(40, 22, 90, 0.14);
-  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -62,8 +63,11 @@ a:hover { text-decoration: underline; }
 .logo { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; }
 .logo:hover { text-decoration: none; }
 .logo-mark { width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0; }
+h1, h2, h3 { font-family: var(--font-heading); }
+
 .logo-word {
   font-size: 1.22rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text);
+  font-family: var(--font-heading);
 }
 .logo-word .dot { color: var(--violet); }
 .logo--on-dark .logo-word { color: var(--on-dark); }
@@ -123,7 +127,7 @@ a:hover { text-decoration: underline; }
 .footer-inner { display: flex; flex-direction: column; gap: 18px; align-items: center; text-align: center; }
 .footer-disclaimer { font-size: 0.8rem; color: #8a83a0; max-width: 560px; line-height: 1.6; }
 .footer-links { display: flex; gap: 18px 24px; flex-wrap: wrap; justify-content: center; font-size: 0.84rem; }
-.footer-links a { color: var(--on-dark-2); transition: color .15s; }
+.footer-links a { color: var(--on-dark-2); transition: color .15s; padding: 8px 4px; }
 .footer-links a:hover { color: #fff; text-decoration: none; }
 .footer-copy { font-size: 0.78rem; color: #6f688a; }
 
@@ -161,3 +165,13 @@ a:hover { text-decoration: underline; }
   padding: 12px 20px; font-size: 0.85rem; font-weight: 700; color: #92400e;
 }
 .attorney-note { margin-top: 44px; font-size: 0.8rem; color: var(--text-3); border-top: 1px solid var(--border); padding-top: 16px; }
+
+/* ── Form validation states ─────────────────────────────────────────────── */
+.input-error { border-color: var(--error) !important; }
+.form-error { font-size: 0.8rem; color: var(--error); margin-top: 6px; }
+.btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+/* ── Founder pricing card ───────────────────────────────────────────────── */
+.price-badge--amber { background: linear-gradient(135deg, var(--amber), #b45309); }
+.founder-card { border: 2px solid var(--amber); }
+.founder-card .price-badge { background: linear-gradient(135deg, var(--amber), #b45309); }

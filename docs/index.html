@@ -7,9 +7,11 @@
   <meta name="description" content="The GLP-1 nutrition companion built by a licensed pharmacist. Protein targets that protect lean mass, injection-cycle guidance, and clinical safety built in." />
   <meta name="author" content="Wali Abdul, PharmD" />
   <link rel="canonical" href="https://glipra.com/" />
-  <meta name="theme-color" content="#5b21b6" />
+  <meta name="theme-color" content="#5b21b6" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#140e26" media="(prefers-color-scheme: dark)" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
 
   <!-- Open Graph / social -->
   <meta property="og:type" content="website" />
@@ -19,10 +21,15 @@
   <meta property="og:title" content="GLiPra - GLP-1 nutrition, built by a pharmacist" />
   <meta property="og:description" content="Protein targets that protect lean mass, guidance that follows your injection cycle, and clinical safety built in. Built by a licensed pharmacist." />
   <meta property="og:image" content="https://glipra.com/assets/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="GLiPra - protect your muscle while GLP-1 does its job. Built by a licensed pharmacist." />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="GLiPra - GLP-1 nutrition, built by a pharmacist" />
   <meta name="twitter:description" content="Protein targets that protect lean mass, injection-cycle-aware guidance, clinical safety. Built by a licensed pharmacist." />
   <meta name="twitter:image" content="https://glipra.com/assets/og-image.png" />
+  <meta name="twitter:image:alt" content="GLiPra - protect your muscle while GLP-1 does its job." />
 
   <!-- Structured data -->
   <script type="application/ld+json">
@@ -160,6 +167,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/site.css" />
+  <script>
+    /* Gate scroll-reveal on JS + motion preference, before first paint (no flash, no-JS safe) */
+    (function () {
+      try {
+        var ok = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        if (ok && 'IntersectionObserver' in window) document.documentElement.classList.add('reveal-on');
+      } catch (e) {}
+    })();
+  </script>
   <style>
     /* ── index-only layout ─────────────────────────────────────────── */
     section { padding: 84px 0; }
@@ -311,6 +327,17 @@
 
     /* Section heading font */
     .section-head h2, .price-card h3, .bio h3, .step h3 { font-family: var(--font-heading); }
+
+    /* Focus ring contrast on dark/gradient sections */
+    #hero :focus-visible, #cta :focus-visible { outline-color: #fff; }
+
+    /* Hero mock bar fill animation */
+    .mbar > span { transition: width 1s ease-out; }
+
+    /* Mobile sticky CTA */
+    .mobile-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; display: none; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: rgba(250,248,245,0.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); }
+    .mobile-cta .btn { width: 100%; }
+    @media (max-width: 640px) { .mobile-cta { display: block; } body { padding-bottom: 80px; } }
   </style>
 </head>
 <body>
@@ -322,6 +349,12 @@
         <img class="logo-mark" src="/assets/glipra-icon-small.svg" alt="" />
         <span class="logo-word">GLiPra</span>
       </a>
+      <div class="nav-links">
+        <a href="#solution">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </div>
       <a href="#waitlist" class="btn btn-primary btn-sm">Join the waitlist</a>
     </div>
   </nav>
@@ -375,7 +408,7 @@
   <!-- Problem -->
   <section id="problem">
     <div class="wrap">
-      <div class="section-head">
+      <div class="section-head reveal">
         <p class="section-label">The problem</p>
         <h2>Every GLP-1 app tracks calories. None of them protect your muscle.</h2>
       </div>
@@ -399,7 +432,7 @@
   <!-- Solution -->
   <section id="solution">
     <div class="wrap">
-      <div class="section-head">
+      <div class="section-head reveal">
         <p class="section-label">What you get</p>
         <h2>Built for the GLP-1 journey, not retrofitted to it.</h2>
         <p>Every feature is grounded in clinical reality, by a pharmacist who dispensed these medications.</p>
@@ -442,7 +475,7 @@
   <!-- How it works -->
   <section id="how">
     <div class="wrap">
-      <div class="section-head">
+      <div class="section-head reveal">
         <p class="section-label">How it works</p>
         <h2>Up and running in three steps.</h2>
       </div>
@@ -469,7 +502,7 @@
   <!-- Injection cycle -->
   <section id="cycle">
     <div class="wrap">
-      <div class="section-head">
+      <div class="section-head reveal">
         <p class="section-label" style="color:#c4b5fd">The GLiPra difference</p>
         <h2>Your appetite is not constant. Your guidance should not be either.</h2>
         <p>Each injection follows a predictable cycle. GLiPra is built to adapt your targets to exactly where you are in it.</p>
@@ -488,7 +521,7 @@
   <!-- Pricing -->
   <section id="pricing">
     <div class="wrap">
-      <div class="section-head">
+      <div class="section-head reveal">
         <p class="section-label">Pricing</p>
         <h2>Generous free tier. Pro when you want the AI.</h2>
         <p>Safety and the core toolkit are always free. Pro adds the AI conveniences.</p>
@@ -541,7 +574,7 @@
   <!-- Credibility -->
   <section id="cred">
     <div class="wrap">
-      <div class="section-head">
+      <div class="section-head reveal">
         <p class="section-label">Why trust GLiPra</p>
         <h2>Built by a pharmacist. Not a generic tracker.</h2>
         <p>A pharmacist understands how the medication works in your body, not just what is on your plate.</p>
@@ -560,7 +593,7 @@
   <!-- FAQ -->
   <section id="faq">
     <div class="wrap">
-      <div class="section-head">
+      <div class="section-head reveal">
         <p class="section-label">FAQ</p>
         <h2>Common questions</h2>
       </div>
@@ -643,6 +676,11 @@
     </div>
   </footer>
 
+  <!-- Mobile sticky CTA -->
+  <div class="mobile-cta">
+    <a href="#waitlist" class="btn btn-gradient btn-full">Join the waitlist</a>
+  </div>
+
   <script>
     var CAPTURE_URL = 'https://cuxndkreewlcmijxlgyg.supabase.co/functions/v1/capture-waitlist';
 
@@ -713,6 +751,42 @@
       });
       if (!isOpen) { item.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
     }
+
+    /* Scroll-reveal: only runs when .reveal-on was set (motion OK + IO supported) */
+    (function () {
+      if (!document.documentElement.classList.contains('reveal-on')) return;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+        });
+      }, { rootMargin: '0px 0px -10% 0px', threshold: 0.1 });
+      document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+    })();
+
+    /* Hero mock: count up the score and fill the bars on load (motion-aware) */
+    (function () {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;
+
+      document.querySelectorAll('.mock .mbar > span').forEach(function (b) {
+        var w = b.style.width;
+        b.style.width = '0%';
+        requestAnimationFrame(function () { requestAnimationFrame(function () { b.style.width = w; }); });
+      });
+
+      var v = document.querySelector('.dial-inner .v');
+      if (v) {
+        var target = parseInt(v.textContent, 10) || 0;
+        var start = null, dur = 1100;
+        v.textContent = '0';
+        requestAnimationFrame(function step(ts) {
+          if (!start) start = ts;
+          var p = Math.min((ts - start) / dur, 1);
+          v.textContent = Math.round(p * target);
+          if (p < 1) requestAnimationFrame(step);
+        });
+      }
+    })();
   </script>
 
 </body>

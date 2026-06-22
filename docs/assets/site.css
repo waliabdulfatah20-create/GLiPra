@@ -1,5 +1,5 @@
-/* GLiPra site design system — shared across all glipra.com pages.
-   Brand: "Crystalline Vigilance" — deep violet, clinical warmth, pharmaceutical precision.
+/* GLiPra site design system, shared across all glipra.com pages.
+   Brand: "Crystalline Vigilance", deep violet, clinical warmth, pharmaceutical precision.
    Palette mirrors the app tokens (src/theme/tokens.ts). */
 
 :root {
@@ -175,3 +175,31 @@ h1, h2, h3 { font-family: var(--font-heading); }
 .price-badge--amber { background: linear-gradient(135deg, var(--amber), #b45309); }
 .founder-card { border: 2px solid var(--amber); }
 .founder-card .price-badge { background: linear-gradient(135deg, var(--amber), #b45309); }
+
+/* ── Anchor offset for sticky nav ───────────────────────────────────────── */
+section[id] { scroll-margin-top: 80px; }
+
+/* ── Keyboard focus visibility ──────────────────────────────────────────── */
+a:focus-visible, button:focus-visible, .btn:focus-visible,
+input:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--violet); outline-offset: 2px;
+}
+
+/* ── Desktop nav anchor links ───────────────────────────────────────────── */
+.nav-links { display: none; gap: 26px; }
+.nav-links a { color: var(--text-2); font-size: 0.9rem; font-weight: 600; transition: color .15s; }
+.nav-links a:hover { color: var(--violet); text-decoration: none; }
+@media (min-width: 760px) { .nav-links { display: flex; align-items: center; } }
+
+/* ── Scroll-reveal (gated behind .reveal-on, set by JS only when motion is OK) */
+.reveal-on .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+.reveal-on .reveal.in { opacity: 1; transform: none; }
+
+/* ── Respect reduced motion ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important; scroll-behavior: auto !important;
+  }
+  .reveal { opacity: 1 !important; transform: none !important; }
+}

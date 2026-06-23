@@ -297,9 +297,16 @@ export const darkTokens: GlipraTokens = {
     surfaceElevated: '#252e3d',
     textPrimary: '#f3f4f6',
     textSecondary: '#9aa4b2',
-    textDisabled: '#6b7280',
+    // textDisabled lightened from #6b7280 (failed WCAG, ~2.8-3.8:1 on dark
+    // surfaces) to #8b95a5, which clears 4.5:1 on background/surface/elevated
+    // while staying dimmer than textSecondary so the hierarchy holds.
+    textDisabled: '#8b95a5',
     textInverse: '#0f1419',
-    border: '#2a3344',
+    // border lightened from #2a3344 (~1.1-1.5:1, near-invisible in dark mode).
+    // #3a4658 is a meaningful visibility bump kept intentionally subtle: full
+    // WCAG 3:1 would need a harsh outline that breaks the Clean Clinical look,
+    // and card/input boundaries are also conveyed by the surface fill + elevation.
+    border: '#3a4658',
     borderFocus: '#c4b5fd',
     escalationBg: 'rgba(248, 113, 113, 0.12)',
     escalationBorder: '#f87171',

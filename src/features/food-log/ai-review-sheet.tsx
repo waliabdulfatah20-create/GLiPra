@@ -426,6 +426,7 @@ export function AIReviewSheet({ result, onClose, transcript, onRescan, rescanIni
             {/* Wrong food? — search the seeded database and patch the form */}
             <Pressable
               onPress={() => setSearchVisible(true)}
+              hitSlop={8}
               accessibilityRole="button"
               accessibilityLabel={t('log.wrong_food_link')}
             >
@@ -437,6 +438,7 @@ export function AIReviewSheet({ result, onClose, transcript, onRescan, rescanIni
             {onRescan && (
               <Pressable
                 onPress={() => setRescanVisible(true)}
+                hitSlop={8}
                 accessibilityRole="button"
                 accessibilityLabel={t('log.rescan_link')}
               >

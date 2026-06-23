@@ -53,6 +53,7 @@ function makeStyles({ colors, spacing, radius }: StyleTokens) {
       alignItems: 'center',
       justifyContent: 'center',
       minWidth: 64,
+      minHeight: 44, // a11y touch-target minimum (Apple HIG)
     },
     chipSelected: {
       backgroundColor: colors.primary,

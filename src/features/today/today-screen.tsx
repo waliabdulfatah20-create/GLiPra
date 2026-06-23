@@ -545,10 +545,12 @@ export function TodayScreen() {
             />
           )}
           <Pressable
-            style={styles.browseAllLink}
+            style={({ pressed }) => [styles.browseAllLink, pressed && { opacity: 0.6 }]}
             onPress={() => setShowCarousel(v => !v)}
+            hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel="Browse all pharmacist tips"
+            accessibilityState={{ expanded: showCarousel }}
+            accessibilityLabel={t('today.browse_all_tips')}
           >
             <Text style={styles.browseAllText}>{t('today.browse_all_tips')}</Text>
           </Pressable>

@@ -116,7 +116,7 @@ export function FoodSearchSheet({ visible, mode, onClose, onSelect }: FoodSearch
           {/* Header */}
           <View style={styles.headerRow}>
             <Text style={styles.title}>{t('log.search_modal_title')}</Text>
-            <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel={t('common.close')}>
+            <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel={t('common.close')}>
               <Text style={styles.closeText}>{t('common.close')}</Text>
             </Pressable>
           </View>

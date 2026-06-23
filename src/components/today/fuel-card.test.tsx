@@ -84,7 +84,8 @@ describe('fuel card', () => {
   it('deep-links to the Micronutrient Watch when the micros tile is tapped', () => {
     setup();
     render(<FuelCard />);
-    fireEvent.press(screen.getByLabelText('today.fuel_micros_label'));
+    // The tile's a11y label now composes label + on-track status, so match the stable prefix.
+    fireEvent.press(screen.getByLabelText(/today\.fuel_micros_label/));
     expect(router.push).toHaveBeenCalledWith('/log?scrollTo=micros');
   });
 

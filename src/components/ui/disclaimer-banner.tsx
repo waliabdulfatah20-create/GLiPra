@@ -41,6 +41,7 @@ export function DisclaimerBanner({
               pressed && styles.acknowledgeButtonPressed,
             ]}
             onPress={onAcknowledge}
+            hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel="Acknowledge medical disclaimer"
           >

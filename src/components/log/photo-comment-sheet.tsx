@@ -18,7 +18,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import { useTheme } from '@/lib/ThemeContext';
@@ -68,9 +67,12 @@ export function PhotoCommentSheet({ visible, onAnalyze, onDismiss, initialCommen
       statusBarTranslucent
     >
       {/* Tap backdrop to dismiss without analyzing */}
-      <TouchableWithoutFeedback onPress={onDismiss}>
-        <View style={styles.backdrop} />
-      </TouchableWithoutFeedback>
+      <Pressable
+        style={styles.backdrop}
+        onPress={onDismiss}
+        accessibilityRole="button"
+        accessibilityLabel={t('common.close')}
+      />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

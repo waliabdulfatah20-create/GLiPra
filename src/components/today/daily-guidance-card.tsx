@@ -103,8 +103,10 @@ export function DailyGuidanceCard({ guidance, isLoading, isError }: DailyGuidanc
 
               <Pressable
                 onPress={handleWhyPress}
-                style={styles.whyButton}
+                style={({ pressed }) => [styles.whyButton, pressed && { opacity: 0.6 }]}
+                hitSlop={8}
                 accessibilityRole="button"
+                accessibilityState={{ expanded: showWhy }}
                 accessibilityLabel={t('today.daily_guidance_why')}
               >
                 <Text style={styles.whyButtonText}>

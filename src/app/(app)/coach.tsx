@@ -243,10 +243,15 @@ export default function CoachScreen() {
                         <Pressable
                           key={c.type}
                           testID="meal-idea-chip"
-                          style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
+                          style={({ pressed }) => [
+                            styles.chip,
+                            mealIdeasLoading && styles.chipDisabled,
+                            pressed && !mealIdeasLoading && styles.chipPressed,
+                          ]}
                           onPress={() => handleMealIdeas(c.type)}
                           disabled={mealIdeasLoading}
                           accessibilityRole="button"
+                          accessibilityState={{ disabled: mealIdeasLoading }}
                           accessibilityLabel={c.label}
                         >
                           <Text style={styles.chipText}>{c.label}</Text>
@@ -309,13 +314,20 @@ export default function CoachScreen() {
               onPress={() => { void handleSend(); }}
               disabled={isSendDisabled}
               accessibilityRole="button"
+              accessibilityState={{ disabled: isSendDisabled, busy: isLoading }}
               accessibilityLabel={t('coach.send')}
             >
-              <ArrowRight
-                color={isSendDisabled ? colors.textDisabled : colors.textInverse}
-                width={22}
-                height={22}
-              />
+              {isLoading
+                ? (
+                    <ActivityIndicator size="small" color={colors.textInverse} />
+                  )
+                : (
+                    <ArrowRight
+                      color={isSendDisabled ? colors.textDisabled : colors.textInverse}
+                      width={22}
+                      height={22}
+                    />
+                  )}
             </Pressable>
           </View>
         </ProGate>
@@ -510,6 +522,9 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     },
     chipPressed: {
       backgroundColor: colors.primaryLight,
+    },
+    chipDisabled: {
+      opacity: 0.5,
     },
     chipText: {
       fontSize: 13,

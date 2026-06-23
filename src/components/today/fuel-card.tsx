@@ -187,7 +187,7 @@ export function FuelCard() {
       <View style={styles.body}>
         {/* Protein hero row — tap anywhere to edit the target */}
         <Pressable
-          style={styles.proteinRow}
+          style={({ pressed }) => [styles.proteinRow, pressed && styles.pressedDim]}
           onPress={() => { haptics.tap(); router.push('/protein-target'); }}
           accessibilityRole="button"
           accessibilityLabel={t('today.protein_edit_a11y')}
@@ -221,9 +221,11 @@ export function FuelCard() {
         {factors.length > 0 && (
           <Animated.View layout={LinearTransition.duration(180)} style={styles.whyWrap}>
             <Pressable
-              style={styles.whyToggle}
+              style={({ pressed }) => [styles.whyToggle, pressed && styles.pressedDim]}
               onPress={() => { haptics.tap(); setExpanded(e => !e); }}
+              hitSlop={12}
               accessibilityRole="button"
+              accessibilityState={{ expanded }}
               accessibilityLabel={t('today.fuel_why_toggle')}
             >
               <Text style={styles.whyToggleText}>{t('today.fuel_why_toggle')}</Text>
@@ -233,7 +235,12 @@ export function FuelCard() {
               <Animated.View entering={FadeIn.duration(150)} exiting={FadeOut.duration(120)}>
                 <Text style={styles.whyLabel}>{t('today.fuel_why_label')}</Text>
                 {factors.map(factor => (
-                  <View key={factor.id} style={styles.factorRow}>
+                  <View
+                    key={factor.id}
+                    style={styles.factorRow}
+                    accessible
+                    accessibilityLabel={`${factor.label}: ${factor.value}`}
+                  >
                     <View
                       style={[
                         styles.factorDot,
@@ -279,10 +286,12 @@ export function FuelCard() {
           </View>
 
           <Pressable
-            style={styles.tile}
+            style={({ pressed }) => [styles.tile, pressed && styles.pressedDim]}
             onPress={() => { haptics.tap(); router.push('/log?scrollTo=micros'); }}
             accessibilityRole="button"
-            accessibilityLabel={t('today.fuel_micros_label')}
+            accessibilityLabel={microSummary.hasMicros
+              ? `${t('today.fuel_micros_label')}, ${t('today.fuel_micros_on_track', { count: microSummary.onTrack, total: microSummary.total })}`
+              : `${t('today.fuel_micros_label')}, ${t('today.fuel_micros_empty')}`}
           >
             <View style={styles.tileHeaderRow}>
               <Text style={styles.tileLabel}>{t('today.fuel_micros_label')}</Text>
@@ -291,7 +300,14 @@ export function FuelCard() {
             {microSummary.hasMicros
               ? (
                   <>
-                    <View style={styles.dotsRow}>
+                    {/* Decorative status dots. The on-track count text + the button
+                        label convey the status, so hide the bare colored dots from
+                        screen readers (color-not-only). */}
+                    <View
+                      style={styles.dotsRow}
+                      accessibilityElementsHidden
+                      importantForAccessibility="no-hide-descendants"
+                    >
                       {microSummary.statuses.map(s => (
                         <View
                           key={s.key}
@@ -428,6 +444,10 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
       flexDirection: 'row',
       alignItems: 'center',
       gap: spacing.lg,
+    },
+    // Shared pressed-state dim for the card's tappable rows/tiles.
+    pressedDim: {
+      opacity: 0.6,
     },
     proteinText: {
       flex: 1,

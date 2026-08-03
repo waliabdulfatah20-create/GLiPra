@@ -8,6 +8,7 @@ export * from './chat-bubble';
 export * from './clipboard-check';
 export * from './crown';
 export * from './dumbbell';
+export * from './eye';
 export * from './feed';
 export * from './github';
 export * from './home';

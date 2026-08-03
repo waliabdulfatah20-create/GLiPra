@@ -18,18 +18,25 @@ import Animated, { FadeInDown, FadeInUp, LinearTransition } from 'react-native-r
 import * as z from 'zod';
 import { Button } from '@/components/ui';
 import { getFieldError } from '@/components/ui/form-utils';
+import { Eye, EyeOff } from '@/components/ui/icons';
 import { useTheme } from '@/lib/ThemeContext';
 
-const schema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email is required')
-    .email('Invalid email format'),
-  password: z
-    .string()
-    .min(1, 'Password is required')
-    .min(8, 'Password must be at least 8 characters'),
-});
+const schema = z
+  .object({
+    email: z
+      .string()
+      .min(1, 'Email is required')
+      .email('Invalid email format'),
+    password: z
+      .string()
+      .min(1, 'Password is required')
+      .min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine(values => values.password === values.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 export type SignUpFormProps = {
   onSubmit: (data: { email: string; password: string }) => Promise<void>;
@@ -102,6 +109,8 @@ export function SignUpForm({ onSubmit, apiError, onApplePress }: SignUpFormProps
   );
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [passwordValue, setPasswordValue] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [appleAvailable, setAppleAvailable] = useState(false);
 
   useEffect(() => {
@@ -109,10 +118,10 @@ export function SignUpForm({ onSubmit, apiError, onApplePress }: SignUpFormProps
   }, []);
 
   const form = useForm({
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: '', password: '', confirmPassword: '' },
     validators: { onChange: schema },
     onSubmit: async ({ value }) => {
-      await onSubmit(value);
+      await onSubmit({ email: value.email, password: value.password });
     },
   });
 
@@ -175,25 +184,87 @@ export function SignUpForm({ onSubmit, apiError, onApplePress }: SignUpFormProps
           return (
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>{t('auth.password_label')}</Text>
-              <TextInput
-                testID="sign-up-password"
-                value={field.state.value}
-                onChangeText={(text) => {
-                  field.handleChange(text);
-                  setPasswordValue(text);
-                }}
-                onBlur={() => { field.handleBlur(); setFocusedField(null); }}
-                onFocus={() => setFocusedField('password')}
-                secureTextEntry
-                placeholder="••••••••"
-                placeholderTextColor={colors.gray400}
-                style={[
-                  styles.input,
-                  focusedField === 'password' && styles.inputFocused,
-                  error ? styles.inputError : null,
-                ]}
-              />
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  testID="sign-up-password"
+                  value={field.state.value}
+                  onChangeText={(text) => {
+                    field.handleChange(text);
+                    setPasswordValue(text);
+                  }}
+                  onBlur={() => { field.handleBlur(); setFocusedField(null); }}
+                  onFocus={() => setFocusedField('password')}
+                  secureTextEntry={!showPassword}
+                  placeholder="••••••••"
+                  placeholderTextColor={colors.gray400}
+                  style={[
+                    styles.input,
+                    focusedField === 'password' && styles.inputFocused,
+                    error ? styles.inputError : null,
+                  ]}
+                />
+                <Pressable
+                  testID="sign-up-password-toggle"
+                  style={styles.eyeButton}
+                  hitSlop={8}
+                  onPress={() => setShowPassword(v => !v)}
+                  accessibilityRole="button"
+                  accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword
+                    ? <EyeOff color={colors.gray400} width={20} height={20} />
+                    : <Eye color={colors.gray400} width={20} height={20} />}
+                </Pressable>
+              </View>
               <PasswordStrengthBar password={passwordValue} />
+              {error
+                ? (
+                    <Animated.View entering={FadeInDown.duration(200)}>
+                      <Text style={styles.errorText}>{error}</Text>
+                    </Animated.View>
+                  )
+                : null}
+            </View>
+          );
+        }}
+      />
+
+      <form.Field
+        name="confirmPassword"
+        children={(field) => {
+          const error = getFieldError(field);
+          return (
+            <View style={styles.fieldContainer}>
+              <Text style={styles.label}>{t('auth.confirm_password_label')}</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  testID="sign-up-confirm-password"
+                  value={field.state.value}
+                  onChangeText={field.handleChange}
+                  onBlur={() => { field.handleBlur(); setFocusedField(null); }}
+                  onFocus={() => setFocusedField('confirmPassword')}
+                  secureTextEntry={!showConfirmPassword}
+                  placeholder="••••••••"
+                  placeholderTextColor={colors.gray400}
+                  style={[
+                    styles.input,
+                    focusedField === 'confirmPassword' && styles.inputFocused,
+                    error ? styles.inputError : null,
+                  ]}
+                />
+                <Pressable
+                  testID="sign-up-confirm-password-toggle"
+                  style={styles.eyeButton}
+                  hitSlop={8}
+                  onPress={() => setShowConfirmPassword(v => !v)}
+                  accessibilityRole="button"
+                  accessibilityLabel={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword
+                    ? <EyeOff color={colors.gray400} width={20} height={20} />
+                    : <Eye color={colors.gray400} width={20} height={20} />}
+                </Pressable>
+              </View>
               {error
                 ? (
                     <Animated.View entering={FadeInDown.duration(200)}>
@@ -266,6 +337,7 @@ function makeStyles({ colors }: StyleTokens) {
       borderRadius: 12,
       borderCurve: 'continuous',
       paddingHorizontal: 14,
+      paddingRight: 44,
       paddingVertical: 13,
       fontSize: 15,
       color: colors.textPrimary,
@@ -276,6 +348,15 @@ function makeStyles({ colors }: StyleTokens) {
       boxShadow: '0 0 0 3px rgba(45,107,228,0.12)',
     },
     inputError: { borderColor: colors.error },
+    inputWrapper: { position: 'relative', justifyContent: 'center' },
+    eyeButton: {
+      position: 'absolute',
+      right: 12,
+      top: 0,
+      bottom: 0,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
     errorText: { color: colors.error, fontSize: 13, marginTop: 4 },
     strengthBarEmpty: { height: 4, marginTop: 6 },
     strengthBarContainer: { flexDirection: 'row', gap: 4, marginTop: 6 },

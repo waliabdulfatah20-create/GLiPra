@@ -35,8 +35,8 @@ import { ArrowRight, ChatBubble } from '@/components/ui/icons';
 import { useAiCoach } from '@/features/ai-coach/hooks';
 import { useMealIdeas } from '@/features/meal-ideas/hooks';
 import { MealIdeasCard } from '@/features/meal-ideas/meal-ideas-card';
+import { presentPaywall } from '@/features/subscription/present-paywall';
 import { ProGate } from '@/features/subscription/pro-gate';
-import { useSubscription } from '@/features/subscription/use-subscription';
 import { haptics } from '@/lib/haptics';
 import { useTheme } from '@/lib/ThemeContext';
 
@@ -124,7 +124,6 @@ export default function CoachScreen() {
   const { t } = useTranslation();
   const { messages, sendMessage, isLoading } = useAiCoach();
   const { result: mealIdeas, request: requestMealIdeas, isLoading: mealIdeasLoading } = useMealIdeas();
-  const { isPro } = useSubscription();
   const [inputText, setInputText] = useState('');
   const flatListRef = useRef<FlatList<CoachMessage>>(null);
   const { colors, spacing, radius, shadows, gradients } = useTheme();
@@ -206,90 +205,105 @@ export default function CoachScreen() {
           </Text>
         </DisclaimerBanner>
 
-        {/* Message area: a centered welcome (empty) or the conversation list */}
-        {isEmpty
-          ? (
-              <ScrollView
-                style={styles.emptyScroll}
-                contentContainerStyle={styles.emptyScrollContent}
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-              >
+        {/* Full content area gated — free users see the centered upgrade prompt */}
+        <ProGate
+          featureName="AI Nutrition Coach"
+          fallback={(
+            <View style={styles.upgradeFill}>
+              <View style={styles.upgradeContent}>
                 <View style={styles.emptyAvatar}>
                   <ChatBubble color={colors.primary} width={28} height={28} />
                 </View>
-                <Text style={styles.emptyText}>{t('coach.welcome')}</Text>
-                {isPro && (
-                  <>
-                    <View style={styles.chipsRow}>
-                      {suggestions.map(s => (
-                        <Pressable
-                          key={s}
-                          testID="coach-chip"
-                          style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
-                          onPress={() => { void handleSend(s); }}
-                          accessibilityRole="button"
-                          accessibilityLabel={s}
-                        >
-                          <Text style={styles.chipText}>{s}</Text>
-                        </Pressable>
-                      ))}
+                <Text style={styles.upgradeTitle}>{t('coach.title')}</Text>
+                <Text style={styles.upgradeBody}>{t('coach.welcome')}</Text>
+                <Pressable
+                  style={({ pressed }) => [styles.upgradeCta, pressed && styles.upgradeCtaPressed]}
+                  onPress={() => presentPaywall('AI Nutrition Coach')}
+                  accessibilityRole="button"
+                  accessibilityLabel="Unlock with Pro"
+                >
+                  <Text style={styles.upgradeCtaText}>Unlock with Pro</Text>
+                </Pressable>
+              </View>
+            </View>
+          )}
+        >
+          {isEmpty
+            ? (
+                <ScrollView
+                  style={styles.emptyScroll}
+                  contentContainerStyle={styles.emptyScrollContent}
+                  showsVerticalScrollIndicator={false}
+                  keyboardShouldPersistTaps="handled"
+                >
+                  <View style={styles.emptyAvatar}>
+                    <ChatBubble color={colors.primary} width={28} height={28} />
+                  </View>
+                  <Text style={styles.emptyText}>{t('coach.welcome')}</Text>
+                  <View style={styles.chipsRow}>
+                    {suggestions.map(s => (
+                      <Pressable
+                        key={s}
+                        testID="coach-chip"
+                        style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
+                        onPress={() => { void handleSend(s); }}
+                        accessibilityRole="button"
+                        accessibilityLabel={s}
+                      >
+                        <Text style={styles.chipText}>{s}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+
+                  {/* Meal ideas — on-demand, Pro. Educational ideas, not a plan. */}
+                  <Text style={styles.mealIdeasLabel}>{t('coach.meal_ideas_label')}</Text>
+                  <View style={styles.chipsRow}>
+                    {mealChips.map(c => (
+                      <Pressable
+                        key={c.type}
+                        testID="meal-idea-chip"
+                        style={({ pressed }) => [
+                          styles.chip,
+                          mealIdeasLoading && styles.chipDisabled,
+                          pressed && !mealIdeasLoading && styles.chipPressed,
+                        ]}
+                        onPress={() => handleMealIdeas(c.type)}
+                        disabled={mealIdeasLoading}
+                        accessibilityRole="button"
+                        accessibilityState={{ disabled: mealIdeasLoading }}
+                        accessibilityLabel={c.label}
+                      >
+                        <Text style={styles.chipText}>{c.label}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+
+                  {mealIdeasLoading && (
+                    <View style={styles.mealLoadingRow}>
+                      <ActivityIndicator size="small" color={colors.primary} />
+                      <Text style={styles.typingText}>{t('coach.meal_ideas_loading')}</Text>
                     </View>
+                  )}
 
-                    {/* Meal ideas — on-demand, Pro. Educational ideas, not a plan. */}
-                    <Text style={styles.mealIdeasLabel}>{t('coach.meal_ideas_label')}</Text>
-                    <View style={styles.chipsRow}>
-                      {mealChips.map(c => (
-                        <Pressable
-                          key={c.type}
-                          testID="meal-idea-chip"
-                          style={({ pressed }) => [
-                            styles.chip,
-                            mealIdeasLoading && styles.chipDisabled,
-                            pressed && !mealIdeasLoading && styles.chipPressed,
-                          ]}
-                          onPress={() => handleMealIdeas(c.type)}
-                          disabled={mealIdeasLoading}
-                          accessibilityRole="button"
-                          accessibilityState={{ disabled: mealIdeasLoading }}
-                          accessibilityLabel={c.label}
-                        >
-                          <Text style={styles.chipText}>{c.label}</Text>
-                        </Pressable>
-                      ))}
+                  {mealIdeas && !mealIdeasLoading && (
+                    <View style={styles.mealCardWrap}>
+                      <MealIdeasCard result={mealIdeas} />
                     </View>
-
-                    {mealIdeasLoading && (
-                      <View style={styles.mealLoadingRow}>
-                        <ActivityIndicator size="small" color={colors.primary} />
-                        <Text style={styles.typingText}>{t('coach.meal_ideas_loading')}</Text>
-                      </View>
-                    )}
-
-                    {mealIdeas && !mealIdeasLoading && (
-                      <View style={styles.mealCardWrap}>
-                        <MealIdeasCard result={mealIdeas} />
-                      </View>
-                    )}
-                  </>
-                )}
-              </ScrollView>
-            )
-          : (
-              <FlatList
-                ref={flatListRef}
-                data={listData}
-                keyExtractor={item => item.id}
-                renderItem={({ item }) => <MessageBubble message={item} />}
-                contentContainerStyle={styles.messageList}
-                showsVerticalScrollIndicator={false}
-                onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
-                ListFooterComponent={isLoading ? <TypingIndicator /> : null}
-              />
-            )}
-
-        {/* Composer — Pro gated (reading is free; sending is Pro) */}
-        <ProGate featureName="AI Nutrition Coach">
+                  )}
+                </ScrollView>
+              )
+            : (
+                <FlatList
+                  ref={flatListRef}
+                  data={listData}
+                  keyExtractor={item => item.id}
+                  renderItem={({ item }) => <MessageBubble message={item} />}
+                  contentContainerStyle={styles.messageList}
+                  showsVerticalScrollIndicator={false}
+                  onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
+                  ListFooterComponent={isLoading ? <TypingIndicator /> : null}
+                />
+              )}
           <View style={styles.inputRow}>
             <TextInput
               style={styles.textInput}
@@ -569,6 +583,48 @@ function makeStyles({ colors, spacing, radius, shadows }: StyleTokens) {
     },
     sendButtonPressed: {
       backgroundColor: colors.primaryDark,
+    },
+
+    // Upgrade prompt — full-height centered view for free users
+    upgradeFill: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: spacing.lg,
+    },
+    upgradeContent: {
+      alignItems: 'center',
+      gap: spacing.md,
+      maxWidth: 300,
+    },
+    upgradeTitle: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      textAlign: 'center',
+    },
+    upgradeBody: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    upgradeCta: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm + 4,
+      marginTop: spacing.xs,
+      minWidth: 200,
+      alignItems: 'center',
+    },
+    upgradeCtaPressed: {
+      backgroundColor: colors.primaryDark,
+    },
+    upgradeCtaText: {
+      color: colors.textInverse,
+      fontSize: 15,
+      fontWeight: '700',
     },
   });
 }
